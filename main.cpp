@@ -7,7 +7,7 @@
 
 #include <iostream> //Input&Output stream model based library
 #include <cmath> //math library for basic operations, pi
-#include <stdio.h> //libabry for printf 
+#include <cstdio> //libabry for printf 
 #include "constants.h" //Header file containing all relevant constants
 #include "corrections.h" //Header file containing all relevant corrections to rates
 

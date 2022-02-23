@@ -1,5 +1,7 @@
 //Unit conversions
 
+#include <cmath> //math library for basic operations, pi
+
 namespace constants
 {
 	const double eV = 1.6*10e-12
@@ -12,7 +14,7 @@ namespace constants
 	const double me = 9.10938356*(10e-28)
 	const double mn = 1.6749286*(10e-24)
 	const double mp = 1.6726231*(10e-24)
-	const double pi = 3.14159265358979323846
+	const double pi = M_PI
 	const double kb = 1.380658*(10e-16)
 
 	//Simplying constants
