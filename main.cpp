@@ -18,20 +18,20 @@ using namespace weakrates;
 
 int main (){
 	double nb = 3.7300E+12;
-	double temp = 1.2040;
+	double temp = 1.2040*eV*10e6;
 	double ye = 0.134;
-  double ee = 10;
-  double pe = 10;
-  double ne = 10;
-	double e_nu = 10.079454858851342;
-	double e_nu_bar = 10.079454858851342;
+    double ee = 10*eV*10e6;
+    double pe = 10*eV*10e6;
+    double ne = 10*eV*10e6;
+	double e_nu = 10.079454858851342*eV*10e6;
+	double e_nu_bar = 10.079454858851342*eV*10e6;
 	double mu_e = 249.51;
 	double mu_np = 6.015;
-  double nun;
-  double nup;
+    double nun;
+    double nup;
 
 	nun = nu_n_abs(nb, temp, ye, e_nu, e_nu_bar, mu_e, mu_np, ne, pe, ee);
 	nup = nu_p_abs(nb, temp, ye, e_nu, e_nu_bar, mu_e, mu_np, ne, pe, ee);
-	std::cout << "Neutrino absorption on neutrons for" << "nb =" << nb << "," << "temp =" << temp << "is" << nup <<std::endl;
-	std::cout << "Neutrino absorption on protons for" << "nb =" << nb << "," << "temp =" << temp << "is" << nun <<std::endl;
+	std::cout << "Neutrino absorption on neutrons for" << " " << "nb =" << nb << " " << "and temp =" << temp << " " << "is" << " " <<nup <<std::endl;
+	std::cout << "Neutrino absorption on protons for" << " " << "nb =" << nb << " " << "and temp =" << temp << " " << "is" << " " <<nun <<std::endl;
 }
