@@ -5,7 +5,7 @@
 
 namespace constants
 {
-	const double eV = 1.6*10e-12;
+	const double eV = 1.6*10e-12; //convert eV to CGS
 
 	//Global Constants (CGS)
 

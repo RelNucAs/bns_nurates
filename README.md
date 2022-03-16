@@ -14,3 +14,7 @@ Eq:11 from Burrows(2004). Weak magnetism, blocking factor and stimulated absorpt
 Code description:
 
 main.cpp contains all the key routines for calculating the opacities. 
+
+To create an exe:
+
+g++ -o rate main.cpp -I.
