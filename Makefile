@@ -1,9 +1,9 @@
-IDIR =./
+IDIR =.
 CC=g++
 CFLAGS=-I$(IDIR)
 
-ODIR = obj
-LDIR = ./
+ODIR = .
+LDIR = .
 
 _DEPS = constants.h corrections.h weak_rates.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
@@ -20,4 +20,4 @@ nu_rates: $(OBJ)
 .PHONY: clean
 
 clean:
-				rm -f $(ODIR)/*.o *- core $(INCDIR)/*-
+				rm nu_rates *.o

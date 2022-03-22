@@ -33,3 +33,5 @@
 
 #Miscillenous
 .idea/
+.DS_Store
+.rate

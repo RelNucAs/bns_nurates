@@ -17,4 +17,6 @@ main.cpp contains all the key routines for calculating the opacities.
 
 To create an exe:
 
-g++ -o rate main.cpp -I.
+g++ -o nu_rates main.cpp -I. 
+
+You can also do make in the main folder that contains the makefile which creates a exe with the name nu_rates.
