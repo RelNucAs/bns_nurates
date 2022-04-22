@@ -14,10 +14,12 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 $(ODIR)/%.o: %.c $(DEPS)
 			$(CC) -c -o $@ $< $(CFLAGS)
 
-nu_rates: $(OBJ)
-			$(CC) -o nu_rates $^ $(CFLAGS) $(LIBS)
+.PHONY : all
+all : nu_rates
 
 .PHONY: clean
-
 clean:
 				rm nu_rates *.o
+
+nu_rates: $(OBJ)
+			$(CC) -o nu_rates $^ $(CFLAGS) $(LIBS)
