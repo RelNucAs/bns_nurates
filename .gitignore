@@ -34,5 +34,5 @@
 #Miscillenous
 .idea/
 .DS_Store
-.nu_rates
+nu_rates
 *.o
