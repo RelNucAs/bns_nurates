@@ -6,10 +6,10 @@ The Opacities are based on Burrows(2004), Bruenn (1985) and references there in.
 We implemented the following reactions's opacities:
 
 1. Neutrino absorption on protons
-Eq:10 from Burrows(2004). Weak magnetism, blocking factor and stimulated absorption corrections included.
+Eq:C13 from Bruenn(1985) with blocking factor and Weak magnetism from Burrows(2004) included.
 
 2. Neutrino absorption on neutrons
-Eq:11 from Burrows(2004). Weak magnetism, blocking factor and stimulated absorption corrections included.
+Eq:C19 from Bruenn(1985) with blocking factor and Weak magnetism from Burrows(2004) included.
 
 Code description:
 
