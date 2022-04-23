@@ -17,9 +17,13 @@ using namespace corrections;
 using namespace weakrates;
 
 int main (){
-	double nb = 10e10;
+	double nb = 10e2; //fm^3
 	double temp = 1.2040;
 	double ye = 0.134;
+	double yn = 6.8660*(10e-1);
+	double yp = 3.1340*(10e-1);
+	double nn = nb*yn;
+	double np = nb*yp;
 	double e_nu = 10.079454858851342;
 	double e_nu_bar = 10.079454858851342;
 	double mu_e = 249.51;
@@ -27,8 +31,8 @@ int main (){
     double nun;
     double nup;
 
-	nun = nu_n_abs(nb, temp, ye, e_nu, mu_e, mu_np);
-	nup = nu_p_abs(nb, temp, ye, e_nu_bar, mu_e, mu_np);
-	std::cout << "Neutrino absorption on neutrons for" << " " << "nb =" << nb << " " << "and temp =" << temp << " " << "is" << " " <<nup <<std::endl;
-	std::cout << "Neutrino absorption on protons for" << " " << "nb =" << nb << " " << "and temp =" << temp << " " << "is" << " " <<nun <<std::endl;
+	nun = nu_n_abs(nn, np, temp, ye, e_nu, mu_e, mu_np);
+	nup = nu_p_abs(nn, np, temp, ye, e_nu_bar, mu_e, mu_np);
+	printf ("nu_n_abs %f\n", nun);
+	printf ("nu_p_abs %f\n", nup);
 }

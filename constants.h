@@ -23,7 +23,7 @@ namespace constants
 	const double e_rm = me;
 	const double n_rm = mn;
 	const double p_rm = mp;
-	const double Gs = 5.88*(10e-44); //in Mev-2cm2 //(4*(Gf*Gf)*(e_rm*e_rm))/(pi); //(pi*pow(h_bar*c,4))
+	const double Gs = 5.88*(10e-18); //in Mev-2fm2 //(4*(Gf*Gf)*(e_rm*e_rm))/(pi); //(pi*pow(h_bar*c,4))
 	const double gA = 1.23;
 	const double gV = 1;
 	const double delta_np = 1.29332;
