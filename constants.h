@@ -17,7 +17,7 @@ namespace constants
 	const double mn = 939.565;
 	const double mp = 938.272;
 	const double pi = M_PI;
-	const double kb = 1.380658*(10e-11);
+	const double kb = 1; //in eV/eV 
 
 	//Simplying constants
 	const double e_rm = me;
