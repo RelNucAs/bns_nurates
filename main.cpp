@@ -27,12 +27,12 @@ int main (){
 	double e_nu = 10.079454858851342;
 	double e_nu_bar = 10.079454858851342;
 	double mu_e = 249.51;
-	double mu_np = 6.015;
+	double mu_np = 60.156;
     double nun;
     double nup;
 
 	nun = nu_n_abs(nn, np, temp, ye, e_nu, mu_e, mu_np);
 	nup = nu_p_abs(nn, np, temp, ye, e_nu_bar, mu_e, mu_np);
 	printf ("nu_n_abs %f\n", nun);
-	printf ("nu_p_abs %f\n", nup);
+	printf ("anu_p_abs %f\n", nup);
 }
