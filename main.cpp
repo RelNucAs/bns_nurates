@@ -17,13 +17,13 @@ using namespace corrections;
 using namespace weakrates;
 
 int main (){
-	double nb = 10e2; //fm^3
-	double temp = 1.2040;
-	double ye = 0.134;
-	double yn = 6.8660*(10e-1);
-	double yp = 3.1340*(10e-1);
-	double nn = nb*yn;
-	double np = nb*yp;
+	double rho = 3.73e14; // g/cm3
+ 	double temp = 12.040;
+ 	double ye = 0.31340;
+ 	double yn = 6.8660e-1;
+ 	double yp = 3.1340e-1;
+ 	double nn = rho*yn/mb;
+ 	double np = rho*yp/mb;
 	double e_nu = 10.079454858851342;
 	double e_nu_bar = 10.079454858851342;
 	double mu_e = 249.51;
@@ -33,6 +33,6 @@ int main (){
 
 	nun = nu_n_abs(nn, np, temp, ye, e_nu, mu_e, mu_np);
 	nup = nu_p_abs(nn, np, temp, ye, e_nu_bar, mu_e, mu_np);
-	printf ("nu_n_abs %f\n", nun);
-	printf ("anu_p_abs %f\n", nup);
+	printf ("nu_n_abs %.3e\n", nun);
+	printf ("anu_p_abs %.3e\n", nup);
 }
