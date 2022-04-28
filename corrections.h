@@ -14,12 +14,12 @@ namespace corrections
 
   double eta_np(double np, double nn, double mu_np, double temp)
   {
-  	return np-nn/(exp(-mu_np/(kb*temp))-1);
+  	return (np-nn)/(exp(-mu_np/(kb*temp))-1);
   }
 
   double eta_pn(double np, double nn, double mu_np, double temp)
   {
-  	return nn-np/(exp(mu_np/(kb*temp))-1);
+  	return (nn-np)/(exp(mu_np/(kb*temp))-1);
   }
 
   //Fermi distributions
