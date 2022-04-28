@@ -24,6 +24,13 @@ int main (){
  	double yp = 3.1340e-1;
  	double nn = rho*yn/mb;
  	double np = rho*yp/mb;
+	double mb = 1.674e-24; // g
+	double temp = 12.040;
+	double ye = 0.31340;
+	double yn = 6.8660e-1;
+	double yp = 3.1340e-1;
+	double nn = rho*yn/mb;
+	double np = rho*yp/mb;
 	double e_nu = 10.079454858851342;
 	double e_nu_bar = 10.079454858851342;
 	double mu_e = 249.51; // MeV

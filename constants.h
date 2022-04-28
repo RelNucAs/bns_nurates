@@ -29,4 +29,5 @@ namespace constants
 	const double gA = 1.23;
 	const double gV = 1;
 	const double delta_np = 1.2935; // MeV
+
 }
