@@ -15,6 +15,7 @@
 using namespace constants;
 using namespace corrections;
 using namespace weakrates;
+using namespace std;
 
 int main (){
 	double rho = 3.73e14; // g/cm3
