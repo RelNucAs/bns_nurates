@@ -23,7 +23,7 @@ using namespace std;
 int main ()
 {
 	ifstream inputfile;
-    inputfile.open("./Input/nurates_1.008E+01.txt");
+    inputfile.open("./Input/nurates_copy.txt");
 	ofstream outputfile("./Output/nu_rates.txt");
 		int zone;
 		double d1;
@@ -63,8 +63,8 @@ int main ()
 			ye << " " << mu_e << " " << mu_np << " " << yp << " " << yn << " " << nun << " " << nup <<'\n';
 			cout << zone << " " << r  << " " << rho << " " << temp << " " << \
 			ye << " " << mu_e << " " << mu_np << " " << yp << " " << yn << '\n';
-			printf ("nu_n_abs %.3e cm^-1\n", nun);
-			printf ("anu_p_abs %.3e cm^-1\n", nup);
+			//printf ("nu_n_abs %.3e cm^-1\n", nun);
+			//printf ("anu_p_abs %.3e cm^-1\n", nup);
      	}
     inputfile.close();
     outputfile.close();
