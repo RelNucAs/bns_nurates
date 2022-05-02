@@ -23,7 +23,7 @@ using namespace std;
 int main ()
 {
 	ifstream inputfile;
-    inputfile.open("./Input/nurates_copy.txt");
+    inputfile.open("./Input/nurates_1.008E+01.txt");
 	ofstream outputfile("./Output/nu_rates.txt");
 		int zone;
 		double d1;
@@ -45,14 +45,12 @@ int main ()
 
 	  	while (true)
 		{
-			inputfile >> zone >> r >> rho >> temp >> ye >> mu_e >> mu_np >> yh >> ya >> yp >> yn >> em_nue >> l_nue >> em_anue >> l_anue;
-			double mb = 1.674e-24; // g
+			inputfile >> zone >> r >> rho >> temp >> ye >> mu_e >> mu_np \
+			>> yh >> ya >> yp >> yn >> em_nue >> l_nue >> em_anue >> l_anue;
  			double nn = rho*yn/mb;
  			double np = rho*yp/mb;
 			double e_nu = 10.079454858851342;
 			double e_nu_bar = 10.079454858851342;
-			double mu_e = 249.51; // MeV
-			double mu_np = 60.156; // MeV
     		double nun;
     		double nup;
 
