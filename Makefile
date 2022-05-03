@@ -8,7 +8,7 @@ LDIR = .
 _DEPS = constants.h corrections.h weak_rates.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o
+_OBJ = check_rates.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: %.c $(DEPS)
@@ -19,7 +19,7 @@ all : nu_rates
 
 .PHONY: clean
 clean:
-				rm nu_rates *.o
+				rm -f nu_rates *.o
 
 nu_rates: $(OBJ)
 			$(CC) -o nu_rates $^ $(CFLAGS) $(LIBS)
