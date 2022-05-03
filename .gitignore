@@ -36,3 +36,4 @@
 .DS_Store
 nu_rates
 *.o
+*/.ipynb_checkpoints/*

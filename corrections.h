@@ -17,11 +17,6 @@ namespace corrections
   	return (np-nn)/(exp(-mu_np/(kb*temp))-1);
   }
 
-  double eta_pn(double np, double nn, double mu_np, double temp)
-  {
-  	return (nn-np)/(exp(mu_np/(kb*temp))-1);
-  }
-
   //Fermi distributions
 
   double Fermi(double mu, double E, double temp)
