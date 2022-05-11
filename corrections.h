@@ -41,24 +41,24 @@ namespace corrections
 
 	//blocking factor and stimulated absorption 
 
-	double B_nu(double e_nu, double mu_e, double temp)
+	double blocking_factor_nu(double e_nu, double mu_e, double temp)
 	{
 		return 1 - Fermi(mu_e, e_nu+delta_np,temp);
 	} 
 
-	double B_nu_bar(double e_nu_bar, double mu_e, double temp)
+	double blocking_factor_nu_bar(double e_nu_bar, double mu_e, double temp)
 	{
 		return 1 - Fermi(mu_e, e_nu_bar-delta_np,temp);
 	}
 
 	//weak magnetism
 
-	double Wm(double e_nu)
+	double weak_magnetism(double e_nu)
 	{
 		return (1+1.1*e_nu)/n_rm;
 	}
 
-	double Wm_bar(double e_nu_bar)
+	double weak_magnetism_bar(double e_nu_bar)
 	{
 		return (1-7.1*e_nu_bar)/n_rm;
 	}
