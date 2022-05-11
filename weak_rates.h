@@ -16,7 +16,7 @@ namespace weakrates
 		double sigma_nun_abs = ((GF*GF/pi)/pow(h*c/(2*pi),4))*eta_np(np,nn,mu_np,temp)*\
 		                       (gV*gV+3*gA*gA)*(pow(e_nu+delta_np,2))*\
 		                       pow((1-pow((e_rm/(e_nu+delta_np)),2)),0.5)*\
-		                       B_nu(e_nu, mu_e, temp); //*Wm(e_nu)
+		                       blocking_factor_nu(e_nu, mu_e, temp); //*weak_magnetism(e_nu)
 		return sigma_nun_abs; 
 	}
 
@@ -26,7 +26,7 @@ namespace weakrates
 		double sigma_nup_abs = ((GF*GF/pi)/pow(h*c/(2*pi),4))*eta_pn(np,nn,mu_np,temp)*\
 		                       (gV*gV+3*gA*gA)*(pow(e_nu_bar-delta_np,2))*\
 		                       pow((1-pow((e_rm/(e_nu_bar-delta_np)),2)),0.5)*\
-		                       B_nu_bar(e_nu_bar, -mu_e, temp)*theta(e_nu_bar); //*Wm_bar(e_nu_bar)
+		                       blocking_factor_nu_bar(e_nu_bar, -mu_e, temp)*theta(e_nu_bar); //*weak_magnetism_bar(e_nu_bar)
 		return sigma_nup_abs;
 	}
 }
