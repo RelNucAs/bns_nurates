@@ -8,7 +8,7 @@ LDIR = .
 _DEPS = constants.h corrections.h weak_rates.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = check_rates.o
+_OBJ = main.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: %.c $(DEPS)

@@ -22,7 +22,6 @@ namespace corrections
 	
   }
 
-
   double eta_pn(double np, double nn, double mu_np, double temp)
   {
 	if (np == 0.){
