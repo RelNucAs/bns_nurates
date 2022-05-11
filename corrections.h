@@ -14,7 +14,21 @@ namespace corrections
 
   double eta_np(double np, double nn, double mu_np, double temp)
   {
-  	return (np-nn)/(exp(-mu_np/(kb*temp))-1);
+	if (nn == 0.){
+		return 0; //enforce zero rates if no neutrons available
+	}
+       
+	return (np-nn)/(exp(-mu_np/temp)-1);
+	
+  }
+
+  double eta_pn(double np, double nn, double mu_np, double temp)
+  {
+	if (np == 0.){
+		return 0; //enforce zero rates if no protons available
+	}
+	
+	return (nn-np)/(exp(mu_np/temp)-1);
   }
 
   //Fermi distributions
