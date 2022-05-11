@@ -19,7 +19,7 @@ all : nu_rates
 
 .PHONY: clean
 clean:
-				rm nu_rates *.o
+				rm -f nu_rates *.o
 
 nu_rates: $(OBJ)
 			$(CC) -o nu_rates $^ $(CFLAGS) $(LIBS)
