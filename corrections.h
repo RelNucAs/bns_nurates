@@ -18,7 +18,7 @@ namespace corrections
 		return 0; //enforce zero rates if no neutrons available
 	}
        
-	return etanp = (np-nn)/(exp(-mu_np/temp)-1);
+	return (np-nn)/(exp(-mu_np/temp)-1);
 	
   }
 
@@ -29,7 +29,7 @@ namespace corrections
 		return 0; //enforce zero rates if no protons available
 	}
 	
-	return etapn = (nn-np)/(exp(mu_np/temp)-1);
+	return (nn-np)/(exp(mu_np/temp)-1);
   }
 
   //Fermi distributions
