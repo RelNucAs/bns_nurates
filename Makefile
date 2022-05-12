@@ -5,7 +5,7 @@ CFLAGS=-I$(IDIR)
 ODIR = .
 LDIR = .
 
-_DEPS = constants.h corrections.h weak_rates.h
+_DEPS = constants.h corrections.h weak_rates.h nu_elastic_scatt.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
 _OBJ = check_rates.o

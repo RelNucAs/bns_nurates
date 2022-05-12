@@ -5,7 +5,7 @@
 
 namespace constants
 {
-	const double eV = 1.602176634*10e-12; //convert eV to CGS
+	const double MeV = 1.602176634e-6; //convert MeV to CGS (erg)
 	const double cm = 10e13; //convert fm to cm 
 
 	//Global Constants (MeV)
@@ -25,9 +25,9 @@ namespace constants
 	const double e_rm = me;
 	const double n_rm = mn;
 	const double p_rm = mp;
-	const double Gs = 5.18*(10e-44); //in Mev-2fm2 //(4*(Gf*Gf)*(e_rm*e_rm))/(pi); //(pi*pow(h_bar*c,4))
 	const double gA = 1.23;
-	const double gV = 1;
+	const double gV = 1.;
+	const double gS = 0.;
 	const double delta_np = 1.2935; // MeV
-
+	const double sinsqthetaw = 0.2325;
 }
