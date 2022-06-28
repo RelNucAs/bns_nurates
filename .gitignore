@@ -41,3 +41,6 @@ nu_rates
 # Plots
 *.png
 *.jpg
+
+# Text files
+*.txt
