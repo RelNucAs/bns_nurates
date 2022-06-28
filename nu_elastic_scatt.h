@@ -40,10 +40,17 @@ namespace elastic_scatt
 			R = 1.;
 			Rbar = 1;
 		}
+		//printf("%.6e, %.6e\n", R, Rbar);
 		return  std::make_tuple(R,Rbar);
 	}
 
 
+	//double eta_nn(double rho, double T, double Ye, double yn){
+		//dmudrho = ....; //[MeV*cm^3/g]
+		//etann = yn / (T*mu*dmudrho); //[1/cm^3]
+		//return etann;
+		
+		
 	double nu_n_scatt(double Enu, double rho, double T, double yn){
 		double nn = yn*rho/mb;
 		double eFn, tmp, etann;

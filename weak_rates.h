@@ -13,7 +13,7 @@ using namespace parameters;
 namespace weakrates
 {
 	//electron neutrino absorption on neutrons
-	double nu_n_abs(double rho, double temp, double ye, double yp, double yn, double e_nu, double mu_e, double mu_np)
+	std::tuple<double,double> nu_n_abs(double rho, double temp, double ye, double yp, double yn, double e_nu, double mu_e, double mu_np)
 	{
 		double nn = rho*yn/mb; 
 		double np = rho*yp/mb; 
@@ -25,16 +25,18 @@ namespace weakrates
 			R = 1.;
 		}
 
-		double sigma_nun_abs = R * ((GF*GF/pi)/pow(h*c/(2*pi),4))*eta_np(np,nn,mu_np,temp)*\
-		                       (gV*gV+3*gA*gA)*(pow(e_nu+delta_np,2))*\
-		                       pow((1-pow((e_rm/(e_nu+delta_np)),2)),0.5)*\
-		                       blocking_factor_nu(e_nu, mu_e, temp); //*weak_magnetism(e_nu)
+		double ab = R * ((GF*GF/pi)/pow(h*c/(2*pi),4))*eta_np(np,nn,mu_np,temp)*\
+		                 (gV*gV+3*gA*gA)*(pow(e_nu+delta_np,2))*\
+		                pow((1-pow((e_rm/(e_nu+delta_np)),2)),0.5)*\
+                                blocking_factor_nu(e_nu, mu_e, temp); //*weak_magnetism(e_nu)
+
+		double em = ab * exp(-(e_nu-(mu_e-mu_np-delta_np))/temp);
 		//printf("%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\n",rho,temp,ye,yp,yn,B_nu(e_nu, mu_e, temp),eta_np(np,nn,mu_np,temp));
-		return sigma_nun_abs; 
+		return std::make_tuple(em,ab); 
 	}
 
-	//electron neutrino absorption on protonss
-	double nu_p_abs(double rho, double temp, double ye, double yp, double yn, double e_nu_bar, double mu_e, double mu_np)
+	//electron antineutrino absorption on protons
+	std::tuple<double,double> nu_p_abs(double rho, double temp, double ye, double yp, double yn, double e_nu_bar, double mu_e, double mu_np)
 	{
 		double nn = rho*yn/mb;
 		double np = rho*yp/mb;
@@ -46,10 +48,12 @@ namespace weakrates
                         Rbar = 1.;
 		}
 
-		double sigma_nup_abs = Rbar * ((GF*GF/pi)/pow(h*c/(2*pi),4))*eta_pn(np,nn,mu_np,temp)*\
-		                       (gV*gV+3*gA*gA)*(pow(e_nu_bar-delta_np,2))*\
-		                       pow((1-pow((e_rm/(e_nu_bar-delta_np)),2)),0.5)*\
-		                       blocking_factor_nu_bar(e_nu_bar, -mu_e, temp)*theta(e_nu_bar); //*weak_magnetism_bar(e_nu_bar)
-		return sigma_nup_abs;
+		double ab = Rbar * ((GF*GF/pi)/pow(h*c/(2*pi),4))*eta_pn(np,nn,mu_np,temp)*\
+		                    (gV*gV+3*gA*gA)*(pow(e_nu_bar-delta_np,2))*\
+		                   pow((1-pow((e_rm/(e_nu_bar-delta_np)),2)),0.5)*\
+		                   blocking_factor_nu_bar(e_nu_bar, -mu_e, temp)*theta(e_nu_bar); //*weak_magnetism_bar(e_nu_bar)
+		
+		double em = ab * exp(-(e_nu_bar-(mu_np+delta_np-mu_e))/temp);
+		return std::make_tuple(em,ab);
 	}
 }

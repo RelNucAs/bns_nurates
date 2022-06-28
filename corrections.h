@@ -84,7 +84,6 @@ namespace corrections
 		double tmp1 = cv*cv*(1.+4.*ehor+16./3.*ehor*ehor) + 3.*ca*ca*pow(1.+4./3.*ehor,2.) + 8./3.*cv*F2*ehor*ehor + 5./3.*ehor*ehor*(1.+2./5.*ehor)*F2*F2;
 		double tmp2 = 4.*(cv+F2)*ca*ehor*(1.+4./3.*ehor);
 		double tmp3 = (cv*cv+3.0*ca*ca)*pow(1.+2.*ehor,3.);
-                       
                 return (tmp1+tmp2)/tmp3;
         }
 
