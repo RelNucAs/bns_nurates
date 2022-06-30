@@ -28,9 +28,14 @@ namespace weakrates
 		double ab = R * ((GF*GF/pi)/pow(h*c/(2*pi),4))*eta_np(np,nn,mu_np,temp)*\
 		                 (gV*gV+3*gA*gA)*(pow(e_nu+delta_np,2))*\
 		                pow((1-pow((e_rm/(e_nu+delta_np)),2)),0.5)*\
-                                blocking_factor_nu(e_nu, mu_e, temp); //*weak_magnetism(e_nu)
+                                (1.-Fermi(mu_e,e_nu+delta_np,temp));
 
-		double em = ab * exp(-(e_nu-(mu_e-mu_np-delta_np))/temp);
+		//double em = ab * c * exp(-(e_nu-(mu_e-mu_np-delta_np))/temp);
+		double em = R * c * ((GF*GF/pi)/pow(h*c/(2*pi),4))*eta_pn(np,nn,mu_np,temp)*\
+                                 (gV*gV+3*gA*gA)*(pow(e_nu+delta_np,2))*\
+                                pow((1-pow((e_rm/(e_nu+delta_np)),2)),0.5)*\
+                                Fermi(mu_e,e_nu+delta_np,temp);
+
 		//printf("%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\n",rho,temp,ye,yp,yn,B_nu(e_nu, mu_e, temp),eta_np(np,nn,mu_np,temp));
 		return std::make_tuple(em,ab); 
 	}
@@ -51,9 +56,13 @@ namespace weakrates
 		double ab = Rbar * ((GF*GF/pi)/pow(h*c/(2*pi),4))*eta_pn(np,nn,mu_np,temp)*\
 		                    (gV*gV+3*gA*gA)*(pow(e_nu_bar-delta_np,2))*\
 		                   pow((1-pow((e_rm/(e_nu_bar-delta_np)),2)),0.5)*\
-		                   blocking_factor_nu_bar(e_nu_bar, -mu_e, temp)*theta(e_nu_bar); //*weak_magnetism_bar(e_nu_bar)
+		                   (1.-Fermi(-mu_e, e_nu_bar-delta_np,temp))*theta(e_nu_bar);
 		
-		double em = ab * exp(-(e_nu_bar-(mu_np+delta_np-mu_e))/temp);
+		//double em = ab * c * exp(-(e_nu_bar-(mu_np+delta_np-mu_e))/temp);
+		double em = Rbar * c * ((GF*GF/pi)/pow(h*c/(2*pi),4))*eta_np(np,nn,mu_np,temp)*\
+                                    (gV*gV+3*gA*gA)*(pow(e_nu_bar-delta_np,2))*\
+                                   pow((1-pow((e_rm/(e_nu_bar-delta_np)),2)),0.5)*\
+                                   Fermi(-mu_e, e_nu_bar-delta_np,temp)*theta(e_nu_bar);
 		return std::make_tuple(em,ab);
 	}
 }

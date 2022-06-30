@@ -18,11 +18,13 @@
 
 #include "constants.h" //Header file containing all relevant constants
 #include "corrections.h" //Header file containing all relevant corrections to rates
+#include "parameters.h" //Header file containing all parameters
 #include "weak_rates.h" //Header file containing all rates
 #include "nu_elastic_scatt.h" //Header file containing elastic scattering rates
 
 using namespace constants;
 using namespace corrections;
+using namespace parameters;
 using namespace weakrates;
 using namespace elastic_scatt;
 using namespace std;
@@ -50,11 +52,17 @@ int main (){
 	}
 	
 	// open output file
-	ofstream fout("check_rates.txt");
+	string outname;
+	if ((use_WM_ab == 1) && (use_WM_sc == 1)) {
+		outname = "newrates_WM.txt";
+ 	} else {
+		outname = "newrates.txt";
+	}
+	ofstream fout(outname);
 	//myfile.open("check_rates.txt");
 	// file header
 	string fhead;
-	fhead = "id, d [g/cm^3], T [MeV], Ye, mu_e [MeV], mu_hat [MeV], Yp, Yn, em_nue, ab_nue[1/cm], em_anue[1/cm], ab_anue[1/cm], B_IS_nue[1/cm], B_IS_anue[1/cm]\n";
+	fhead = "# id, d [g/cm^3], T [MeV], Ye, mu_e [MeV], mu_hat [MeV], Yp, Yn, em_nue, ab_nue[1/cm], em_anue[1/cm], ab_anue[1/cm], B_IS_nue[1/cm], B_IS_anue[1/cm]\n";
 	fout << fhead;
 
 
