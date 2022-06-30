@@ -44,3 +44,6 @@ nu_rates
 
 # Text files
 *.txt
+
+# Compiled Python files
+*.pyc
