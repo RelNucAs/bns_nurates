@@ -14,7 +14,7 @@ namespace corrections
 {
   //number densities
 
-  double eta_np(double np, double nn, double mu_np, double temp)
+  double eta_np(double np, double nn, double mu_np, double T)
   {
 	if (nn == 0.){
 		return 0; //enforce zero rates if no neutrons available
@@ -24,7 +24,7 @@ namespace corrections
 		return nn;
 	}
 	
-	double etanp = (np-nn)/(exp(-mu_np/temp)-1);
+	double etanp = (np-nn)/(exp(-mu_np/T)-1);
 	
 	if (etanp < 0.){
 		etanp = nn;
@@ -33,7 +33,7 @@ namespace corrections
 		return etanp;
   }
 
-  double eta_pn(double np, double nn, double mu_np, double temp)
+  double eta_pn(double np, double nn, double mu_np, double T)
   {
 	if (np == 0.){
 		return 0; //enforce zero rates if no protons available
@@ -43,7 +43,7 @@ namespace corrections
 		return np;
 	}
        
-	double etapn = (nn-np)/(exp(mu_np/temp)-1);
+	double etapn = (nn-np)/(exp(mu_np/T)-1);
 	
 	if (etapn < 0.) {
 		etapn = np;
@@ -55,22 +55,22 @@ namespace corrections
 
   //Fermi distributions
 
-  double Fermi(double mu, double E, double temp)
+  double Fermi(double mu, double E, double T)
 	{
-  		return 1/(exp((E-mu)/(kb*temp))+1);
+  		return 1/(exp((E-mu)/T)+1);
 	}
 
 
   //blocking factor and stimulated absorption 
 
-  double blocking_factor_nu(double e_nu, double mu_e, double temp)
+  double blocking_factor_nu(double e_nu, double mu_e, double T)
 	{
-		return 1 - Fermi(mu_e, e_nu+delta_np,temp);
+		return 1 - Fermi(mu_e, e_nu+delta_np,T);
 	} 
 
-  double blocking_factor_nu_bar(double e_nu_bar, double mu_e, double temp)
+  double blocking_factor_nu_bar(double e_nu_bar, double mu_e, double T)
 	{
-		return 1 - Fermi(mu_e, e_nu_bar-delta_np,temp);
+		return 1 - Fermi(mu_e, e_nu_bar-delta_np,T);
 	}
 
   //weak magnetism

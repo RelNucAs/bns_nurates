@@ -33,6 +33,7 @@ int main (){
 	int zone;
 	double r, d, T;
 	double yh, ya, ye, yn, yp;
+	double E[ne];
 	double e_nu = 10.079454858851342;
 	double e_nu_bar = 10.079454858851342;
 	double mu_e, mu_hat;
@@ -40,6 +41,20 @@ int main (){
 	double em_nue, ab_nue, em_anue, ab_anue, B_IS_nue, B_IS_anue;
 	string dummyLine;
 	
+	// define energy array
+	double f1 = pow(emax/emin)
+      allocate(e(ne),de(ne))
+
+      f1 = (emax/emin)**(1./float(ne-1))
+      f2 = (f1-1.)/sqrt( (1.+f1*(1.+f1))/3. )
+      e(1) = emin
+      de(1) = f2*e(1)
+      do ie=2,ne
+        e(ie) = f1*e(ie-1)
+        de(ie) = f2*e(ie)
+      enddo
+      egroup_empty = .false.
+
 	// open input profile
 	//string filename = "nurates_1.008E+01.txt";
 	std::fstream fin("nurates_1.008E+01.txt"); //read file
@@ -72,8 +87,8 @@ int main (){
 		ss >> zone >> r >> d >> T >> ye >> mu_e >> mu_hat >> yh >> ya >> yp >> yn;
 
 		// electron (anti)neutrino absorption 
-		std::tie(em_nue,ab_nue)   = nu_n_abs(d, T, ye, yp, yn, e_nu, mu_e, mu_hat);
-		std::tie(em_anue,ab_anue) = nu_p_abs(d, T, ye, yp, yn, e_nu_bar, mu_e, mu_hat);
+		std::tie(em_nue,ab_nue)   = nu_n_abs(d, T, me, yp, yn, e_nu, mu_e, mu_hat);
+		std::tie(em_anue,ab_anue) = nu_p_abs(d, T, me, yp, yn, e_nu_bar, mu_e, mu_hat);
 
 		// neutrino-nucleon scattering
 		B_IS_nue  = nu_N_scatt_tot(e_nu, d, T, yn, yp);
