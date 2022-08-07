@@ -1,4 +1,4 @@
-//Parametrization of single nucleon form factors
+// Calculation of single nucleon form factors
 
 #pragma once //compile only once
 
@@ -6,14 +6,9 @@
 #include <cmath>
 #include <tuple>
 
-std::tuple<int, int, int> SomeFunction()
-{
-    return std::make_tuple(5, 4, 3);
-}
-
 using namespace constants;
 
-namespace test
+namespace formfactors
 {
 	std::tuple<double,double,double> nucfrmfac(double E, int reacflag) {
 		const double lamp = 1.793;

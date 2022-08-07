@@ -7,13 +7,13 @@ WM = False
 
 # Fortran data file
 if WM:
-    f_file = '../nurates_1.008E+01_WM.txt'
+    f_file = '../input/nurates_1.008E+01_WM.txt'
 else:
-    f_file = '../nurates_1.008E+01.txt'
+    f_file = '../input/nurates_1.008E+01.txt'
 
 
 # C++ data file
 if WM:
-    C_file = '../newrates_WM.txt'
+    C_file = '../input/newrates_WM.txt'
 else:
-    C_file = '../newrates.txt'
+    C_file = '../input/newrates.txt'

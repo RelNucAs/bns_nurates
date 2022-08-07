@@ -16,11 +16,11 @@ else:
 f_data = np.nan_to_num(np.loadtxt(pars.f_file,comments='#',unpack=True))
 r,d,T,ye  = f_data[1:5]
 f_rates = f_data[11:17]
-
+#print(f_rates)
 # Import C++ data
 C_data = np.nan_to_num(np.loadtxt(pars.C_file,comments='#',unpack=True))
 C_rates = C_data[8:14]
-
+#print(C_rates)
 C_rates[4] = 2*math.pi*C_rates[4] #possibily 2pi factor more in Fortran code 
 C_rates[5] = 2*math.pi*C_rates[5]
 
@@ -30,7 +30,6 @@ print(C_rates[4])
 print(C_rates[5])
 rel_diff = np.nan_to_num(rel_diff)
 #print([np.amax(rel_diff[i]) for i in range(rel_diff.shape[0])])
-exit()
 
 # Make plots for comparison
 y1lab = [r'$j_{\nu_e}$ [1/s]', r'$\chi_{\nu_e}$ [1/cm]', r'$j_{\bar{\nu}_e}$ [1/s]', r'$\chi_{\bar{\nu}_e}$ [1/cm]',

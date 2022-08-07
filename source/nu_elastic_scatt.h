@@ -5,11 +5,11 @@
 #include <cmath> //Needed for sqrt computation
 #include "constants.h" //Header file containing all relevant constants
 #include "parameters.h" //Header file containing all parameters
-#include "nucfrmfac.h" //Header file for computation of nucleon form factors
+#include "weak_magnetism.h" //Header file for computation of nucleon form factors
 
 using namespace constants;
 using namespace parameters;
-using namespace test;
+using namespace weakmag;
 
 namespace elastic_scatt
 {
@@ -23,28 +23,6 @@ namespace elastic_scatt
 	double c0 = (4.*pi*GF*GF)/h;
 	double c1 = (4./3.*pi*GF*GF)/h;
 	
-	std::tuple<double,double> WM_scatt(double Enu, int reacflag){
-		
-		double R, Rbar;
-		
-		if (use_WM_sc != 0) {
-			double cv, ca, F2;
-			std::tie(cv,ca,F2) = nucfrmfac(Enu,reacflag); //form factors
-        		double x = 0.; //assume an average angle x=0
-
-          		double ehor = Enu* MeV/(mb*c*c);
-			double tmp = (4.*ca*(cv+F2)) / (cv*cv*(1.+x) + ca*ca*(3.-x));
-		        R    = (1.+(tmp-3.) *ehor*(1.-x));
-          		Rbar = (1.+(-tmp-3.)*ehor*(1.-x));
-		} else {
-			R = 1.;
-			Rbar = 1;
-		}
-		//printf("%.6e, %.6e\n", R, Rbar);
-		return  std::make_tuple(R,Rbar);
-	}
-
-
 	//double eta_nn(double rho, double T, double Ye, double yn){
 		//dmudrho = ....; //[MeV*cm^3/g]
 		//etann = yn / (T*mu*dmudrho); //[1/cm^3]

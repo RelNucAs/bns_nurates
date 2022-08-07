@@ -2,16 +2,67 @@
 
 #pragma once //compile only once
 
-#include "constants.h" //Header file containing all relevant constants
-#include "corrections.h" //Header file containing all relevant corrections to rates
-#include "parameters.h" // Header file containing WM parameter
+#include "constants.h" //Header file for physical constants
+#include "fermi.h" //Header file for Fermi distribution
+#include "parameters.h" // Header file for code parameters
+#include "nucfrmfac.h" //Header file for nucleon form factors
+#include "weak_magnetism.h" //Header file for weak magnetism corrections
 
-using namespace corrections;
+using namespace weakmag;
 using namespace constants;
 using namespace parameters;
+using namespace fermi;
 
-namespace weakrates
+namespace nuabsem
 {
+
+	double eta_np(double np, double nn, double mu_np, double T, double dU)
+	{
+		if (nn == 0.){
+			return 0; //enforce zero rates if no neutrons available
+		}
+
+		if (fabs(mu_np) < 1.e-2) {
+			return nn;
+		}
+
+		double etanp = (np-nn)/(exp(-mu_np/T)-1);
+
+		if (etanp < 0.){
+			etanp = nn;
+		}
+
+			return etanp;
+	  }
+
+      	double eta_pn(double np, double nn, double mu_np, double T, double dU)
+	{
+		if (np == 0.){
+			return 0; //enforce zero rates if no protons available
+		}
+
+		if (fabs(mu_np) < 1.e-2) {
+			return np;
+		}
+
+		double etapn = (nn-np)/(exp(mu_np/T)-1);
+
+		if (etapn < 0.) {
+			etapn = np;
+		}
+
+		return etapn;
+	}
+
+	double theta(double e)
+        {
+                if (e-delta_np-me < 0.)
+                        return 0.;
+                else
+                        return 1.;
+        }
+
+
 	//electron neutrino absorption on neutrons
 	std::tuple<double,double> nu_n_abs(double rho, double T, double Ml, double yp, double yn, double omega, double mu_l, double mu_hat)
 	{

@@ -16,16 +16,14 @@
 #include <cstdio> //libabry for printf 
 #include <cstdlib> //libabry for abs()
 
-#include "constants.h" //Header file containing all relevant constants
-#include "corrections.h" //Header file containing all relevant corrections to rates
-#include "parameters.h" //Header file containing all parameters
-#include "weak_rates.h" //Header file containing all rates
-#include "nu_elastic_scatt.h" //Header file containing elastic scattering rates
+#include "./source/constants.h" //Header file containing all relevant constants
+#include "./source/parameters.h" //Header file containing all parameters
+#include "./source/nu_abs_em.h" //Header file containing all rates
+#include "./source/nu_elastic_scatt.h" //Header file containing elastic scattering rates
 
 using namespace constants;
-using namespace corrections;
 using namespace parameters;
-using namespace weakrates;
+using namespace nuabsem;
 using namespace elastic_scatt;
 using namespace std;
 
@@ -42,22 +40,23 @@ int main (){
 	string dummyLine;
 	
 	// define energy array
-	double f1 = pow(emax/emin)
-      allocate(e(ne),de(ne))
+	//double f1 = pow(emax/emin)
+      
+	//	llocate(e(ne),de(ne))
 
-      f1 = (emax/emin)**(1./float(ne-1))
-      f2 = (f1-1.)/sqrt( (1.+f1*(1.+f1))/3. )
-      e(1) = emin
-      de(1) = f2*e(1)
-      do ie=2,ne
-        e(ie) = f1*e(ie-1)
-        de(ie) = f2*e(ie)
-      enddo
-      egroup_empty = .false.
+      //f1 = (emax/emin)**(1./float(ne-1))
+      //f2 = (f1-1.)/sqrt( (1.+f1*(1.+f1))/3. )
+      //e(1) = emin
+      //de(1) = f2*e(1)
+      //do ie=2,ne
+        //e(ie) = f1*e(ie-1)
+        //de(ie) = f2*e(ie)
+      //enddo
+      //egroup_empty = .false.
 
 	// open input profile
 	//string filename = "nurates_1.008E+01.txt";
-	std::fstream fin("nurates_1.008E+01.txt"); //read file
+	std::fstream fin("./input/nurates_1.008E+01.txt"); //read file
         if (!fin)
         {
                 cout << "File not found" << '\n';
@@ -69,9 +68,9 @@ int main (){
 	// open output file
 	string outname;
 	if ((use_WM_ab == 1) && (use_WM_sc == 1)) {
-		outname = "newrates_WM.txt";
+		outname = "./input/newrates_WM.txt";
  	} else {
-		outname = "newrates.txt";
+		outname = "./input/newrates.txt";
 	}
 	ofstream fout(outname);
 	//myfile.open("check_rates.txt");

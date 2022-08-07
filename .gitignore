@@ -47,3 +47,6 @@ nu_rates
 
 # Compiled Python files
 *.pyc
+
+# EOS tables
+*.dat
