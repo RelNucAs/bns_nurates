@@ -30,7 +30,10 @@ using namespace std;
 int main (){
 	int zone;
 	double r, d, T;
+	double nb;
 	double yh, ya, ye, yn, yp;
+	double dU;
+	double R, Rbar, Rn, Rbarn, Rp, Rbarp;
 	double E[ne];
 	double e_nu = 10.079454858851342;
 	double e_nu_bar = 10.079454858851342;
@@ -67,8 +70,9 @@ int main (){
 	
 	// open output file
 	string outname;
-	if ((use_WM_ab == 1) && (use_WM_sc == 1)) {
-		outname = "./input/newrates_WM.txt";
+	//if ((use_WM_ab == 1) && (use_WM_sc == 1)) {
+	if (use_dU == 1) {
+		outname = "./input/newrates_dU.txt";
  	} else {
 		outname = "./input/newrates.txt";
 	}
@@ -76,27 +80,38 @@ int main (){
 	//myfile.open("check_rates.txt");
 	// file header
 	string fhead;
-	fhead = "# id, d [g/cm^3], T [MeV], Ye, mu_e [MeV], mu_hat [MeV], Yp, Yn, em_nue, ab_nue[1/cm], em_anue[1/cm], ab_anue[1/cm], B_IS_nue[1/cm], B_IS_anue[1/cm]\n";
+	fhead = "# id, d [g/cm^3], T [MeV], Ye, mu_e [MeV], mu_hat [MeV], Yp, Yn, dU, em_nue, ab_nue[1/cm], em_anue[1/cm], ab_anue[1/cm], R, Rbar, B_IS_nue[1/cm], B_IS_anue[1/cm], Rn, Rbarn, Rp, Rbarp\n";
 	fout << fhead;
+
+        R    = WM_nue_abs(e_nu);
+	Rbar = WM_anue_abs(e_nu_bar);
+	std::tie(Rp,Rbarp) = WM_scatt(e_nu, 1);
+        std::tie(Rn,Rbarn) = WM_scatt(e_nu, 2);
 
 
 	while (!fin.fail()){
 		// read data from input table
 		std::stringstream ss(dummyLine);
-		ss >> zone >> r >> d >> T >> ye >> mu_e >> mu_hat >> yh >> ya >> yp >> yn;
+		ss >> zone >> r >> d >> T >> ye >> mu_e >> mu_hat >> yh >> ya >> yp >> yn >> dU;
+
+		nb = d/mb;
+
+		if (use_dU == 0) dU = 0.;
 
 		// electron (anti)neutrino absorption 
-		std::tie(em_nue,ab_nue)   = nu_n_abs(d, T, me, yp, yn, e_nu, mu_e, mu_hat);
-		std::tie(em_anue,ab_anue) = nu_p_abs(d, T, me, yp, yn, e_nu_bar, mu_e, mu_hat);
+		std::tie(em_nue,ab_nue)   = nu_n_abs(e_nu, nb, T, me, yp, yn, mu_e, mu_hat, dU);
+		std::tie(em_anue,ab_anue) = nu_p_abs(e_nu_bar, nb, T, me, yp, yn, mu_e, mu_hat, dU);
 
 		// neutrino-nucleon scattering
-		B_IS_nue  = nu_N_scatt_tot(e_nu, d, T, yn, yp);
-                B_IS_anue = anu_N_scatt_tot(e_nu_bar, d, T, yn, yp);
+		B_IS_nue  = nu_N_scatt_tot(e_nu, nb, T, yn, yp);
+                B_IS_anue = anu_N_scatt_tot(e_nu_bar, nb, T, yn, yp);
 
 		// write data in myfile
 		fout << std::scientific << zone << "\t"  << d << "\t" << T << "\t" << ye << "\t" << mu_e << "\t" << mu_hat << "\t";
-		fout << yp << "\t" << yn << "\t" << em_nue << "\t" << ab_nue << "\t" << em_anue << "\t" << ab_anue << "\t";
-		fout << B_IS_nue << "\t" << B_IS_anue << "\n";
+		fout << yp << "\t" << yn << "\t" << dU << "\t" << em_nue << "\t" << ab_nue << "\t" << em_anue << "\t" << ab_anue << "\t";
+		fout << R << "\t" << Rbar << "\t";
+		fout << B_IS_nue << "\t" << B_IS_anue << "\t";
+		fout << Rn << "\t" << Rbarn << "\t" << Rp << "\t" << Rbarp << "\n";
 		
 		std::getline(fin, dummyLine);
 		// comparison with Fortran code

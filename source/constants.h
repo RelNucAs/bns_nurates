@@ -21,7 +21,7 @@ namespace constants
 	
 	// Proton mass 
 	const double mp = 938.272; // MeV
-	const double delta_np = 1.2935; // MeV
+	const double Q = 1.2935; // MeV
 	
 	// Atomic mass unit
 	const double mb = 1.674e-24; // g
