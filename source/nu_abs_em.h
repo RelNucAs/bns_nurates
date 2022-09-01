@@ -121,10 +121,12 @@ namespace nuabsem
                 mu_np = mu_hat - dU;
 
 		if (use_WM_ab == 1) {
-                        Rbar = WM_nue_abs(omega);
+                        Rbar = WM_anue_abs(omega);
                 } else {
                         Rbar = 1.;
 		}
+		
+		printf("Rbar = %.5lf\n", Rbar);
 
 		double ab = Rbar * c1 * c2 * eta_pn(np,nn,mu_np,T) * pow(E,2) *\
 		                   pow((1-pow(lep_mass/E,2)),0.5) * (1.-Fermi(-mu_l,E,T)) * theta(E-lep_mass);

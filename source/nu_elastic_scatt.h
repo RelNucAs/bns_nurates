@@ -28,9 +28,8 @@ namespace elastic_scatt
 		//etann = yn / (T*mu*dmudrho); //[1/cm^3]
 		//return etann;
 		
-		
-	double nu_n_scatt(double Enu, double rho, double T, double yn){
-		double nn = yn*rho/mb;
+	double nu_n_scatt(double Enu, double nb, double T, double yn){
+		double nn = yn*nb;
 		double eFn, tmp, etann;
 
 		double phi0, phi1;
@@ -55,8 +54,8 @@ namespace elastic_scatt
 	}
 
 
-	double nu_p_scatt(double Enu, double rho, double T, double yp){
-		double np = yp*rho/mb;
+	double nu_p_scatt(double Enu, double nb, double T, double yp){
+		double np = yp*nb;
 		double eFp, tmp, etapp;
 
 		double phi0, phi1;
@@ -80,24 +79,24 @@ namespace elastic_scatt
 		return B_IS_p;			
 	}
 
-	double nu_N_scatt_tot(double Enu, double rho, double T, double yn, double yp){
+	double nu_N_scatt_tot(double Enu, double nb, double T, double yn, double yp){
 		double Rp, Rn, Rbarp, Rbarn;
 		std::tie(Rp,Rbarp) = WM_scatt(Enu, 1);
 		std::tie(Rn,Rbarn) = WM_scatt(Enu, 2);
 		double B_IS_tot;
 
-		B_IS_tot = Rn*nu_n_scatt(Enu,rho,T,yn) + Rp*nu_p_scatt(Enu,rho,T,yp);
+		B_IS_tot = Rn*nu_n_scatt(Enu,nb,T,yn) + Rp*nu_p_scatt(Enu,nb,T,yp);
 
 		return B_IS_tot;
 	}
 	
-	double anu_N_scatt_tot(double Enu, double rho, double T, double yn, double yp){
+	double anu_N_scatt_tot(double Enu, double nb, double T, double yn, double yp){
 		double Rp, Rn, Rbarp, Rbarn;
 		std::tie(Rp,Rbarp) = WM_scatt(Enu, 1);
 		std::tie(Rn,Rbarn) = WM_scatt(Enu, 2);
 		double B_IS_tot;
 
-		B_IS_tot = Rbarn*nu_n_scatt(Enu,rho,T,yn) + Rbarp*nu_p_scatt(Enu,rho,T,yp);
+		B_IS_tot = Rbarn*nu_n_scatt(Enu,nb,T,yn) + Rbarp*nu_p_scatt(Enu,nb,T,yp);
 
 		return B_IS_tot;
 	}

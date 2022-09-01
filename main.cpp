@@ -18,6 +18,7 @@
 
 #include "./source/constants.h" //Header file containing all relevant constants
 #include "./source/parameters.h" //Header file containing all parameters
+#include "./source/weak_magnetism.h" //Header file containing functions to compute WM
 #include "./source/nu_abs_em.h" //Header file containing all rates
 #include "./source/nu_elastic_scatt.h" //Header file containing elastic scattering rates
 
@@ -25,6 +26,7 @@ using namespace constants;
 using namespace parameters;
 using namespace nuabsem;
 using namespace elastic_scatt;
+using namespace weakmag;
 using namespace std;
 
 int main (){
@@ -33,7 +35,7 @@ int main (){
 	double nb;
 	double yh, ya, ye, yn, yp;
 	double dU;
-	double R, Rbar, Rn, Rbarn, Rp, Rbarp;
+	double R, Rbarc, Rn, Rbarn, Rp, Rbarp;
 	double E[ne];
 	double e_nu = 10.079454858851342;
 	double e_nu_bar = 10.079454858851342;
@@ -84,7 +86,7 @@ int main (){
 	fout << fhead;
 
         R    = WM_nue_abs(e_nu);
-	Rbar = WM_anue_abs(e_nu_bar);
+	Rbarc = WM_anue_abs(e_nu_bar);
 	std::tie(Rp,Rbarp) = WM_scatt(e_nu, 1);
         std::tie(Rn,Rbarn) = WM_scatt(e_nu, 2);
 
@@ -96,7 +98,7 @@ int main (){
 
 		nb = d/mb;
 
-		if (use_dU == 0) dU = 0.;
+		//if (use_dU == 0) dU = 0.;
 
 		// electron (anti)neutrino absorption 
 		std::tie(em_nue,ab_nue)   = nu_n_abs(e_nu, nb, T, me, yp, yn, mu_e, mu_hat, dU);
@@ -109,7 +111,7 @@ int main (){
 		// write data in myfile
 		fout << std::scientific << zone << "\t"  << d << "\t" << T << "\t" << ye << "\t" << mu_e << "\t" << mu_hat << "\t";
 		fout << yp << "\t" << yn << "\t" << dU << "\t" << em_nue << "\t" << ab_nue << "\t" << em_anue << "\t" << ab_anue << "\t";
-		fout << R << "\t" << Rbar << "\t";
+		fout << R << "\t" << Rbarc << "\t";
 		fout << B_IS_nue << "\t" << B_IS_anue << "\t";
 		fout << Rn << "\t" << Rbarn << "\t" << Rp << "\t" << Rbarp << "\n";
 		
