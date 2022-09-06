@@ -38,7 +38,7 @@ int main (){
 	double R, Rbarc, Rn, Rbarn, Rp, Rbarp;
 	double E[ne];
 	double e_nu = 10.079454858851342;
-	double e_nu_bar = 10.079454858851342;
+	double e_nu_bar = e_nu;
 	double mu_e, mu_hat;
 	double np, nn;
 	double em_nue, ab_nue, em_anue, ab_anue, B_IS_nue, B_IS_anue;
@@ -71,12 +71,13 @@ int main (){
 	}
 	
 	// open output file
-	string outname;
+	//string outname;
+	char outname[35];
 	//if ((use_WM_ab == 1) && (use_WM_sc == 1)) {
 	if (use_dU == 1) {
-		outname = "./input/newrates_dU.txt";
+		sprintf(outname, "./input/newrates_%.3e_dU.txt", e_nu);
  	} else {
-		outname = "./input/newrates.txt";
+		sprintf(outname, "./input/newrates_%.3e.txt", e_nu);
 	}
 	ofstream fout(outname);
 	//myfile.open("check_rates.txt");

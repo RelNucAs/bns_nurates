@@ -36,7 +36,7 @@ namespace elastic_scatt
 		double B_IS_n;
 		
 		// degeneracy parameter eta_nn
-		if (nn < 0.) {
+		if (nn <= 0.) {
 			etann = 0.;
 		} else {
 			eFn = 0.5*hbar*hbar * pow(3.*pi*pi*nn,2./3.) / mb * MeV; //from erg to MeV
@@ -81,9 +81,17 @@ namespace elastic_scatt
 
 	double nu_N_scatt_tot(double Enu, double nb, double T, double yn, double yp){
 		double Rp, Rn, Rbarp, Rbarn;
-		std::tie(Rp,Rbarp) = WM_scatt(Enu, 1);
-		std::tie(Rn,Rbarn) = WM_scatt(Enu, 2);
 		double B_IS_tot;
+		
+		if (use_WM_sc != 0) {
+			std::tie(Rp,Rbarp) = WM_scatt(Enu, 1);
+			std::tie(Rn,Rbarn) = WM_scatt(Enu, 2);
+		} else {
+			Rp = 1.;
+			Rn = 1.;
+			Rbarp = 1.;
+			Rbarn = 1.;
+		}
 
 		B_IS_tot = Rn*nu_n_scatt(Enu,nb,T,yn) + Rp*nu_p_scatt(Enu,nb,T,yp);
 
@@ -92,9 +100,17 @@ namespace elastic_scatt
 	
 	double anu_N_scatt_tot(double Enu, double nb, double T, double yn, double yp){
 		double Rp, Rn, Rbarp, Rbarn;
-		std::tie(Rp,Rbarp) = WM_scatt(Enu, 1);
-		std::tie(Rn,Rbarn) = WM_scatt(Enu, 2);
 		double B_IS_tot;
+		
+		if (use_WM_sc != 0) {
+			std::tie(Rp,Rbarp) = WM_scatt(Enu, 1);
+			std::tie(Rn,Rbarn) = WM_scatt(Enu, 2);
+		} else {
+			Rp = 1.;
+			Rn = 1.;
+			Rbarp = 1.;
+			Rbarn = 1.;
+		}
 
 		B_IS_tot = Rbarn*nu_n_scatt(Enu,nb,T,yn) + Rbarp*nu_p_scatt(Enu,nb,T,yp);
 
