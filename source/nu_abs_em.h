@@ -75,7 +75,8 @@ namespace nuabsem
 		double nn = nb*yn; 
 		double np = nb*yp; 
 		double mu_np;
-		double dU, E, R;
+		double dU, Qprime, E, R;
+		double em, ab;
 
 		if (use_dU == 1) {
 			dU = deltaU;
@@ -83,7 +84,8 @@ namespace nuabsem
 			dU = 0;
 		}
 		
-		E = omega + Q + dU; 
+		Qprime = Q + dU;
+		E = omega + Qprime; 
 		mu_np = mu_hat - dU;
 
 		if (use_WM_ab == 1) {
@@ -92,13 +94,18 @@ namespace nuabsem
 			R = 1.;
 		}
 
-		double ab = R * c1 * c2 * eta_np(np,nn,mu_np,T) * pow(E,2) *\
-		                pow((1-pow(lep_mass/E,2)),0.5) * (1.-Fermi(mu_l,E,T));
+		if (E-lep_mass > 0.) {
+			ab = R * c1 * c2 * eta_np(np,nn,mu_np,T) * pow(E,2) *\
+		             pow((1-pow(lep_mass/E,2)),0.5) * (1.-Fermi(mu_l,E,T)); //*theta(E-lep_mass);
+
+			em = R * c * c1 * c2 * eta_pn(np,nn,mu_np,T) * pow(E,2)*\
+                             pow((1-pow(lep_mass/E,2)),0.5) * Fermi(mu_l,E,T); //*theta(E-lep_mass);
+		} else {
+			ab = 0;
+			em = 0;
+		}
 
 		//double em = ab * c * exp(-(omega-(mu_l-mu_hat-delta_np))/T); //to be checked
-
-		double em = R * c * c1 * c2 * eta_pn(np,nn,mu_np,T) * pow(E,2)*\
-                                pow((1-pow(lep_mass/E,2)),0.5) * Fermi(mu_l,E,T);
 
 		return std::make_tuple(em,ab); 
 	}
@@ -109,7 +116,8 @@ namespace nuabsem
 		double nn = nb*yn;
 		double np = nb*yp;
 		double mu_np;
-		double dU, E, Rbar;
+		double dU, Qprime, E, Rbar;
+		double ab, em;
 
                 if (use_dU == 1) {
                         dU = deltaU;
@@ -117,7 +125,8 @@ namespace nuabsem
                         dU = 0;
                 }
 
-                E = omega - Q - dU;
+		Qprime = Q + dU;
+                E = omega - Qprime;
                 mu_np = mu_hat - dU;
 
 		if (use_WM_ab == 1) {
@@ -126,16 +135,19 @@ namespace nuabsem
                         Rbar = 1.;
 		}
 		
-		printf("Rbar = %.5lf\n", Rbar);
+		if (E-lep_mass > 0.) {
+			ab = Rbar * c1 * c2 * eta_pn(np,nn,mu_np,T) * pow(E,2) *\
+		             pow((1-pow(lep_mass/E,2)),0.5) * (1.-Fermi(-mu_l,E,T)); // * theta(E-lep_mass);
+			
+			em = Rbar * c * c1 * c2 * eta_np(np,nn,mu_np,T) * pow(E,2) *\
+                            pow((1-pow(lep_mass/E,2)),0.5) * Fermi(-mu_l,E,T); // * theta(E-lep_mass);
+		} else {
+			ab = 0.;
+			em = 0.;
+		}
 
-		double ab = Rbar * c1 * c2 * eta_pn(np,nn,mu_np,T) * pow(E,2) *\
-		                   pow((1-pow(lep_mass/E,2)),0.5) * (1.-Fermi(-mu_l,E,T)) * theta(E-lep_mass);
-		
 		//double em = ab * c * exp(-(omega_bar-(mu_hat+delta_np-mu_l))/T); //to be checked
 
-		double em = Rbar * c * c1 * c2 * eta_np(np,nn,mu_np,T) * pow(E,2) *\
-                                   pow((1-pow(lep_mass/E,2)),0.5) * Fermi(-mu_l,E,T) * theta(E-lep_mass);
-		
 		return std::make_tuple(em,ab);
 	}
 

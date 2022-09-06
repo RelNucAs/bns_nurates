@@ -40,25 +40,20 @@ namespace weakmag
 	}
 
 
-        std::tuple<double,double> WM_scatt(double Enu, int reacflag){
+  std::tuple<double,double> WM_scatt(double Enu, int reacflag){
 
                 double R, Rbar;
+		double cv, ca, F2;
+		std::tie(cv,ca,F2) = nucfrmfac(Enu,reacflag); //form factors
+		double x = 0.; //assume an average angle x=0
 
-                if (use_WM_sc != 0) {
-                        double cv, ca, F2;
-                        std::tie(cv,ca,F2) = nucfrmfac(Enu,reacflag); //form factors
-                        double x = 0.; //assume an average angle x=0
+		double ehor = Enu* MeV/(mb*c*c);
+		double tmp = (4.*ca*(cv+F2)) / (cv*cv*(1.+x) + ca*ca*(3.-x));
+		R    = (1.+(tmp-3.) *ehor*(1.-x));
+		Rbar = (1.+(-tmp-3.)*ehor*(1.-x));
 
-                        double ehor = Enu* MeV/(mb*c*c);
-                        double tmp = (4.*ca*(cv+F2)) / (cv*cv*(1.+x) + ca*ca*(3.-x));
-                        R    = (1.+(tmp-3.) *ehor*(1.-x));
-                        Rbar = (1.+(-tmp-3.)*ehor*(1.-x));
-                } else {
-                        R = 1.;
-                        Rbar = 1;
-                }
-                //printf("%.6e, %.6e\n", R, Rbar);
                 return  std::make_tuple(R,Rbar);
+
         }
 
 }
