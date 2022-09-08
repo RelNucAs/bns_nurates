@@ -21,6 +21,8 @@
 #include "./source/weak_magnetism.h" //Header file containing functions to compute WM
 #include "./source/nu_abs_em.h" //Header file containing all rates
 #include "./source/nu_elastic_scatt.h" //Header file containing elastic scattering rates
+#include "./source/integration.h" //Header file contatining integration routines
+#include "./source/tools/nr3.h"
 
 using namespace constants;
 using namespace parameters;
@@ -30,6 +32,7 @@ using namespace weakmag;
 using namespace std;
 
 int main (){
+	int ne = 25;
 	int zone;
 	double r, d, T;
 	double nb;
@@ -42,22 +45,9 @@ int main (){
 	double mu_e, mu_hat;
 	double np, nn;
 	double em_nue, ab_nue, em_anue, ab_anue, B_IS_nue, B_IS_anue;
+	double intResult;
 	string dummyLine;
-	
-	// define energy array
-	//double f1 = pow(emax/emin)
-      
-	//	llocate(e(ne),de(ne))
-
-      //f1 = (emax/emin)**(1./float(ne-1))
-      //f2 = (f1-1.)/sqrt( (1.+f1*(1.+f1))/3. )
-      //e(1) = emin
-      //de(1) = f2*e(1)
-      //do ie=2,ne
-        //e(ie) = f1*e(ie-1)
-        //de(ie) = f2*e(ie)
-      //enddo
-      //egroup_empty = .false.
+	const Doub alpha = 0.;
 
 	// open input profile
 	//string filename = "nurates_1.008E+01.txt";
@@ -91,6 +81,7 @@ int main (){
 	std::tie(Rp,Rbarp) = WM_scatt(e_nu, 1);
         std::tie(Rn,Rbarn) = WM_scatt(e_nu, 2);
 
+	save_gaulag(ne, alpha);
 
 	while (!fin.fail()){
 		// read data from input table
@@ -109,6 +100,9 @@ int main (){
 		B_IS_nue  = nu_N_scatt_tot(e_nu, nb, T, yn, yp);
                 B_IS_anue = anu_N_scatt_tot(e_nu_bar, nb, T, yn, yp);
 
+		//intResult = em_integ(ne, nb, T, me, yp, yn, mu_e, mu_hat, dU, 0);
+		//printf("%.3e\n",intResult);
+
 		// write data in myfile
 		fout << std::scientific << zone << "\t"  << d << "\t" << T << "\t" << ye << "\t" << mu_e << "\t" << mu_hat << "\t";
 		fout << yp << "\t" << yn << "\t" << dU << "\t" << em_nue << "\t" << ab_nue << "\t" << em_anue << "\t" << ab_anue << "\t";
@@ -124,4 +118,6 @@ int main (){
 	fin.close();
 	fout.close();
 
+	return 0;
 }
+

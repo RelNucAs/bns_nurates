@@ -10,7 +10,7 @@ namespace parameters
         const int use_WM_sc = 1;
 
 	//decide to use (1) or not (0) deltaU 
-        const int use_dU = 1;
+        const int use_dU = 0;
 	
 	//energy bins parameter
 	const int ne = 20;
