@@ -5,7 +5,7 @@
 #WM_scatt = False #for (anti)neutrino scattering on nucleons
 
 # dU correction
-use_dU = True
+use_dU = False
 
 # Energy of the comparison
 E = "3.000e+02"

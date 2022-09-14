@@ -30,7 +30,7 @@ namespace nuabsem
 			return nn;
 		}
 
-		double etanp = (np-nn)/(exp(-mu_hat/T)-1);
+		double etanp = (np-nn)/(exp(-mu_hat/T)-1.);
 
 		if (etanp < 0.){
 			etanp = nn;
@@ -50,7 +50,7 @@ namespace nuabsem
 			return np;
 		}
 
-		double etapn = (nn-np)/(exp(mu_hat/T)-1);
+		double etapn = (nn-np)/(exp(mu_hat/T)-1.);
 
 		if (etapn < 0.) {
 			etapn = np;
@@ -81,7 +81,7 @@ namespace nuabsem
 		if (use_dU == 1) {
 			dU = deltaU;
 		} else {
-			dU = 0;
+			dU = 0.;
 		}
 		
 		Qprime = Q + dU;

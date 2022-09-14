@@ -90,16 +90,16 @@ print("")
 #f_data = np.nan_to_num(np.loadtxt(pars.f_file,comments='#',unpack=True,max_rows=pars.nrowmax))
 f_data = np.loadtxt(pars.f_file,comments='#',unpack=True,max_rows=pars.nrowmax)
 r,d,T,ye  = f_data[1:5]
-f_rates = f_data[11:24] 
+f_rates = f_data[11:23] 
 
 ## Import C++ data
 #C_data = np.nan_to_num(np.loadtxt(pars.C_file,comments='#',unpack=True,max_rows=nrowmax))
 C_data = np.loadtxt(pars.C_file,comments='#',unpack=True,max_rows=pars.nrowmax)
-C_rates = C_data[8:21]
+C_rates = C_data[8:20]
 
 # legend =  0: dU,   1: j_nue,  2: 1/l_nue, 3: j_anue,  4: 1/l_anue,
-#           5: R (nue), 6: Rbar (anue), 7: B_IS (nu), 8: B_IS (anu),
-#           9: R (nu+n), 10: Rbar (anu+n),  11: R (nu+p),   12: Rbar (anu+p)
+#           5: R (nue), 6: Rbar (anue), 7: B_IS (nu),
+#           8: R0 (nu+n), 9: R1 (nu+n),  10: R0 (nu+p),  11: R (nu+p)
 
 ## Compare dU values
 dU   = np.column_stack((f_rates[0],C_rates[0]))
@@ -115,10 +115,10 @@ print("\n\n")
 R    = np.column_stack((f_rates[5],C_rates[5]))
 Rbar = np.column_stack((f_rates[6],C_rates[6]))
 
-Rn    = np.column_stack((f_rates[9], C_rates[9]))
-Rbarn = np.column_stack((f_rates[10],C_rates[10]))
-Rp    = np.column_stack((f_rates[11],C_rates[11]))
-Rbarp = np.column_stack((f_rates[12],C_rates[12]))
+R0_n = np.column_stack((f_rates[8], C_rates[8]))
+R1_n = np.column_stack((f_rates[9],C_rates[9]))
+R0_p = np.column_stack((f_rates[10],C_rates[10]))
+R1_p = np.column_stack((f_rates[11],C_rates[11]))
 
 if (np.unique(R).size > 2):
     print("R is not unique, R unique size = %d" %np.unique(R).size)
@@ -136,37 +136,37 @@ else:
     else:
         print("Rbar (Fortran) = %.3e, Rbar (C++) = %.3e" %(Rbar[0,0],Rbar[0,1]))
 
-if (np.unique(Rn).size > 2):
-    print("Rn is not unique, Rn unique size = %d" %np.unique(Rn).size)
+if (np.unique(R0_n).size > 2):
+    print("R0_n is not unique, R0_n unique size = %d" %np.unique(R0_n).size)
 else:
-    if ((Rn[0,0] < 0.) or (Rn[0,1] < 0.)):
+    if ((R0_n[0,0] < 0.) or (R0_n[0,1] < 0.)):
         print("WARNING: negative WM correction")
     else:
-        print("Rn (Fortran) = %.3e, Rn (C++) = %.3e" %(Rn[0,0],Rn[0,1]))
+        print("R0_n (Fortran) = %.3e, R0_n (C++) = %.3e" %(R0_n[0,0],R0_n[0,1]))
 
-if (np.unique(Rbarn).size > 2):
-    print("Rbarn is not unique, Rbarn unique size = %d" %np.unique(Rbarn).size)
+if (np.unique(R1_n).size > 2):
+    print("R1_n is not unique, R1_n unique size = %d" %np.unique(R1_n).size)
 else:
-    if ((Rbarn[0,0] < 0.) or (Rbarn[0,1] < 0.)):
+    if ((R1_n[0,0] < 0.) or (R1_n[0,1] < 0.)):
         print("WARNING: negative WM correction")
     else:
-        print("Rbarn (Fortran) = %.3e, Rbarn (C++) = %.3e" %(Rbarn[0,0],Rbarn[0,1]))
+        print("R1_n (Fortran) = %.3e, R1_n (C++) = %.3e" %(R1_n[0,0],R1_n[0,1]))
 
-if (np.unique(Rp).size > 2):
-    print("Rp is not unique, Rp unique size = %d" %np.unique(Rp).size)
+if (np.unique(R0_p).size > 2):
+    print("R0_p is not unique, R0_p unique size = %d" %np.unique(R0_p).size)
 else:
-    if ((Rp[0,0] < 0.) or (Rp[0,1] < 0.)):
+    if ((R0_p[0,0] < 0.) or (R0_p[0,1] < 0.)):
         print("WARNING: negative WM correction")
     else:
-        print("Rp (Fortran) = %.3e, Rp (C++) = %.3e" %(Rp[0,0],Rp[0,1]))
+        print("R0_p (Fortran) = %.3e, R0_p (C++) = %.3e" %(R0_p[0,0],R0_p[0,1]))
 
-if (np.unique(Rbarp).size > 2):
-    print("Rbarp is not unique, Rbarp unique size = %d" %np.unique(Rbarp).size)
+if (np.unique(R1_p).size > 2):
+    print("R1_p is not unique, R1_p unique size = %d" %np.unique(R1_p).size)
 else:
-    if ((Rbarp[0,0] < 0.) or (Rbarp[0,1] < 0.)):
+    if ((R1_p[0,0] < 0.) or (R1_p[0,1] < 0.)):
         print("WARNING: negative WM correction")
     else:
-        print("Rbarp (Fortran) = %.3e, Rbarp (C++) = %.3e" %(Rbarp[0,0],Rbarp[0,1]))
+        print("R1_p (Fortran) = %.3e, R1_p (C++) = %.3e" %(R1_p[0,0],R1_p[0,1]))
 
 
 ## Compare neutrino emissivity and opacity
@@ -190,15 +190,15 @@ code_comparison(tit,ab_em[:,idx],ab_em[:,idx+4]) #electron antineutrino opacity
 
 
 ## Compare scattering source term
-B_IS  = np.column_stack((f_rates[7],f_rates[8],2*math.pi*C_rates[7],2*math.pi*C_rates[8])) #probably 2pi factor more in Fortran code
+B_IS  = np.column_stack((f_rates[7],2*math.pi*C_rates[7])) #probably 2pi factor more in Fortran code
 
 tit = 'Neutrino scattering source term (B_IS_nu)'
 idx = 0
-code_comparison(tit,B_IS[:,idx],B_IS[:,idx+2]) #neutrino scattering
+code_comparison(tit,B_IS[:,idx],B_IS[:,idx+1]) #neutrino scattering
 
-tit = 'Antineutrino scattering source term (B_IS_anu)'
-idx = 1
-code_comparison(tit,B_IS[:,idx],B_IS[:,idx+2]) #antineutrino scattering
+#tit = 'Antineutrino scattering source term (B_IS_anu)'
+#idx = 1
+#code_comparison(tit,B_IS[:,idx],B_IS[:,idx+2]) #antineutrino scattering
 
 
 # Make plots for comparison
@@ -238,13 +238,13 @@ B_IS_nu = {'title': r'$\nu+N\rightarrow\nu+N$:  source term',
         'y2lab':  r'$\Delta|R^{\rm IS}|/R^{\rm IS}$',
         'plotname': 'B_IS_nu_'+pars.E+dU_str+'.png'}
 idx = 0
-plot_rates(B_IS[:,idx],B_IS[:,idx+2],B_IS_nu)
+plot_rates(B_IS[:,idx],B_IS[:,idx+1],B_IS_nu)
 
 
-B_IS_anu = {'title': r'$\bar{\nu}+N\rightarrow\bar{\nu}+N$:  source term',
-        'y1lab': r'$B^{\rm IS}_{\bar{\nu}_e}$ [1/cm]',
-        'y2lab': r'$\Delta|R^{\rm IS}|/R^{\rm IS}$',
-        'plotname': 'B_IS_anu_'+pars.E+dU_str+'.png'}
-idx = 1
-plot_rates(B_IS[:,idx],B_IS[:,idx+2],B_IS_anu)
+#B_IS_anu = {'title': r'$\bar{\nu}+N\rightarrow\bar{\nu}+N$:  source term',
+#        'y1lab': r'$B^{\rm IS}_{\bar{\nu}_e}$ [1/cm]',
+#        'y2lab': r'$\Delta|R^{\rm IS}|/R^{\rm IS}$',
+#        'plotname': 'B_IS_anu_'+pars.E+dU_str+'.png'}
+#idx = 1
+#plot_rates(B_IS[:,idx],B_IS[:,idx+2],B_IS_anu)
 

@@ -38,4 +38,11 @@ namespace constants
 	const double gV = 1.;
 	const double gS = 0.;
 	const double sinsqthetaw = 0.2325;
+
+        // Neutral current nucleon form factors (Q^2=0)
+        const double hnv = -0.5;
+        const double hna = -0.5*gA;
+        const double hpv =  0.5-2.*sinsqthetaw;
+        const double hpa =  0.5*gA;
+
 }
