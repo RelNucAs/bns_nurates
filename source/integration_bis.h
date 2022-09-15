@@ -102,33 +102,23 @@ double do_integration(int n, double *wgt, double *spectrArray) {
 
 }
 
-double compute_integral(int n, double *f, int g_type) {
+
+
+double compute_integral(int n, double *spectrArray, int g_type, double tmp) {
 	double x[n];
 	double w[n];
 
+	printf("%.3e, %.3e\n", tmp, Fermi_integral_p5(tmp));
 	read_wgts(n, x, w, g_type);
 	
-	return do_integration(n, w, f);
+	//for (int i=0;i<n;i++) {
+	//	printf("%.3lf, %.3lf\n",x[i], w[i]);
+	//}
+	return do_integration(n, w, spectrArray);
 
 }
 
-double compute_split_gauleg(int n, double *f1, double *f2, double a) {
-	double x[n], w[n];
-	double I1, I2;
-	double f3[n];
 
-	read_wgts(n, x, w, 0);
+double split_value(
 
-	for (int i=0;i<n;i++) f3[i] = f2[i] / (x[i] * x[i]);
-
-	I1 = a * do_integration(n, w, f1);
-	I2 = a * do_integration(n, w, f3);	
-	
-	return I1 + I2;
-}
-
-
-double split_value(double T, double eta_e) {
-	return T * Fermi_integral_p5(eta_e) / Fermi_integral_p4(eta_e);
-}
 

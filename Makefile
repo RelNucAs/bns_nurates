@@ -1,6 +1,6 @@
-IDIR =.
+IDIR =/usr/local/include
 CC=g++
-CFLAGS=-I$(IDIR)
+CFLAGS=-I$(IDIR) -lgsl -lgslcblas -lm
 
 ODIR = .
 LDIR = .
