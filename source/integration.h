@@ -21,7 +21,10 @@ void save_gauleg(int n, const Doub x1, const Doub x2) {
 
 	gauleg(x1, x2, x, w);
 
-        ofstream fout("./input/gauleg_weights.txt");
+        char outname[50];
+        sprintf(outname, "./input/gauleg_weights_n_%d.txt", n);
+
+        ofstream fout(outname);
         sprintf(fileHeader, "# Abscissas and weights for Gauss-Legendre integration from x1 = %.3lf to x2 = %.3lf\n", x1, x2);
 	
 	fout << fileHeader;
@@ -45,8 +48,11 @@ void save_gaulag(int n, const Doub alf) {
         }
 	
         gaulag(x, w, alf);
-	
-        ofstream fout("./input/gaulag_weights.txt");
+
+        char outname[50];
+        sprintf(outname, "./input/gaulag_weights_%.0lf_n_%d.txt", alf, n);
+
+        ofstream fout(outname);
         fout << "# Abscissas and weights for Gauss-Laguerre integration\n";
 	
 	for (int i=0;i<n;i++) {
@@ -57,21 +63,25 @@ void save_gaulag(int n, const Doub alf) {
 
 void read_wgts(int n, double *x, double *w, int g_type) {
 	//g_type = 0: Gauss-Legendre
-	//g_type = 1: Gauss-Laguerre
-	
-	string filename, dummyLine;
+	//g_type = 1: Gauss-Laguerre (alpha = 0)
+	//g_type = 2: Gauss-Laguerre (alpha = 5)
+  
+  	char gaussname[50];
+	string dummyLine;
 
 	if (g_type == 0) {
-                filename = "./input/gauleg_weights.txt";
+                sprintf(gaussname, "./input/gauleg_weights_n_%d.txt", n);
         } else if (g_type == 1) {
-                filename = "./input/gaulag_weights.txt";
+                sprintf(gaussname, "./input/gaulag_weights_0_n_%d.txt", n);
+        } else if (g_type == 2) {
+                sprintf(gaussname, "./input/gaulag_weights_5_n_%d.txt", n);
         } else {
                 printf("Index of Gaussian Quadrature method not recognized");
                 exit (EXIT_FAILURE);
         }
-        
+
         // open input file
-        std::fstream fin(filename);
+        std::fstream fin(gaussname);
 
         if (!fin) {
                 cout << "File regarding Gaussian quadrature not found" << '\n';
@@ -112,23 +122,28 @@ double compute_integral(int n, double *f, int g_type) {
 
 }
 
-double compute_split_gauleg(int n, double *f1, double *f2, double a) {
-	double x[n], w[n];
-	double I1, I2;
-	double f3[n];
-
-	read_wgts(n, x, w, 0);
-
-	for (int i=0;i<n;i++) f3[i] = f2[i] / (x[i] * x[i]);
-
-	I1 = a * do_integration(n, w, f1);
-	I2 = a * do_integration(n, w, f3);	
-	
-	return I1 + I2;
+double split_value(double T, double eta_e) {
+	return T * Fermi_integral_p5(eta_e) / Fermi_integral_p4(eta_e);
 }
 
 
-double split_value(double T, double eta_e) {
-	return T * Fermi_integral_p5(eta_e) / Fermi_integral_p4(eta_e);
+double split_gauleg(int n, double *f1, double *f2, double t) {
+        double x[n], w[n];
+	double f3[n];
+
+        read_wgts(n, x, w, 0);
+
+        for (int i=0;i<n;i++)  f3[i] = f2[i] / (x[i]*x[i]);
+        
+	return t * (do_integration(n, w, f1) + do_integration(n, w, f3));
+}
+
+double GSL_integration(int n, double a, double b, double alpha, double beta, gsl_function F, const gsl_integration_fixed_type * gauss_type) {
+        gsl_integration_fixed_workspace *w;
+        double result;
+        w = gsl_integration_fixed_alloc(gauss_type, n, a, b, alpha, beta);
+        gsl_integration_fixed(&F, &result, w);
+        gsl_integration_fixed_free (w);
+        return result;
 }
 

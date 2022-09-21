@@ -18,6 +18,8 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_sf_gamma.h>
+#include <gsl/gsl_errno.h>
+#include <gsl/gsl_roots.h>
 
 #include "./source/constants.h" //Header file containing all relevant constants
 #include "./source/parameters.h" //Header file containing all parameters
@@ -26,6 +28,8 @@
 #include "./source/nu_elastic_scatt.h" //Header file containing elastic scattering rates
 #include "./source/integration.h" //Header file contatining integration routines
 #include "./source/tools/nr3.h"
+#include "./source/tools/NewtonRaphson.h"
+#include "./source/tools/fermi_integrals.h"
 
 using namespace constants;
 using namespace parameters;
@@ -54,16 +58,15 @@ double j_lag(double x, void * p) {
     	return 4. * pi * pow(x,3.) * fEm * exp(x) / pow(x,5.);
 }
 
-double j_leg(double x, void * p) {
-	struct my_f_params * params = (struct my_f_params *)p;
-	double nb = (params->nb);
-	double T  = (params->T);
-	double me = (params->me);
-	double yp = (params->yp);
-	double yn = (params->yn);
-	double mu_e = (params->mu_e);
-	double mu_hat = (params->mu_hat);
-	double dU = (params->dU);
+double j_leg(double x, struct my_f_params params) {
+	double nb = (params.nb);
+	double T  = (params.T);
+	double me = (params.me);
+	double yp = (params.yp);
+	double yn = (params.yn);
+	double mu_e = (params.mu_e);
+	double mu_hat = (params.mu_hat);
+	double dU = (params.dU);
                           
 	double fEm, fAb;
 	
@@ -87,36 +90,41 @@ double eta_lag(int n, gsl_function F) {
 }
 
 
-double eta_leg(int n, gsl_function F, double t) {
+void eta_leg(int n, double *f1, double *f2, struct my_f_params p, double t) {
         double x[n], w[n];
-        double f1[n], f2[n];
 
         read_wgts(n, x, w, 0);
 
-        void *p = F.params;
-
         for (int i=0;i<n;i++) {
                 f1[i] = j_leg(t*x[i], p);
-                f2[i] = j_leg(t/x[i], p) / (x[i]*x[i]);
+                f2[i] = j_leg(t/x[i], p);
         }
 
-        return t * (do_integration(n, w, f1) + do_integration(n, w, f2));
+        return;
 }
 
 
-double GSL_integration(int n, double a, double b, double alpha, double beta, gsl_function F, const gsl_integration_fixed_type * gauss_type) {
-        gsl_integration_fixed_workspace *w;
-        double result;
-        w = gsl_integration_fixed_alloc(gauss_type, n, a, b, alpha, beta);
-        gsl_integration_fixed(&F, &result, w);
-        gsl_integration_fixed_free (w);
-        return result;
+double find_max(int nslice, struct my_f_params p) {
+        double val, max = 0;
+        double guess;
+	double x0 = log10(0.1), x1 = log10(400.);
+        double dx = (x1-x0) / (double) nslice;
+        for (double x=x0;x<x1;x+=dx) {
+                val = j_leg(pow(10.,x), p);
+		//printf("%.3e  ",val);
+                if (val > max) {
+                        max = val;
+                        guess = pow(10.,x);
+                }
+        }
+	printf("\n");
+        return guess;
 }
 
 
 
 int main (){
-	int n = 24;
+	int n = 32;
 	int zone;
 	double r, d, T;
 	double nb;
@@ -132,8 +140,11 @@ int main (){
 	string dummyLine;
 
 	double a = 0., b = 1.;
-	double alpha = 5., beta = 0.;
+	double alpha = 0., beta = 0.;
 	double GSL_lag, NR_lag, NR_leg;
+
+	//double f1[n] = {0.}, f2[n] = {0.};
+	double t;
 
 	save_gauleg(n, a, b);
 	save_gaulag(n, alpha);
@@ -162,9 +173,9 @@ int main (){
 	ofstream fout(outname);
 	//myfile.open("check_rates.txt");
 
-	string Ioutname = "./output/j_integral.txt";
+	string Ioutname = "./output/j_integral_1_WM_dU.txt";
 	ofstream Iout(Ioutname);
-	Iout << "# r [cm], eta_e, Laguerre [GSL], Laguerre [NR], Legendre [NR]\n";
+	Iout << "# r [cm], T [MeV], mu_e [MeV], [Laguerre] n=8, n=16, n=24, n=32, n=100\n";
 
 
 	// file header
@@ -193,26 +204,54 @@ int main (){
 		
 		struct my_f_params params = {nb, T, me, yp, yn, mu_e, mu_hat, dU};
 
-		double eta_e = mu_e/T;
-		double t = eta_e;
+		//double eta_e = mu_e/T;
+
 		
-		gsl_function F_lag;		
-		F_lag.function = &j_lag;
-		F_lag.params = &params;
-		const gsl_integration_fixed_type * lag_type = gsl_integration_fixed_laguerre;
-		GSL_lag = GSL_integration(n, a, b, alpha, beta, F_lag, lag_type);
+		//gsl_function F_lag;		
+		//F_lag.function = &j_lag;
+		//F_lag.params = &params;
+		//const gsl_integration_fixed_type * lag_type = gsl_integration_fixed_laguerre;
+		//GSL_lag = GSL_integration(n, a, b, alpha, beta, F_lag, lag_type);
 		
-	        NR_lag = eta_lag(n, F_lag);
+	        //NR_lag = eta_lag(n, F_lag);
 
-        	gsl_function F_leg;
-		F_leg.function = &j_leg;
-		F_leg.params = &params;
+        	//gsl_function F_leg;
+		//F_leg.function = &j_leg;
+		//F_leg.params = &params;
 
-		NR_leg = eta_leg(n, F_leg, t);
+  		//x0 = find_guess(1000, F_leg);
+                //printf("id = %d, scanned_value = %.3lf\n", i, x);     
 
-		printf("%.3e, %.3e, %.3e\n", GSL_lag, NR_lag, NR_leg);
+                //x = x_NRaphson(max_iter, x0, FDF);
 
-		Iout << std::scientific << r << "\t" << eta_e << "\t" << GSL_lag << "\t" << NR_lag << "\t" << NR_leg << "\n"; 
+		t = max(mu_e-Q,5.);
+		//t = find_max(1000, params);
+
+		Iout << std::scientific << setprecision(10) << r << "\t" << T << "\t" << mu_e << "\t"; 
+
+		for (int nn=8;nn<=32;nn+=8) {
+		        double f1[nn] = {0.};
+		        double f2[nn] = {0.};
+
+                        eta_leg(nn, f1, f2, params, t);
+                        NR_leg = split_gauleg(nn, f1, f2, t);
+
+                        Iout << NR_leg << "\t"; 
+
+			//printf("t = %.3e, max = %.3e, Result = %.6e, Exact = %.6e\n", t, Mscan, NR_leg, ciao);
+		}
+
+		double f1[100] = {0.};
+		double f2[100] = {0.};
+
+		eta_leg(100, f1, f2, params, t);
+		NR_leg = split_gauleg(100, f1, f2, t);
+
+		Iout << NR_leg << "\n";
+
+
+		//printf("%.3e, %.3e\n", GSL_lag, NR_lag, NR_leg);
+		//Iout << std::scientific << r << "\t" << T << "\t" << mu_e << "\t" << GSL_lag << "\t" << NR_lag << "\t" << NR_leg << "\n"; 
 			
 		// write data in myfile
 		fout << std::scientific << zone << "\t"  << d << "\t" << T << "\t" << ye << "\t" << mu_e << "\t" << mu_hat << "\t";
