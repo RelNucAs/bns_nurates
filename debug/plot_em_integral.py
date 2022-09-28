@@ -13,7 +13,7 @@ def compare_arrays(arr1,arr2):
     return arr3
 
 dU = ""
-#dU = "_dU"
+dU = "_dU"
 
 WM = ""
 WM = "_WM"
@@ -25,8 +25,8 @@ T    = data[1]
 mu_e = data[2]
 NR_leg = data[3:8]
 
-data = np.loadtxt("../output/j_integral_2"+str(WM)+str(dU)+".txt",comments='#',unpack=True)
-NR_leg = data[3:8]
+#data = np.loadtxt("../output/j_integral_2"+str(WM)+str(dU)+".txt",comments='#',unpack=True)
+#NR_leg = data[3:8]
 
 # legend =  0: r [cm], 1: T [MeV], 2: mu_e [MeV],    3-7: NR_leg (n=8,16,24,32,100)
 
@@ -64,5 +64,5 @@ axs[1].plot(r,compare_arrays(NR_leg[2],NR_leg[4]),label=r"$n=24$")
 axs[1].plot(r,compare_arrays(NR_leg[3],NR_leg[4]),label=r"$n=32$")
 axs[1].legend() #loc='upper right')
 
-plt.savefig("../output/plots/j_integral_2"+str(WM)+str(dU)+".png", dpi=200)
+plt.savefig("../output/plots/j_integral_1"+str(WM)+str(dU)+".png", dpi=200)
 

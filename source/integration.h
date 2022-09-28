@@ -6,7 +6,7 @@
 #include "./tools/nr3.h"
 #include "./tools/gamma.h"
 #include "./tools/gauss_wgts.h"
-
+#include "./spectral_function.h"
 
 void save_gauleg(int n, const Doub x1, const Doub x2) {
         VecDoub_O x(n);
@@ -112,30 +112,41 @@ double do_integration(int n, double *wgt, double *spectrArray) {
 
 }
 
-double compute_integral(int n, double *f, int g_type) {
-	double x[n];
-	double w[n];
+double use_gaulag(int n, double (*func)(double, struct my_f_params), struct my_f_params p, int g_type) {
+        double x[n], w[n];
+        double f[n];
 
-	read_wgts(n, x, w, g_type);
-	
-	return do_integration(n, w, f);
+        read_wgts(n, x, w, g_type);
 
+        if (g_type == 1) { //alpha = 0
+		for (int i=0;i<n;i++) f[i] = func(x[i], p) * exp(x[i]);
+	} else if (g_type == 2) {
+		for (int i=0;i<n;i++) f[i] = func(x[i], p) * exp(x[i]) / pow(x[i],5.);
+	} else {
+		printf("Index for g_type is not correct\n");
+	}
+
+        return do_integration(n, w, f);
 }
+
 
 double split_value(double T, double eta_e) {
 	return T * Fermi_integral_p5(eta_e) / Fermi_integral_p4(eta_e);
 }
 
 
-double split_gauleg(int n, double *f1, double *f2, double t) {
+double split_gauleg(int n, double (*func)(double, struct my_f_params), struct my_f_params p, double t) {
         double x[n], w[n];
-	double f3[n];
+        double f1[n], f2[n];
 
         read_wgts(n, x, w, 0);
 
-        for (int i=0;i<n;i++)  f3[i] = f2[i] / (x[i]*x[i]);
-        
-	return t * (do_integration(n, w, f1) + do_integration(n, w, f3));
+        for (int i=0;i<n;i++) {
+                f1[i] = func(t*x[i], p);
+                f2[i] = func(t/x[i], p) / (x[i]*x[i]);
+        }
+ 
+	return t * (do_integration(n, w, f1) + do_integration(n, w, f2));
 }
 
 double GSL_integration(int n, double a, double b, double alpha, double beta, gsl_function F, const gsl_integration_fixed_type * gauss_type) {
@@ -147,3 +158,23 @@ double GSL_integration(int n, double a, double b, double alpha, double beta, gsl
         return result;
 }
 
+double find_max(int nslice, double x0, double x1, double (*func)(double, struct my_f_params), struct my_f_params p) {
+        double val, max = 0;
+        double x_step, guess;
+        double dx = (log10(x1)-log10(x0)) / (double) nslice;
+        for (double x=x0;x<x1;x+=dx) {
+                x_step = pow(10.,x);
+                val = func(x_step, p);
+                //printf("%.3e  ",val);
+                if (val > max) {
+                        max = val;
+                        guess = x_step;
+                }
+        }
+        //printf("\n");
+        return guess;
+}
+
+double find_thick_params() {
+
+}

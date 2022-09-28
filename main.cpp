@@ -27,6 +27,7 @@
 #include "./source/nu_abs_em.h" //Header file containing all rates
 #include "./source/nu_elastic_scatt.h" //Header file containing elastic scattering rates
 #include "./source/integration.h" //Header file contatining integration routines
+#include "./source/spectral_function.h" //Header file contatining spectral functions
 #include "./source/tools/nr3.h"
 #include "./source/tools/NewtonRaphson.h"
 #include "./source/tools/fermi_integrals.h"
@@ -38,90 +39,7 @@ using namespace elastic_scatt;
 using namespace weakmag;
 using namespace std;
 
-struct my_f_params { double nb; double T; double me; double yp; double yn; double mu_e; double mu_hat; double dU; };
-
-double j_lag(double x, void * p) {
-	struct my_f_params * params = (struct my_f_params *)p;
-	double nb = (params->nb);
-	double T  = (params->T);
-	double me = (params->me);
-	double yp = (params->yp);
-	double yn = (params->yn);
-	double mu_e = (params->mu_e);
-	double mu_hat = (params->mu_hat);
-	double dU = (params->dU);
-                          
-	double fEm, fAb;
-	
-	std::tie(fEm,fAb) = nu_n_abs(x, nb, T, me, yp, yn, mu_e, mu_hat, dU);
-        
-    	return 4. * pi * pow(x,3.) * fEm * exp(x) / pow(x,5.);
-}
-
-double j_leg(double x, struct my_f_params params) {
-	double nb = (params.nb);
-	double T  = (params.T);
-	double me = (params.me);
-	double yp = (params.yp);
-	double yn = (params.yn);
-	double mu_e = (params.mu_e);
-	double mu_hat = (params.mu_hat);
-	double dU = (params.dU);
-                          
-	double fEm, fAb;
-	
-	std::tie(fEm,fAb) = nu_n_abs(x, nb, T, me, yp, yn, mu_e, mu_hat, dU);
-        
-    	return 4. * pi * pow(x,3.) * fEm;
-}
-
-
-double eta_lag(int n, gsl_function F) {
-        double x[n], w[n];
-	double f[n];
-
-        read_wgts(n, x, w, 1);
-
-        void *p = F.params;
-
-        for (int i=0;i<n;i++) f[i] = j_lag(x[i], p);
-
-        return do_integration(n, w, f);
-}
-
-
-void eta_leg(int n, double *f1, double *f2, struct my_f_params p, double t) {
-        double x[n], w[n];
-
-        read_wgts(n, x, w, 0);
-
-        for (int i=0;i<n;i++) {
-                f1[i] = j_leg(t*x[i], p);
-                f2[i] = j_leg(t/x[i], p);
-        }
-
-        return;
-}
-
-
-double find_max(int nslice, struct my_f_params p) {
-        double val, max = 0;
-        double guess;
-	double x0 = log10(0.1), x1 = log10(400.);
-        double dx = (x1-x0) / (double) nslice;
-        for (double x=x0;x<x1;x+=dx) {
-                val = j_leg(pow(10.,x), p);
-		//printf("%.3e  ",val);
-                if (val > max) {
-                        max = val;
-                        guess = pow(10.,x);
-                }
-        }
-	printf("\n");
-        return guess;
-}
-
-
+//struct my_f_params { double nb; double T; double me; double yp; double yn; double mu_e; double mu_hat; double dU; };
 
 int main (){
 	int n = 32;
@@ -141,17 +59,16 @@ int main (){
 
 	double a = 0., b = 1.;
 	double alpha = 0., beta = 0.;
-	double GSL_lag, NR_lag, NR_leg;
-
-	//double f1[n] = {0.}, f2[n] = {0.};
-	double t;
+	//double GSL_lag, NR_lag;
+	double eta_nue, eta_anue;
+	double eta0_nue, eta0_anue;
+	double t1, t2, t3, t4;
 
 	save_gauleg(n, a, b);
 	save_gaulag(n, alpha);
 
 	
 	// open input profile
-	//string filename = "nurates_1.008E+01.txt";
 	std::fstream fin("./input/nurates_1.008E+01.txt"); //read file
         if (!fin)
         {
@@ -162,7 +79,6 @@ int main (){
 	}
 	
 	// open output file
-	//string outname;
 	char outname[35];
 	//if ((use_WM_ab == 1) && (use_WM_sc == 1)) {
 	if (use_dU == 1) {
@@ -171,9 +87,11 @@ int main (){
 		sprintf(outname, "./input/newrates_%.3e.txt", e_nu);
 	}
 	ofstream fout(outname);
-	//myfile.open("check_rates.txt");
 
-	string Ioutname = "./output/j_integral_1_WM_dU.txt";
+	string Ioutname = "./output/j_integral_2";
+	if (use_WM_ab == 1) Ioutname = Ioutname + "_WM";
+	if (use_dU == 1)    Ioutname = Ioutname + "_dU";
+	Ioutname = Ioutname + ".txt";
 	ofstream Iout(Ioutname);
 	Iout << "# r [cm], T [MeV], mu_e [MeV], [Laguerre] n=8, n=16, n=24, n=32, n=100\n";
 
@@ -217,37 +135,36 @@ int main (){
 
         	//gsl_function F_leg;
 		//F_leg.function = &j_leg;
-		//F_leg.params = &params;
-
-  		//x0 = find_guess(1000, F_leg);
-                //printf("id = %d, scanned_value = %.3lf\n", i, x);     
+		//F_leg.params = &params1
 
                 //x = x_NRaphson(max_iter, x0, FDF);
 
-		t = max(mu_e-Q,5.);
-		//t = find_max(1000, params);
-
+		t1 = max(mu_e-Q,5.);
+		//t = find_max(1000, 0.1, 400., &j_nue, params);
+		t2 = max(-(mu_e-Q),5.); 
+		t3 = max(mu_e-Q,4.); 
+		t4 = max(-(mu_e-Q),4.); 
+		
 		Iout << std::scientific << setprecision(10) << r << "\t" << T << "\t" << mu_e << "\t"; 
 
 		for (int nn=8;nn<=32;nn+=8) {
-		        double f1[nn] = {0.};
-		        double f2[nn] = {0.};
+                        eta_nue   = split_gauleg(nn, &j_nue,   params, t1);
+                        eta_anue  = split_gauleg(nn, &j_anue,  params, t2);
+                        eta0_nue  = split_gauleg(nn, &j0_nue,  params, t3);
+                        eta0_anue = split_gauleg(nn, &j0_anue, params, t4);
 
-                        eta_leg(nn, f1, f2, params, t);
-                        NR_leg = split_gauleg(nn, f1, f2, t);
+                        Iout << eta_nue << "\t"; 
 
-                        Iout << NR_leg << "\t"; 
-
-			//printf("t = %.3e, max = %.3e, Result = %.6e, Exact = %.6e\n", t, Mscan, NR_leg, ciao);
+			printf("t1 = %.3e, eta_nue = %.6e;	t2 = %.3e, eta_anue  = %.6e\n", t1, eta_nue, t2, eta_anue);
+			printf("t3 = %.3e, eta0_nue = %.6e;	t4 = %.3e, eta0_anue = %.6e\n\n", t3, eta0_nue, t4, eta0_anue);
 		}
 
-		double f1[100] = {0.};
-		double f2[100] = {0.};
+		eta_nue   = split_gauleg(100, &j_nue,   params, t1);
+		eta_anue  = split_gauleg(100, &j_anue,  params, t2);
+		eta0_nue  = split_gauleg(100, &j0_nue,  params, t3);
+		eta0_anue = split_gauleg(100, &j0_anue, params, t4);
 
-		eta_leg(100, f1, f2, params, t);
-		NR_leg = split_gauleg(100, f1, f2, t);
-
-		Iout << NR_leg << "\n";
+		Iout << eta_nue << "\n";
 
 
 		//printf("%.3e, %.3e\n", GSL_lag, NR_lag, NR_leg);

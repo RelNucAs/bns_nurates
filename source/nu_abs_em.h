@@ -107,7 +107,7 @@ namespace nuabsem
 
 		//double em = ab * c * exp(-(omega-(mu_l-mu_hat-delta_np))/T); //to be checked
 
-		return std::make_tuple(em,ab); 
+		return std::make_tuple(em,em+ab); //(em,ab)
 	}
 
 	//electron antineutrino absorption on protons
@@ -148,7 +148,7 @@ namespace nuabsem
 
 		//double em = ab * c * exp(-(omega_bar-(mu_hat+delta_np-mu_l))/T); //to be checked
 
-		return std::make_tuple(em,ab);
+		return std::make_tuple(em,em+ab); //(em,ab)
 	}
 
 }
