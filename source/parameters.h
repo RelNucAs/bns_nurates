@@ -17,4 +17,6 @@ namespace parameters
 	const double emin = 3.e0;
 	const double emax = 3.e2;
 
+	//numerical integration
+	const double alpha = 0.; //power exponent of Gauss-Laguerre weight
 }
