@@ -32,6 +32,7 @@ namespace constants
  	const double c = 2.997924562e+10; // cm/s
  	const double GF = 8.957e-44; // MeV*cm^3
 	const double pi = 3.1415926535898;
+        const double kB = 8.617333262e-11; // MeV/K
 
 	// Coupling constants
 	const double gA = 1.23;
