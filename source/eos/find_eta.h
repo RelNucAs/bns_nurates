@@ -22,6 +22,18 @@ double n_net_f(double eta, double T, double mLep, gsl_integration_fixed_workspac
         return  K*pow(theta,1.5)*(f1-f2+theta*(f3-f4));
 }
 
+double n_net_f0(double eta, double T, double mLep, gsl_integration_fixed_workspace *w_leg, gsl_integration_fixed_workspace *w_lag) {
+        double K = 8*sqrt(2)*pi*pow(mLep/(h*c),3.); //31217845.162531383*mLep**3
+        double f1, f2, f3, f4;
+        double theta = T/mLep;
+
+        f1 = compute_res_0( eta,          theta, 0.5, w_leg, w_lag);
+        f2 = compute_res_0(-eta-2./theta, theta, 0.5, w_leg, w_lag);
+        f3 = compute_res_0( eta,          theta, 1.5, w_leg, w_lag);
+        f4 = compute_res_0(-eta-2./theta, theta, 1.5, w_leg, w_lag);
+
+        return  K*pow(theta,1.5)*(f1-f2+theta*(f3-f4));
+}
 
 double n_net_df(double eta, double T, double mLep, gsl_integration_fixed_workspace *w_leg, gsl_integration_fixed_workspace *w_lag) {
         double K = 8*sqrt(2)*pi*pow(mLep/(h*c),3.); //31217845.162531383*mLep**3
@@ -129,8 +141,8 @@ double rtsafe(double nLep, double T, double mLep, const double guess, const doub
 //between x1 and x2. The root will be reﬁned until its accuracy is known within ˙xacc. funcd
 //is a user-supplied struct that returns the function value as a functor and the ﬁrst derivative of
 //the function at the point x as the function df (see text).
-	const int MAXIT=1500; //Maximum allowed number of iterations.
-	const double xacc = 1.e-4; //set the accuracy for Newton Rapsondouble xh,xl;
+	const int MAXIT=150; //Maximum allowed number of iterations.
+	const double xacc = 1.e-7; //set the accuracy for Newton Rapsondouble xh,xl;
 	double xh, xl;
 	double fl=n_net_f(x1, T, mLep, w_leg, w_lag)-nLep;
 	double fh=n_net_f(x2, T, mLep, w_leg, w_lag)-nLep;
@@ -147,7 +159,7 @@ double rtsafe(double nLep, double T, double mLep, const double guess, const doub
 		xl=x2;
 	}
 	double rts=guess; //0.5*(x1+x2);  //Initialize the guess for root,
-	double dxold=abs(x2-x1); //the “stepsize before last,”
+	double dxold=fabs(x2-x1); //the “stepsize before last,”
 	double dx=dxold;         //and the last step.
 	double f=n_net_f(rts, T, mLep, w_leg, w_lag)-nLep;
 	double df=n_net_df(rts, T, mLep, w_leg, w_lag);
@@ -156,23 +168,32 @@ double rtsafe(double nLep, double T, double mLep, const double guess, const doub
 			dxold=dx;
 			dx=0.5*(xh-xl);
 			rts=xl+dx;
+			//printf("If 1\n");
 			if (xl == rts) return rts;
 		} else { //Change in root is negligible. Newton step acceptable. Take it.
 			dxold=dx;
 			dx=f/df;
 			double temp=rts;
 			rts -= dx;
+			//printf("If 2\n");
 			if (temp == rts) return rts;
 		}
 		if (fabs(dx) < xacc) return rts; //Convergence criterion.
-		double f=n_net_f(rts, T, mLep, w_leg, w_lag)-nLep;
-		double df=n_net_df(rts, T, mLep, w_leg, w_lag); //The one new function evaluation per iteration.
+		//printf("dx = %.3e\n", dxold);
+		//printf("eta = %.3e\n", rts);
+
+		f=n_net_f(rts, T, mLep, w_leg, w_lag)-nLep;
+		df=n_net_df(rts, T, mLep, w_leg, w_lag); //The one new function evaluation per iteration.
+		//printf("rts = %.3e\n", rts);
+		//printf("f = %.3e\n", f);
+		//printf("df = %.3e\n\n", df);
+
+
 		if (f < 0.0) { //Maintain the bracket on the root.
 			xl=rts;
 		} else {
 			xh=rts;
 		}
-		throw("Maximum number of iterations exceeded in rtsafe");
 	}
-	return rts;
+	throw("Maximum number of iterations exceeded in rtsafe");
 }

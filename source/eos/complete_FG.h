@@ -77,7 +77,43 @@ double compute_res(double eta, double theta, float k, gsl_integration_fixed_work
 	F.params = &p;
         gsl_integration_fixed(&F, &r4, w_lag);
 
-        return r1+r2+r3+r4;
+	return r1+r2+r3+r4;
+
+}
+
+double compute_res_0(double eta, double theta, float k, gsl_integration_fixed_workspace *w_leg, gsl_integration_fixed_workspace *w_lag) {
+        double r1,r2,r3,r4;
+        double s1 = 0., s2 = 0., s3 = 0.;
+	struct FD_params p;
+	gsl_function F;
+        
+        extremes(eta,&s1,&s2,&s3);
+
+	F.function = &fermi_func1;
+        p = {k, eta, theta, 0., sqrt(s1)};
+	F.params = &p;
+        gsl_integration_fixed(&F, &r1, w_leg);
+
+	F.function = &fermi_func2;
+        p = {k, eta, theta, s1, s2};
+	F.params = &p;
+        gsl_integration_fixed(&F, &r2, w_leg);
+	
+	F.function = &fermi_func2;
+        p = {k, eta, theta, s2, s3};
+	F.params = &p;
+        gsl_integration_fixed(&F, &r3, w_leg);
+	
+	F.function = &fermi_func3;
+        p = {k, eta, theta, s3, 0.};
+	F.params = &p;
+        gsl_integration_fixed(&F, &r4, w_lag);
+
+        printf("r1 = %.3e\n", r1);
+        printf("r2 = %.3e\n", r2);
+        printf("r3 = %.3e\n", r3);
+        printf("r4 = %.3e\n", r4);
+	return r1+r2+r3+r4;
 
 }
 
