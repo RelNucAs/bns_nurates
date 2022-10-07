@@ -1,6 +1,7 @@
 #pragma once
 
 #include <gsl/gsl_sf_gamma.h>
+#include <gsl/gsl_sf_psi.h>
 #include <gsl/gsl_multiroots.h>
 #include "./tools/fermi_integrals.h"
 #include "./nu_abs_em.h" //Header file containing all rates
@@ -258,8 +259,8 @@ int thick_f(const gsl_vector *x, void *p, gsl_vector *f) {
         const double x0 = gsl_vector_get(x,0);
         const double x1 = gsl_vector_get(x,1);
 
-        gsl_vector_set(f, 0, n_nu - 4.*pi*Fermi_integral_p2(x1)/pow(x0,3.));
-        gsl_vector_set(f, 1, J_nu - 4.*pi*Fermi_integral_p3(x1)/pow(x0,4.));
+        gsl_vector_set(f, 0, n_nu*pow(h*c,3.) - 4.*pi*Fermi_integral_p2(x1)/pow(x0,3.));
+        gsl_vector_set(f, 1, J_nu*pow(h*c,3.) - 4.*pi*Fermi_integral_p3(x1)/pow(x0,4.));
 
         return GSL_SUCCESS;
 }
@@ -314,9 +315,29 @@ int thin_f(const gsl_vector *x, void *p, gsl_vector *f) {
         const double x0 = gsl_vector_get(x,0);
         const double x1 = gsl_vector_get(x,1);
 
-        gsl_vector_set(f, 0, n_nu - 4.*pi*gsl_sf_gamma(x0+3.)/pow(x1,x0+3.));
-        gsl_vector_set(f, 1, J_nu - 4.*pi*gsl_sf_gamma(x0+4.)/pow(x1,x0+4.));
+        gsl_vector_set(f, 0, n_nu*pow(h*c,3.) - 4.*pi*gsl_sf_gamma(x0+3.)/pow(x1,x0+3.));
+        gsl_vector_set(f, 1, J_nu*pow(h*c,3.) - 4.*pi*gsl_sf_gamma(x0+4.)/pow(x1,x0+4.));
 
+        return GSL_SUCCESS;
+}
+
+int thin_df(const gsl_vector *x, void *p, gsl_matrix *J) {
+        struct M1_values * params = (struct M1_values *) p;
+
+        const double x0 = gsl_vector_get(x,0);
+        const double x1 = gsl_vector_get(x,1);
+
+        gsl_matrix_set(J, 0, 0, 4.*pi*gsl_sf_gamma(x0+3.)/pow(x1,x0+3.)*(log(x1)-gsl_sf_psi(x0+3.)));
+        gsl_matrix_set(J, 0, 1, 4.*pi*(x0+3.)*gsl_sf_gamma(x0+3.)/pow(x1,x0+4.));
+        gsl_matrix_set(J, 1, 0, 4.*pi*gsl_sf_gamma(x0+4.)/pow(x1,x0+4.)*(log(x1)-gsl_sf_psi(x0+4.)));
+        gsl_matrix_set(J, 1, 1, 4.*pi*(x0+4.)*gsl_sf_gamma(x0+4.)/pow(x1,x0+5.));
+
+        return GSL_SUCCESS;
+}
+
+int thin_fdf(const gsl_vector * x, void *params, gsl_vector *f, gsl_matrix *J) {
+        thin_f(x, params, f);
+        thin_df(x, params, J);
         return GSL_SUCCESS;
 }
 

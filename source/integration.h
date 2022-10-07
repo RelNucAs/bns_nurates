@@ -174,7 +174,3 @@ double find_max(int nslice, double x0, double x1, double (*func)(double, struct 
         //printf("\n");
         return guess;
 }
-
-double find_thick_params() {
-
-}

@@ -33,6 +33,8 @@ int main (){
 	string finLine, dinLine;
 	gsl_multiroot_function_fdf FDF;
 	gsl_multiroot_function F;
+	double tmp[2];
+	int opt = 0; //0:thick, 1:thin
 
 	std::fstream din("./ccsn_data/abun1d00380.d");
         if (!din)
@@ -53,7 +55,8 @@ int main (){
         for (int i = 0; i < 3; i++) { //skip first two lines and read first one with data
                 getline(fin, finLine);
         }
-
+	
+	int i = 0;
 
         while (!din.fail()){
                 // read data from input table
@@ -78,32 +81,83 @@ int main (){
 		//printf("%.3e, %.3e\n", ynu*nb, znu*nb);
 
 		A = 1/T;
-		B = mu_e/T;
-		
-		//n_nu = 4.*pi*Fermi_integral_p2(B)/pow(A,3.);
-		//j_nu = 4.*pi*Fermi_integral_p3(B)/pow(A,4.);
-		
-		n_nu = 4.*pi*gsl_sf_gamma(A+3.)/pow(B,A+3.);
-		j_nu = 4.*pi*gsl_sf_gamma(A+4.)/pow(B,A+4.);
-		
-		struct M1_values p = {n_nu,j_nu};
-		//struct M1_values p = {ynu*nb*pow(h*c,3.), znu*nb*pow(h*c,3.)};
-		FDF = {&thick_f, &thick_df, &thick_fdf, 2, &p};
-		
-		F = {&thin_f, 2, &p};
+		B = mu_nu/T;
 
-        	x0[0] = A*1.058;
-        	x0[1] = B*0.983;
+		//// Check NR correctness
 
-		//printf("Exact A = %.3lf, Exact B = %.3lf\n", A, B);
-	        //NRaphson_2D(x0, x, FDF);
-	        NRaphson_2D_findiff(x0, x, F);
+		if (opt == 0) { //optically thick
+			n_nu = 4.*pi*Fermi_integral_p2(B)/pow(A,3.);
+			j_nu = 4.*pi*Fermi_integral_p3(B)/pow(A,4.);
+		} else if (opt == 1) { //optically thin
+			n_nu = 4.*pi*gsl_sf_gamma(A+3.)/pow(B,A+3.);
+			j_nu = 4.*pi*gsl_sf_gamma(A+4.)/pow(B,A+4.);
+		}
+		
+		struct M1_values p = {n_nu/pow(h*c,3.),j_nu/pow(h*c,3.)};
+		
+		if (opt == 0) {
+			FDF = {&thick_f, &thick_df, &thick_fdf, 2, &p};
+			F = {&thick_f, 2, &p};
+	 	} else if (opt == 1) {
+			FDF = {&thin_f, &thin_df, &thin_fdf, 2, &p};
+			F = {&thin_f, 2, &p};
+		}
 
-		printf("Exact A = %.3lf, Recovered A = %.3lf, diff = %.3e\n",   A, x[0], abs(A-x[0])/min(A,x[0]));
-		printf("Exact B = %.3lf, Recovered B = %.3lf, diff = %.3e\n\n", B, x[1], abs(B-x[1])/min(B,x[1]));
+		x0[0] = A*1.02;
+		x0[1] = B*0.98;
 
+	        NRaphson_2D(x0, x, FDF);
+	        //NRaphson_2D_findiff(x0, x, F);
+		
+		//if (abs(A-x[0])/min(A,x[0]) > 1.e-3) {
+		//	printf("Exact A = %.3lf,	Recovered A = %.3lf,	diff = %.3e\n",   A, x[0], abs(A-x[0])/min(A,x[0]));
+		//} else {
+		//	printf("Exact A = %.3lf,	Recovered A = %.3lf\n",   A, x[0]);
+		//}
+
+		//if (abs(B-x[1])/min(B,x[1]) > 1.e-3) {
+		//	printf("Exact B = %.3lf,	Recovered B = %.3lf,	diff = %.3e\n\n", B, x[1], abs(B-x[1])/min(B,x[1]));
+		//} else {
+		//	printf("Exact B = %.3lf,	Recovered B = %.3lf\n\n", B, x[1]);
+		//}
+		
+		//// Compute A e B (T and eta_nu) along CCSN 1D profile
+		p = {ynu*nb, znu*nb};
+		if (opt == 0) {
+			FDF = {&thick_f, &thick_df, &thick_fdf, 2, &p};
+			F = {&thick_f, 2, &p};
+		} else if (opt == 1) {
+			FDF = {&thick_f, &thick_df, &thick_fdf, 2, &p};
+			F = {&thin_f, 2, &p};
+		}
+
+
+		if (i == 0) {
+			x0[0] = A;
+        		x0[1] = B;
+		} else {
+			x0[0] = tmp[0];
+			x0[1] = tmp[1];
+		}
+
+
+	        NRaphson_2D(x0, x, FDF);
+	        //NRaphson_2D_findiff(x0, x, F);
+	
+		tmp[0] = x[0];
+		tmp[1] = x[1];
+
+		x0[0] = A;
+		x0[1] = B;
+
+	        NRaphson_2D(x0, x, FDF);
+		
+		//printf("%.5e, %.5e, %.5e, %.5e, %.5e\n", r, d, mu_nu, x[1]/x[0], tmp[1]/tmp[0]);
+		printf("%.5e, %.5e, %.5e, %.5e, %.5e\n", r, d, T, x[0], tmp[0]);
+		//printf("ok\n");
                 std::getline(fin, finLine);
                 std::getline(din, dinLine);
+		i += 1;
         }
 
 
