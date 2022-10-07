@@ -18,5 +18,13 @@ namespace parameters
 	const double emax = 3.e2;
 
 	//numerical integration
+	bool save_wghs = true;	
 	const double alpha = 0.; //power exponent of Gauss-Laguerre weight
+	const int ngle = 20;
+	const int ngla = 20;
+
+	//fermionic eos
+	//electrons
+	const double eta1 = -5.e3;
+	const double eta2 =  5.e3;
 }
