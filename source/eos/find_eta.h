@@ -2,6 +2,7 @@
 #include <gsl/gsl_roots.h>
 #include "../constants.h"
 #include "../tools/nr3.h"
+#include "./complete_FG.h"
 
 using namespace constants;
 struct eta_NR_params { double nLep; double T; double mLep; gsl_integration_fixed_workspace *w_leg; gsl_integration_fixed_workspace *w_lag; };

@@ -16,8 +16,8 @@ using namespace fermi;
 namespace nuabsem
 {
 
-	double c1 = (GF*GF/pi) / pow(h*c/(2*pi),4);
-	double c2 = gV*gV+3*gA*gA;
+	double g1 = (GF*GF/pi) / pow(h*c/(2*pi),4);
+	double g2 = gV*gV+3*gA*gA;
 
 	double eta_np(double np, double nn, double mu_hat, double T)
 	{
@@ -95,10 +95,10 @@ namespace nuabsem
 		}
 
 		if (E-lep_mass > 0.) {
-			ab = R * c1 * c2 * eta_np(np,nn,mu_np,T) * pow(E,2) *\
+			ab = R * g1 * g2 * eta_np(np,nn,mu_np,T) * pow(E,2) *\
 		             pow((1-pow(lep_mass/E,2)),0.5) * (1.-Fermi(mu_l,E,T)); //*theta(E-lep_mass);
 
-			em = R * c * c1 * c2 * eta_pn(np,nn,mu_np,T) * pow(E,2)*\
+			em = R * c * g1 * g2 * eta_pn(np,nn,mu_np,T) * pow(E,2)*\
                              pow((1-pow(lep_mass/E,2)),0.5) * Fermi(mu_l,E,T); //*theta(E-lep_mass);
 		} else {
 			ab = 0;
@@ -136,10 +136,10 @@ namespace nuabsem
 		}
 		
 		if (E-lep_mass > 0.) {
-			ab = Rbar * c1 * c2 * eta_pn(np,nn,mu_np,T) * pow(E,2) *\
+			ab = Rbar * g1 * g2 * eta_pn(np,nn,mu_np,T) * pow(E,2) *\
 		             pow((1-pow(lep_mass/E,2)),0.5) * (1.-Fermi(-mu_l,E,T)); // * theta(E-lep_mass);
 			
-			em = Rbar * c * c1 * c2 * eta_np(np,nn,mu_np,T) * pow(E,2) *\
+			em = Rbar * c * g1 * g2 * eta_np(np,nn,mu_np,T) * pow(E,2) *\
                             pow((1-pow(lep_mass/E,2)),0.5) * Fermi(-mu_l,E,T); // * theta(E-lep_mass);
 		} else {
 			ab = 0.;

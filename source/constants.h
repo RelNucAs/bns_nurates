@@ -25,6 +25,7 @@ namespace constants
 	
 	// Atomic mass unit
 	const double mb = 1.674e-24; // g
+        const double mu = 1.66054e-24; //g
 	
 	// Physical constants
 	const double h_bar = 6.582*(10e-22); // MeV*s
