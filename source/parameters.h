@@ -25,6 +25,8 @@ namespace parameters
 
 	//fermionic eos
 	//electrons
-	const double eta1 = -5.e3;
-	const double eta2 =  5.e3;
+	const double eta1 = -2.3e4;
+	const double eta2 =  2.3e4;
+	const int nne = 700;
+	const int nt = 150;
 }

@@ -4,8 +4,10 @@
 #include <string>
 #include <vector>
 
-const int nne = 700;
-const int nt = 150;
+#include "../parameters.h"
+
+using namespace parameters;
+using namespace std;
 
 struct EOSeta {
         double d[nne]; //density
@@ -45,13 +47,13 @@ std::string trim(const std::string& str,
 }
 
 struct EOSeta read_eta_table() {
-	string filename = "eos_table/eos_electrons_v2.txt";
-	string EOSline;
+	std::string filename = "eos_table/eos_electrons_v2.txt";
+	std::string EOSline;
 	struct EOSeta output;
 	int n1, n2;
 	int i, j;
 	
-	ifstream EOStable;
+	std::ifstream EOStable;
 	//EOStable.open(filename,ios::in);  // open
 	EOStable.open(filename);  // open
 	// open input table
@@ -149,18 +151,18 @@ struct EOScomplete read_total_table() {
                 std::exit(EXIT_FAILURE);
         }
 
-        for (j=0;j<4;j++) {
-		getline(EOStable, EOSline);
-        	std::stringstream s3(EOSline);
-        	for (i=0;i<150;i++) {
-                	s3 >> output.d[j*150+i];
-        	}
-	}
+        //for (j=0;j<4;j++) {
+	//	getline(EOStable, EOSline);
+        //	std::stringstream s3(EOSline);
+        //	for (i=0;i<150;i++) {
+        //        	s3 >> output.d[j*150+i];
+        //	}
+	//}
 
 	//reset_string(s3);
 	getline(EOStable, EOSline);
 	std::stringstream s3(EOSline);
-        for (i=600;i<700;i++) {//for (i=0;i<n1;i++) {
+        for (i=0;i<n1;i++) { //for (i=600;i<700;i++)
         	s3 >> output.d[i];
         }
 	
@@ -301,9 +303,9 @@ void sett(double t, double t_arr[], int* idx, double* r) {
 
 	*idx = it;
 	*r   = rt;
-	printf("logt = %.3lf, rt = %.3lf\n", logt, rt);
-	printf("it = %d, t[it] = %.3lf, t[it+1] = %.3lf\n", it, t_arr[it], t_arr[it+1]);
-	printf("idx = %d, r = %.3lf\n", it, rt);
+	//printf("logt = %.3lf, rt = %.3lf\n", logt, rt);
+	//printf("it = %d, t[it] = %.3lf, t[it+1] = %.3lf\n", it, t_arr[it], t_arr[it+1]);
+	//printf("idx = %d, r = %.3lf\n", it, rt);
 	return;
 }
 

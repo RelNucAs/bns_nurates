@@ -1,8 +1,9 @@
+#pragma once
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_roots.h>
-#include "../constants.h"
+#include "../constants_bis.h"
 #include "../tools/nr3.h"
-#include "./complete_FG.h"
+#include "complete_FG.h"
 
 using namespace constants;
 struct eta_NR_params { double nLep; double T; double mLep; gsl_integration_fixed_workspace *w_leg; gsl_integration_fixed_workspace *w_lag; };
@@ -11,32 +12,31 @@ struct eta_NR_params { double nLep; double T; double mLep; gsl_integration_fixed
 //.......and the particle species, the subroutine computes the net fraction ynet and the first eta derivative.
 //.......UNITS: rho in g/cm**3; T in MeV
 double n_net_f(double eta, double T, double mLep) {
-	double K = 8*sqrt(2)*pi*pow(mLep/(h*c),3.); //31217845.162531383*mLep**3
-	double f1, f2, f3, f4;
+        double K = 8*sqrt(2)*pi*pow(mLep/(h*c),3.); //31217845.162531383*mLep**3
+        double f1, f2, f3, f4;
         double theta = T/mLep;
 
-	f1 = compute_res( eta,          theta, 0.5);
-	f2 = compute_res(-eta-2./theta, theta, 0.5);
-	f3 = compute_res( eta,          theta, 1.5);
-	f4 = compute_res(-eta-2./theta, theta, 1.5);
-        
+        f1 = compute_res( eta,          theta, 0.5);
+        f2 = compute_res(-eta-2./theta, theta, 0.5);
+        f3 = compute_res( eta,          theta, 1.5);
+        f4 = compute_res(-eta-2./theta, theta, 1.5);
+
         return  K*pow(theta,1.5)*(f1-f2+theta*(f3-f4));
 }
 
 
 double n_net_df(double eta, double T, double mLep) {
         double K = 8*sqrt(2)*pi*pow(mLep/(h*c),3.); //31217845.162531383*mLep**3
-	double f1, f2, f3, f4;
+        double f1, f2, f3, f4;
         double theta = T/mLep;
 
-	f1 = compute_res_ed( eta,          theta, 0.5);
-	f2 = compute_res_ed(-eta-2./theta, theta, 0.5);
-	f3 = compute_res_ed( eta,          theta, 1.5);
-	f4 = compute_res_ed(-eta-2./theta, theta, 1.5);
-        
+        f1 = compute_res_ed( eta,          theta, 0.5);
+        f2 = compute_res_ed(-eta-2./theta, theta, 0.5);
+        f3 = compute_res_ed( eta,          theta, 1.5);
+        f4 = compute_res_ed(-eta-2./theta, theta, 1.5);
+
         return  K*pow(theta,1.5)*(f1-f2+theta*(f3-f4));
 }
-
 
 
 double find_guess_e(double ne, double T) {
@@ -106,8 +106,10 @@ double rtsafe(double nLep, double T, double mLep, const double guess, const doub
 	double fl=n_net_f(x1, T, mLep)-nLep;
 	double fh=n_net_f(x2, T, mLep)-nLep;
 
-	if ((fl > 0.0 && fh > 0.0) || (fl < 0.0 && fh < 0.0))
+	if ((fl > 0.0 && fh > 0.0) || (fl < 0.0 && fh < 0.0)) {
+		printf("nLep = %.3e cm-3, T = %.3e MeV, fl = %.3e cm-3, fh = %.3e cm-3\n", nLep, T, fl, fh);
 		throw("Root must be bracketed in rtsafe");
+	}
 	if (fl == 0.0) return x1;
 	if (fh == 0.0) return x2;
 	if (fl < 0.0) { //Orient the search so that f(xl) < 0.

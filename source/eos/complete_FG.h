@@ -1,3 +1,5 @@
+#pragma once
+
 #include <gsl/gsl_integration.h>
 #include "FD_functions.h"
 

@@ -1,5 +1,3 @@
-#include "complete_FG.h"
-
 double n_part(double T, double eta, double mLep) {
         double K = 8*sqrt(2)*pi*pow(mLep/(h*c),3.); //31217845.162531383*mLep**3
         double f1, f2;
