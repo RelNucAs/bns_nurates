@@ -299,7 +299,7 @@ int thick_fdf_old (gsl_vector *x, void *p, gsl_vector *f, gsl_matrix *J) {
         return GSL_SUCCESS;
 }
 
-int thick_fdf(const gsl_vector * x, void *params, gsl_vector *f, gsl_matrix *J) {
+int thick_fdf_GSL(const gsl_vector * x, void *params, gsl_vector *f, gsl_matrix *J) {
         thick_f(x, params, f);
         thick_df(x, params, J);
         return GSL_SUCCESS;
@@ -335,7 +335,7 @@ int thin_df(const gsl_vector *x, void *p, gsl_matrix *J) {
         return GSL_SUCCESS;
 }
 
-int thin_fdf(const gsl_vector * x, void *params, gsl_vector *f, gsl_matrix *J) {
+int thin_fdf_GSL(const gsl_vector * x, void *params, gsl_vector *f, gsl_matrix *J) {
         thin_f(x, params, f);
         thin_df(x, params, J);
         return GSL_SUCCESS;

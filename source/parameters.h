@@ -27,6 +27,12 @@ namespace parameters
 	//electrons
 	const double eta1 = -2.3e4;
 	const double eta2 =  2.3e4;
-	const int nne = 700;
-	const int nt = 150;
+	
+	bool HR = true;
+	//if (HR == true) {
+		const int nne = 1400;
+		const int nt = 300;
+	//} else {
+	//	const int nne = 700;
+	//	const int nt = 150;
 }

@@ -8,14 +8,16 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include "source/parameters.h"
-#include "source/eos/interp.h"
-#include "source/eos/find_eta.h"
-#include "source/eos/eos_fermions.h"
+#include "../source/parameters.h"
+#include "../source/eos/interp.h"
+#include "../source/eos/find_eta.h"
+#include "../source/eos/eos_fermions.h"
 
+#include <limits>
 int main (){
 	double r1, r2;
-	double n_arr[nne], t_arr[nt], eta_arr[nne*nt]; //, e_arr[nne*nt];
+	std::vector<double> n_arr, t_arr;
+	std::vector<double> eta_arr;
 	double ne, T;
 	double dn, dt;
         double eta_NR, eta;
@@ -24,7 +26,7 @@ int main (){
 	double a_p1, a_p2, a_p3;
 	double e1, e2, e3;
 	double a_e1, a_e2, a_e3;
-	double s1, s2, s3;
+        double  s1, s2, s3;
 	double a_s1, a_s2, a_s3;
 	double guess;
 
@@ -33,29 +35,47 @@ int main (){
 	struct EOScomplete EOS_table = read_total_table();
 
 	//Input arrays
-	for (int i=0;i<nne;i++) n_arr[i] = eta_table.d[i];
-	for (int i=0;i<nt;i++)  t_arr[i] = eta_table.t[i];
-	for (int i=0;i<nne*nt;i++) eta_arr[i] = eta_table.eta[i];
+	//for (int i=0;i<nne;i++) 
+	n_arr = eta_table.d;
+	//for (int i=0;i<nt;i++) 
+	t_arr = eta_table.t;
+	eta_arr = eta_table.eta;
+
+	//for (int i=0;i<nne*nt;i++) eta_arr[i] = eta_table.eta[i];
 	//for (int i=0;i<nne*nt;i++) {
 		//e_arr[i]   = EOS_table.e_part[i];
-		//printf("%.3e\n", EOS_table.e_part[i]);
+		//printf("i = %d, nne = %d, r = %d, y = %.3e\n", i, i/nne, i%nt, EOS_table.P_antipart[i]);
+		//printf("%.3e\n", eta_table.eta[i]);
 	//}
-	
-	
 
-        std::ofstream fin("input_entries.txt");
-        if (!fin)  cout << "File not found" << '\n';
+	//printf("%e, %e\n",std::numeric_limits<double>::min(),std::numeric_limits<double>::max());
+
+	//if (HR == true) {
+		std::ofstream fin("input_entries_HR.txt");
+	//} else {
+	//	std::ofstream fin("input_entries.txt");
+	//}
+	if (!fin)  cout << "File not found" << '\n';
 	fin << std::scientific;
         
-	std::ofstream f1("first_method.txt");
+	//if (HR == true) {
+		std::ofstream f1("first_method_HR.txt");
+	//} else {
+	//	std::ofstream f1("first_method.txt");
         if (!f1)  cout << "File not found" << '\n';
 	f1 << std::scientific;
 
-	std::ofstream f2("second_method.txt");
+	//if (HR == true) {
+		std::ofstream f2("second_method_HR.txt");
+	//} else {
+	//	std::ofstream f2("second_method.txt");
         if (!f2)  cout << "File not found" << '\n';
 	f2 << std::scientific;
 	
-	std::ofstream f3("third_method.txt");
+	//if (HR == true) {
+		std::ofstream f3("third_method_HR.txt");
+	//} else {
+	//	std::ofstream f3("third_method.txt");
         if (!f3)  cout << "File not found" << '\n';
 	f3 << std::scientific;
 	
@@ -98,7 +118,7 @@ int main (){
 			a_s2 = s_antipart(T, eta, me);
 
 			//Third method: direct interpolation of e.g. energy
-			mu2 = T*eta + me;
+			mu3 = eos_tintep(ne, T, n_arr, t_arr, EOS_table.mu_part);
 			p3  = eos_tintep(ne, T, n_arr, t_arr, EOS_table.P_part);
 			e3  = eos_tintep(ne, T, n_arr, t_arr, EOS_table.e_part);
 			s3  = eos_tintep(ne, T, n_arr, t_arr, EOS_table.s_part);

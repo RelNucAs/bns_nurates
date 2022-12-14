@@ -15,10 +15,10 @@
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_roots.h>
 
-#include "./source/integration.h" //Header file contatining integration routines
-#include "./source/tools/nr3.h"
-#include "./source/tools/fermi_integrals.h"
-#include "./source/tools/NewtonRaphson.h"
+#include "../source/integration.h" //Header file contatining integration routines
+#include "../source/tools/nr3.h"
+#include "../source/tools/fermi_integrals.h"
+#include "../source/tools/NewtonRaphson.h"
 
 struct my_f_params { int k; double eta; double alpha; };
 
