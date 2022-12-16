@@ -1,13 +1,14 @@
 //Define parameters
 #pragma once //compile only once
+#include <string>
 
 namespace parameters
 {
 	//decide to use (1) or not (0) recoil and weak magnetism for neutrino absorption on nucleons 
-        const int use_WM_ab = 1;
+        const int use_WM_ab = 0;
 	
 	//decide to use (1) or not (0) recoil and weak magnetism for elastic neutrino scattering on nucleons 
-        const int use_WM_sc = 1;
+        const int use_WM_sc = 0;
 
 	//decide to use (1) or not (0) deltaU 
         const int use_dU = 0;
@@ -35,4 +36,5 @@ namespace parameters
 	//} else {
 	//	const int nne = 700;
 	//	const int nt = 150;
+	std::string abs_path = "/home/leonardo/Desktop/PhD_work/BNS_muons/bns_nurates/"; //to be moved somewhere else
 }

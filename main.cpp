@@ -60,6 +60,7 @@ int main (){
 	double a = 0., b = 1.;
 	double alpha = 0., beta = 0.;
 	//double GSL_lag, NR_lag;
+	my_function F1, F2, F3, F4;
 	double eta_nue, eta_anue;
 	double eta0_nue, eta0_anue;
 	double t1, t2, t3, t4;
@@ -67,6 +68,10 @@ int main (){
 	save_gauleg(n, a, b);
 	save_gaulag(n, alpha);
 
+	F1.function = &j_nue;
+	F2.function = &j_anue;
+	F3.function = &j0_nue;
+	F4.function = &j0_anue;
 	
 	// open input profile
 	std::fstream fin("./input/nurates_1.008E+01.txt"); //read file
@@ -138,7 +143,12 @@ int main (){
 		//F_leg.params = &params1
 
                 //x = x_NRaphson(max_iter, x0, FDF);
-
+		
+		F1.params = &params;
+		F2.params = &params;
+		F3.params = &params;
+		F4.params = &params;
+		
 		t1 = max(mu_e-Q,5.);
 		//t = find_max(1000, 0.1, 400., &j_nue, params);
 		t2 = max(-(mu_e-Q),5.); 
@@ -148,10 +158,10 @@ int main (){
 		Iout << std::scientific << setprecision(10) << r << "\t" << T << "\t" << mu_e << "\t"; 
 
 		for (int nn=8;nn<=32;nn+=8) {
-                        eta_nue   = split_gauleg(nn, &j_nue,   params, t1);
-                        eta_anue  = split_gauleg(nn, &j_anue,  params, t2);
-                        eta0_nue  = split_gauleg(nn, &j0_nue,  params, t3);
-                        eta0_anue = split_gauleg(nn, &j0_anue, params, t4);
+                        eta_nue   = gleg_integ(nn, F1, t1);
+                        eta_anue  = gleg_integ(nn, F2, t2);
+                        eta0_nue  = gleg_integ(nn, F3, t3);
+                        eta0_anue = gleg_integ(nn, F4, t4);
 
                         Iout << eta_nue << "\t"; 
 
@@ -159,10 +169,10 @@ int main (){
 			printf("t3 = %.3e, eta0_nue = %.6e;	t4 = %.3e, eta0_anue = %.6e\n\n", t3, eta0_nue, t4, eta0_anue);
 		}
 
-		eta_nue   = split_gauleg(100, &j_nue,   params, t1);
-		eta_anue  = split_gauleg(100, &j_anue,  params, t2);
-		eta0_nue  = split_gauleg(100, &j0_nue,  params, t3);
-		eta0_anue = split_gauleg(100, &j0_anue, params, t4);
+		eta_nue   = gleg_integ(100, F1, t1);
+		eta_anue  = gleg_integ(100, F2, t2);
+		eta0_nue  = gleg_integ(100, F3, t3);
+		eta0_anue = gleg_integ(100, F4, t4);
 
 		Iout << eta_nue << "\n";
 

@@ -22,9 +22,9 @@ void save_gauleg(int n, const Doub x1, const Doub x2) {
 	gauleg(x1, x2, x, w);
 
         char outname[50];
-        sprintf(outname, "./input/gauleg_weights_n_%d.txt", n);
+        sprintf(outname, "input/gauleg_weights_n_%d.txt", n);
 
-        ofstream fout(outname);
+        ofstream fout(abs_path+outname);
         sprintf(fileHeader, "# Abscissas and weights for Gauss-Legendre integration from x1 = %.3lf to x2 = %.3lf\n", x1, x2);
 	
 	fout << fileHeader;
@@ -50,9 +50,9 @@ void save_gaulag(int n, const Doub alf) {
         gaulag(x, w, alf);
 
         char outname[50];
-        sprintf(outname, "./input/gaulag_weights_%.0lf_n_%d.txt", alf, n);
+        sprintf(outname, "input/gaulag_weights_%.0lf_n_%d.txt", alf, n);
 
-        ofstream fout(outname);
+        ofstream fout(abs_path+outname);
         fout << "# Abscissas and weights for Gauss-Laguerre integration\n";
 	
 	for (int i=0;i<n;i++) {
@@ -61,30 +61,27 @@ void save_gaulag(int n, const Doub alf) {
         fout.close();
 }
 
-void read_wgts(int n, double *x, double *w, int g_type) {
-	//g_type = 0: Gauss-Legendre
-	//g_type = 1: Gauss-Laguerre (alpha = 0)
-	//g_type = 2: Gauss-Laguerre (alpha = 5)
-  
+void read_gleg_wgts(int n, double *x, double *w) {
   	char gaussname[50];
 	string dummyLine;
+        sprintf(gaussname, "input/gauleg_weights_n_%d.txt", n);
 
-	if (g_type == 0) {
-                sprintf(gaussname, "./input/gauleg_weights_n_%d.txt", n);
-        } else if (g_type == 1) {
-                sprintf(gaussname, "./input/gaulag_weights_0_n_%d.txt", n);
-        } else if (g_type == 2) {
-                sprintf(gaussname, "./input/gaulag_weights_5_n_%d.txt", n);
-        } else {
-                printf("Index of Gaussian Quadrature method not recognized");
-                exit (EXIT_FAILURE);
-        }
+	//if (g_type == 0) {
+        //        sprintf(gaussname, "../input/gauleg_weights_n_%d.txt", n);
+        //} else if (g_type == 1) {
+        //        sprintf(gaussname, "../input/gaulag_weights_0_n_%d.txt", n);
+        //} else if (g_type == 2) {
+        //        sprintf(gaussname, "../input/gaulag_weights_5_n_%d.txt", n);
+        //} else {
+        //        printf("Index of Gaussian Quadrature method not recognized");
+        //        exit (EXIT_FAILURE);
+        //}
 
         // open input file
-        std::fstream fin(gaussname);
+        std::fstream fin(abs_path+gaussname);
 
         if (!fin) {
-                cout << "File regarding Gaussian quadrature not found" << '\n';
+                cout << "File regarding Gauleg quadrature not found: n = " << n << "\n";
                 exit (EXIT_FAILURE);
         }
 
@@ -96,6 +93,30 @@ void read_wgts(int n, double *x, double *w, int g_type) {
 	}
 
 	fin.close();
+}
+
+void read_glag_wgts(int n, double *x, double *w, double alpha) {
+        char gaussname[50];
+        string dummyLine;
+
+        sprintf(gaussname, "input/gaulag_weights_%d_n_%d.txt", int(alpha), n);
+        
+	// open input file
+        std::fstream fin(abs_path+gaussname);
+
+        if (!fin) {
+                cout << "File regarding Gaulag quadrature not found: n = " << n << ", alpha = " << alpha << "\n";
+                exit (EXIT_FAILURE);
+        }
+
+        getline(fin, dummyLine); //skip header line
+
+        for (int i=0;i<n;i++) {
+                std::stringstream ss(dummyLine);
+                fin >> x[i] >> w[i];
+        }
+
+        fin.close();
 }
 
 
@@ -112,18 +133,16 @@ double do_integration(int n, double *wgt, double *spectrArray) {
 
 }
 
-double use_gaulag(int n, double (*func)(double, struct my_f_params), struct my_f_params p, int g_type) {
+double glag_integ(int n, my_function F, double alpha) {
         double x[n], w[n];
         double f[n];
 
-        read_wgts(n, x, w, g_type);
+        read_glag_wgts(n, x, w, alpha);
 
-        if (g_type == 1) { //alpha = 0
-		for (int i=0;i<n;i++) f[i] = func(x[i], p) * exp(x[i]);
-	} else if (g_type == 2) {
-		for (int i=0;i<n;i++) f[i] = func(x[i], p) * exp(x[i]) / pow(x[i],5.);
+	if (alpha == 0.) {
+		for (int i=0;i<n;i++) f[i] = F.function(x[i], F.params) * exp(x[i]);
 	} else {
-		printf("Index for g_type is not correct\n");
+		for (int i=0;i<n;i++) f[i] = F.function(x[i], F.params) * exp(x[i]) / pow(x[i],alpha);
 	}
 
         return do_integration(n, w, f);
@@ -135,19 +154,19 @@ double split_value(double T, double eta_e) {
 }
 
 
-double split_gauleg(int n, double (*func)(double, struct my_f_params), struct my_f_params p, double t) {
+double gleg_integ(int n, my_function F, double t) {
         double x[n], w[n];
         double f1[n], f2[n];
 
-        read_wgts(n, x, w, 0);
+        read_gleg_wgts(n, x, w);
 
         for (int i=0;i<n;i++) {
-                f1[i] = func(t*x[i], p);
-                f2[i] = func(t/x[i], p) / (x[i]*x[i]);
+                f1[i] = F.function(t*x[i], F.params);
+                f2[i] = F.function(t/x[i], F.params) / (x[i]*x[i]);
         }
- 
-	return t * (do_integration(n, w, f1) + do_integration(n, w, f2));
+        return t * (do_integration(n, w, f1) + do_integration(n, w, f2));
 }
+
 
 double GSL_integration(int n, double a, double b, double alpha, double beta, gsl_function F, const gsl_integration_fixed_type * gauss_type) {
         gsl_integration_fixed_workspace *w;
@@ -174,3 +193,32 @@ double find_max(int nslice, double x0, double x1, double (*func)(double, struct 
         //printf("\n");
         return guess;
 }
+
+double find_guess(int nslice, my_function F) {
+        double val, max = 0;
+        double guess;
+        void *p = F.params;
+        struct FD_params * params = (struct FD_params *)p;
+        double eta = (params->eta);
+        double x0, x1;
+
+        if (abs(eta) < 10.) {
+                x0 = 0.1*abs(eta),
+                x1 = 100*abs(eta);
+        } else {
+                x0 = 0.5*abs(eta);
+                x1 = 2.0*abs(eta);
+        }
+
+        double dx = (x1-x0) / (double) nslice;
+        for (double x=x0;x<x1;x+=dx) {
+                val = F.function(x,p);
+                //printf("x = %.3e, Val = %.3e\n", x, val);
+                if (val > max) {
+                        max = val;
+                        guess = x;
+                }
+        }
+        return guess;
+}
+
