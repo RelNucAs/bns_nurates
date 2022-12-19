@@ -52,7 +52,7 @@ std::string trim(const std::string& str,
 struct EOSeta read_eta_table() {
 	//std::string filename = "eos_table/eos_electrons_v2.txt";
 	//if (HR == true) {
-		std::string filename = "../eos_table/eos_electrons_leo_HR.txt";
+		std::string filename = "../eos_table/eos_electrons_v2.txt"; //leo_HR.txt";
 	//} else {
 	//	std::string filename = "../eos_table/eos_electrons_leo.txt";
 	std::string EOSline;

@@ -36,11 +36,12 @@ int main (){
         t_arr = eta_table.t;
         eta_arr = eta_table.eta;
 
-	ne = 1.e-1;
+	ne = 6.;
 	//eta = 3.84251563e+02;
 	T = 6.e-2; //5.12913428e-02; //MeV
 	theta = T/me;
-
+	
+	printf("%.12e\n", compute_res(10., theta, 0.5));
 	printf("Input quantities: ne = %.3e 1/fm^3, T = %.3e MeV (theta = %.3e)\n\n", ne, T, theta);
 
 	//double h1 = compute_res(eta, theta, 0.5);
@@ -55,7 +56,7 @@ int main (){
 	printf("First method: completely on-the-fly\n");
 	guess = find_guess_e(1.e39*ne, T);
 	eta_NR = rtsafe(1.e39*ne, T, me, guess, eta1, eta2);
-	printf("eta_NR = %.6e\n", eta_NR);
+	printf("eta_NR = %.15e\n", eta_NR);
 	mu1 = T*eta_NR + me;
 	p1  = P_part(T, eta_NR, me);
 	e1  = e_part(T, eta_NR, me);
@@ -63,8 +64,11 @@ int main (){
 	a_p1 = P_antipart(T, eta_NR, me);
 	a_e1 = e_antipart(T, eta_NR, me);
 	a_s1 = s_antipart(T, eta_NR, me);
+	//printf("s = %.12e\n", s1);
+	exit(EXIT_SUCCESS);
 	printf("Electrons: P = %.6e, e = %.6e, s = %.6e\n", p1, e1, s1);
 	printf("Positrons: P = %.6e, e = %.6e, s = %.6e\n\n", a_p1, a_e1, a_s1);
+
 
 	//Second method: eta interpolation + e.g. energy on-the-fly
 	printf("Second method: eta interpolation, then on-the-fly\n");

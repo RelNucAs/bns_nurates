@@ -31,10 +31,10 @@ namespace parameters
 	
 	bool HR = true;
 	//if (HR == true) {
-		const int nne = 1400;
-		const int nt = 300;
+		//const int nne = 1400;
+		//const int nt = 300;
 	//} else {
-	//	const int nne = 700;
-	//	const int nt = 150;
+		const int nne = 700;
+		const int nt = 150;
 	std::string abs_path = "/home/leonardo/Desktop/PhD_work/BNS_muons/bns_nurates/"; //to be moved somewhere else
 }

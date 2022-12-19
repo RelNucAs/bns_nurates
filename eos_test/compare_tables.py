@@ -74,7 +74,7 @@ plt.savefig(plot_folder+"plot_eta_table.png",dpi=300,bbox_inches='tight')
 
 plt.close()
 
-complete_file = '../eos_table/eos_electrons_complete_leo.txt'
+complete_file = '../eos_table/eos_electrons_complete_leo.txt' #with_eta_ele.txt'
 mu  = np.loadtxt(complete_file,skiprows=4,max_rows=700,unpack=True,dtype=float)
 P   = np.loadtxt(complete_file,skiprows=4+700*1,max_rows=700,unpack=True,dtype=float)
 a_P = np.loadtxt(complete_file,skiprows=4+700*2,max_rows=700,unpack=True,dtype=float)
@@ -101,7 +101,7 @@ therm_ele = np.where(therm_ele>0.,therm_ele,1.e-50)
 diff = abs(therm_leo-therm_ele)/therm_leo
 diff = np.where(diff>0.,diff,1.e-10)
 
-titles = [r'Electron pressure $P_{e^-}$', r'Electron internal energy $e_{e^-}$', r'Electron entropy $s_{e^-}$', r'Positron pressure $P_{e^+}$', r'Positron internal energy $e^+$', r'Positron entropy $s_{e^+}$']
+titles = [r'Electron pressure $P_{e^-}$', r'Electron int. energy $e_{e^-}$', r'Electron entropy $s_{e^-}$', r'Positron pressure $P_{e^+}$', r'Positron int. energy $e_{e^+}$', r'Positron entropy $s_{e^+}$']
 
 #plot figure
 for i in range(int(therm_leo.shape[0]/3)):
@@ -125,7 +125,7 @@ for i in range(int(therm_leo.shape[0]/3)):
         axs[1][j].set_xlabel(r'$n_e$ [fm$^{-3}$]')
 
         axs[0][j].set_title(titles[i*3+j])
-        axs[1][j].set_title('Rel diff')
+        axs[1][j].set_title('Rel diff (max = %.2e)' %np.amax(diff[i*3+j]))
        
         plt.colorbar(c1,ax=axs[0][j])
         plt.colorbar(c2,ax=axs[1][j])
@@ -136,6 +136,6 @@ for i in range(int(therm_leo.shape[0]/3)):
     axs[1][0].set_ylabel(r'$T$ [MeV]')
     
     plt.subplots_adjust(top=0.95,bottom=0.1,right=0.8,left=0.1,wspace=0.12)
-    plt.savefig(plot_folder+"plot_eos_table_%d.png" %i,dpi=300,bbox_inches='tight')
+    plt.savefig(plot_folder+"plot_eos_table_leo_%d.png" %i,dpi=300,bbox_inches='tight')
     plt.close()
 

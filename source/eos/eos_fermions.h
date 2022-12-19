@@ -85,7 +85,11 @@ double s_part(double T, double eta, double mLep) {
         f1 = compute_res(eta, theta, 0.5);
         f2 = compute_res(eta, theta, 1.5);
         f3 = compute_res(eta, theta, 2.5);
-
+	
+	printf("%.12e\t", fabs(-eta*f1+(5./3.-eta*theta)*f2 + 4./3.*theta*f3)/std::max(std::max(fabs(-eta*f1),fabs((5./3.-eta*theta)*f2)),fabs(4./3.*theta*f3)));
+	//printf("%.12e\n", -eta*f1+(5./3.-eta*theta)*f2 + 4./3.*theta*f3);
+	//printf("%.12e\n", K*kB*MeV*pow(theta,1.5));
+	//printf("%.12e\n", K*kB*MeV*pow(theta,1.5)*(-eta*f1+(5./3.-eta*theta)*f2+4./3.*theta*f3));
         return  K*kB*MeV*pow(theta,1.5)*(-eta*f1+(5./3.-eta*theta)*f2+4./3.*theta*f3); //erg/K/cm^3
 }
 
