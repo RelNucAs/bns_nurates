@@ -51,6 +51,8 @@ t_array = np.array([0.5*(t_edges[i]+t_edges[i+1]) for i in range(t_edges.size-1)
 #eta_file = '../eos_table/eos_electrons_v2.txt'
 #eta_ele = np.loadtxt(eta_file,skiprows=4,max_rows=700,unpack=True,dtype=float)
 
+[X, Y] = np.meshgrid(ne_array,t_array)
+
 #import data
 ne_rand, t_rand = np.loadtxt(sp+"/input_entries_"+sp+res+".txt",unpack=True)
 first  = np.loadtxt(sp+"/first_method_"+sp+res+".txt",unpack=True)
@@ -77,50 +79,34 @@ Y1  = total[id_a-1][1:]
 Y2  = total[id_b-1][1:]
 titles = titles[1:]
 
-thres = 1.e-10
-#Y = np.where(Y1>0., abs(Y1-Y2)/Y1, 1.e-10) 
-Y = abs(Y1-Y2)/Y1
-Y = np.where(Y>0., Y, 1.e-6) 
-#Y = np.where((Y1>thres) | (Y2>thres), Y, 1.e-10)
-ref = np.where(ref>0.,ref,1.e-50)
+ref = np.array([ref[i]+ref[i+3] for i in range(3)])
+Y1  = np.array([Y1[i]+Y1[i+3]   for i in range(3)])
+Y2  = np.array([Y2[i]+Y2[i+3]   for i in range(3)])
 
+thres = 1.e-10
+Y = np.where(Y1==Y2, 1.e-10, abs(Y1-Y2)/Y1)
+#Y = np.where(Y1>0., Y, 1.e-10) 
+#Y = np.where((Y1>thres) | (Y2>thres), Y, 1.e-10)
+#ref = np.where(ref>0.,ref,1.e-50)
+
+for i in range(Y[0].size):
+    if (Y[0].flatten()[i]==0.):
+        print("%.3e, %.3e, %.3e" %(Y[0].flatten()[i], Y1[0].flatten()[i], Y2[0].flatten()[i]))
 plot_folder = '../output/plots/eos/'
 
 #plot figure
 fig, axs = plt.subplots(2, 3, sharex='all', sharey='all', figsize=(16,8))
-plt.suptitle('Method 1')
-for i in range(Y.shape[0]):
-    ax = axs[int(i/3)][i%3]
-    #cx = ax.pcolormesh(ne_rand,t_rand,ref[i],norm=colors.LogNorm(vmin=1.e-10,vmax=np.amax(ref[i])),shading='gouraud')
-    if (i<3):
-        #cx = ax.pcolormesh(ne_rand,t_rand,ref[i],norm=colors.LogNorm(vmin=np.amin(ref[i]),vmax=np.amax(ref[i])),shading='gouraud')
-        cx = ax.contourf(ne_rand,t_rand,ref[i],norm=colors.LogNorm(vmin=np.amin(ref[i]),vmax=np.amax(ref[i])),levels=10**np.arange(math.floor(np.log10(np.amin(ref[i]))),math.floor(np.log10(np.amax(ref[i]))),2,dtype=np.float),extend='both')
-    else:
-        #cx = ax.pcolormesh(ne_rand,t_rand,ref[i],norm=colors.LogNorm(vmin=1.e-10,vmax=np.amax(ref[i])),shading='gouraud')
-        cx = ax.contourf(ne_rand,t_rand,ref[i],norm=colors.LogNorm(vmin=1.e-10,vmax=np.amax(ref[i])),levels=10**np.arange(-10,math.floor(np.log10(np.amax(ref[i]))),2,dtype=np.float),extend='both')
-    plt.colorbar(cx,ax=ax)
-    ax.set_title(titles[i])
-
-axs[0][0].set_xscale('log')
-axs[0][0].set_yscale('log')
-for i in range(3):
-    axs[1][i].set_xlabel(r'$n_L$ [fm$^{-3}$]')
-for i in range(2):
-    axs[i][0].set_ylabel(r'$T$ [MeV]')
-
-plt.subplots_adjust(top=0.85,bottom=0.1,right=0.8,left=0.1,wspace=0.12)
-plt.savefig(plot_folder+"/"+sp+"/plot_eos_onthefly_"+sp+res+".png",dpi=200,bbox_inches='tight')
-plt.close()
-
-#plot figure
-fig, axs = plt.subplots(2, 3, sharex='all', sharey='all', figsize=(16,8))
 plt.suptitle('Method %d vs method %d' %(id_a,id_b))
-for i in range(Y.shape[0]):
-    ax = axs[int(i/3)][i%3]
-    #cx = ax.pcolormesh(ne_rand,t_rand,Y[i],norm=colors.LogNorm(vmin=1.e-5,vmax=1.e-1),shading='gouraud')
-    cx = ax.contourf(ne_rand,t_rand,Y[i],norm=colors.LogNorm(vmin=1.e-5,vmax=1.e0),levels=np.logspace(-5,0,num=6),extend='both')
-    plt.colorbar(cx,ax=ax)
-    ax.set_title(titles[i]+' (Max diff: %.2e)' %np.amax(Y[i]))
+for i in range(3):
+    ax = axs[0][i]
+    cx1 = ax.contourf(ne_rand,t_rand,ref[i],norm=colors.LogNorm(vmin=np.amin(ref[i]),vmax=np.amax(ref[i])),levels=10**np.arange(math.floor(np.log10(np.amin(ref[i]))),math.floor(np.log10(np.amax(ref[i]))),2,dtype=np.float),extend='both')
+    plt.colorbar(cx1,ax=ax)
+    ax.set_title(titles[i])
+    ax = axs[1][i]
+    cx2 = ax.contourf(ne_rand,t_rand,Y[i],norm=colors.LogNorm(vmin=1.e-5,vmax=1.e0),levels=np.logspace(-5,0,num=6),extend='both')
+    plt.colorbar(cx2,ax=ax)
+    ax.set_title('Max diff: %.2e' %np.amax(Y[i]))
+    
 axs[0][0].set_xscale('log')
 axs[0][0].set_yscale('log')
 for i in range(3):
@@ -129,6 +115,6 @@ for i in range(2):
     axs[i][0].set_ylabel(r'$T$ [MeV]')
 
 plt.subplots_adjust(top=0.85,bottom=0.1,right=0.8,left=0.1,wspace=0.12)
-plt.savefig(plot_folder+"/"+sp+"/test_eos_"+sp+"_%d_vs_%d" %(id_a,id_b)+res+".png",dpi=200,bbox_inches='tight')
+plt.savefig(plot_folder+sp+"/test_eos_sum_"+sp+"_%d_vs_%d" %(id_a,id_b)+res+".png",dpi=200,bbox_inches='tight')
 plt.close()
 

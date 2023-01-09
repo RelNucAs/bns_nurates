@@ -2,6 +2,8 @@
 #pragma once //compile only once
 #include <string>
 
+struct eos_table_dim {int nne; int nnm; int nt;};
+
 namespace parameters
 {
 	//decide to use (1) or not (0) recoil and weak magnetism for neutrino absorption on nucleons 
@@ -26,15 +28,18 @@ namespace parameters
 
 	//fermionic eos
 	//electrons
-	const double eta1 = -2.3e4;
-	const double eta2 =  2.3e4;
-	
+	const double eta1_e = -2.3e4;
+	const double eta2_e =  2.3e4;
+	//muons
+	const double eta1_mu = -2.3e4;
+        const double eta2_mu = 5.0e4; //1.3e4
+
 	bool HR = true;
-	//if (HR == true) {
-		//const int nne = 1400;
-		//const int nt = 300;
-	//} else {
-		const int nne = 700;
-		const int nt = 150;
+
+	struct eos_table_dim SR_tab = {700 ,  750, 150};
+	struct eos_table_dim HR_tab = {1400, 1500, 300};
+	
 	std::string abs_path = "/home/leonardo/Desktop/PhD_work/BNS_muons/bns_nurates/"; //to be moved somewhere else
 }
+
+

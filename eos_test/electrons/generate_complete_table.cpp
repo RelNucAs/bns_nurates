@@ -8,14 +8,20 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include "../source/parameters.h"
-#include "../source/eos/find_eta.h"
-#include "../source/eos/eos_fermions.h"
-#include "../source/eos/interp.h"
+#include "../../source/parameters.h"
+#include "../../source/eos/find_eta.h"
+#include "../../source/eos/eos_fermions.h"
+#include "../../source/eos/interp.h"
 
 int main (){
-	int n1 = 700; //1400; //nne
-	int n2 = 150; //300; //nt
+        int n1, n2;
+        if (parameters::HR == true){
+                n1 = parameters::HR_tab.nne;
+                n2 = parameters::HR_tab.nt;
+        } else {
+                n1 = parameters::SR_tab.nne;
+                n2 = parameters::SR_tab.nt;
+        }
 
 	double ne, T, eta;
 	double guess;
@@ -39,9 +45,16 @@ int main (){
 	double ne_array[n1];
 	double t_array[n2];
 	double eta_array[n1*n2];
-	std::vector<double> eta_arr(n1*n2);
+	//std::vector<double> eta_arr(n1*n2);
 
-        string table_filename = "../eos_table/eos_electrons_complete_with_eta_ele.txt"; //eos_electrons_complete_leo_HR.txt";
+        string res;
+        if (parameters::HR == true) {
+                res = "_HR";
+        } else {
+                res = "";
+        }
+
+        string table_filename = abs_path + "eos_table/electrons/eos_electrons_complete_leo"+res+".txt";
         ofstream Iout(table_filename);
         Iout << n1 << "\n";
 	Iout << n2 << "\n";
@@ -61,20 +74,19 @@ int main (){
 	}
 	Iout << "\n";
 	
-        struct EOSeta eta_table = read_eta_table();
-        eta_arr = eta_table.eta;
+        //struct EOSeta eta_table = read_eta_table();
+        //eta_arr = eta_table.eta;
 
 	for (int i=0;i<n1;i++) {
 		for (int j=0;j<n2;j++) {
 			printf("i = %d, j = %d\n", i, j);
-	//		ne = ne_array[i];
-	//		T = t_array[j];
+	                ne = ne_array[i];
+			T = t_array[j];
 
-	//		guess = find_guess_e(1.e39*ne, T);
-        //                eta = rtsafe(1.e39*ne, T, me, guess, eta1, eta2);
+			guess = find_guess_e(1.e39*ne, T);
+                        eta = rtsafe(1.e39*ne, T, me, guess, eta1_e, eta2_e);
                         
-	         	eta_array[n2*i+j] = eta_arr[n2*i+j];
-                        //s = s_part(t_array[j], eta_array[n2*i+j], me);
+	         	eta_array[n2*i+j] = eta; //eta_arr[n2*i+j];
 		}
 	//	printf("\n");
 	}

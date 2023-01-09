@@ -8,13 +8,19 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include "../source/parameters.h"
-#include "../source/eos/find_eta.h"
-#include "../source/eos/eos_fermions.h"
+#include "../../source/parameters.h"
+#include "../../source/eos/find_eta.h"
+#include "../../source/eos/eos_fermions.h"
 
 int main (){
-	int n1 = 1400; //700; //nne
-	int n2 = 300; //150; //nt
+        int n1, n2;
+        if (parameters::HR == true){
+                n1 = parameters::HR_tab.nne;
+                n2 = parameters::HR_tab.nt;
+        } else {
+                n1 = parameters::SR_tab.nne;
+                n2 = parameters::SR_tab.nt;
+        }
 
 	double ne, T, eta;
 	double guess;
@@ -36,7 +42,14 @@ int main (){
 	double ne_array[n1];
 	double t_array[n2];
 
-        string table_filename = "../eos_table/eos_electrons_leo_HR.txt";
+        string res;
+        if (parameters::HR == true) {
+                res = "_HR";
+        } else {
+                res = "";
+        }
+
+        string table_filename = abs_path + "eos_table/electrons/eos_electrons_leo"+res+".txt";
         ofstream Iout(table_filename);
         Iout << n1 << "\n";
 	Iout << n2 << "\n";
@@ -63,7 +76,7 @@ int main (){
 			T = t_array[j];
 
 			guess = find_guess_e(1.e39*ne, T);
-                        eta = rtsafe(1.e39*ne, T, me, guess, eta1, eta2);
+                        eta = rtsafe(1.e39*ne, T, me, guess, eta1_e, eta2_e);
          
 	       		Iout << eta << " ";
 		}

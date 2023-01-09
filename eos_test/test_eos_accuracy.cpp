@@ -15,10 +15,11 @@
 
 #include <limits>
 int main (){
+	int nn, nt;
 	double r1, r2;
 	std::vector<double> n_arr, t_arr;
 	std::vector<double> eta_arr;
-	double ne, T;
+	double nL, T;
 	double dn, dt;
         double eta_NR, eta;
 	double mu1, mu2, mu3;
@@ -26,105 +27,108 @@ int main (){
 	double a_p1, a_p2, a_p3;
 	double e1, e2, e3;
 	double a_e1, a_e2, a_e3;
-        double  s1, s2, s3;
+        double s1, s2, s3;
 	double a_s1, a_s2, a_s3;
 	double guess;
 
+	const int Nsp = 1;
+
 	//Read EOS tables
-	struct EOSeta eta_table = read_eta_table();
-	struct EOScomplete EOS_table = read_total_table();
+	struct EOSeta eta_table = read_eta_table(Nsp);
+	struct EOScomplete EOS_table = read_total_table(Nsp);
+
+	nn = eta_table.nn;
+	nt = eta_table.nt;
 
 	//Input arrays
-	//for (int i=0;i<nne;i++) 
 	n_arr = eta_table.d;
-	//for (int i=0;i<nt;i++) 
 	t_arr = eta_table.t;
 	eta_arr = eta_table.eta;
 
-	//for (int i=0;i<nne*nt;i++) eta_arr[i] = eta_table.eta[i];
-	//for (int i=0;i<nne*nt;i++) {
-		//e_arr[i]   = EOS_table.e_part[i];
-		//printf("i = %d, nne = %d, r = %d, y = %.3e\n", i, i/nne, i%nt, EOS_table.P_antipart[i]);
-		//printf("%.3e\n", eta_table.eta[i]);
-	//}
+	std::string sp, res;
+	
+	double mL;
+       	if (Nsp==1) {
+		sp = "electrons";
+		mL = me;
+	} else {
+		sp = "muons";
+		mL = mmu;
+	}
 
-	//printf("%e, %e\n",std::numeric_limits<double>::min(),std::numeric_limits<double>::max());
+	if (parameters::HR == true) {
+		res = "_HR";
+	} else {
+		res = "";
+	}
 
-	//if (HR == true) {
-		std::ofstream fin("input_entries_HR.txt");
-	//} else {
-	//	std::ofstream fin("input_entries.txt");
-	//}
+	std::ofstream fin(sp+"/input_entries_"+sp+res+".txt");
 	if (!fin)  cout << "File not found" << '\n';
 	fin << std::scientific;
         
-	//if (HR == true) {
-		std::ofstream f1("first_method_HR.txt");
-	//} else {
-	//	std::ofstream f1("first_method.txt");
-        if (!f1)  cout << "File not found" << '\n';
+	std::ofstream f1(sp+"/first_method_"+sp+res+".txt");
+	if (!f1)  cout << "File not found" << '\n';
 	f1 << std::scientific;
 
-	//if (HR == true) {
-		std::ofstream f2("second_method_HR.txt");
-	//} else {
-	//	std::ofstream f2("second_method.txt");
-        if (!f2)  cout << "File not found" << '\n';
+	std::ofstream f2(sp+"/second_method_"+sp+res+".txt");
+	if (!f2)  cout << "File not found" << '\n';
 	f2 << std::scientific;
 	
-	//if (HR == true) {
-		std::ofstream f3("third_method_HR.txt");
-	//} else {
-	//	std::ofstream f3("third_method.txt");
+	std::ofstream f3(sp+"/third_method_"+sp+res+".txt");
         if (!f3)  cout << "File not found" << '\n';
 	f3 << std::scientific;
 	
-	//Initialization of random number generator
+	//Initialization of random number genLrator
 	srand(time(NULL));
 
-	//Loop over (ne-T) grid
-	for (int i=0;i<nne-1;i++) {
+	//Loop over (nL-T) grid
+	for (int i=0;i<nn-1;i++) {
 		for (int j=0;j<nt-1;j++) {
 			printf("i = %d, j = %d\n", i, j);
 			r1 = rand() / (double) RAND_MAX; //Returns a pseudo-random number between 0 and 1
 	       		r2 = rand() / (double) RAND_MAX;
 			//printf("r1 = %.3lf, r2 = %.3lf\n", r1, r2); //OK
 			dn = n_arr[i+1] - n_arr[i];
-			ne = n_arr[i] + r1*dn;		
+			nL = n_arr[i] + r1*dn;		
 			dt = t_arr[j+1] - t_arr[j];
 			T  = t_arr[j] + r2*dt;
 			
-			fin << ne << "\t" << T << "\n"; 
+			fin << nL << "\t" << T << "\n"; 
 			
 			//First method: completely on-the-fly (both eta and e.g. energy)
-			guess = find_guess_e(1.e39*ne, T);
-			eta_NR = rtsafe(1.e39*ne, T, me, guess, eta1, eta2);
-			mu1 = T*eta_NR + me;
-			p1  = P_part(T, eta_NR, me);
-			e1  = e_part(T, eta_NR, me);
-			s1  = s_part(T, eta_NR, me);
-			a_p1 = P_antipart(T, eta_NR, me);
-			a_e1 = e_antipart(T, eta_NR, me);
-			a_s1 = s_antipart(T, eta_NR, me);
+			if (Nsp == 1) {
+				guess = find_guess_e(1.e39*nL, T);
+				eta_NR = rtsafe(1.e39*nL, T, mL, guess, eta1_e, eta2_e);
+			} else if (Nsp == 2) {
+				guess = find_guess_mu(1.e39*nL, T);
+				eta_NR = rtsafe(1.e39*nL, T, mL, guess, eta1_mu, eta2_mu);
+			}
+			mu1 = T*eta_NR + mL;
+			p1  = P_part(T, eta_NR, mL);
+			e1  = e_part(T, eta_NR, mL);
+			s1  = s_part(T, eta_NR, mL);
+			a_p1 = P_antipart(T, eta_NR, mL);
+			a_e1 = e_antipart(T, eta_NR, mL);
+			a_s1 = s_antipart(T, eta_NR, mL);
 	
-			//Second method: eta interpolation + e.g. energy on-the-fly
-			eta = eos_tintep(ne, T, n_arr, t_arr, eta_arr);
-			mu2 = T*eta + me;
-			p2  = P_part(T, eta, me);
-			e2  = e_part(T, eta, me);
-			s2  = s_part(T, eta, me);
-			a_p2 = P_antipart(T, eta, me);
-			a_e2 = e_antipart(T, eta, me);
-			a_s2 = s_antipart(T, eta, me);
+			//Second mLthod: eta interpolation + e.g. enLrgy on-the-fly
+			eta = eos_tintep(nL, T, n_arr, t_arr, eta_arr);
+			mu2 = T*eta + mL;
+			p2  = P_part(T, eta, mL);
+			e2  = e_part(T, eta, mL);
+			s2  = s_part(T, eta, mL);
+			a_p2 = P_antipart(T, eta, mL);
+			a_e2 = e_antipart(T, eta, mL);
+			a_s2 = s_antipart(T, eta, mL);
 
-			//Third method: direct interpolation of e.g. energy
-			mu3 = eos_tintep(ne, T, n_arr, t_arr, EOS_table.mu_part);
-			p3  = eos_tintep(ne, T, n_arr, t_arr, EOS_table.P_part);
-			e3  = eos_tintep(ne, T, n_arr, t_arr, EOS_table.e_part);
-			s3  = eos_tintep(ne, T, n_arr, t_arr, EOS_table.s_part);
-			a_p3  = eos_tintep(ne, T, n_arr, t_arr, EOS_table.P_antipart);
-			a_e3  = eos_tintep(ne, T, n_arr, t_arr, EOS_table.e_antipart);
-			a_s3  = eos_tintep(ne, T, n_arr, t_arr, EOS_table.s_antipart);
+			//Third mLthod: direct interpolation of e.g. enLrgy
+			mu3 = eos_tintep(nL, T, n_arr, t_arr, EOS_table.mu_part);
+			p3  = eos_tintep(nL, T, n_arr, t_arr, EOS_table.P_part);
+			e3  = eos_tintep(nL, T, n_arr, t_arr, EOS_table.e_part);
+			s3  = eos_tintep(nL, T, n_arr, t_arr, EOS_table.s_part);
+			a_p3  = eos_tintep(nL, T, n_arr, t_arr, EOS_table.P_antipart);
+			a_e3  = eos_tintep(nL, T, n_arr, t_arr, EOS_table.e_antipart);
+			a_s3  = eos_tintep(nL, T, n_arr, t_arr, EOS_table.s_antipart);
 	 		
 			f1 << mu1 << "\t" << p1 << "\t" << e1 << "\t" << s1 << "\t" << a_p1 << "\t" << a_e1 << "\t" << a_s1 << "\n";
 			f2 << mu2 << "\t" << p2 << "\t" << e2 << "\t" << s2 << "\t" << a_p2 << "\t" << a_e2 << "\t" << a_s2 << "\n";

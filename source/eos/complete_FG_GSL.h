@@ -1,6 +1,7 @@
 #pragma once
 
-#include "FD_functions.h"
+#include <gsl/gsl_integration.h>
+#include "FD_functions_GSL.h"
 
 namespace aparicio {
 //.......Define parameters for GFF and theta derivatives
@@ -51,67 +52,67 @@ void extremes_ed(double eta, double* s1, double* s2, double *s3) {
 }
 
 
-double gleg_integration(double f[]){
-	double r = 0.;
-	for (int i=0;i<ngle;i++){
-		r += f[i]*wgle[i];
-	}
-	return r;
-}
-
-double glag_integration(double f[]){
-        double r = 0.;
-        for (int i=0;i<ngla;i++){
-                r += f[i]*wgla[i];
-        }
-        return r;
-}
-
-
-double compute_res(double eta, double theta, float k) {
+double compute_res_GSL(double eta, double theta, float k, gsl_integration_fixed_workspace *w_leg, gsl_integration_fixed_workspace *w_lag) {
         double r1,r2,r3,r4;
         double s1 = 0., s2 = 0., s3 = 0.;
-       	double f1[ngle], f2[ngle], f3[ngle], f4[ngla];
-
+	struct FD_params p;
+	gsl_function F;
+        
         extremes(eta,&s1,&s2,&s3);
 
-	fermi_func1(eta,theta,k,0.,sqrt(s1),f1);
-        r1 = gleg_integration(f1);
+	F.function = &fermi_func1_GSL;
+        p = {k, eta, theta, 0., sqrt(s1)};
+	F.params = &p;
+        gsl_integration_fixed(&F, &r1, w_leg);
 
-	fermi_func2(eta,theta,k,s1,s2,f2);
-        r2 = gleg_integration(f2);
+	F.function = &fermi_func2_GSL;
+        p = {k, eta, theta, s1, s2};
+	F.params = &p;
+        gsl_integration_fixed(&F, &r2, w_leg);
 	
-	fermi_func2(eta,theta,k,s2,s3,f3);
-        r3 = gleg_integration(f3);
+	F.function = &fermi_func2_GSL;
+        p = {k, eta, theta, s2, s3};
+	F.params = &p;
+        gsl_integration_fixed(&F, &r3, w_leg);
 	
-	fermi_func3(eta,theta,k,s3,f4);
-        r4 = glag_integration(f4);
+	F.function = &fermi_func3_GSL;
+        p = {k, eta, theta, s3, 0.};
+	F.params = &p;
+        gsl_integration_fixed(&F, &r4, w_lag);
 
-	//printf("r1 = %.3e, r2 = %.3e, r3 = %.3e, r4 = %.3e\n", r1, r2, r3, r4);
-	//for (int i=0;i<ngle;i++) printf("%.3e\n", f4[i]);
 	return r1+r2+r3+r4;
+
 }
 
-
-double compute_res_ed(double eta, double theta, float k) {
+double compute_res_ed_GSL(double eta, double theta, float k, gsl_integration_fixed_workspace *w_leg, gsl_integration_fixed_workspace *w_lag) {
         double r1,r2,r3,r4;
         double s1 = 0., s2 = 0., s3 = 0.;
-        double f1[ngle], f2[ngle], f3[ngle], f4[ngla];
+        struct FD_params p;
+        gsl_function F;
 
         extremes_ed(eta,&s1,&s2,&s3);
+        
+	F.function = &fermi_ed1_GSL;
+        p = {k, eta, theta, 0., sqrt(s1)};
+        F.params = &p;
+        gsl_integration_fixed(&F, &r1, w_leg);
 
-        fermi_ed1(eta,theta,k,0.,sqrt(s1),f1);
-        r1 = gleg_integration(f1);
+        F.function = &fermi_ed2_GSL;
+        p = {k, eta, theta, s1, s2};
+        F.params = &p;
+        gsl_integration_fixed(&F, &r2, w_leg);
 
-        fermi_ed2(eta,theta,k,s1,s2,f2);
-        r2 = gleg_integration(f2);
+        F.function = &fermi_ed2_GSL;
+        p = {k, eta, theta, s2, s3};
+        F.params = &p;
+        gsl_integration_fixed(&F, &r3, w_leg);
 
-        fermi_ed2(eta,theta,k,s2,s3,f3);
-        r3 = gleg_integration(f3);
-
-        fermi_ed3(eta,theta,k,s3,f4);
-        r4 = glag_integration(f4);
+        F.function = &fermi_ed3_GSL;
+        p = {k, eta, theta, s3, 0.};
+        F.params = &p;
+        gsl_integration_fixed(&F, &r4, w_lag);
 
         return r1+r2+r3+r4;
+
 }
-        
+

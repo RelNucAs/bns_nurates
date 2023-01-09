@@ -1,4 +1,5 @@
 /* RADIATION EOS */
+#include <cmath>
 #include "../constants_bis.h"
 
 using namespace constants;

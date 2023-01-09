@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
-complete_file = '../eos_table/eos_electrons_complete_leo.txt'
+complete_file = '../eos_table/electrons/eos_electrons_complete_leo.txt'
 ne = np.loadtxt(complete_file,skiprows=0,max_rows=1,dtype=int)
 nt  = np.loadtxt(complete_file,skiprows=1,max_rows=1,dtype=int)
 ne_array = np.loadtxt(complete_file,skiprows=2,max_rows=1,dtype=float)
@@ -28,5 +28,5 @@ plt.ylabel(r'$T$ [MeV]')
 plt.xscale('log')
 plt.yscale('log')
 plt.colorbar()
-plt.savefig("../output/plots/eos/plot_eos_entropy.png")
+plt.savefig("../output/plots/eos/electrons/plot_eos_entropy.png")
 plt.close()

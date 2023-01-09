@@ -17,10 +17,12 @@ namespace constants
 	const double mmu = 105.65837; // MeV
 	
 	// Neutron mass
-	const double mn = 939.565; // MeV
+	//const double mn = 939.565; // MeV
+	const double mn = 939.5654133; // MeV
 	
 	// Proton mass 
-	const double mp = 938.272; // MeV
+	//const double mp = 938.272; // MeV
+	const double mp = 938.2720813; // MeV
 	const double Q = 1.2935; // MeV
 	
 	// Atomic mass unit

@@ -50,9 +50,10 @@ int main (){
 	double dn = ne_max-ne_min;
 	double dt = t_max-t_min;
 
+	const int sp = 1; //1:electrons, 2:muons
 	//Read EOS tables
-        struct EOSeta eta_table = read_eta_table();
-        struct EOScomplete EOS_table = read_total_table();
+        struct EOSeta eta_table = read_eta_table(sp);
+        struct EOScomplete EOS_table = read_total_table(sp);
 
         //Input table
         n_tab = eta_table.d;
@@ -81,7 +82,7 @@ int main (){
 		t  = t_arr[i];
 
 		guess = find_guess_e(1.e39*ne, t);
-		eta_NR = rtsafe(1.e39*ne, t, me, guess, eta1, eta2);
+		eta_NR = rtsafe(1.e39*ne, t, me, guess, eta1_e, eta2_e);
 		s1  = s_part(t, eta_NR, me);
 	}
 	stop = high_resolution_clock::now();

@@ -1,10 +1,9 @@
 #pragma once
 
-#include <gsl/gsl_sf_gamma.h>
-#include <gsl/gsl_sf_psi.h>
-#include <gsl/gsl_multiroots.h>
 #include "./constants.h"
 #include "./tools/fermi_integrals.h"
+#include "./tools/gamma.h"
+#include "./tools/digamma.h"
 
 void usrfun(VecDoub_I &x, VecDoub_O &fvec, MatDoub_O &fjac);
 
@@ -58,18 +57,19 @@ void thickfun(VecDoub_I &x, VecDoub_O &fvec, MatDoub_O &fjac) {
 void thin_f(double *x, double *C, double *f) {
 	double A = x[0];
 	double B = x[1];
-        f[0] = C[0]*pow(h*c,3.) - 4.*pi*gsl_sf_gamma(A+3.)/pow(B,A+3.);
-        f[1] = C[1]*pow(h*c,3.) - 4.*pi*gsl_sf_gamma(A+4.)/pow(B,A+4.);
+        f[0] = C[0]*pow(h*c,3.) - 4.*pi*gammln(A+3.)/pow(B,A+3.);
+        f[0] = C[0]*pow(h*c,3.) - 4.*pi*gammln(A+3.)/pow(B,A+3.);
+        f[1] = C[1]*pow(h*c,3.) - 4.*pi*gammln(A+4.)/pow(B,A+4.);
         return;
 }
 
 void thin_df(double *x, double *C, double *f) {
 	double A = x[0];
 	double B = x[1];
-        J[0] = 4.*pi*gsl_sf_gamma(A+3.)/pow(B,A+3.)*(log(B)-gsl_sf_psi(A+3.));
-        J[1] = 4.*pi*(A+3.)*gsl_sf_gamma(A+3.)/pow(B,A+4.);
-        J[2] = 4.*pi*gsl_sf_gamma(A+4.)/pow(B,A+4.)*(log(B)-gsl_sf_psi(A+4.));
-        J[3] = 4.*pi*(A+4.)*gsl_sf_gamma(A+4.)/pow(B,A+5.);
+        J[0] = 4.*pi*gammln(A+3.)/pow(B,A+3.)*(log(B)-sf_psi(A+3.)); //4.*pi*gsl_sf_gamma(A+3.)/pow(B,A+3.)*(log(B)-gsl_sf_psi(A+3.));
+        J[1] = 4.*pi*(A+3.)*gammln(A+3.)/pow(B,A+4.); //4.*pi*(A+3.)*gsl_sf_gamma(A+3.)/pow(B,A+4.);
+        J[2] = 4.*pi*gammln(A+4.)/pow(B,A+4.)*(log(B)-sf_psi(A+4.)); //4.*pi*gsl_sf_gamma(A+4.)/pow(B,A+4.)*(log(B)-gsl_sf_psi(A+4.));
+        J[3] = 4.*pi*(A+4.)*gammln(A+4.)/pow(B,A+5.); //4.*pi*(A+4.)*gsl_sf_gamma(A+4.)/pow(B,A+5.);
         return;
 }
 

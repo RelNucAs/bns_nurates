@@ -27,22 +27,24 @@ int main (){
         double s1, s2, s3;
         double a_s1, a_s2, a_s3;
 
+	const int sp = 1; 
+
 	/*Read EOS tables*/
-        struct EOSeta eta_table = read_eta_table();
-        struct EOScomplete EOS_table = read_total_table();
+        struct EOSeta eta_table = read_eta_table(sp);
+        struct EOScomplete EOS_table = read_total_table(sp);
 
         //EOS arrays
         n_arr = eta_table.d;
         t_arr = eta_table.t;
         eta_arr = eta_table.eta;
 
-	ne = 6.;
+	ne = 1.e0; //e-7;
 	//eta = 3.84251563e+02;
-	T = 6.e-2; //5.12913428e-02; //MeV
+	T = 6.e-2; //MeV
 	theta = T/me;
 	
-	printf("%.12e\n", compute_res(10., theta, 0.5));
-	printf("Input quantities: ne = %.3e 1/fm^3, T = %.3e MeV (theta = %.3e)\n\n", ne, T, theta);
+	//printf("%.12e\n", compute_res(10., theta, 0.5));
+	printf("Input quantities: ne = %.3e 1/fm^3, T = %.3e MeV (theta = %.10e)\n\n", ne, T, theta);
 
 	//double h1 = compute_res(eta, theta, 0.5);
 	//double h2 = compute_res(eta, theta, 1.5);
@@ -51,20 +53,39 @@ int main (){
 	//printf("f = %.15e, df = %.15e\n", h1, h2);
 	//printf("h1 = %.6e, h2 = %.6e, h3 = %.6e\n", h1, h2, h3);
         
+	//double test_1 = exp(500.);
+	//long double test_2 = exp((long double) 500.);
+	//long double test_3 = expl((long double) 500.);
+
+	//long double tmp = -25.;
+	//long double tt = 1. - exp(tmp)/(1.+exp(tmp));
+	//long double tt1 = pow(1.+exp(tmp),-1.);
+	//long double tt2 = 1. - exp(tmp);
+	//printf("t1 = %.10e, t2 = %.10Le, t3 = %.10Le\n", test_1, test_2, test_3);
+	//printf("tt = %.30Le, tt1 = %.30Le, tt2 = %.30Le\n", tt, tt1, tt2);
 
 	//First method: completely on-the-fly (both eta and e.g. energy)
 	printf("First method: completely on-the-fly\n");
 	guess = find_guess_e(1.e39*ne, T);
-	eta_NR = rtsafe(1.e39*ne, T, me, guess, eta1, eta2);
-	printf("eta_NR = %.15e\n", eta_NR);
+	eta_NR = rtsafe(1.e39*ne, T, me, guess, eta1_e, eta2_e);
+	printf("eta_NR = %.20e\n", eta_NR);
+	double antieta = -(eta_NR+2./theta);
+	printf("antieta_NR = %.20e\n", antieta);
 	mu1 = T*eta_NR + me;
-	p1  = P_part(T, eta_NR, me);
-	e1  = e_part(T, eta_NR, me);
-	s1  = s_part(T, eta_NR, me);
+	//p1  = P_part(T, eta_NR, me);
+	//e1  = e_part(T, eta_NR, me);
+	//s1  = s_part(T, eta_NR, me);
 	a_p1 = P_antipart(T, eta_NR, me);
-	a_e1 = e_antipart(T, eta_NR, me);
-	a_s1 = s_antipart(T, eta_NR, me);
-	//printf("s = %.12e\n", s1);
+	//a_e1 = e_antipart(T, eta_NR, me);
+	//a_s1 = s_antipart(T, eta_NR, me);
+	printf("Positron pressure = %.20e erg/cm^3\n", a_p1);
+	//double F1 = compute_res(antieta, theta, 0.5);
+	//double F2 = compute_res(antieta, theta, 1.5);
+	//double F3 = compute_res(antieta, theta, 2.5);
+	//printf("FD integral (k = 0.5, eta = %.3e, theta = %.3e): %.12e\n", antieta, theta, F1);
+	//printf("FD integral (k = 1.5, eta = %.3e, theta = %.3e): %.12e\n", antieta, theta, F2);
+	//printf("FD integral (k = 2.5, eta = %.3e, theta = %.3e): %.12e\n", antieta, theta, F3);
+
 	exit(EXIT_SUCCESS);
 	printf("Electrons: P = %.6e, e = %.6e, s = %.6e\n", p1, e1, s1);
 	printf("Positrons: P = %.6e, e = %.6e, s = %.6e\n\n", a_p1, a_e1, a_s1);

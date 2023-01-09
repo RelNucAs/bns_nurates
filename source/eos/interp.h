@@ -13,15 +13,21 @@ struct EOSeta {
         //double d[nne]; //density
         //double t[nt]; //temperature
         //double eta[nne*nt]; //relativistic parameter
+	int nn; //number of density points
+	int nt; //number of temperature points
 	std::vector<double> d; //density
 	std::vector<double> t; //temperature
 	std::vector<double> eta; //relativistic parameter
 };
 
 struct EOScomplete {
+	int nn; //number of density points
+	int nt; //number of temperature points
 	std::vector<double> d; //density
 	std::vector<double> t; //temperature
 	std::vector<double> mu_part; //chemical potential of particles
+	std::vector<double> n_part; //number density of particles 
+	std::vector<double> n_antipart; //number density of antiparticles 
 	std::vector<double> P_part; //pressure of particles 
 	std::vector<double> P_antipart; //pressure of antiparticles 
 	std::vector<double> e_part; //internal energy of particles 
@@ -49,12 +55,24 @@ std::string trim(const std::string& str,
     return str.substr(strBegin, strRange);
 }
 
-struct EOSeta read_eta_table() {
-	//std::string filename = "eos_table/eos_electrons_v2.txt";
-	//if (HR == true) {
-		std::string filename = "../eos_table/eos_electrons_v2.txt"; //leo_HR.txt";
-	//} else {
-	//	std::string filename = "../eos_table/eos_electrons_leo.txt";
+struct EOSeta read_eta_table(const int sp) {
+	std::string filename; //"eos_table/eos_electrons_v2.txt";
+	std::string res;
+	if (parameters::HR == true) {
+		res = "_HR";
+	} else {
+		res = "";
+	}
+
+	if (sp == 1) {
+		filename = abs_path + "eos_table/electrons/eos_electrons_leo"+res+".txt"; //_HR.txt";
+	} else if (sp == 2) {
+		filename = abs_path + "eos_table/muons/eos_muons_leo"+res+".txt";
+	} else {
+		printf("Number of lepton species: ERROR\n");
+		std::exit(EXIT_FAILURE);
+	}
+		
 	std::string EOSline;
 	struct EOSeta output;
 	int n1, n2;
@@ -74,18 +92,20 @@ struct EOSeta read_eta_table() {
 	std::getline(EOStable, EOSline);
 	std::stringstream s1(EOSline);
 	s1 >> n1;
-	if (n1 != nne) {
-		cout << "Number of density entries in the table is not what expected!" << endl;
-	        std::exit(EXIT_FAILURE);
-	}
+	output.nn = n1;
+	//if (n1 != nne) {
+	//	cout << "Number of density entries in the table is not what expected!" << endl;
+	//        std::exit(EXIT_FAILURE);
+	//}
 
 	std::getline(EOStable, EOSline);
 	std::stringstream s2(EOSline);
 	s2 >> n2;
-	if (n2 != nt) {
-		cout << "Number of temperature entries in the table is not what expected!" << endl;
-	        std::exit(EXIT_FAILURE);
-	}
+	output.nt = n2;
+	//if (n2 != nt) {
+	//	cout << "Number of temperature entries in the table is not what expected!" << endl;
+	//        std::exit(EXIT_FAILURE);
+	//}
 
         getline(EOStable, EOSline);
 	std::stringstream s3(EOSline);
@@ -133,15 +153,24 @@ struct EOSeta read_eta_table() {
     	return output;
  }
 
-struct EOScomplete read_total_table() {
-	//string filename = "eos_table/eos_electrons_complete.txt";
-	string filename = "../eos_table/eos_electrons_complete_leo_HR.txt";
-	//if (HR == true) {
-	//	filename = "../eos_table/eos_electrons_complete_leo_HR.txt";
-	//} else {
-	//	filename = "../eos_table/eos_electrons_complete_leo.txt";
-	//}
+struct EOScomplete read_total_table(const int sp) {
+	std::string filename; //"eos_table/eos_electrons_complete.txt";
+        std::string res;
+        if (parameters::HR == true) {
+                res = "_HR";
+        } else {
+                res = "";
+        }
 
+	if (sp == 1) {
+		filename = abs_path + "eos_table/electrons/eos_electrons_complete_leo"+res+".txt";
+	} else if (sp == 2) {
+		filename = abs_path + "eos_table/muons/eos_muons_complete_leo"+res+".txt";
+	} else {
+		printf("Number of lepton species: ERROR\n");
+		std::exit(EXIT_FAILURE);
+	}
+		
 	string EOSline;
 	struct EOScomplete output;
 	int n1, n2;
@@ -159,18 +188,20 @@ struct EOScomplete read_total_table() {
         std::getline(EOStable, EOSline);
         std::stringstream s1(EOSline);
         s1 >> n1;
-        if (n1 != nne) {
-                cout << "Number of density entries in the table is not what expected!" << endl;
-                std::exit(EXIT_FAILURE);
-        }
+	output.nn = n1;
+        //if (n1 != nne) {
+        //        cout << "Number of density entries in the table is not what expected!" << endl;
+        //        std::exit(EXIT_FAILURE);
+        //}
 
         std::getline(EOStable, EOSline);
         std::stringstream s2(EOSline);
         s2 >> n2;
-        if (n2 != nt) {
-                cout << "Number of temperature entries in the table is not what expected!" << endl;
-                std::exit(EXIT_FAILURE);
-        }
+	output.nt = n2;
+        //if (n2 != nt) {
+        //        cout << "Number of temperature entries in the table is not what expected!" << endl;
+        //        std::exit(EXIT_FAILURE);
+        //}
 
         //for (j=0;j<4;j++) {
 	//	getline(EOStable, EOSline);
@@ -300,43 +331,59 @@ struct EOScomplete read_total_table() {
 //=======================================================================
 
 void sett(double t, std::vector<double> t_arr, int* idx, double* r) {
-	double logt;
+	double logt, t1, t2;
 	double xmin = t_arr[0];
 	double dx = log10(t_arr[1])-log10(t_arr[0]);
-	int it;
+	int it, itmp;
         double rt;	
 
+	int nt = t_arr.size();
+
 //.....find temperature index.........................................
-      	logt = t;
-      	it = floor( (log10(logt) - log10(xmin))/dx );
+      	logt = log10(t);
+      	it = floor( (logt - log10(xmin))/dx );
       	if (it < 1) {
 		it = 0;
 	} else if (it >= nt-1) {
         	it = nt - 2;
 	}
+
+	itmp = it;
+
+	t1 = log10(t_arr[it]);
+	t2 = log10(t_arr[it+1]);
+	
 //.....check the index for non-equidistant grid...........................
-      	if (t_arr[it] > logt) {
+      	if (t1 > logt) {
         	if (it == 0) {
           		rt = 0.;
 		} else {
 			it = it - 1;
-			rt = (logt - t_arr[it]) / (t_arr[it+1] - t_arr[it]);
+			t1 = log10(t_arr[it]);
+			t2 = log10(t_arr[it+1]);
+			rt = (logt - t1) / (t2 - t1);
 		}
-	} else if (t_arr[it+1] < logt) {
+	} else if (t2 < logt) {
 		if (it == nt-2) {
           		rt = 1.;
 		} else {
           		it = it + 1;
-			rt = (logt - t_arr[it]) / (t_arr[it+1] - t_arr[it]);
+			t1 = log10(t_arr[it]);
+			t2 = log10(t_arr[it+1]);
+			rt = (logt - t1) / (t2 - t1);
 		}
+	} else if (t1 == logt) {
+		rt = 0.;
+	} else if (t2 == logt) {
+		rt = 1.;		
 	} else {
-        	rt = (logt - t_arr[it]) / (t_arr[it+1] - t_arr[it]);
+        	rt = (logt - t1) / (t2 - t1);
 	}
       
 	if ((rt>1.) || (rt<0.)) {
 	       printf("Warning: Something wrong with t index in tinterp!\n");
 	       printf("logt = %.3lf, rt = %.3lf\n", logt, rt);
-	       printf("it = %d, t[it] = %.3lf, t[it+1] = %.3lf\n", it, t_arr[it], t_arr[it+1]);
+	       printf("it = %d, itmp = %d, t[it] = %.3lf, t[it+1] = %.3lf\n", it, itmp, t_arr[it], t_arr[it+1]);
                std::exit(EXIT_FAILURE);
       	}
 
@@ -356,43 +403,63 @@ void sett(double t, std::vector<double> t_arr, int* idx, double* r) {
 //=======================================================================
 
 void setd(double d, std::vector<double> d_arr, int* idx, double* r) {
-	double logd;
+	double logd, d1, d2;
 	double xmin = d_arr[0];
 	double dx = log10(d_arr[1]) - log10(d_arr[0]);
-	int id;
+	int id, itmp;
 	double rd;
 
+	int nne = d_arr.size();
+
 	//.....find density index................................................
-      	logd = d; //log10(d);
-	id = 1 + floor( (log10(logd) - log10(xmin))/dx );
+      	logd = log10(d); //d
+	id = floor( (logd - log10(xmin))/dx );
 	if (id < 1) {
 		id = 0;
 	} else if (id >= nne-1) {
 		id = nne - 2;
 	}
+
+	itmp = id;
+
+	d1 = log10(d_arr[id]);
+	d2 = log10(d_arr[id+1]);
+
 //.....check the index for non-equdistant grid...........................
-  	if (d_arr[id] > logd) {
+  	if (d1 > logd) {
 		if (id == 0) {
         		rd = 0.;
 		} else {
 			id = id - 1;
-			rd = (logd - d_arr[id]) / (d_arr[id+1] - d_arr[id]);
+			if (log10(d_arr[id]) > logd) {
+				id = id - 1;
+			}
+			d1 = log10(d_arr[id]);
+			d2 = log10(d_arr[id+1]);
+			rd = (logd - d1) / (d2 - d1);
 		}
-	} else if (d_arr[id+1] < logd) {
+	} else if (d2 < logd) {
 	        if (id == nne-2) {
           		rd = 1.;
 		} else {
 			id = id + 1;
-	      		rd = (logd - d_arr[id]) / (d_arr[id+1] - d_arr[id]);
+			if (log10(d_arr[id+1]) < logd) {
+				id = id + 1;
+			}
+			d1 = log10(d_arr[id]);
+			d2 = log10(d_arr[id+1]);
+	      		rd = (logd - d1) / (d2 - d1);
 		}
 	} else {
-        	rd = (logd - d_arr[id]) / (d_arr[id+1] - d_arr[id]);
+        	rd = (logd - d1) / (d2 - d1);
 	}
       
 	if ((rd>1.) || (rd<0.)) {
 	       printf("Warning: Something wrong with d index in dinterp!\n");
-	       printf("logd = %.3lf, rd = %.3lf\n", logd, rd);
-	       printf("id = %d, d[id] = %.3lf, d[id+1] = %.3lf\n", id, d_arr[id], d_arr[id+1]);
+	       printf("logd = %.15e, rd = %.3lf\n", logd, rd);
+	       printf("logd = %.15e, rd = %.3lf\n", d, rd);
+	       printf("id = %d, itmp = %d, d[id] = %.15e, d[id+1] = %.15e\n", id, itmp, d_arr[id], d_arr[id+1]);
+	       printf("id = %d, itmp = %d, d[id] = %.15lf, d[id+1] = %.15lf\n", id, itmp, d1, d2);
                std::exit(EXIT_FAILURE);
       	}
 	*idx = id;
@@ -417,6 +484,9 @@ double eos_tintep(double d, double t, std::vector<double> d_arr, std::vector<dou
         int id, it;
         double rd, rt;
         double yintp;
+
+        int nne = d_arr.size();
+        int nt  = t_arr.size();
 
         // Read table
       //if (teos%initial) then

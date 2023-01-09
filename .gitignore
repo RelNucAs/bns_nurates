@@ -50,3 +50,4 @@ nu_rates
 
 # EOS tables
 *.dat
+*.tab
