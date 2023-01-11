@@ -80,6 +80,7 @@ std::array<double,26> eos_extended(double den, double temp, double ye, double ym
 	std::array<double,9>       e_eos, m_eos; //Eos of electrons and muons, see eos_ferm_array in eos_fermions
 	std::array<double,26>      eos_out;
 	int s_el, s_mu; //to select electrons or muons
+	int lep_method; //method for computing leptonic EOS
 	int i;
 	
 //.......Define baryon number density [fm^-3]
@@ -89,7 +90,10 @@ std::array<double,26> eos_extended(double den, double temp, double ye, double ym
 //.......Define muonic species
 	s_mu = 2;
 
-        eos_type dd2_eos;
+//.......Define method of computation for lepton EOS
+	lep_method = 2;
+
+	eos_type dd2_eos;
         dd2_eos = eos_readin();
 
 	std::array<double,t_entries>  t_array  = read_t_baryon(); //temperature array
@@ -113,7 +117,7 @@ std::array<double,26> eos_extended(double den, double temp, double ye, double ym
 	//  e_interp_temp = e_interp	  
 	//end if
         
-	e_eos = eos_ferm_array(den, ye, temp, s_el, 2);
+	e_eos = eos_ferm_array(den, ye, temp, s_el, lep_method);
 
 	//e_interp_temp = e_interp
 
@@ -126,7 +130,7 @@ std::array<double,26> eos_extended(double den, double temp, double ye, double ym
         //   nq = (2.*pi*m_m*temp/(c**2.))**1.5
 	//   guess_m = -log(abs(2.*nq/(ymu*n_bar)))
 	// end if
-		m_eos = eos_ferm_array(den, ymu, temp, s_mu, 2);
+		m_eos = eos_ferm_array(den, ymu, temp, s_mu, lep_method);
 	} else {
 		for (i=0;i<8;i++) {
 			m_eos[i] = 0.;
@@ -292,6 +296,7 @@ std::array<double,53> eos_full(double den, double temp, double ye, double ymu) {
         std::array<double,9>       e_eos, m_eos; //Eos of electrons and muons, see eos_ferm_array in eos_fermions
         std::array<double,53>      eos_out;
         int s_el, s_mu; //to select electrons or muons
+	int lep_method; //method for computing leptonic EOS
         int i;
         bool e_interp_temp, mu_interp_temp;
 
@@ -301,6 +306,9 @@ std::array<double,53> eos_full(double den, double temp, double ye, double ymu) {
         s_el = 1;
 //.......Define muonic species
         s_mu = 2;
+
+//.......Define method of computation for lepton EOS
+	lep_method = 2;
 
 //.......Define temperature in K (kb is boltz. constant in [MeV/K] defined in eos_fermions)
 	//t_kelv = temp/kb 
@@ -334,7 +342,7 @@ std::array<double,53> eos_full(double den, double temp, double ye, double ymu) {
 	  //e_interp_temp = e_interp  
 	//end if
 
-        e_eos = eos_ferm_array(den, ye, temp, s_el, 2);
+        e_eos = eos_ferm_array(den, ye, temp, s_el, lep_method);
 
         //e_interp_temp = e_interp
 
@@ -360,7 +368,7 @@ std::array<double,53> eos_full(double den, double temp, double ye, double ymu) {
 	//else
       //mu_interp_temp = mu_interp 
 	//end if
-		m_eos = eos_ferm_array(den, ymu, temp, s_mu, 2);
+		m_eos = eos_ferm_array(den, ymu, temp, s_mu, lep_method);
 	//mu_interp_temp = mu_interp
 	//end if
         }

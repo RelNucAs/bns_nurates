@@ -3,6 +3,7 @@
 #include "../constants_bis.h"
 #include "complete_FG.h"
 #include "find_eta.h"
+#include "interp.h"
 
 using namespace constants;
 
@@ -109,8 +110,42 @@ double s_antipart(double T, double eta, double mLep) {
         return  K*kB*MeV*pow(theta,1.5)*(-eta_anti*f1+(5./3.-eta_anti*theta)*f2+4./3.*theta*f3); //erg/K/cm^3
 }
 
+std::array<double,9> eos_ferm_interp(double nLep, double T, int species, const struct EOScomplete &EOS_table, const std::vector<std::vector<double>> &EOS_vector) {
+        std::array<double,9> eos_array;
+//!........................INPUT........................................................
+//!...... matter density rho [g/cm^3]; net particle fraction y_tilde; temperature T [MeV];
+//!.......species 1 for electrons, 2 for muons; interval for non relat. degen. parameter [eta1,eta2]
+//!.......el_interp = .true. to interpolate electrons, el_interp = .false. to use newrap 1D
+//!.......mu_interp = .true. to interpolate muons, mu_interp = .false. to use newrap 1D
+//!.....................................................................................
+//!.......................OUTPUT........................................................
+//!.......eos_array(1) = number density of particles [1/cm^3]...........................
+//!.......eos_array(2) = number density of antiparticles [1/cm^3].......................
+//!.......eos_array(3) = pressure of particles [erg/cm^3]...............................
+//!.......eos_array(4) = pressure of antiparticles [erg/cm^3]...........................
+//!.......eos_array(5) = energy of particles [erg/g]....................................
+//!.......eos_array(6) = energy of antiparticles [erg/g]................................
+//!.......eos_array(7) = entropy of particles [erg/K/g].................................
+//!.......eos_array(8) = entropy of antiparticles [erg/K/g].............................
+//!.......eos_array(9) = non relat. degeneracy parameter of particles...................
+//!.......For a complete description of output variables, see subroutines above.........
+	double mLep;
+//.......Select particle mass
+        if (species == 1) {
+          mLep = me;
+        } else if (species == 2) {
+          mLep = mmu;
+        }
 
-std::array<double,9> eos_ferm_array(double rho, double y_tilde, double T, int species, int eos_method) {
+	eos_array = eos_tintep_full(nLep, T, EOS_table.d, EOS_table.t, EOS_vector);
+	
+	eos_array[8] = (eos_array[8] - mLep) / T;
+	
+	return eos_array;
+}
+
+
+std::array<double,9> eos_ferm_array(double nLep, double T, int species, int eos_method, struct EOSeta &eta_table, struct EOScomplete &EOS_table) {
         std::array<double,9> eos_array;
 //!........................INPUT........................................................
 //!...... matter density rho [g/cm^3]; net particle fraction y_tilde; temperature T [MeV];
@@ -133,9 +168,8 @@ std::array<double,9> eos_ferm_array(double rho, double y_tilde, double T, int sp
 	double mLep, K;
         double theta;
 	double guess, eta, a_eta, eta1_Lep, eta2_Lep;
-	double nLep = (rho*y_tilde*1.e-39)/mu;
         double f12, f32, f52, a_f12, a_f32, a_f52;
-
+	bool guess_from_interp = false;
 
 //.......Select particle mass
         if (species == 1) {
@@ -148,63 +182,149 @@ std::array<double,9> eos_ferm_array(double rho, double y_tilde, double T, int sp
 	  mLep = mmu;
 	}
 
-//.......Define theta (relativity parameter)
-        //Tmev = T*kb
+	if (eos_method == 3) {
+		/*Read EOS tables*/
+                //struct EOScomplete EOS_table->= read_total_table(species);
+
+                //EOS arrays
+                std::vector<double> n_arr = EOS_table.d;
+                std::vector<double> t_arr = EOS_table.t;
+
+                //.......Compute eos_array[0]
+                eos_array[0] = eos_tintep(nLep, T, n_arr, t_arr, EOS_table.n_part);
+
+                //.......Compute eos_array[1]
+                eos_array[1] = eos_tintep(nLep, T, n_arr, t_arr, EOS_table.n_antipart);
+
+                //.......Compute eos_array[2]
+                eos_array[2] = eos_tintep(nLep, T, n_arr, t_arr, EOS_table.P_part);
+
+                //.......Compute eos_array[3]
+                eos_array[3] = eos_tintep(nLep, T, n_arr, t_arr, EOS_table.P_antipart);
+
+                //.......Compute eos_array[4]
+                eos_array[4] = eos_tintep(nLep, T, n_arr, t_arr, EOS_table.e_part);
+
+                //.......Compute eos_array[5]
+                eos_array[5] = eos_tintep(nLep, T, n_arr, t_arr, EOS_table.e_antipart);
+
+                //.......Compute eos_array[6]
+                eos_array[6] = eos_tintep(nLep, T, n_arr, t_arr, EOS_table.s_part);
+
+                //.......Compute eos_array[7]
+                eos_array[7] = eos_tintep(nLep, T, n_arr, t_arr, EOS_table.s_antipart);
+
+                //.......Compute eos_array[8]
+                eos_array[8] = (eos_tintep(nLep, T, n_arr, t_arr, EOS_table.mu_part) - mLep) / T;
+
+                return eos_array;
+	} else if (eos_method == 1) {
+		   guess = find_guess_e(1.e39*nLep, T);
+		   eta = rtsafe(1.e39*nLep, T, mLep, guess, eta1_Lep, eta2_Lep);
+	} else if (eos_method == 2) {
+		//EOS arrays
+		//std::vector<double> n_arr = eta_table->d;
+		//std::vector<double> t_arr = eta_table->t;
+		//std::vector<double> eta_arr = eta_table->eta;
+
+                eta = eos_tintep(nLep, T, eta_table.d, eta_table.t, eta_table.eta);
+
+		//if (guess_from_interp == true) {
+		//	guess = eta;
+		//	eta = rtsafe(1.e39*nLep, T, mLep, guess, eta1_Lep, eta2_Lep);
+		//}
+	}
+
+	//.......Define theta (relativity parameter)
         theta = T/mLep;
 
         K = 8.*sqrt(2.)*pi*pow(mLep/(h*c),3.);
-
-	if (eos_method == 3) {
-		/*Read EOS tables*/
-		struct EOScomplete EOS_table = read_total_table(species);
-
-		//EOS arrays
-		std::vector<double> n_arr = EOS_table.d;
-		std::vector<double> t_arr = EOS_table.t;
 	
-		//.......Compute eos_array[0]
-		eos_array[0] = eos_tintep(nLep, T, n_arr, t_arr, EOS_table.n_part);
+	f12 = compute_res(eta, theta, 0.5);
+	f32 = compute_res(eta, theta, 1.5);
+	f52 = compute_res(eta, theta, 2.5);
 
-		//.......Compute eos_array[1]
-		eos_array[1] = eos_tintep(nLep, T, n_arr, t_arr, EOS_table.n_antipart);
+	a_eta = -(eta+2./theta);
 
-		//.......Compute eos_array[2]
-		eos_array[2] = eos_tintep(nLep, T, n_arr, t_arr, EOS_table.P_part);
+	a_f12 = compute_res(a_eta, theta, 0.5);
+	a_f32 = compute_res(a_eta, theta, 1.5);
+	a_f52 = compute_res(a_eta, theta, 2.5);
 
-		//.......Compute eos_array[3]
-		eos_array[3] = eos_tintep(nLep, T, n_arr, t_arr, EOS_table.P_antipart);
+	//.......Compute eos_array[0]
+	//eos_array[0] = n_part(T, eta, mLep);
+	eos_array[0] = K*pow(theta,1.5)*(f12+theta*f32);
 
-		//.......Compute eos_array[4]
-		eos_array[4] = eos_tintep(nLep, T, n_arr, t_arr, EOS_table.e_part);
+	//.......Compute eos_array[1]
+	//eos_array[1] = n_antipart(T, eta, mLep);
+	eos_array[1] = K*pow(theta,1.5)*(a_f12+theta*a_f32);
 
-		//.......Compute eos_array[5]
-		eos_array[5] = eos_tintep(nLep, T, n_arr, t_arr, EOS_table.e_antipart);
+	//.......Compute eos_array[2]
+	//eos_array[2] = P_part(T, eta, mLep);
+	eos_array[2] = K/3.*mLep*MeV*pow(theta,2.5)*(2.*f32+theta*f52); //erg/cm^3
 
-		//.......Compute eos_array[6]
-		eos_array[6] = eos_tintep(nLep, T, n_arr, t_arr, EOS_table.s_part);
+	//.......Compute eos_array[3]
+	//eos_array[3] = P_antipart(T, eta, mLep)
+	eos_array[3] = K/3.*mLep*MeV*pow(theta,2.5)*(2.*a_f32+theta*a_f52); //erg/cm^3
 
-		//.......Compute eos_array[7]
-		eos_array[7] = eos_tintep(nLep, T, n_arr, t_arr, EOS_table.s_antipart);
+	//.......Compute eos_array[4]
+	//eos_array[4] = e_part(T, eta, mLep);
+	eos_array[4] = K*mLep*MeV*pow(theta,1.5)*(f12+2.*theta*f32+theta*theta*f52); //erg/cm^3
 
-		//.......Compute eos_array[8]
-		eos_array[8] = (eos_tintep(nLep, T, n_arr, t_arr, EOS_table.mu_part) - mLep) / T;
-		
-		return eos_array;
+	//.......Compute eos_array[5]
+	//eos_array[5] = e_antipart(T, eta, mLep);
+	eos_array[5] = K*mLep*MeV*pow(theta,1.5)*(a_f12+2.*theta*a_f32+theta*theta*a_f52); //erg/cm^3
 
-	} else if (species == 1) {
-		   guess = find_guess_e(1.e39*nLep, T);
-		   eta = rtsafe(1.e39*nLep, T, mLep, guess, eta1_Lep, eta2_Lep);
-	} else if (species == 2) {
-		/*Read EOS tables*/
-		struct EOSeta eta_table = read_eta_table(species);
+	//.......Compute eos_array[6]
+	//eos_array[6] = s_part(T, eta, mLep);
+	eos_array[6] = K*kB*MeV*pow(theta,1.5)*(-eta*f12+(5./3.-eta*theta)*f32+4./3.*theta*f52); //erg/K/cm^3
 
-		//EOS arrays
-		std::vector<double> n_arr = eta_table.d;
-		std::vector<double> t_arr = eta_table.t;
-		std::vector<double> eta_arr = eta_table.eta;
+	//.......Compute eos_array[7]
+	//eos_array[7] = s_antipart(T, eta, mLep);
+	eos_array[7] = K*kB*MeV*pow(theta,1.5)*(-a_eta*a_f12+(5./3.-a_eta*theta)*a_f32+4./3.*theta*a_f52); //erg/K/cm^3
 
-                eta = eos_tintep(nLep, T, n_arr, t_arr, eta_arr);
-	}
+	//.......Compute eos_array[8]
+	eos_array[8] = eta;
+
+	return eos_array;
+}
+
+
+
+std::array<double,9> eos_ferm_onthefly(double eta, double T, int species) {
+        std::array<double,9> eos_array;
+//!........................INPUT........................................................
+//!...... matter density rho [g/cm^3]; net particle fraction y_tilde; temperature T [MeV];
+//!.......species 1 for electrons, 2 for muons; interval for non relat. degen. parameter [eta1,eta2]
+//!.......el_interp = .true. to interpolate electrons, el_interp = .false. to use newrap 1D
+//!.......mu_interp = .true. to interpolate muons, mu_interp = .false. to use newrap 1D
+//!.....................................................................................
+//!.......................OUTPUT........................................................
+//!.......eos_array(1) = number density of particles [1/cm^3]...........................
+//!.......eos_array(2) = number density of antiparticles [1/cm^3].......................
+//!.......eos_array(3) = pressure of particles [erg/cm^3]...............................
+//!.......eos_array(4) = pressure of antiparticles [erg/cm^3]...........................
+//!.......eos_array(5) = energy of particles [erg/g]....................................
+//!.......eos_array(6) = energy of antiparticles [erg/g]................................
+//!.......eos_array(7) = entropy of particles [erg/K/g].................................
+//!.......eos_array(8) = entropy of antiparticles [erg/K/g].............................
+//!.......eos_array(9) = non relat. degeneracy parameter of particles...................
+//!.......For a complete description of output variables, see subroutines above.........
+	
+        double mLep, K;
+        double theta, a_eta;
+        double f12, f32, f52, a_f12, a_f32, a_f52;
+
+//.......Select particle mass
+        if (species == 1) {
+          mLep = me;
+        } else if (species == 2) {
+          mLep = mmu;
+        }
+
+//.......Define theta (relativity parameter)
+        theta = T/mLep;
+
+        K = 8.*sqrt(2.)*pi*pow(mLep/(h*c),3.);
 
 	f12 = compute_res(eta, theta, 0.5);
 	f32 = compute_res(eta, theta, 1.5);
@@ -253,3 +373,4 @@ std::array<double,9> eos_ferm_array(double rho, double y_tilde, double T, int sp
 
 	return eos_array;
 }
+

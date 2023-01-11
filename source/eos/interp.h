@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -20,7 +22,7 @@ struct EOSeta {
 	std::vector<double> eta; //relativistic parameter
 };
 
-struct EOScomplete {
+struct EOScomplete_old {
 	int nn; //number of density points
 	int nt; //number of temperature points
 	std::vector<double> d; //density
@@ -35,6 +37,27 @@ struct EOScomplete {
 	std::vector<double> s_part; //entropy of particles
 	std::vector<double> s_antipart; //entropy of antiparticles
 };
+
+struct EOScomplete {
+	int nn; //number of density points
+	int nt; //number of temperature points
+	std::vector<double> nL; //density
+	std::vector<double> t; //temperature
+	std:array<std::vector<double>,9> eos_table;
+	//i=0: chemical potential of particles
+	//i=1: number density of particles 
+	/7std::vector<double> n_antipart; //number density of antiparticles 
+	std::vector<double> P_part; //pressure of particles 
+	std::vector<double> P_antipart; //pressure of antiparticles 
+	std::vector<double> e_part; //internal energy of particles 
+	std::vector<double> e_antipart; //internal energy of antiparticles
+	std::vector<double> s_part; //entropy of particles
+	std::vector<double> s_antipart; //entropy of antiparticles
+};
+
+void reset_string(std::stringstream ss) {
+	ss.str("");
+	ss.clear(); // Clear state flags.
 
 void reset_string(std::stringstream ss) {
 	ss.str("");
@@ -163,9 +186,9 @@ struct EOScomplete read_total_table(const int sp) {
         }
 
 	if (sp == 1) {
-		filename = abs_path + "eos_table/electrons/eos_electrons_complete_leo"+res+".txt";
+		filename = abs_path + "eos_table/electrons/eos_electrons_complete_leo"+res+"_withn.txt";
 	} else if (sp == 2) {
-		filename = abs_path + "eos_table/muons/eos_muons_complete_leo"+res+".txt";
+		filename = abs_path + "eos_table/muons/eos_muons_complete_leo"+res+"_withn.txt";
 	} else {
 		printf("Number of lepton species: ERROR\n");
 		std::exit(EXIT_FAILURE);
@@ -238,6 +261,26 @@ struct EOScomplete read_total_table(const int sp) {
 			//s5 >> output.mu_part[i*n2+j];
 		}
 	}
+
+        for (i=0;i<n1;i++) {
+                getline(EOStable, EOSline);
+                std::stringstream s5(EOSline);
+                for (j=0;j<n2;j++) {
+                        s5 >> number;
+                        output.n_part.push_back(number);
+                        //s5 >> output.P_part[i*n2+j];
+                }
+        }
+
+        for (i=0;i<n1;i++) {
+                getline(EOStable, EOSline);
+                std::stringstream s5(EOSline);
+                for (j=0;j<n2;j++) {
+                        s5 >> number;
+                        output.n_antipart.push_back(number);
+                        //s5 >> output.P_antipart[i*n2+j];
+                }
+        }
 	
         for (i=0;i<n1;i++) {
                 getline(EOStable, EOSline);
@@ -475,7 +518,7 @@ void setd(double d, std::vector<double> d_arr, int* idx, double* r) {
 //=======================================================================
 
 
-double eos_tintep(double d, double t, std::vector<double> d_arr, std::vector<double> t_arr, std::vector<double> y) {
+double eos_tintep(double d, double t, std::vector<double> d_arr, std::vector<double> t_arr, std::vector<double> &y) {
 
 //     input:
 //    d ... density [g/cm^3]
@@ -506,4 +549,45 @@ double eos_tintep(double d, double t, std::vector<double> d_arr, std::vector<dou
 
         return yintp;
 }
+
+double interp(int it, double rt, int id, double rd, int nt, std::vector<double> arr_in) {
+	double y;
+	y = (1.-rd)*( (1.-rt)*arr_in[nt*id + it]
+         +                rt *arr_in[nt*id + it+1] )
+         +      rd *( (1.-rt)*arr_in[nt*(id+1) + it]
+         +                rt *arr_in[nt*(id+1) + it+1] );
+	return y;
+}
+
+std::array<double,9> eos_tintep_full(double d, double t, std::vector<double> d_arr, std::vector<double> t_arr, const std::vector<std::vector<double>> &arr_in) {
+
+//     input:
+//    d ... density [g/cm^3]
+//    t ... temperature [MeV]
+
+        double rd, rt;
+        double yintp;
+
+        int id, it;
+        int nne = d_arr.size();
+        int nt  = t_arr.size();
+	
+	std::vector<double> tmp;
+	std::array<double,9> y;
+
+        setd(d,d_arr,&id,&rd);
+        sett(t,t_arr,&it,&rt);
+
+
+//.....interpolate.......................................................
+	for (int i=0;i<9;i++) {
+		y[i] = (1.-rd)*( (1.-rt)*arr_in[i][nt*id + it]
+         	    +                rt *arr_in[i][nt*id + it+1] )
+         	    +      rd *( (1.-rt)*arr_in[i][nt*(id+1) + it]
+         	    +                rt *arr_in[i][nt*(id+1) + it+1] );
+	}
+
+	return y;
+}
+
 

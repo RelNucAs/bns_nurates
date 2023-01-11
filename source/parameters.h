@@ -34,7 +34,7 @@ namespace parameters
 	const double eta1_mu = -2.3e4;
         const double eta2_mu = 5.0e4; //1.3e4
 
-	bool HR = true;
+	bool HR = false;
 
 	struct eos_table_dim SR_tab = {700 ,  750, 150};
 	struct eos_table_dim HR_tab = {1400, 1500, 300};

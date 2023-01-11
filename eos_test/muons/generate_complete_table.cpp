@@ -29,7 +29,7 @@ int main (){
 	double nmu, T, eta;
 	double guess;
 	
-	double mu_mu, p, e, s, ap, ae, as;
+	double mu_mu, p, n, e, s, an, ap, ae, as;
 
         double ymumin = 5.e-8;
         double ymumax = 5.e-1;
@@ -58,7 +58,7 @@ int main (){
 	} else {
 		res = "";
 	}
-	string table_filename = abs_path + "eos_table/muons/eos_muons_complete_leo"+res+".txt";
+	string table_filename = abs_path + "eos_table/muons/eos_muons_complete_leo"+res+"_withn.txt";
         ofstream Iout(table_filename);
         Iout << n1 << "\n";
 	Iout << n2 << "\n";
@@ -102,6 +102,22 @@ int main (){
 		}
 		Iout << "\n";
 	}
+
+	for (int i=0;i<n1;i++) {
+                for (int j=0;j<n2;j++) {
+                        n = n_part(t_array[j], eta_array[n2*i+j], mL);
+                        Iout << n << " ";
+                }
+                Iout << "\n";
+        }
+
+	for (int i=0;i<n1;i++) {
+                for (int j=0;j<n2;j++) {
+                        an = n_antipart(t_array[j], eta_array[n2*i+j], mL);
+                        Iout << an << " ";
+                }
+                Iout << "\n";
+        }
 
         for (int i=0;i<n1;i++) {
                 for (int j=0;j<n2;j++) {

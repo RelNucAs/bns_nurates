@@ -102,16 +102,25 @@ double rtsafe(double nLep, double T, double mLep, const double guess, const doub
 			dx=0.5*(xh-xl);
 			rts=xl+dx;
 			//printf("If 1\n");
-			if (xl == rts) return rts;
+			if (xl == rts) {
+				//printf("%d", j);
+				return rts;
+			}
 		} else { //Change in root is negligible. Newton step acceptable. Take it.
 			dxold=dx;
 			dx=f/df;
 			double temp=rts;
 			rts -= dx;
 			//printf("If 2\n");
-			if (temp == rts) return rts;
+			if (temp == rts) {
+				//printf("%d", j);
+				return rts;
+			}
 		}
-		if (fabs(dx) < xacc) return rts; //Convergence criterion.
+		if (fabs(dx) < xacc) { //Convergence criterion.
+			//printf("%d", j);
+			return rts;
+		}
 		//printf("dx = %.3e\n", dxold);
 		//printf("eta = %.3e\n", rts);
 
