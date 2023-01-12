@@ -37,7 +37,7 @@ double n_net_df(double eta, double T, double mLep) {
 
 
 double find_guess_e(double ne, double T) {
-	double nq, guess;
+	double nq, guess = 0;
 	double t = T/kB; //temp in K
 	double nfm = ne*1.e-39; //number density in fm^{-3}
 	double pF = h*c*pow(3.*ne/(8.*pi),1./3.); //[MeV]

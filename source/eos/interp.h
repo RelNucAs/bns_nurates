@@ -17,7 +17,7 @@ struct EOSeta {
         //double eta[nne*nt]; //relativistic parameter
 	int nn; //number of density points
 	int nt; //number of temperature points
-	std::vector<double> d; //density
+	std::vector<double> nL; //density
 	std::vector<double> t; //temperature
 	std::vector<double> eta; //relativistic parameter
 };
@@ -43,21 +43,17 @@ struct EOScomplete {
 	int nt; //number of temperature points
 	std::vector<double> nL; //density
 	std::vector<double> t; //temperature
-	std:array<std::vector<double>,9> eos_table;
+	std::array<std::vector<double>,9> eos_table;
 	//i=0: chemical potential of particles
 	//i=1: number density of particles 
-	/7std::vector<double> n_antipart; //number density of antiparticles 
-	std::vector<double> P_part; //pressure of particles 
-	std::vector<double> P_antipart; //pressure of antiparticles 
-	std::vector<double> e_part; //internal energy of particles 
-	std::vector<double> e_antipart; //internal energy of antiparticles
-	std::vector<double> s_part; //entropy of particles
-	std::vector<double> s_antipart; //entropy of antiparticles
+	//i=2: number density of antiparticles 
+	//i=3: pressure of particles 
+	//i=4: pressure of antiparticles 
+	//i=5: internal energy of particles 
+	//i=6: internal energy of antiparticles
+	//i=7: entropy of particles
+	//i=8: entropy of antiparticles
 };
-
-void reset_string(std::stringstream ss) {
-	ss.str("");
-	ss.clear(); // Clear state flags.
 
 void reset_string(std::stringstream ss) {
 	ss.str("");
@@ -102,17 +98,17 @@ struct EOSeta read_eta_table(const int sp) {
 	int i, j;
 	double number;
 
-	std::ifstream EOStable;
-	//EOStable.open(filename,ios::in);  // open
-	EOStable.open(filename);  // open
+	std::ifstream EOSinput;
+	//EOSinput.open(filename,ios::in);  // open
+	EOSinput.open(filename);  // open
 	// open input table
-        //std::fstream EOStable("eos_table/eos_electrons_v2.txt"); //read file
-        if (!EOStable) {
+        //std::fstream EOSinput("eos_table/eos_electrons_v2.txt"); //read file
+        if (!EOSinput) {
                 cout << "EOS table not found!" << endl; //'\n';
 	        std::exit(EXIT_FAILURE);
         }
 	
-	std::getline(EOStable, EOSline);
+	std::getline(EOSinput, EOSline);
 	std::stringstream s1(EOSline);
 	s1 >> n1;
 	output.nn = n1;
@@ -121,7 +117,7 @@ struct EOSeta read_eta_table(const int sp) {
 	//        std::exit(EXIT_FAILURE);
 	//}
 
-	std::getline(EOStable, EOSline);
+	std::getline(EOSinput, EOSline);
 	std::stringstream s2(EOSline);
 	s2 >> n2;
 	output.nt = n2;
@@ -130,15 +126,15 @@ struct EOSeta read_eta_table(const int sp) {
 	//        std::exit(EXIT_FAILURE);
 	//}
 
-        getline(EOStable, EOSline);
+        getline(EOSinput, EOSline);
 	std::stringstream s3(EOSline);
         for (i=0;i<n1;i++) {
         	s3 >> number;
-		output.d.push_back(number);
+		output.nL.push_back(number);
         }
 
 
-        getline(EOStable, EOSline);
+        getline(EOSinput, EOSline);
 	std::stringstream s4(EOSline);
         for (i=0;i<n2;i++) {
         	s4 >> number;
@@ -147,7 +143,7 @@ struct EOSeta read_eta_table(const int sp) {
         }
 
 	for (i=0;i<n1;i++) {
-		getline(EOStable, EOSline);
+		getline(EOSinput, EOSline);
 		std::stringstream s5(EOSline);
 		for (j=0;j<n2;j++) {
 			s5 >> number;
@@ -156,23 +152,23 @@ struct EOSeta read_eta_table(const int sp) {
 		}
 	}
 
-	//std::ifstream EOStable (filename, ios::in | ios::binary);
+	//std::ifstream EOSinput (filename, ios::in | ios::binary);
 
 	// get length of file:
-    	//EOStable.seekg (0, EOStable.end);
-    	//int length = EOStable.tellg();
-    	//EOStable.seekg (0, EOStable.beg);
+    	//EOSinput.seekg (0, EOSinput.end);
+    	//int length = EOSinput.tellg();
+    	//EOSinput.seekg (0, EOSinput.beg);
 
-    	//EOStable.read(reinterpret_cast<char *>(&n1), sizeof(n1));
-    	//EOStable.read((char *) &n1, sizeof(n1));
-	//EOStable >> n1 >> n2;
+    	//EOSinput.read(reinterpret_cast<char *>(&n1), sizeof(n1));
+    	//EOSinput.read((char *) &n1, sizeof(n1));
+	//EOSinput >> n1 >> n2;
 	//printf("%d, %d\n", n1, n2);
-    	//if (EOStable.tellg() == length) {
+    	//if (EOSinput.tellg() == length) {
 	//	std::cout << "all characters read successfully.\n";
     	//} else {
 	//	std::cout << "error: not all characters read successfully\n";
 	//}
-	EOStable.close();
+	EOSinput.close();
     	return output;
  }
 
@@ -199,16 +195,17 @@ struct EOScomplete read_total_table(const int sp) {
 	int n1, n2;
 	int i, j;
 	double number;
+	std::vector<double> tmp;
 
-	ifstream EOStable;
-	EOStable.open(filename);  // open
-        //std::fstream EOStable("eos_table/eos_electrons_v2.txt"); //read file
-        if (!EOStable) {
+	ifstream EOSinput;
+	EOSinput.open(filename);  // open
+        //std::fstream EOSinput("eos_table/eos_electrons_v2.txt"); //read file
+        if (!EOSinput) {
                 cout << "EOS table not found!" << endl; //'\n';
 	        std::exit(EXIT_FAILURE);
         }
 
-        std::getline(EOStable, EOSline);
+        std::getline(EOSinput, EOSline);
         std::stringstream s1(EOSline);
         s1 >> n1;
 	output.nn = n1;
@@ -217,7 +214,7 @@ struct EOScomplete read_total_table(const int sp) {
         //        std::exit(EXIT_FAILURE);
         //}
 
-        std::getline(EOStable, EOSline);
+        std::getline(EOSinput, EOSline);
         std::stringstream s2(EOSline);
         s2 >> n2;
 	output.nt = n2;
@@ -227,7 +224,7 @@ struct EOScomplete read_total_table(const int sp) {
         //}
 
         //for (j=0;j<4;j++) {
-	//	getline(EOStable, EOSline);
+	//	getline(EOSinput, EOSline);
         //	std::stringstream s3(EOSline);
         //	for (i=0;i<150;i++) {
         //        	s3 >> output.d[j*150+i];
@@ -235,114 +232,130 @@ struct EOScomplete read_total_table(const int sp) {
 	//}
 
 	//reset_string(s3);
-	getline(EOStable, EOSline);
+	getline(EOSinput, EOSline);
 	std::stringstream s3(EOSline);
         for (i=0;i<n1;i++) { //for (i=600;i<700;i++)
 		s3 >> number;
-		output.d.push_back(number);
-        	//s3 >> output.d[i];
+		output.nL.push_back(number);
         }
 	
 
-        getline(EOStable, EOSline);
+        getline(EOSinput, EOSline);
 	std::stringstream s4(EOSline);
         for (i=0;i<n2;i++) {
 		s4 >> number;
 		output.t.push_back(number);
-        	//s4 >> output.t[i];
         }
 
 	for (i=0;i<n1;i++) {
-		getline(EOStable, EOSline);
+		getline(EOSinput, EOSline);
 		std::stringstream s5(EOSline);
 		for (j=0;j<n2;j++) {
 			s5 >> number;
-			output.mu_part.push_back(number);
-			//s5 >> output.mu_part[i*n2+j];
+			tmp.push_back(number);
 		}
 	}
 
-        for (i=0;i<n1;i++) {
-                getline(EOStable, EOSline);
-                std::stringstream s5(EOSline);
-                for (j=0;j<n2;j++) {
-                        s5 >> number;
-                        output.n_part.push_back(number);
-                        //s5 >> output.P_part[i*n2+j];
-                }
-        }
+	output.eos_table[0] = tmp;
+	tmp.clear();
 
         for (i=0;i<n1;i++) {
-                getline(EOStable, EOSline);
+                getline(EOSinput, EOSline);
                 std::stringstream s5(EOSline);
                 for (j=0;j<n2;j++) {
                         s5 >> number;
-                        output.n_antipart.push_back(number);
-                        //s5 >> output.P_antipart[i*n2+j];
+                        tmp.push_back(number);
                 }
         }
 	
+	output.eos_table[1] = tmp;
+	tmp.clear();
+
         for (i=0;i<n1;i++) {
-                getline(EOStable, EOSline);
+                getline(EOSinput, EOSline);
+                std::stringstream s5(EOSline);
+                for (j=0;j<n2;j++) {
+                        s5 >> number;
+                        tmp.push_back(number);
+                }
+        }
+	
+	output.eos_table[2] = tmp;
+	tmp.clear();
+	
+        for (i=0;i<n1;i++) {
+                getline(EOSinput, EOSline);
                 std::stringstream s5(EOSline);
                 for (j=0;j<n2;j++) {
 			s5 >> number;
-			output.P_part.push_back(number);
-                        //s5 >> output.P_part[i*n2+j];
+			tmp.push_back(number);
                 }
         }
 
-        for (i=0;i<n1;i++) {
-                getline(EOStable, EOSline);
+	output.eos_table[3] = tmp;
+	tmp.clear();
+        
+	for (i=0;i<n1;i++) {
+                getline(EOSinput, EOSline);
                 std::stringstream s5(EOSline);
                 for (j=0;j<n2;j++) {
 			s5 >> number;
-			output.P_antipart.push_back(number);
-                        //s5 >> output.P_antipart[i*n2+j];
+			tmp.push_back(number);
                 }
         }
 
-        for (i=0;i<n1;i++) {
-                getline(EOStable, EOSline);
+	output.eos_table[4] = tmp;
+	tmp.clear();
+        
+	for (i=0;i<n1;i++) {
+                getline(EOSinput, EOSline);
                 std::stringstream s5(EOSline);
                 for (j=0;j<n2;j++) {
 			s5 >> number;
-			output.e_part.push_back(number);
-                        //s5 >> output.e_part[i*n2+j];
+			tmp.push_back(number);
                 }
         }
 
-        for (i=0;i<n1;i++) {
-                getline(EOStable, EOSline);
+	output.eos_table[5] = tmp;
+	tmp.clear();
+        
+	for (i=0;i<n1;i++) {
+                getline(EOSinput, EOSline);
                 std::stringstream s5(EOSline);
                 for (j=0;j<n2;j++) {
 			s5 >> number;
-			output.e_antipart.push_back(number);
-                        //s5 >> output.e_antipart[i*n2+j];
+			tmp.push_back(number);
                 }
         }
 
-        for (i=0;i<n1;i++) {
-                getline(EOStable, EOSline);
+	output.eos_table[6] = tmp;
+	tmp.clear();
+        
+	for (i=0;i<n1;i++) {
+                getline(EOSinput, EOSline);
                 std::stringstream s5(EOSline);
                 for (j=0;j<n2;j++) {
 			s5 >> number;
-			output.s_part.push_back(number);
-                        //s5 >> output.s_part[i*n2+j];
+			tmp.push_back(number);
                 }
         }
 
-        for (i=0;i<n1;i++) {
-                getline(EOStable, EOSline);
+	output.eos_table[7] = tmp;
+	tmp.clear();
+        
+	for (i=0;i<n1;i++) {
+                getline(EOSinput, EOSline);
                 std::stringstream s5(EOSline);
                 for (j=0;j<n2;j++) {
 			s5 >> number;
-			output.s_antipart.push_back(number);
-                        //s5 >> output.s_antipart[i*n2+j];
+			tmp.push_back(number);
                 }
         }
+	
+	output.eos_table[8] = tmp;
+	tmp.clear();
 
-	EOStable.close();
+	EOSinput.close();
     	return output;
  }
 
@@ -518,7 +531,7 @@ void setd(double d, std::vector<double> d_arr, int* idx, double* r) {
 //=======================================================================
 
 
-double eos_tintep(double d, double t, std::vector<double> d_arr, std::vector<double> t_arr, std::vector<double> &y) {
+double eos_tintep(double d, double t, std::vector<double> &d_arr, std::vector<double> &t_arr, std::vector<double> &y) {
 
 //     input:
 //    d ... density [g/cm^3]
@@ -528,14 +541,8 @@ double eos_tintep(double d, double t, std::vector<double> d_arr, std::vector<dou
         double rd, rt;
         double yintp;
 
-        int nne = d_arr.size();
+        //int nne = d_arr.size();
         int nt  = t_arr.size();
-
-        // Read table
-      //if (teos%initial) then
-        //write(6,*) 'Error: eos table unknown in eos_tinterp!'
-        //stop
-      //endif
 
         setd(d,d_arr,&id,&rd);
         sett(t,t_arr,&it,&rt);
@@ -550,41 +557,30 @@ double eos_tintep(double d, double t, std::vector<double> d_arr, std::vector<dou
         return yintp;
 }
 
-double interp(int it, double rt, int id, double rd, int nt, std::vector<double> arr_in) {
-	double y;
-	y = (1.-rd)*( (1.-rt)*arr_in[nt*id + it]
-         +                rt *arr_in[nt*id + it+1] )
-         +      rd *( (1.-rt)*arr_in[nt*(id+1) + it]
-         +                rt *arr_in[nt*(id+1) + it+1] );
-	return y;
-}
-
-std::array<double,9> eos_tintep_full(double d, double t, std::vector<double> d_arr, std::vector<double> t_arr, const std::vector<std::vector<double>> &arr_in) {
+std::array<double,9> eos_interp(double d, double t, struct EOScomplete &EOSin) {
 
 //     input:
 //    d ... density [g/cm^3]
 //    t ... temperature [MeV]
 
         double rd, rt;
-        double yintp;
 
         int id, it;
-        int nne = d_arr.size();
-        int nt  = t_arr.size();
+        //int nne = EOSin.nL.size();
+        int nt  = EOSin.t.size();
 	
-	std::vector<double> tmp;
 	std::array<double,9> y;
 
-        setd(d,d_arr,&id,&rd);
-        sett(t,t_arr,&it,&rt);
+        setd(d,EOSin.nL,&id,&rd);
+        sett(t,EOSin.t ,&it,&rt);
 
 
 //.....interpolate.......................................................
 	for (int i=0;i<9;i++) {
-		y[i] = (1.-rd)*( (1.-rt)*arr_in[i][nt*id + it]
-         	    +                rt *arr_in[i][nt*id + it+1] )
-         	    +      rd *( (1.-rt)*arr_in[i][nt*(id+1) + it]
-         	    +                rt *arr_in[i][nt*(id+1) + it+1] );
+		y[i] = (1.-rd)*( (1.-rt)*EOSin.eos_table[i][nt*id + it]
+         	    +                rt *EOSin.eos_table[i][nt*id + it+1] )
+         	    +      rd *( (1.-rt)*EOSin.eos_table[i][nt*(id+1) + it]
+         	    +                rt *EOSin.eos_table[i][nt*(id+1) + it+1] );
 	}
 
 	return y;

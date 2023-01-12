@@ -23,7 +23,6 @@ typedef std::chrono::duration<long int, std::ratio<1, 1000> > chrono_int;
 
 int main (){
 	int niter = 10000;
-	int i = 0;
 	double r1, r2;
 	std::vector<double> n_arr, t_arr;
 	std::vector<double> n_tab, t_tab, eta_tab;
@@ -32,7 +31,7 @@ int main (){
 	chrono_int duration;
 	
 	double s1, s2, s3;
-        double rho, ne, t, eta, eta_NR;
+        double rho, ne, t;
 	double ye = mu*1.e39;
         double guess;
 
