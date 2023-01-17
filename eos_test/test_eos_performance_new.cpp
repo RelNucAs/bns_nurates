@@ -82,7 +82,7 @@ int main (){
 	for (int i=0; i<niter; i++) {
 		ne = n_arr[i];
 		t  = t_arr[i];
-		lep_EOS = eos_ferm_array(ne, t, sp, 1, eta_table, EOS_table);
+		lep_EOS = eos_ferm_array<1,sp>(ne, t, eta_table, EOS_table);
 
 	}
 	stop = high_resolution_clock::now();
@@ -99,7 +99,7 @@ int main (){
 	for (int i=0; i<niter; i++) {
 		ne = n_arr[i];
 		t  = t_arr[i];
-		lep_EOS = eos_ferm_array(ne, t, sp, 2, eta_table, EOS_table);
+		lep_EOS = eos_ferm_array<2,sp>(ne, t, eta_table, EOS_table);
 	}
 	stop = high_resolution_clock::now();
 	//for (int i=0; i<9; i++) printf("EOS_array[%d] = %.10e\n", i, lep_EOS[i]);
@@ -115,7 +115,7 @@ int main (){
 	for (int i=0; i<niter; i++) {
 		ne = n_arr[i];
 		t  = t_arr[i];
-		lep_EOS = eos_ferm_array(ne, t, sp, 3, eta_table, EOS_table);
+		lep_EOS = eos_ferm_array<3,sp>(ne, t, eta_table, EOS_table);
 	}
 	stop = high_resolution_clock::now();
 	//for (int i=0; i<9; i++) printf("EOS_array[%d] = %.10e\n", i, lep_EOS[i]);

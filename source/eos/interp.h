@@ -5,7 +5,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
-
+#include <array>
 #include "../parameters.h"
 
 using namespace parameters;
@@ -182,9 +182,9 @@ struct EOScomplete read_total_table(const int sp) {
         }
 
 	if (sp == 1) {
-		filename = abs_path + "eos_table/electrons/eos_electrons_complete_leo"+res+"_withn.txt";
+		filename = abs_path + "eos_table/electrons/eos_electrons_complete_leo"+res+".txt";
 	} else if (sp == 2) {
-		filename = abs_path + "eos_table/muons/eos_muons_complete_leo"+res+"_withn.txt";
+		filename = abs_path + "eos_table/muons/eos_muons_complete_leo"+res+".txt";
 	} else {
 		printf("Number of lepton species: ERROR\n");
 		std::exit(EXIT_FAILURE);
@@ -256,6 +256,18 @@ struct EOScomplete read_total_table(const int sp) {
 		}
 	}
 
+	output.eos_table[8] = tmp;
+	tmp.clear();
+
+        for (i=0;i<n1;i++) {
+                getline(EOSinput, EOSline);
+                std::stringstream s5(EOSline);
+                for (j=0;j<n2;j++) {
+                        s5 >> number;
+                        tmp.push_back(number);
+                }
+        }
+	
 	output.eos_table[0] = tmp;
 	tmp.clear();
 
@@ -270,20 +282,20 @@ struct EOScomplete read_total_table(const int sp) {
 	
 	output.eos_table[1] = tmp;
 	tmp.clear();
-
+	
         for (i=0;i<n1;i++) {
                 getline(EOSinput, EOSline);
                 std::stringstream s5(EOSline);
                 for (j=0;j<n2;j++) {
-                        s5 >> number;
-                        tmp.push_back(number);
+			s5 >> number;
+			tmp.push_back(number);
                 }
         }
-	
+
 	output.eos_table[2] = tmp;
 	tmp.clear();
-	
-        for (i=0;i<n1;i++) {
+        
+	for (i=0;i<n1;i++) {
                 getline(EOSinput, EOSline);
                 std::stringstream s5(EOSline);
                 for (j=0;j<n2;j++) {
@@ -339,20 +351,8 @@ struct EOScomplete read_total_table(const int sp) {
 			tmp.push_back(number);
                 }
         }
-
-	output.eos_table[7] = tmp;
-	tmp.clear();
-        
-	for (i=0;i<n1;i++) {
-                getline(EOSinput, EOSline);
-                std::stringstream s5(EOSline);
-                for (j=0;j<n2;j++) {
-			s5 >> number;
-			tmp.push_back(number);
-                }
-        }
 	
-	output.eos_table[8] = tmp;
+	output.eos_table[7] = tmp;
 	tmp.clear();
 
 	EOSinput.close();
@@ -386,68 +386,51 @@ struct EOScomplete read_total_table(const int sp) {
 //
 //=======================================================================
 
-void sett(double t, std::vector<double> t_arr, int* idx, double* r) {
-	double logt, t1, t2;
-	double xmin = t_arr[0];
-	double dx = log10(t_arr[1])-log10(t_arr[0]);
-	int it, itmp;
-        double rt;	
+void set_idx(const double x, const std::vector<double> &x_arr, int &idx, double &r) {
+	int id;
+	int nd = x_arr.size();
+	double rd;
+	const double dx = x_arr[1]-x_arr[0];
 
-	int nt = t_arr.size();
 
-//.....find temperature index.........................................
-      	logt = log10(t);
-      	it = floor( (logt - log10(xmin))/dx );
-      	if (it < 1) {
-		it = 0;
-	} else if (it >= nt-1) {
-        	it = nt - 2;
+//.....find index.........................................
+      	const double logx = log10(x);
+      	id = floor( (logx - x_arr[0])/dx );
+      	if (id < 1) {
+		id = 0;
+	} else if (id >= nd-1) {
+        	id = nd - 2;
 	}
 
-	itmp = it;
+	rd = (logx - x_arr[id]) / (x_arr[id+1] - x_arr[id]);
 
-	t1 = log10(t_arr[it]);
-	t2 = log10(t_arr[it+1]);
-	
 //.....check the index for non-equidistant grid...........................
-      	if (t1 > logt) {
-        	if (it == 0) {
-          		rt = 0.;
-		} else {
-			it = it - 1;
-			t1 = log10(t_arr[it]);
-			t2 = log10(t_arr[it+1]);
-			rt = (logt - t1) / (t2 - t1);
+	#ifdef DEBUG
+		if (x_arr[id] > logx) {
+			if (id == 0) {
+				rd = 0.;
+			} else {
+				id = id - 1;
+				rd = (logx - x_arr[id]) / (x_arr[id+1] - x_arr[id]);
+			}
+		} else if (x_arr[id+1] < logx) {
+			if (id == nd-2) {
+				rd = 1.;
+			} else {
+				id = id + 1;
+				rd = (logx - x_arr[id]) / (x_arr[id+1] - x_arr[id]);
+			}
 		}
-	} else if (t2 < logt) {
-		if (it == nt-2) {
-          		rt = 1.;
-		} else {
-          		it = it + 1;
-			t1 = log10(t_arr[it]);
-			t2 = log10(t_arr[it+1]);
-			rt = (logt - t1) / (t2 - t1);
+		if ((rd>1.) || (rd<0.)) {
+		       printf("Warning: Something wrong with index in set_idx!\n");
+		       printf("logx = %.3lf, rd = %.3lf\n", logx, rd);
+		       printf("id = %d, logx[id] = %.3lf, logx[id+1] = %.3lf\n", id, x_arr[id], x_arr[id+1]);
+		       std::exit(EXIT_FAILURE);
 		}
-	} else if (t1 == logt) {
-		rt = 0.;
-	} else if (t2 == logt) {
-		rt = 1.;		
-	} else {
-        	rt = (logt - t1) / (t2 - t1);
-	}
-      
-	if ((rt>1.) || (rt<0.)) {
-	       printf("Warning: Something wrong with t index in tinterp!\n");
-	       printf("logt = %.3lf, rt = %.3lf\n", logt, rt);
-	       printf("it = %d, itmp = %d, t[it] = %.3lf, t[it+1] = %.3lf\n", it, itmp, t_arr[it], t_arr[it+1]);
-               std::exit(EXIT_FAILURE);
-      	}
+	#endif
 
-	*idx = it;
-	*r   = rt;
-	//printf("logt = %.3lf, rt = %.3lf\n", logt, rt);
-	//printf("it = %d, t[it] = %.3lf, t[it+1] = %.3lf\n", it, t_arr[it], t_arr[it+1]);
-	//printf("idx = %d, r = %.3lf\n", it, rt);
+	idx = id;
+	r   = rd;
 	return;
 }
 
@@ -544,8 +527,8 @@ double eos_tintep(double d, double t, std::vector<double> &d_arr, std::vector<do
         //int nne = d_arr.size();
         int nt  = t_arr.size();
 
-        setd(d,d_arr,&id,&rd);
-        sett(t,t_arr,&it,&rt);
+        set_idx(d,d_arr,id,rd);
+        set_idx(t,t_arr,it,rt);
 
 
 //.....interpolate.......................................................
@@ -557,7 +540,7 @@ double eos_tintep(double d, double t, std::vector<double> &d_arr, std::vector<do
         return yintp;
 }
 
-std::array<double,9> eos_interp(double d, double t, struct EOScomplete &EOSin) {
+std::array<double,9> eos_interp(const double d, const double t, const struct EOScomplete &EOSin) {
 
 //     input:
 //    d ... density [g/cm^3]
@@ -571,8 +554,8 @@ std::array<double,9> eos_interp(double d, double t, struct EOScomplete &EOSin) {
 	
 	std::array<double,9> y;
 
-        setd(d,EOSin.nL,&id,&rd);
-        sett(t,EOSin.t ,&it,&rt);
+        set_idx(d,EOSin.nL,id,rd);
+        set_idx(t,EOSin.t ,it,rt);
 
 
 //.....interpolate.......................................................
@@ -582,6 +565,7 @@ std::array<double,9> eos_interp(double d, double t, struct EOScomplete &EOSin) {
          	    +      rd *( (1.-rt)*EOSin.eos_table[i][nt*(id+1) + it]
          	    +                rt *EOSin.eos_table[i][nt*(id+1) + it+1] );
 	}
+	
 
 	return y;
 }

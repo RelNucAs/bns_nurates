@@ -51,3 +51,6 @@ nu_rates
 # EOS tables
 *.dat
 *.tab
+
+# G++ compile
+./compile
