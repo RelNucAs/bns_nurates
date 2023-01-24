@@ -13,10 +13,6 @@ Eq:C19 from Bruenn(1985) with blocking factor and Weak magnetism from Burrows(20
 
 Code description:
 
-main.cpp contains all the key routines for calculating the opacities. 
+For the moment main.cpp computes the (energy-integrated) emissivity and number emissivity for (anti)electron neutrinos along a 1D CCSN profile.
 
-To create an exe:
-
-g++ -o nu_rates main.cpp -I. 
-
-You can also do make in the main folder that contains the makefile which creates a exe with the name nu_rates.
+Use Makefile to compile the main file.

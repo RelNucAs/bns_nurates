@@ -50,6 +50,12 @@ nu_rates: $(OBJECTS) main.o
 main.o: main.cpp
 	$(CXX) $(RFLAGS) -c main.cpp
 
+test: $(OBJECTS)
+	$(CXX) $(RFLAGS) -o tests/prova tests/prova.cpp $(SOURCES)
+
+test_bis: $(OBJECTS) tests/test_integration.cpp
+	$(CXX) $(RFLAGS) -o tests/test_integration tests/test_integration.cpp $(SOURCES)
+
 #program.o: $(SOURCES)
 #	$(CXX) $(RFLAGS) -c $(SOURCES)
 

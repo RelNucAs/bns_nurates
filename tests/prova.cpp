@@ -11,7 +11,7 @@
 
 #include "tools/integration.hpp" //Header file contatining integration routines
 #include "tools/nr3.h"
-#include "tools/fermi_integrals.hpp"
+#include "tools/fermi_integrals.h"
 //#include "tools/NewtonRaphson.hpp"
 //struct FD_params { int k; double eta; double alpha; };
 
@@ -39,7 +39,7 @@ int main (){
 
 	F_leg.function = &FD_legendre;
 	F_leg.params = &pp1;
-	double test_2 = use_gaulag(24,F_leg,5.);
+	double test_2 = gleg_integ(24,F_leg,5.);
 
 	printf("1: %.5e, 2: %.5e\n", test_1, test_2);
 
