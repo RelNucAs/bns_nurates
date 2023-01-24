@@ -7,22 +7,21 @@
 #include <cstdio> //libabry for printf 
 #include <cstdlib> //libabry for abs()
 
-#include "../source/constants.h" //Header file containing all relevant constants
-#include "../source/parameters.h" //Header file containing all parameters
-#include "../source/weak_magnetism.h" //Header file containing functions to compute WM
-#include "../source/nu_abs_em.h" //Header file containing all rates
-#include "../source/nu_elastic_scatt.h" //Header file containing elastic scattering rates
-#include "../source/spectral_function.h"
-#include "../source/tools/fermi_integrals.h"
-#include "../source/tools/NewtonRaphson.h"
-#include "../source/tools/nr3.h"
-#include "../source/mnewt.h"
+#include "constants.hpp" //Header file containing all relevant constants
+#include "parameters.hpp" //Header file containing all parameters
+#include "weak_magnetism.hpp" //Header file containing functions to compute WM
+#include "nu_abs_em.hpp" //Header file containing all rates
+#include "nu_elastic_scatt.hpp" //Header file containing elastic scattering rates
+#include "spectral_function.hpp"
+#include "tools/fermi_integrals.hpp"
+#include "tools/nr3.h"
+//#include "tools/mnewt.hpp"
 
 using namespace constants;
 using namespace parameters;
 using namespace nuabsem;
 using namespace elastic_scatt;
-using namespace weakmag;
+//using namespace weakmag;
 using namespace std;
 
 int main (){

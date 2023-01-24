@@ -9,16 +9,10 @@
 #include <cstdio> //libabry for printf 
 #include <cstdlib> //libabry for abs()
 
-#include <gsl/gsl_math.h>
-#include <gsl/gsl_integration.h>
-#include <gsl/gsl_sf_gamma.h>
-#include <gsl/gsl_errno.h>
-#include <gsl/gsl_roots.h>
-
-#include "../source/integration.h" //Header file contatining integration routines
-#include "../source/tools/nr3.h"
-#include "../source/tools/fermi_integrals.h"
-#include "../source/tools/NewtonRaphson.h"
+#include "tools/integration.hpp" //Header file contatining integration routines
+#include "tools/nr3.h"
+#include "tools/fermi_integrals.hpp"
+//#include "tools/NewtonRaphson.hpp"
 //struct FD_params { int k; double eta; double alpha; };
 
 

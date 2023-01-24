@@ -15,28 +15,22 @@
 #include <cmath> //math library for basic operations, pi
 #include <cstdio> //libabry for printf 
 #include <cstdlib> //libabry for abs()
-#include <gsl/gsl_math.h>
-#include <gsl/gsl_integration.h>
-#include <gsl/gsl_sf_gamma.h>
-#include <gsl/gsl_errno.h>
-#include <gsl/gsl_roots.h>
 
-#include "./source/constants.h" //Header file containing all relevant constants
-#include "./source/parameters.h" //Header file containing all parameters
-#include "./source/weak_magnetism.h" //Header file containing functions to compute WM
-#include "./source/nu_abs_em.h" //Header file containing all rates
-#include "./source/nu_elastic_scatt.h" //Header file containing elastic scattering rates
-#include "./source/integration.h" //Header file contatining integration routines
-#include "./source/spectral_function.h" //Header file contatining spectral functions
-#include "./source/tools/nr3.h"
-#include "./source/tools/NewtonRaphson.h"
-#include "./source/tools/fermi_integrals.h"
+#include "constants.hpp" //Header file containing all relevant constants
+#include "parameters.hpp" //Header file containing all parameters
+#include "weak_magnetism.hpp" //Header file containing functions to compute WM
+#include "nu_abs_em.hpp" //Header file containing all rates
+#include "nu_elastic_scatt.hpp" //Header file containing elastic scattering rates
+#include "tools/integration.hpp" //Header file contatining integration routines
+#include "spectral_function.hpp" //Header file contatining spectral functions
+#include "tools/nr3.h"
+//#include "tools/NewtonRaphson.h"
+#include "tools/fermi_integrals.h"
 
 using namespace constants;
 using namespace parameters;
 using namespace nuabsem;
 using namespace elastic_scatt;
-using namespace weakmag;
 using namespace std;
 
 //struct my_f_params { double nb; double T; double me; double yp; double yn; double mu_e; double mu_hat; double dU; };
