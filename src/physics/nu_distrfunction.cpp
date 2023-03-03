@@ -1,31 +1,34 @@
-#pragma once
+// \file  nu_distrfunction.cpp
+// \brief Define functional form of neutrino distribution function in
+//        optically thick and thin conditions depending on a set of  
+//        parameters to be reconstructed from M1 quantities
 
-#include "constants.hpp"
-#include "tools/fermi_integrals.hpp"
-#include "tools/gamma.hpp"
-#include "tools/digamma.hpp"
+#include "constants.hpp"           // Header file for physical constants
+#include "tools/fermi_integrals.h" // Header file for computation of NR Fermi-Dirac intergrals
+#include "tools/gamma.hpp"         // Header file for gamma function
+#include "tools/digamma.hpp"       // Header file for digamma function
 
-void mnewt(const Int ntrial, VecDoub_IO &x, const Doub tolx, const Doub tolf) {
-        Int i,n=x.size();
-        VecDoub p(n),fvec(n);
-        MatDoub fjac(n,n);
-        for (Int k=0;k<ntrial;k++) {
-                usrfun(x,fvec,fjac);
-                Doub errf=0.0;
-                for (i=0;i<n;i++) errf += abs(fvec[i]);
-                if (errf <= tolf) return;
-                for (i=0;i<n;i++) p[i] = -fvec[i];
-                LUdcmp alu(fjac);
-                alu.solve(p,p);
-                Doub errx=0.0;
-                for (i=0;i<n;i++) {
-                        errx += abs(p[i]);
-                        x[i] += p[i];
-                }
-                if (errx <= tolx) return;
-        }
-        return;
-}
+//void mnewt(const Int ntrial, VecDoub_IO &x, const Doub tolx, const Doub tolf) {
+//        Int i,n=x.size();
+//        VecDoub p(n),fvec(n);
+//        MatDoub fjac(n,n);
+//        for (Int k=0;k<ntrial;k++) {
+//                usrfun(x,fvec,fjac);
+//                Doub errf=0.0;
+//                for (i=0;i<n;i++) errf += abs(fvec[i]);
+//                if (errf <= tolf) return;
+//                for (i=0;i<n;i++) p[i] = -fvec[i];
+//                LUdcmp alu(fjac);
+//                alu.solve(p,p);
+//                Doub errx=0.0;
+//                for (i=0;i<n;i++) {
+//                        errx += abs(p[i]);
+//                        x[i] += p[i];
+//                }
+//                if (errx <= tolx) return;
+//        }
+//        return;
+//}
 
 
 void thick_f(double *x, double *C, double *f) {

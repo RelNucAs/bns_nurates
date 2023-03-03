@@ -1,6 +1,10 @@
-#pragma once
+#ifndef SPEC_FUNCTION_H
+#define SPEC_FUNCTION_H
 
-struct FD_params { int k; double eta; double alpha; };
+// \file  spectral_function.hpp
+// \brief Define energy-dependent functions for emissivity/absorptivity
+//        of neutrino-matter interactions
+
 struct function_struct
 {
   double (* function) (double x, void * params);
@@ -8,6 +12,7 @@ struct function_struct
 };
 typedef struct function_struct my_function;
 
+struct FD_params { int k; double eta; double alpha; };
 struct my_f_params { double nb; double T; double mL; double yp; double yn; double mu_L; double mu_hat; double dU; };
 struct M1_values { double n_nu; double J_nu; };
 struct fnu_params {double A; double B; };
@@ -51,3 +56,4 @@ double df_NRaphson(double x, void *p);
 
 void fdf_NRaphson(double x, void *p, double * f, double * df);
 
+#endif

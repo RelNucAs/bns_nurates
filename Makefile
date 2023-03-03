@@ -43,6 +43,14 @@ clean:
 	rm -v -f $(OBJECTS)
 	rm -v -f ./main
 	rm -v -f ./main.o
+	rm -v -f ./make_plot.o
+	rm -v -f ./tests/test_NNbrem
+
+plot: $(OBJECTS) make_plot.o
+	$(CXX) $(RFLAGS) -o ./plot ./make_plot.o $(OBJECTS)
+
+make_plot.o: make_plot.cpp
+	$(CXX) $(RFLAGS) -c make_plot.cpp
 
 nu_rates: $(OBJECTS) main.o
 	$(CXX) $(RFLAGS) -o ./main ./main.o $(OBJECTS)
@@ -55,6 +63,9 @@ test: $(OBJECTS)
 
 test_bis: $(OBJECTS) tests/test_integration.cpp
 	$(CXX) $(RFLAGS) -o tests/test_integration tests/test_integration.cpp $(SOURCES)
+
+test_NN: $(OBJECTS) tests/test_NNbrem.cpp
+	$(CXX) $(RFLAGS) -o tests/test_NNbrem tests/test_NNbrem.cpp $(SOURCES)
 
 #program.o: $(SOURCES)
 #	$(CXX) $(RFLAGS) -c $(SOURCES)

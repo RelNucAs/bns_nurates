@@ -1,7 +1,11 @@
+// \file  spectral_function.cpp
+// \brief Define energy-dependent functions for emissivity/absorptivity
+//        of neutrino-matter interactions
+
 #include <tuple>
 
-#include "spectral_function.hpp"
-#include "nu_abs_em.hpp" //Header file containing all rates
+#include "spectral_function.hpp" // Header file for energy-dependent functions
+#include "physics/nu_abs_em.hpp" // Header file for nu_abs_em rates
 
 double j0_nue(double x, void *p) {
         struct my_f_params * pars = (struct my_f_params *)p;
