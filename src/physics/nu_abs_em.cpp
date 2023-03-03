@@ -72,12 +72,13 @@ std::tuple<double,double> nu_n_abs(const double omega, const double nb, const do
 	const double nn = nb*yn; //neutron number density [cm-3]
 	const double np = nb*yp; //proton number density  [cm-3]
 	double em, ab;
+	double dU, R;
 
 	/* Nucleon interaction correction to chemical potential */
 	if (use_dU == 1) {
-		const double dU = deltaU; // [MeV]
+		dU = deltaU; // [MeV]
 	} else {
-		const double dU = 0.;
+		dU = 0.;
 	}
 	const double Qprime = Q + dU;     // [MeV], Eq.(79) in Hempel
 	const double E = omega + Qprime;  // [MeV]
@@ -85,9 +86,9 @@ std::tuple<double,double> nu_n_abs(const double omega, const double nb, const do
 
 	/* Phase space, recoil and weak magnetism correction */
 	if (use_WM_ab == 1) {
-		const double R = WM_nue_abs(omega);
+		R = WM_nue_abs(omega);
 	} else {
-		const double R = 1.;
+		R = 1.;
 	}
 
 	
@@ -116,6 +117,7 @@ std::tuple<double,double> nu_p_abs(const double omega, const double nb, const do
 	const double nn = nb*yn; //neutron number density [cm-3]
 	const double np = nb*yp; //proton number density  [cm-3]
 	double ab, em;
+	double dU, Rbar;
 
 	/* Nucleon interaction correction to chemical potential */
 	if (use_dU == 1) {
@@ -129,9 +131,9 @@ std::tuple<double,double> nu_p_abs(const double omega, const double nb, const do
 
 	/* Phase space, recoil and weak magnetism correction */
 	if (use_WM_ab == 1) {
-		const double Rbar = WM_anue_abs(omega);
+		Rbar = WM_anue_abs(omega);
 	} else {
-		const double Rbar = 1.;
+		Rbar = 1.;
 	}
 	
 	/* Check kinematics constraint for the reaction */
@@ -159,12 +161,12 @@ std::tuple<double,double> nu_p_abs(const double omega, const double nb, const do
 std::tuple<double,double> nu_n_abs_stim(const double omega, const double nb, const double T, const double lep_mass, const double yp, const double yn, const double mu_l, const double mu_hat, const double deltaU) {
         double em, ab;
         std::tie(em,ab) = nu_n_abs(omega, nb, T, lep_mass, yp, yn, mu_l, mu_hat, deltaU);
-	return std::make_tuple(em,em+ab)	
+	return std::make_tuple(em,em+ab);	
 }
 
 
 std::tuple<double,double> nu_p_abs_stim(const double omega, const double nb, const double T, const double lep_mass, const double yp, const double yn, const double mu_l, const double mu_hat, const double deltaU) {
         double em, ab;
         std::tie(em,ab) = nu_p_abs(omega, nb, T, lep_mass, yp, yn, mu_l, mu_hat, deltaU);
-	return std::make_tuple(em,em+ab)	
+	return std::make_tuple(em,em+ab);	
 }

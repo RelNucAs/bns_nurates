@@ -1,15 +1,19 @@
+// \file  integration.cpp
+// \brief Quadrature methods (Gauss-Legendre and Gauss-Laguerre) for integration
+
 #include <fstream>
 
-#include "parameters.hpp"
-//#include "tools/fermi_integrals.h"
+#include "parameters.hpp" 
 #include "tools/nr3.h"
-#include "tools/gamma.h"
-#include "tools/gauss_wgts.h"
-#include "spectral_function.hpp"
+#include "tools/gamma.hpp"
+#include "tools/gauss_wgts.hpp"
 #include "tools/integration.hpp"
+#include "spectral_function.hpp"
 
 using namespace parameters;
 
+/* Save abscissas and weights to txt file */
+// Gauss-Legendre
 void save_gauleg(int n, const Doub x1, const Doub x2) {
         VecDoub_O x(n);
         VecDoub_O w(n);
@@ -37,7 +41,7 @@ void save_gauleg(int n, const Doub x1, const Doub x2) {
         fout.close();
 }
 
-
+// Gauss-Laguerre
 void save_gaulag(int n, const Doub alf) {
 	VecDoub_O x(n);
 	VecDoub_O w(n);
@@ -45,8 +49,6 @@ void save_gaulag(int n, const Doub alf) {
 	for (int i=0;i<n;i++) {
                 x[i] = 0.;
                 w[i] = 0.;
-                //printf("%.3lf\n", x[i]);
-                //printf("%.3lf\n", w[i]);
         }
 	
         gaulag(x, w, alf);
@@ -63,21 +65,12 @@ void save_gaulag(int n, const Doub alf) {
         fout.close();
 }
 
+/* Read abscissas and weights from txt file */
+// Gauss-Legendre
 void read_gleg_wgts(int n, double *x, double *w) {
   	char gaussname[50];
 	string dummyLine;
         sprintf(gaussname, "input/gauleg_weights_n_%d.txt", n);
-
-	//if (g_type == 0) {
-        //        sprintf(gaussname, "../input/gauleg_weights_n_%d.txt", n);
-        //} else if (g_type == 1) {
-        //        sprintf(gaussname, "../input/gaulag_weights_0_n_%d.txt", n);
-        //} else if (g_type == 2) {
-        //        sprintf(gaussname, "../input/gaulag_weights_5_n_%d.txt", n);
-        //} else {
-        //        printf("Index of Gaussian Quadrature method not recognized");
-        //        exit (EXIT_FAILURE);
-        //}
 
         // open input file
         std::fstream fin(abs_path+gaussname);
@@ -97,6 +90,7 @@ void read_gleg_wgts(int n, double *x, double *w) {
 	fin.close();
 }
 
+// Gauss-Laguerre
 void read_glag_wgts(int n, double *x, double *w, double alpha) {
         char gaussname[50];
         string dummyLine;
@@ -121,9 +115,8 @@ void read_glag_wgts(int n, double *x, double *w, double alpha) {
         fin.close();
 }
 
-
+/* Make convolution between sampled function and weights */
 double do_integration(int n, double *wgt, double *spectrArray) {
-	
 	double integral = 0.;
 
 	for (int i=0;i<n;i++) {
@@ -135,6 +128,7 @@ double do_integration(int n, double *wgt, double *spectrArray) {
 
 }
 
+/* Perform Gauss-Laguerre integration */
 double glag_integ(int n, my_function F, double alpha) {
         double x[n], w[n];
         double f[n];
@@ -150,12 +144,7 @@ double glag_integ(int n, my_function F, double alpha) {
         return do_integration(n, w, f);
 }
 
-
-//double split_value(double T, double eta_e) {
-	//return T * Fermi_integral_p5(eta_e) / Fermi_integral_p4(eta_e);
-//}
-
-
+/* Perform Gauss-Legendre integration */
 double gleg_integ(int n, my_function F, double t) {
         double x[n], w[n];
         double f1[n], f2[n];
@@ -169,8 +158,8 @@ double gleg_integ(int n, my_function F, double t) {
         return t * (do_integration(n, w, f1) + do_integration(n, w, f2));
 }
 
-
-double find_max(int nslice, double x0, double x1, double (*func)(double, struct my_f_params), struct my_f_params p) {
+/* Estimate maximum of the function to be integrated */
+double find_max(int nslice, double x0, double x1, double (*func)(double, struct FD_params), struct FD_params p) {
         double val, max = 0;
         double x_step, guess;
         double dx = (log10(x1)-log10(x0)) / (double) nslice;
@@ -215,3 +204,6 @@ double find_guess(int nslice, my_function F) {
         return guess;
 }
 
+//double split_value(double T, double eta_e) {
+	//return T * Fermi_integral_p5(eta_e) / Fermi_integral_p4(eta_e);
+//}

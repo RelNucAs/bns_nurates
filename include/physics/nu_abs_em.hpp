@@ -30,3 +30,5 @@ std::tuple<double,double> nu_n_abs_stim(const double omega, const double nb, con
 /* Antineutrino absorption on neutron (anul + p -> l+ + n) */
 std::tuple<double,double> nu_p_abs(const double omega, const double nb, const double T, const double lep_mass, const double yp, const double yn, const double mu_l, const double mu_hat, const double deltaU);
 std::tuple<double,double> nu_p_abs_stim(const double omega, const double nb, const double T, const double lep_mass, const double yp, const double yn, const double mu_l, const double mu_hat, const double deltaU);
+
+#endif

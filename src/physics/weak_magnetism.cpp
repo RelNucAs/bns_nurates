@@ -51,16 +51,17 @@ double WM_anue_abs(const double e_nu) {
 // Output: correction to zeroth (R0) and first Legendre (R1) coefficients of scattering kernel
 std::tuple<double,double> WM_scatt(const double Enu, const int reacflag) {
 	double cv, ca, F2;
+	double h0, h1;
 	
 	std::tie(cv,ca,F2) = nucfrmfac(Enu,reacflag); //nuclear form factors
 	//std::tie(cv_0,ca_0,F2_0) = nucfrmfac(0.,reacflag); //nuclear form factors at Q^2=0
 	 
 	if (reacflag == 1) {
-		const double h0 = hpv*hpv + 3.*hpa*hpa;
-		const double h1 = hpv*hpv -    hpa*hpa;
+		h0 = hpv*hpv + 3.*hpa*hpa;
+		h1 = hpv*hpv -    hpa*hpa;
 	} else if (reacflag == 2) {
-		const double h0 = hnv*hnv + 3.*hna*hna;
-		const double h1 = hnv*hnv -    hna*hna;
+		h0 = hnv*hnv + 3.*hna*hna;
+		h1 = hnv*hnv -    hna*hna;
 	}
 
 	const double ehor = Enu* MeV/(mb*c*c);

@@ -61,7 +61,7 @@ main.o: main.cpp
 test: $(OBJECTS)
 	$(CXX) $(RFLAGS) -o tests/prova tests/prova.cpp $(SOURCES)
 
-test_bis: $(OBJECTS) tests/test_integration.cpp
+test_integration: $(OBJECTS) tests/test_integration.cpp
 	$(CXX) $(RFLAGS) -o tests/test_integration tests/test_integration.cpp $(SOURCES)
 
 test_NN: $(OBJECTS) tests/test_NNbrem.cpp

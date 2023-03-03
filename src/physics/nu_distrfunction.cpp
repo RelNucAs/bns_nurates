@@ -8,6 +8,8 @@
 #include "tools/gamma.hpp"         // Header file for gamma function
 #include "tools/digamma.hpp"       // Header file for digamma function
 
+using namespace constants;
+
 //void mnewt(const Int ntrial, VecDoub_IO &x, const Doub tolx, const Doub tolf) {
 //        Int i,n=x.size();
 //        VecDoub p(n),fvec(n);
@@ -60,7 +62,7 @@ void thin_f(double *x, double *C, double *f) {
         return;
 }
 
-void thin_df(double *x, double *C, double *f) {
+void thin_df(double *x, double *C, double *J) {
 	double A = x[0];
 	double B = x[1];
         J[0] = 4.*pi*gammln(A+3.)/pow(B,A+3.)*(log(B)-sf_psi(A+3.)); //4.*pi*gsl_sf_gamma(A+3.)/pow(B,A+3.)*(log(B)-gsl_sf_psi(A+3.));

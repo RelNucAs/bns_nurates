@@ -54,7 +54,7 @@ std::tuple<double,double,double> nucfrmfac(const double E, const int reacflag) {
 		ca = gA/pow(1.+3.53*tau,2.);              //Eq.(B8)
 		F2 = Fp2 - Fn2;                           //Eq.(B9)
 	} else {
-		std::cout << "Error: reacflag out of range in nucfrmfac" << std::end;
+		std::cout << "Error: reacflag out of range in nucfrmfac" << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 
