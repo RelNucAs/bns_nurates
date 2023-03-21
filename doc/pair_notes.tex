@@ -1,0 +1,123 @@
+\documentclass{h2020proposal} 
+
+\usepackage[english]{babel}
+
+%% For underlined wrapped text.
+\usepackage{soul}
+\usepackage{amsmath,amssymb,amsfonts,mathrsfs}
+\usepackage{graphicx}
+\usepackage{float}
+
+%% Nicer tables.  Read the excellent documentation.
+\usepackage{booktabs}
+
+% Compressed itemized lists (with a * at the end)
+\usepackage{mdwlist}
+
+%% Nicer URLs.
+\usepackage{url}
+
+%% Configure citation styles
+\usepackage[numbers,sort&compress,square]{natbib}
+\def\bibfont{\footnotesize}     %for smaller fonts in the biblio section
+
+%% Hyper Ref package. In order to operate correctly, it must be the last package declared
+\usepackage[colorlinks,pagebackref,breaklinks]{hyperref} 
+
+%% Extra package options
+\hypersetup{
+	hypertexnames=true, linkcolor=blue, anchorcolor=black,
+	citecolor=blue, urlcolor=blue  
+}
+
+\urlstyle{rm} %so it doesn't use a typewriter font for urls.
+\DeclareGraphicsExtensions{.jpg,.pdf,.mps,.png} % for pdflatex
+\graphicspath{{img/} {./}} %put all figures in these dirs
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\makeheadstyles{default}{%
+\renewcommand*{\chapnamefont}{\normalfont\bfseries}
+\renewcommand*{\chapnumfont}{\normalfont\bfseries}
+\renewcommand*{\chaptitlefont}{\normalfont\bfseries}
+\renewcommand*{\secheadstyle}{\normalfont\bfseries}
+}%
+\headstyles{default}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Chapter Style
+\chapterstyle{section}
+\renewcommand*{\chaptitlefont}{\normalfont\Large\bfseries}
+\renewcommand*{\chapnumfont}{\normalfont\Large\bfseries}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\centerline{{\textbf{Notes on the Pair Process}}}
+\vskip0.5cm
+\centerline{Maitraya Bhattacharyya}
+\vskip0.5cm
+
+\subsection{The pair contribution}
+Reaction:
+\begin{align}
+	 \boxed{e^{+} + e^{-} \leftrightarrow \nu + \nu'}.
+\end{align}
+The contribution from the thermal production and absorption of neutrinos to the right hand side of the transport equations can be written down as
+\begin{align}
+	B_{TP} = j (1 - F(t,r,\mu,\omega)) - \frac{1}{\lambda^{(a)}} F(t,r,\mu,\omega),
+\end{align}
+where the neutrino distribution function is a function of $t$, $r$, the cosine of the polar angle~$\mu$ and the energy~$\omega$ in the co-moving frame. The emissivity~$j$ and mean free path~$\lambda^{(a)}$ can be computed from the absorption and production kernels and the distribution function for anti-neutrinos~$\bar{F}$~\cite{PonMirIba1998}
+\begin{align} \label{eq:pairexpr}
+	\eta &= \frac{1}{c(hc)^3} \int_{0}^{\infty} \omega'^2 d\omega' \int_{-1}^{1} d\mu' \int_{0}^{2 \pi} d\phi R^p_{TP}(\omega, \omega', \cos \theta)(1 - \bar{F}), \nonumber \\
+	\frac{1}{\lambda^{(a)}} &= \frac{1}{c(hc)^3} \int_{0}^{\infty} \omega'^2 d\omega' \int_{-1}^{1} d\mu' \int_{0}^{2 \pi} d\phi R^a_{TP}(\omega, \omega', \cos \theta)\bar{F}.
+\end{align}
+The angle between neutrino and anti-neutrino directions~$\theta$ is related to $\mu$, $\mu'$ by the following relation
+\begin{align}
+	\cos \theta = \mu \mu' + \left[ (1-\mu^2)(1-\mu'^2) \right]^{1/2} \cos \phi,
+\end{align}
+where~$\phi$ is the difference between azimuthal angles of neutrinos and anti-neutrinos.  Assuming equilibrium between electrons and positrons, the production and absorption kernels in Eqn.~\eqref{eq:pairexpr} are not independent and one can be computed from the following the relation
+\begin{align}
+	R^a_{TP}(\omega, \omega', \cos \theta) = e^{\frac{\omega+\omega'}{T}} R^p_{TP}(\omega, \omega', \cos \theta).
+\end{align}
+For practical calculations, the production kernels are expanded in terms of Legendre polynomials which are truncated at $l = 3$
+\begin{align}
+	R^p_{TP}(\omega, \omega', \cos \theta) = \sum_{l} \frac{2 l + 1}{2} \Phi_l(\omega, \omega') P_l(\cos \theta), && \Phi_l(y,z) = \frac{G^2}{\pi}\frac{T^2}{1-e^{y+z}} \left[ \alpha_1 \Psi_l(y,z) + \alpha_2 \Psi_l(z,y)\right].
+\end{align}
+where~$y = \omega/T$ and~$z = \omega'/T$. Also~$G = 1.55 \times 10^{-33} \textrm{cm}^{3} \textrm{MeV}^{-2} \textrm{s}^{-1}$ is the Fermi constant and the constants~$\alpha_1$,~$\alpha_2$ depend on the neutrino species and can be defined in terms of the Weinberg angle~$\theta_w$. For electron neutrinos,~$\alpha_1 = 1 + 2 \sin^2 \theta_w$,~$\alpha_2 = 2 \sin^2 \theta_w$ and for $\mu$ or $\tau$ neutrinos,~$\alpha_1 = -1 + 2 \sin^2 \theta_w$,~$\alpha_2 = 2 \sin^2 \theta_w$.  The functions~$\Psi_l$ are defined as
+\begin{align}
+	\Psi_l(y,z) = \sum_{n=0}^2 \left[c_{ln} G_n(y,y+z) + d_{ln} G_n(z,y+z) \right] + \sum_{n=3}^{2l+5} a_{ln}\left[ G_n(0,min(y,z)) - G_n(max(y,z),y+z) \right],
+\end{align}
+where the constants~$a_{ln}$,~$c_{ln}$ and~$d_{ln}$ for~$l \leq 3$ are provided in appendix A of~\cite{PonMirIba1998} and
+\begin{align}
+	G_n(a,b) = F_n(\eta,b) - F_n(\eta,a) - F_n(\eta + y + z,b) + F_n(\eta + y + z,a).
+\end{align}
+The functions~$F_k$ can be computed when the electron degeneracy parameter~$\eta$ is known. They are defined as
+\begin{align}
+	F_k(\eta, x_1) &= k! \left[ T_{k+1} (- \eta) - \sum_{l=0}^{k} \frac{T_{k+1-l}(x_1 - \eta) x^l_1}{l!}\right],  && \eta < 0, \nonumber \\
+	F_k(\eta, x_1) &= \frac{\eta^{k+1}}{k+1} + k! \left[2 \sum_{l=0}^{int((k-1)/2)} \frac{T_{2l+2} (0) \eta^{k-1-2l}}{(k-1-2l)!} + (-1)^k T_{k+1}(\eta) \right. \nonumber \\ &\left. - \sum_{l=0}^{k} \frac{T_{k+1-l}(x_1 - \eta) x^l_1}{l!}\right], && 0 \leq \eta \leq x_1, \nonumber \\
+	F_k(\eta, x_1) &= \frac{x^{k+1}_1}{k+1} + k! \left[(-1)^k T_{k+1}(\eta) - \sum_{l=0}^{k}(-1)^{k-l} \frac{T_{k+1-l}(\eta - x_1) x^l_1}{l!}\right], && x_1 < \eta,
+\end{align}
+where
+\begin{align}
+	T_l(\alpha) = \sum_{n=1}^{\infty} \frac{(-1)^{n+1} e^{-n \alpha}}{n^l}.
+\end{align}
+Writing down an alternative form for the contribution of the thermal pair production and annihilation reaction:
+\begin{align}
+	B_{TP} = \eta - \kappa_a F(t,r,\mu,\omega),
+\end{align}
+the quantities~$\eta$ and~$\kappa_a$ can be computed as follows:
+\begin{align}
+	\eta &= \frac{2 \pi}{c (h c)^3} \int_{0}^{\infty} \omega'^2 d\omega' \Phi_0 (\omega, \omega') - \frac{2 \pi}{c(hc)^3} \sum_{l} \frac{2l+1}{2} P_l(\mu) f_l (\alpha) \int_{0}^{\infty} \omega'^2 d\omega' \Phi_l(\omega,\omega') \int_{-1}^{1} d\mu' P_l(\mu') \bar{F}, \\
+	\kappa_a &=  \frac{2 \pi}{c (h c)^3} \int_{0}^{\infty} \omega'^2 d\omega' \Phi_0 (\omega, \omega') - \frac{2 \pi}{c(hc)^3} \sum_{l} \frac{2l+1}{2} P_l(\mu) f_l (\alpha) \int_{0}^{\infty} \omega'^2 d\omega' \Phi_l(\omega,\omega') \left(1 - e^{\frac{\omega + \omega'}{T}}\right)\int_{-1}^{1} d\mu' P_l(\mu') \bar{F}. \nonumber
+\end{align}
+Here~$f_l(\alpha)$ is a filter with a strength~$\alpha$, designed to remove non-physical oscillations from the computed solutions~\cite{MccHau2010}:
+\begin{align}
+	f_l(\alpha) = \frac{1}{1 + \alpha l^2 (l+1)^2}.
+\end{align}
+\setlength{\bibsep}{-0.9pt}
+\bibliographystyle{unsrt}
+\bibliography{references} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
