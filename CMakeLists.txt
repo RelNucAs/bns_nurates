@@ -15,3 +15,5 @@ add_executable(bns_nurates
         src/output/outputs.h
         src/eos/eos.h
         tests/tests.h)
+
+target_link_libraries(bns_nurates m)
