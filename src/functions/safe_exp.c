@@ -10,7 +10,7 @@ const double fExpLowLim = -fExpUppLim;   //                              const*D
 
 // Safe exp function to avoid underflow/overflow
 double SafeExp (const double x) {
-	return exp(fmin(fmax(x,-fExpLim),fExpLim));
+	return exp(fmin(fmax(x,fExpLowLim),fExpUppLim));
 }
 
 
