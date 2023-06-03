@@ -8,6 +8,7 @@ add_executable(bns_nurates
         src/constants.h
         src/bns_nurates.h
         src/functions/functions.h
+        src/functions/gamma.c
         src/functions/safe_exp.c
         src/integration/integration.h
         src/opacities/kernels/kernels.h
