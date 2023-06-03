@@ -5,6 +5,40 @@
 #ifndef BNS_NURATES_SRC_FUNCTIONS_FUNCTIONS_H_
 #define BNS_NURATES_SRC_FUNCTIONS_FUNCTIONS_H_
 
+#include <stdio.h>
+#include <stdlib.h>
+
+// Exception handling from Numerical Recipes
+// TODO: decide how to handling errors in the code
+
+#ifndef _USENRERRORCLASS_
+#define throw(message) { \
+  printf("ERROR: %s\n     in file %s at line %d\n", message,__FILE__,__LINE__); \
+  exit(1); \
+}
+#else
+struct NRerror {
+  char *message;
+  char *file;
+  int line;
+  NRerror(char *m, char *f, int l) : message(m), file(f), line(l) {}
+};
+#define throw(message) throw(NRerror(message,__FILE__,__LINE__));
+void NRcatch(NRerror err) {
+  printf("ERROR: %s\n     in file %s at line %d\n",
+          err.message, err.file, err.line);
+  exit(1);
+}
+#endif
+
+
+
+/*===========================================================================*/
+
+// gamma.c
+
+// Computation of gamma function
+double Gammln(const double xx);
 
 /*===========================================================================*/
 
