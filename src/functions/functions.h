@@ -32,6 +32,19 @@ void NRcatch(NRerror err) {
 #endif
 
 
+/*===========================================================================*/
+
+// digamma.c
+
+// Evaluation of Psi (Digamma) function
+double SFPsi(const double x);
+
+/*===========================================================================*/
+
+// fermi.c
+
+// Computation of Fermi-Dirac distribution function
+double FermiDistr(const double e, const double temp, const double mu);
 
 /*===========================================================================*/
 
