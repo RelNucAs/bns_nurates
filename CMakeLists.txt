@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.25)
 project(bns_nurates C)
 
 set(CMAKE_C_STANDARD 11)
+find_package(GSL)
 
 add_executable(bns_nurates
         main.c
@@ -19,6 +20,8 @@ add_executable(bns_nurates
         src/opacities/opacities.h
         src/output/outputs.h
         src/eos/eos.h
-        tests/tests.h)
+        tests/tests.h
+	tests/GSL_code/integration_GSL.c)
 
+target_link_libraries(bns_nurates GSL::gsl GSL::gslcblas)
 target_link_libraries(bns_nurates m)
