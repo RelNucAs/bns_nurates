@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 // Exception handling from Numerical Recipes
 // TODO: decide how to handling errors in the code
 
@@ -52,6 +53,15 @@ double FermiDistr(const double e, const double temp, const double mu);
 
 // Computation of gamma function
 double Gammln(const double xx);
+
+/*===========================================================================*/
+
+// mnewt2d.c
+
+// Implementation of 2D Newton-Raphson root finding
+void MNewt2d(double *x,
+             double C[2],
+             void (*fdf)(double*, double*, double*, double*));
 
 /*===========================================================================*/
 
