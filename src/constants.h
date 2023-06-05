@@ -9,8 +9,8 @@
 //  \brief constants used for the rest of the code
 
 // Units conversion
-const double MeV = 1.602176634e-6;    //convert MeV to CGS (erg)
-const double cm = 10e13;              //convert fm to cm
+const double MeV = 1.602176634e-6;    // convert MeV to CGS (erg)
+const double cm = 10e13;              // convert fm to cm
 
 // Electron mass
 const double me = 0.510998928;        // MeV
@@ -50,7 +50,7 @@ const double hpv = 0.5 - 2. * sinsqthetaw;
 const double hpa = 0.5 * gA;
 
 // Constants for the pair reaction
-const double G_sqr = 1.55 * 1E-33;                  // [cm^3 MeV^-2 s^-1], from Bruenn Eqn. (C51)
+const double G_sqr = 1.55 * 1E-33;                  // cm^3 MeV^-2 s^-1, from Bruenn Eqn. (C51)
 const double alpha_1_e = 1. + 2. * sinsqthetaw;     // Table 1, Pons et. al. (1998)
 const double alpha_2_e = 2. * sinsqthetaw;          // Table 1, Pons et. al. (1998)
 const double alpha_1_x = -1. + 2. * sinsqthetaw;    // Table 1, Pons et. al. (1998)
