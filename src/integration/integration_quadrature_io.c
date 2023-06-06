@@ -25,7 +25,7 @@
  * y2:    upper limit of y (optional)
  * alpha: Gauss-Laguerre parameter (optional)
  */
-void save_quadrature(const int n, const int dim, enum Quadrature type, const double x1, const double x2, const double y1, const double y2, const double alpha) {
+void SaveQuadrature(const int n, const int dim, enum Quadrature type, const double x1, const double x2, const double y1, const double y2, const double alpha) {
 
   char fileHeader[100];
   char fileline[50];
@@ -77,7 +77,7 @@ void save_quadrature(const int n, const int dim, enum Quadrature type, const dou
 
 }
 
-void load_quadrature(MyQuadrature *quad, const int n, const int dim, enum Quadrature type, const double x1, const double x2, const double y1, const double y2, const double alpha) {
+void LoadQuadrature(MyQuadrature *quad, const int n, const int dim, enum Quadrature type, const double x1, const double x2, const double y1, const double y2, const double alpha) {
   char fileHeader[100];
   char fileline[50];
   char outname[50];
