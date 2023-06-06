@@ -10,7 +10,7 @@
 #include "../src/integration/integration.h"
 
 void PrintGaussLegendreQuadrature(const int n) {
-  MyQuadrature quad = {.dim =1, .type = kGauleg, .x1=-1., .x2=-1., .n = n};
+  MyQuadrature quad = {.dim =1, .type = kGauleg, .x1=-1., .x2=1., .n = n};
 
   GaussLegendre(&quad);
 

@@ -16,7 +16,7 @@ int main() {
    }
   printf("Hello, World!\n");
 
-  PrintGaussLegendreQuadrature(15);
+  PrintGaussLegendreQuadrature(4);
 
   return 0;
 }

@@ -61,6 +61,7 @@ void GaussLegendre(MyQuadrature *quad) {
     quad->w[n - 1 - i] = quad->w[i];
 
   }
+
 }
 
 // Compute Gauss-Laguerre quadratures
