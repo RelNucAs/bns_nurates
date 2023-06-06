@@ -6,107 +6,108 @@
 //  \brief write and read quadratures for integration
 
 #include <stdio.h>
+#include <string.h>
 #include "../bns_nurates.h"
 #include "integration.h"
 #include "../functions/functions.h"
 
-void save_gauss_legendre(int n, const double x1, const double x2) {
+// Generate and save quadratures
+
+/*
+ * Inputs:
+ *
+ * n:   number of quadrature points
+ * dim: dimension of quadrature (1d/2d)
+ * type:  type of quadrature
+ * x1:    lower limit of x
+ * x2:    upper limit of x
+ * y1:    lower limit of y (optional)
+ * y2:    upper limit of y (optional)
+ * alpha: Gauss-Laguerre parameter (optional)
+ */
+void save_quadrature(const int n, const int dim, enum Quadrature type, const double x1, const double x2, const double y1, const double y2, const double alpha) {
 
   char fileHeader[100];
+  char fileline[50];
 
   MyQuadrature quad;
-  quad.type = kGauleg;
+  quad.type = type;
+  quad.dim = dim;
   quad.n = n;
-  quad.dim = 1;
-
-  gauss_legendre(&quad);
+  quad.x1 = x1;
+  quad.x2 = x2;
+  quad.y1 = y1;
+  quad.y2 = y2;
 
   char outname[50];
-  sprintf(outname, "../quadratures/gauleg_weights_n_%d.txt", n);
+  char *abs_path = "/var/home/maitraya/Documents/bns_nurates/src/";
 
-  ofstream fout(abs_path+outname);
-  sprintf(fileHeader, "# Abscissas and weights for Gauss-Legendre integration from x1 = %.3lf to x2 = %.3lf\n", x1, x2);
+  FILE *fptr;
 
-  fout << fileHeader;
+  if (type == kGauleg && dim == 1) {
+    sprintf(fileHeader, "# Abscissas and weights for Gauss-Legendre integration from x1 = %.3lf to x2 = %.3lf\n", x1, x2);
+    gauss_legendre(&quad);
+    sprintf(outname, "../quadratures/gausslegquad_n_%d.txt", n);
+  } else if (type == kGaulag && dim == 1) {
+    gauss_laguerre(&quad, alpha);
+    sprintf(outname, "../quadratures/gausslagquad_n_%d_alf_%d.txt", n, alpha);
+  } else {
+    printf("The requested quadrature is not implement!\n");
+    exit(1);
+  }
 
-  fout << std::scientific;
-  fout << std::setprecision(16);
-        for (int i=0;i<n;i++) {
-                fout << x[i] << "\t"  << w[i] << "\n";
-        }
-        fout.close();
+  fptr = fopen(strcat(abs_path, outname), "w");
+  if (fptr == NULL) {
+    printf("The directory %s does not exist!\n", abs_path);
+    exit(1);
+  }
+
+  fprintf(fptr, fileHeader);
+
+  for (int i = 0; i < n; i++) {
+    sprintf(fileline, "%d \t %d\n", quad.x[i], quad.w[i]);
+    fprintf(fptr, fileline);
+  }
+
+  fclose(fptr);
+
+  free(quad.x);
+  free(quad.y);
+  free(quad.w);
+
 }
 
-// Gauss-Laguerre
-void save_gaulag(int n, const Doub alf) {
-	VecDoub_O x(n);
-	VecDoub_O w(n);
+void load_quadrature(MyQuadrature *quad, const int n, const int dim, enum Quadrature type, const double x1, const double x2, const double y1, const double y2, const double alpha) {
+  char fileHeader[100];
+  char fileline[50];
+  char outname[50];
+  char *abs_path = "/var/home/maitraya/Documents/bns_nurates/src/";
 
-	for (int i=0;i<n;i++) {
-                x[i] = 0.;
-                w[i] = 0.;
-        }
+  FILE *fptr;
 
-        gaulag(x, w, alf);
+  fptr = fopen(strcat(abs_path, outname), "r");
 
-        char outname[50];
-        sprintf(outname, "input/gaulag_weights_%.0lf_n_%d.txt", alf, n);
+  if (fptr == NULL) {
+    printf("The file %s does not exist!\n", strcat(abs_path, outname));
+    exit(1);
+  }
 
-        ofstream fout(abs_path+outname);
-        fout << "# Abscissas and weights for Gauss-Laguerre integration\n";
+  quad.type = type;
+  quad.dim = dim;
+  quad.n = n;
+  quad.x1 = x1;
+  quad.x2 = x2;
+  quad.y1 = y1;
+  quad.y2 = y2;
 
-	fout << std::scientific;
-	fout << std::setprecision(16);
-	for (int i=0;i<n;i++) {
-		fout << x[i] << "\t"  << w[i] << "\n";
-	}
-        fout.close();
-}
+  quad.x = (double *) malloc(quad->n * sizeof(double));
+  quad.w = (double *) malloc(quad->n * sizeof(double));
 
-void read_gleg_wgts(int n, double *x, double *w) {
-  	char gaussname[50];
-	string dummyLine;
-        sprintf(gaussname, "input/gauleg_weights_n_%d.txt", n);
+  fscanf(fptr, fileHeader);
 
-        // open input file
-        std::fstream fin(abs_path+gaussname);
+  for (int i = 0; i < n; i++) {
+    fscanf(fptr, "%d %d\n", quad.x[i], quad.w[i]);
+  }
 
-        if (!fin) {
-                cout << "File regarding Gauleg quadrature not found: n = " << n << "\n";
-                exit (EXIT_FAILURE);
-        }
-
-        getline(fin, dummyLine); //skip header line
-
-        for (int i=0;i<n;i++) {
-                std::stringstream ss(dummyLine);
-                fin >> x[i] >> w[i];
-	}
-
-	fin.close();
-}
-
-// Gauss-Laguerre
-void read_glag_wgts(int n, double *x, double *w, double alpha) {
-        char gaussname[50];
-        string dummyLine;
-
-        sprintf(gaussname, "input/gaulag_weights_%d_n_%d.txt", int(alpha), n);
-
-	// open input file
-        std::fstream fin(abs_path+gaussname);
-
-        if (!fin) {
-                cout << "File regarding Gaulag quadrature not found: n = " << n << ", alpha = " << alpha << "\n";
-                exit (EXIT_FAILURE);
-        }
-
-        getline(fin, dummyLine); //skip header line
-
-        for (int i=0;i<n;i++) {
-                std::stringstream ss(dummyLine);
-                fin >> x[i] >> w[i];
-        }
-
-        fin.close();
+  fclose(fptr);
 }
