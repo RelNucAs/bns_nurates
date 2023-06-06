@@ -56,7 +56,8 @@ int MNewt2d_GSL(double *xi, double *xf, gsl_multiroot_function_fdf *fdf);
 int MNewt2d_fd_GSL(double *xi, double *xf, gsl_multiroot_function * f);
 
 // ===================================================================
-void PrintGaussLegendreQuadrature(const int n);
+void PrintGaussLegendreQuadrature(const int n, const double x1, const double  x2);
+void PrintGaussLaguerreQuadrature(const int n, const double alpha);
 
 #endif //BNS_NURATES_TESTS_TESTS_H_
 

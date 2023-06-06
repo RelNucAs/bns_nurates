@@ -49,7 +49,7 @@ void SaveQuadrature(const int n, const int dim, enum Quadrature type, const doub
     GaussLegendre(&quad);
     sprintf(outname, "../quadratures/gausslegquad_n_%d.txt", n);
   } else if (type == kGaulag && dim == 1) {
-    GaussLaguerre(quad, alpha);
+    GaussLaguerre(&quad, alpha);
     sprintf(outname, "../quadratures/gausslagquad_n_%d_alf_%d.txt", n, alpha);
   } else {
     printf("The requested quadrature is not implement!\n");

@@ -64,28 +64,33 @@ void GaussLegendre(MyQuadrature *quad) {
 
 }
 
-// Compute Gauss-Laguerre quadratures
-
-/* Inputs:
- * 	quad: MyQuadrature structure to hold quadrature data
-*/
-void GaussLaguerre(MyQuadrature quad, const double alpha) {
+/* Generate Gauss-Laguerre quadratures in [0,inf].
+ * For this routine to generate data successfully, quad struct
+ * must have dim, type, n metadata populated.
+ *
+ * Inputs:
+ *      quad:   A MyQuadrature structure to hold quadratures.
+ *              This already contains metadata for the quadrature, the routine
+ *              only populates the quadrature points and weights
+ *      alpha:  The alpha of weighting function W(x) = x^alpha e^-x
+ */
+void GaussLaguerre(MyQuadrature *quad, const double alpha) {
 
   const int kMaxit = 10;
   const double kEps = 1.0e-14;
 
-  assert(quad.dim == 1);
-  assert(quad.type == kGauleg);
+  assert(quad->dim == 1);
+  assert(quad->type == kGaulag);
 
-  quad.x = (double *) malloc(quad.n * sizeof(double));
-  quad.w = (double *) malloc(quad.n * sizeof(double));
+  quad->x = (double *) malloc(quad->n * sizeof(double));
+  quad->w = (double *) malloc(quad->n * sizeof(double));
 
-  double *x = quad.x;
-  double *w = quad.w;
+  double *x = quad->x;
+  double *w = quad->w;
 
   int i, its, j;
   double ai, p1, p2, p3, pp, z, z1;
-  int n = quad.n;
+  int n = quad->n;
 
   for (i = 0; i < n; i++) {
     if (i == 0) {
@@ -115,5 +120,6 @@ void GaussLaguerre(MyQuadrature quad, const double alpha) {
 
     x[i] = z;
     w[i] = -exp(Gammln(alpha + n) - Gammln(((double) n))) / (pp * n * p2);
+
   }
 }
