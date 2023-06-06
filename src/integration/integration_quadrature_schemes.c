@@ -12,30 +12,31 @@
 #include "integration.h"
 #include "../functions/functions.h"
 
-/* Generate Gauss-Legendre quadratures in [-1,1]
+/* Generate Gauss-Legendre quadratures in [x1,x2].
+ * For this routine to generate data successfully, quad struct
+ * must have dim, type, n, x1, x2 metadata populated.
  *
  * Inputs:
- *      quad: A MyQuadrature structure to hold quadratures and metadata
+ *      quad: A MyQuadrature structure to hold quadratures.
+ *            This already contains metadata for the quadrature, the routine
+ *            only populates the quadrature points and weights
  */
-void GaussLegendre(MyQuadrature quad) {
+void GaussLegendre(MyQuadrature *quad) {
 
   const double kEps = 1.0e-10; //1.0e-14;
 
-  assert(quad.dim == 1);
-  assert(quad.type == kGaulag);
+  assert(quad->dim == 1);
+  assert(quad->type == kGauleg);
 
-  quad.x = (double *) malloc(quad.n * sizeof(double));
-  quad.w = (double *) malloc(quad.n * sizeof(double));
-
-  double *x = quad.x;
-  double *w = quad.w;
+  quad->x = (double *) malloc(quad->n * sizeof(double));
+  quad->w = (double *) malloc(quad->n * sizeof(double));
 
   double z1, z, xm, xl, pp, p3, p2, p1;
 
-  int n = quad.n;
+  int n = quad->n;
   int m = (n + 1) / 2;
-  xm = 0.5 * (quad.x2 + quad.x1);
-  xl = 0.5 * (quad.x2 - quad.x1);
+  xm = 0.5 * (quad->x2 + quad->x1);
+  xl = 0.5 * (quad->x2 - quad->x1);
 
   for (int i = 0; i < m; i++) {
     z = cos(3.141592654 * (i + 0.75) / (n + 0.5));
@@ -54,10 +55,10 @@ void GaussLegendre(MyQuadrature quad) {
 
     } while (fabs(z - z1) > kEps);
 
-    x[i] = xm - xl * z;
-    x[n - 1 - i] = xm + xl * z;
-    w[i] = 2.0 * xl / ((1.0 - z * z) * pp * pp);
-    w[n - 1 - i] = w[i];
+    quad->x[i] = xm - xl * z;
+    quad->x[n - 1 - i] = xm + xl * z;
+    quad->w[i] = 2.0 * xl / ((1.0 - z * z) * pp * pp);
+    quad->w[n - 1 - i] = quad->w[i];
 
   }
 }

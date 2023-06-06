@@ -46,7 +46,7 @@ void SaveQuadrature(const int n, const int dim, enum Quadrature type, const doub
 
   if (type == kGauleg && dim == 1) {
     sprintf(fileHeader, "# Abscissas and weights for Gauss-Legendre integration from x1 = %.3lf to x2 = %.3lf\n", x1, x2);
-    GaussLegendre(quad);
+    GaussLegendre(&quad);
     sprintf(outname, "../quadratures/gausslegquad_n_%d.txt", n);
   } else if (type == kGaulag && dim == 1) {
     GaussLaguerre(quad, alpha);

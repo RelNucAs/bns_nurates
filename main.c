@@ -4,6 +4,8 @@
 #include "src/integration/integration.h"
 #include <unistd.h>
 #include <limits.h>
+#include "tests/tests.h"
+
 int main() {
   char cwd[PATH_MAX];
   if (getcwd(cwd, sizeof(cwd)) != NULL) {
@@ -13,5 +15,8 @@ int main() {
        return 1;
    }
   printf("Hello, World!\n");
+
+  PrintGaussLegendreQuadrature(15);
+
   return 0;
 }

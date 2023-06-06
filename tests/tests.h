@@ -55,6 +55,9 @@ int MNewt2d_GSL(double *xi, double *xf, gsl_multiroot_function_fdf *fdf);
 // 2D Newton-Raphson with finite difference Jacobian
 int MNewt2d_fd_GSL(double *xi, double *xf, gsl_multiroot_function * f);
 
+// ===================================================================
+void PrintGaussLegendreQuadrature(const int n);
+
 #endif //BNS_NURATES_TESTS_TESTS_H_
 
 
