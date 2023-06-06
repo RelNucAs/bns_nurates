@@ -107,7 +107,10 @@ void gauss_laguerre(MyQuadrature *quad, const double alpha) {
       z = z1 - p1 / pp;
       if (fabs(z - z1) <= kEps) { break; }
     }
-    if (its >= kMaxit) {throw("too many iterations in gaulag")};
+    if (its >= kMaxit) {
+      throw("too many iterations in gaulag")
+    };
+
     x[i] = z;
     w[i] = -exp(Gammln(alpha + n) - Gammln(((double) n))) / (pp * n * p2);
   }
