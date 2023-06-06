@@ -21,7 +21,8 @@ add_executable(bns_nurates
         src/output/outputs.h
         src/eos/eos.h
         tests/tests.h
-	tests/GSL_code/integration_GSL.c)
+	tests/GSL_code/integration_GSL.c
+	tests/GSL_code/mnewt_GSL.c)
 
 target_link_libraries(bns_nurates GSL::gsl GSL::gslcblas)
 target_link_libraries(bns_nurates m)
