@@ -27,5 +27,5 @@ add_executable(bns_nurates
 		src/integration/integration_quadrature_schemes.c
 		src/integration/integration_quadrature_io.c)
 
-#target_link_libraries(bns_nurates GSL::gsl GSL::gslcblas)
-#target_link_libraries(bns_nurates m)
+target_link_libraries(bns_nurates GSL::gsl GSL::gslcblas)
+target_link_libraries(bns_nurates m)
