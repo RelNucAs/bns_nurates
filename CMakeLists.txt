@@ -23,7 +23,7 @@ add_executable(bns_nurates
         tests/tests.h
 		tests/GSL_code/integration_GSL.c
 		tests/GSL_code/mnewt_GSL.c
-		src/integration/integration_quadrature_generate.c)
+		src/integration/integration_quadrature_generate.c
 		tests/GSL_code/integration_GSL.c
 		src/integration/integration_quadrature_schemes.c
 		src/integration/integration_quadrature_io.c)
