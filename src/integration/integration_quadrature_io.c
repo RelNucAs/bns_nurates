@@ -77,7 +77,7 @@ void SaveQuadrature(const int n, const int dim, enum Quadrature type, const doub
 
 }
 
-void LoadQuadrature(MyQuadrature *quad, const int n, const int dim, enum Quadrature type, const double x1, const double x2, const double y1, const double y2, const double alpha) {
+void LoadQuadrature(MyQuadrature quad, const int n, const int dim, enum Quadrature type, const double x1, const double x2, const double y1, const double y2, const double alpha) {
   char fileHeader[100];
   char fileline[50];
   char outname[50];
@@ -92,21 +92,21 @@ void LoadQuadrature(MyQuadrature *quad, const int n, const int dim, enum Quadrat
     exit(1);
   }
 
-  quad->type = type;
-  quad->dim = dim;
-  quad->n = n;
-  quad->x1 = x1;
-  quad->x2 = x2;
-  quad->y1 = y1;
-  quad->y2 = y2;
+  quad.type = type;
+  quad.dim = dim;
+  quad.n = n;
+  quad.x1 = x1;
+  quad.x2 = x2;
+  quad.y1 = y1;
+  quad.y2 = y2;
 
-  quad->x = (double *) malloc(quad->n * sizeof(double));
-  quad->w = (double *) malloc(quad->n * sizeof(double));
+  quad.x = (double *) malloc(quad.n * sizeof(double));
+  quad.w = (double *) malloc(quad.n * sizeof(double));
 
   fscanf(fptr, fileHeader);
 
   for (int i = 0; i < n; i++) {
-    fscanf(fptr, "%d %d\n", quad->x[i], quad->w[i]);
+    fscanf(fptr, "%d %d\n", quad.x[i], quad.w[i]);
   }
 
   fclose(fptr);
