@@ -12,30 +12,30 @@
 #include "integration.h"
 #include "../functions/functions.h"
 
-// Compute Gauss-Legendre quadratures
-
-/* Inputs:
- * 	quad: MyQuadrature structure to hold quadrature data
-*/
-void gauss_legendre(MyQuadrature *quad) {
+/* Generate Gauss-Legendre quadratures in [-1,1]
+ *
+ * Inputs:
+ *      quad: A MyQuadrature structure to hold quadratures and metadata
+ */
+void GaussLegendre(MyQuadrature quad) {
 
   const double kEps = 1.0e-10; //1.0e-14;
 
-  assert(quad->dim == 1);
-  assert(quad->type == kGaulag);
+  assert(quad.dim == 1);
+  assert(quad.type == kGaulag);
 
-  quad->x = (double *) malloc(quad->n * sizeof(double));
-  quad->w = (double *) malloc(quad->n * sizeof(double));
+  quad.x = (double *) malloc(quad.n * sizeof(double));
+  quad.w = (double *) malloc(quad.n * sizeof(double));
 
-  double *x = quad->x;
-  double *w = quad->w;
+  double *x = quad.x;
+  double *w = quad.w;
 
   double z1, z, xm, xl, pp, p3, p2, p1;
 
-  int n = quad->n;
+  int n = quad.n;
   int m = (n + 1) / 2;
-  xm = 0.5 * (quad->x2 + quad->x1);
-  xl = 0.5 * (quad->x2 - quad->x1);
+  xm = 0.5 * (quad.x2 + quad.x1);
+  xl = 0.5 * (quad.x2 - quad.x1);
 
   for (int i = 0; i < m; i++) {
     z = cos(3.141592654 * (i + 0.75) / (n + 0.5));
@@ -67,23 +67,23 @@ void gauss_legendre(MyQuadrature *quad) {
 /* Inputs:
  * 	quad: MyQuadrature structure to hold quadrature data
 */
-void gauss_laguerre(MyQuadrature *quad, const double alpha) {
+void GaussLaguerre(MyQuadrature quad, const double alpha) {
 
   const int kMaxit = 10;
   const double kEps = 1.0e-14;
 
-  assert(quad->dim == 1);
-  assert(quad->type == kGauleg);
+  assert(quad.dim == 1);
+  assert(quad.type == kGauleg);
 
-  quad->x = (double *) malloc(quad->n * sizeof(double));
-  quad->w = (double *) malloc(quad->n * sizeof(double));
+  quad.x = (double *) malloc(quad.n * sizeof(double));
+  quad.w = (double *) malloc(quad.n * sizeof(double));
 
-  double *x = quad->x;
-  double *w = quad->w;
+  double *x = quad.x;
+  double *w = quad.w;
 
   int i, its, j;
   double ai, p1, p2, p3, pp, z, z1;
-  int n = quad->n;
+  int n = quad.n;
 
   for (i = 0; i < n; i++) {
     if (i == 0) {
