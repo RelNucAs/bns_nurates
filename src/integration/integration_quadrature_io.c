@@ -11,103 +11,100 @@
 #include "integration.h"
 #include "../functions/functions.h"
 
-// Generate and save quadratures
-
-/*
- * Inputs:
+/* Generate and save quadratures
  *
- * n:   number of quadrature points
- * dim: dimension of quadrature (1d/2d)
- * type:  type of quadrature
- * x1:    lower limit of x
- * x2:    upper limit of x
- * y1:    lower limit of y (optional)
- * y2:    upper limit of y (optional)
- * alpha: Gauss-Laguerre parameter (optional)
+ * Inputs:
+ *    filedir:  location of save directory
+ *    quad:     quadrature struct with proper metadata populated
  */
-void SaveQuadrature(const int n, const int dim, enum Quadrature type, const double x1, const double x2, const double y1, const double y2, const double alpha) {
+void SaveQuadrature(char *filedir, MyQuadrature *quad) {
 
   char fileHeader[100];
   char fileline[50];
-
-  MyQuadrature quad;
-  quad.type = type;
-  quad.dim = dim;
-  quad.n = n;
-  quad.x1 = x1;
-  quad.x2 = x2;
-  quad.y1 = y1;
-  quad.y2 = y2;
-
   char outname[50];
-  char *abs_path = "/var/home/maitraya/Documents/bns_nurates/src/";
+  char filepath[200] = {'\0'};
 
   FILE *fptr;
 
-  if (type == kGauleg && dim == 1) {
-    sprintf(fileHeader, "# Abscissas and weights for Gauss-Legendre integration from x1 = %.3lf to x2 = %.3lf\n", x1, x2);
-    GaussLegendre(&quad);
-    sprintf(outname, "../quadratures/gausslegquad_n_%d.txt", n);
-  } else if (type == kGaulag && dim == 1) {
-    GaussLaguerre(&quad, alpha);
-    sprintf(outname, "../quadratures/gausslagquad_n_%d_alf_%d.txt", n, alpha);
+  if (quad->type == kGauleg && quad->dim == 1) {
+    sprintf(fileHeader, "# Abscissas and weights for Gauss-Legendre integration from x1 = %.3lf to x2 = %.3lf\n", quad->x1, quad->x2);
+    GaussLegendre(quad);
+    sprintf(outname, "/GaussLegQuad_n_%d.txt", quad->n);
+  } else if (quad->type == kGaulag && quad->dim == 1) {
+    sprintf(fileHeader, "# Abscissas and weights for Gauss-Laguerre integration\n");
+    GaussLaguerre(quad);
+    sprintf(outname, "/GaussLagQuad_n_%d_alf_%d.txt", quad->n, quad->alpha);
   } else {
-    printf("The requested quadrature is not implement!\n");
+    printf("The requested quadrature is not implemented!\n");
     exit(1);
   }
 
-  fptr = fopen(strcat(abs_path, outname), "w");
+  strcat(filepath, filedir);
+  strcat(filepath, outname);
+
+  fptr = fopen(filepath, "w");
   if (fptr == NULL) {
-    printf("The directory %s does not exist!\n", abs_path);
+    printf("%s: The file %s does not exist!\n", __FILE_NAME__, filepath);
     exit(1);
   }
 
   fprintf(fptr, fileHeader);
 
-  for (int i = 0; i < n; i++) {
-    sprintf(fileline, "%d \t %d\n", quad.x[i], quad.w[i]);
+  for (int i = 0; i < quad->n; i++) {
+    sprintf(fileline, "%0.16e \t %0.16e\n", quad->x[i], quad->w[i]);
     fprintf(fptr, fileline);
   }
 
   fclose(fptr);
 
-  free(quad.x);
-  free(quad.y);
-  free(quad.w);
-
 }
 
-void LoadQuadrature(MyQuadrature quad, const int n, const int dim, enum Quadrature type, const double x1, const double x2, const double y1, const double y2, const double alpha) {
+/* Load quadrature from disk. If not present, generate and save to disk
+ *
+ * Inputs:
+ *    filedir:  location of save directory
+ *    quad:     quadrature struct with proper metadata populated
+ */
+void LoadQuadrature(char *filedir, MyQuadrature *quad) {
+
   char fileHeader[100];
-  char fileline[50];
   char outname[50];
-  char *abs_path = "/var/home/maitraya/Documents/bns_nurates/src/";
+  char filepath[200] = {'\0'};
 
   FILE *fptr;
 
-  fptr = fopen(strcat(abs_path, outname), "r");
+  strcat(filepath, filedir);
 
-  if (fptr == NULL) {
-    printf("The file %s does not exist!\n", strcat(abs_path, outname));
+  if (quad->type == kGauleg && quad->dim == 1) {
+    sprintf(fileHeader, "# Abscissas and weights for Gauss-Legendre integration from x1 = %.3lf to x2 = %.3lf\n", quad->x1, quad->x2);
+    sprintf(outname, "/GaussLegQuad_n_%d.txt", quad->n);
+  } else if (quad->type == kGaulag && quad->dim == 1) {
+    sprintf(fileHeader, "# Abscissas and weights for Gauss-Laguerre integration\n");
+    sprintf(outname, "/GaussLagQuad_n_%d_alf_%d.txt", quad->n, quad->alpha);
+  } else {
+    printf("The requested quadrature is not implemented!\n");
     exit(1);
   }
 
-  quad.type = type;
-  quad.dim = dim;
-  quad.n = n;
-  quad.x1 = x1;
-  quad.x2 = x2;
-  quad.y1 = y1;
-  quad.y2 = y2;
+  strcat(filepath, outname);
 
-  quad.x = (double *) malloc(quad.n * sizeof(double));
-  quad.w = (double *) malloc(quad.n * sizeof(double));
+  fptr = fopen(filepath, "r");
 
-  fscanf(fptr, fileHeader);
+  if (fptr == NULL) {
+    printf("The file %s does not exist!\n", filepath);
+    SaveQuadrature(filedir, quad);
+    exit(1);
+  } else {
+    quad->x = (double *) malloc(quad->n * sizeof(double));
+    quad->w = (double *) malloc(quad->n * sizeof(double));
 
-  for (int i = 0; i < n; i++) {
-    fscanf(fptr, "%d %d\n", quad.x[i], quad.w[i]);
+    fscanf(fptr, fileHeader);
+
+    for (int i = 0; i < quad->n; i++) {
+      fscanf(fptr, "%.16e %.16e\n", quad->x[i], quad->w[i]);
+    }
   }
 
   fclose(fptr);
+
 }

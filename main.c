@@ -2,8 +2,6 @@
 //#include "src/constants.h"
 #include "src/bns_nurates.h"
 #include "src/integration/integration.h"
-#include <unistd.h>
-#include <limits.h>
 #include "tests/tests.h"
 
 struct FD_params {
@@ -28,18 +26,22 @@ double FD_laguerre(double x, void *p) {
 
 
 int main() {
-  char cwd[PATH_MAX];
-  if (getcwd(cwd, sizeof(cwd)) != NULL) {
-       printf("Current working dir: %s\n", cwd);
-   } else {
-       perror("getcwd() error");
-       return 1;
-   }
+
   printf("Hello, World!\n");
 
   //PrintGaussLegendreQuadrature(10, -1., 1.);
   printf("\n");
   PrintGaussLaguerreQuadrature(5, 0.);
+
+  MyQuadrature quad;
+  quad.n = 3;
+  quad.dim = 1;
+  quad.type = kGaulag;
+  quad.x1 = -1.;
+  quad.x2 = 1.;
+  quad.alpha = 0.;
+
+  SaveQuadrature("/var/home/maitraya/Documents/bns_nurates/src/quadratures/", &quad);
 
   /*=========================================================================*/
 
@@ -60,13 +62,13 @@ int main() {
   const double alpha = 0.;
 
   printf("\n");
-  
+
   // Gauss-Laguerre integration (weight = (x-a)^alpha * exp(-b*(x-a)))
   double gLag = GSL_lag_quadr(n, a, b, alpha, &f);
   printf("Gauss-Laguerre integration from 0 to inf:   %.5e\n", gLag);
 
   f.function = &FD_legendre;
-  
+
   // Gauss-Legendre integration from a to b (weight = 1)
   // First version
   double gLeg_1 = GSL_leg_quadr(n, a, b, &f);
@@ -82,6 +84,6 @@ int main() {
   printf("Gauss-Legendre integration from 0 to inf:   %.5e\n", gLeg_inf);
 
   /*=========================================================================*/
-  
+
   return 0;
 }

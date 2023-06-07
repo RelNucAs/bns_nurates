@@ -29,7 +29,7 @@ double GaussLaguerreIntegrate(const int n, MyFunction F, double alpha) {
   MyQuadrature quad;
   double f[n];
 
-  LoadQuadrature(quad, n, 1, kGaulag, 0, 1, -42, -42, alpha);
+  /* LoadQuadrature(quad, n, 1, kGaulag, 0, 1, -42, -42, alpha); */
 
   if (alpha == 0.) {
     for (int i = 0; i < n; i++) f[i] = F.function(quad.x[i], F.params) * exp(quad.x[i]);
@@ -45,7 +45,7 @@ double GaussLegendreIntegrate(const int n, MyFunction F, double t) {
   double f[n];
   double f1[n], f2[n];
 
-  LoadQuadrature(quad, n, 1, kGaulag, 0, 1, -42, -42, -42.);
+  /* LoadQuadrature(quad, n, 1, kGaulag, 0, 1, -42, -42, -42.); */
 
   for (int i = 0; i < n; i++) {
     f1[i] = F.function(t * quad.x[i], F.params);

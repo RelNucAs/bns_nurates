@@ -72,9 +72,8 @@ void GaussLegendre(MyQuadrature *quad) {
  *      quad:   A MyQuadrature structure to hold quadratures.
  *              This already contains metadata for the quadrature, the routine
  *              only populates the quadrature points and weights
- *      alpha:  The alpha of weighting function W(x) = x^alpha e^-x
  */
-void GaussLaguerre(MyQuadrature *quad, const double alpha) {
+void GaussLaguerre(MyQuadrature *quad) {
 
   const int kMaxit = 10;
   const double kEps = 1.0e-14;
@@ -94,12 +93,12 @@ void GaussLaguerre(MyQuadrature *quad, const double alpha) {
 
   for (i = 0; i < n; i++) {
     if (i == 0) {
-      z = (1.0 + alpha) * (3.0 + 0.92 * alpha) / (1.0 + 2.4 * n + 1.8 * alpha);
+      z = (1.0 + quad->alpha) * (3.0 + 0.92 * quad->alpha) / (1.0 + 2.4 * n + 1.8 * quad->alpha);
     } else if (i == 1) {
-      z += (15.0 + 6.25 * alpha) / (1.0 + 0.9 * alpha + 2.5 * n);
+      z += (15.0 + 6.25 * quad->alpha) / (1.0 + 0.9 * quad->alpha + 2.5 * n);
     } else {
       ai = i - 1;
-      z += ((1.0 + 2.55 * ai) / (1.9 * ai) + 1.26 * ai * alpha / (1.0 + 3.5 * ai)) * (z - x[i - 2]) / (1.0 + 0.3 * alpha);
+      z += ((1.0 + 2.55 * ai) / (1.9 * ai) + 1.26 * ai * quad->alpha / (1.0 + 3.5 * ai)) * (z - x[i - 2]) / (1.0 + 0.3 * quad->alpha);
     }
     for (its = 0; its < kMaxit; its++) {
       p1 = 1.0;
@@ -107,9 +106,9 @@ void GaussLaguerre(MyQuadrature *quad, const double alpha) {
       for (j = 0; j < n; j++) {
         p3 = p2;
         p2 = p1;
-        p1 = ((2 * j + 1 + alpha - z) * p2 - (j + alpha) * p3) / (j + 1);
+        p1 = ((2 * j + 1 + quad->alpha - z) * p2 - (j + quad->alpha) * p3) / (j + 1);
       }
-      pp = (n * p1 - (n + alpha) * p2) / z;
+      pp = (n * p1 - (n + quad->alpha) * p2) / z;
       z1 = z;
       z = z1 - p1 / pp;
       if (fabs(z - z1) <= kEps) { break; }
@@ -119,7 +118,7 @@ void GaussLaguerre(MyQuadrature *quad, const double alpha) {
     };
 
     x[i] = z;
-    w[i] = -exp(Gammln(alpha + n) - Gammln(((double) n))) / (pp * n * p2);
+    w[i] = -exp(Gammln(quad->alpha + n) - Gammln(((double) n))) / (pp * n * p2);
 
   }
 }
