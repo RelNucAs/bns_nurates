@@ -41,6 +41,7 @@ struct MyQuadrature {
   enum Quadrature type;
   int n;
   int dim;
+  double alpha;
   double x1;
   double x2;
   double y1;

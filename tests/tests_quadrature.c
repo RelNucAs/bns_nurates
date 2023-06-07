@@ -27,9 +27,9 @@ void PrintGaussLegendreQuadrature(const int n, const double x1, const double x2)
 }
 
 void PrintGaussLaguerreQuadrature(const int n, const double alpha) {
-  MyQuadrature quad = {.dim =1, .type = kGaulag, .n = n};
+  MyQuadrature quad = {.dim =1, .type = kGaulag, .n = n, .alpha = 0.};
 
-  GaussLaguerre(&quad, alpha);
+  GaussLaguerre(&quad);
 
   printf("Generating Gauss-Laguerre quadratures ... \n");
   printf("x1 = 0 \t x2 = inf \t n = %d\n", quad.n);
