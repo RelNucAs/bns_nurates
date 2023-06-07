@@ -12,6 +12,8 @@
 #include "../constants.h"
 #include "weak_magnetism/weak_magnetism.h"
 
+// TODO: change names of variables and functions following Google C style
+
 // Definition of parameters
 // TODO: decide how to switch on/off corrections to the rates
 const int use_WM_sc = 0; // flag for activating weak magnetism (and related) corrections

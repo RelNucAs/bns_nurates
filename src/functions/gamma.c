@@ -2,6 +2,7 @@
 
 #include "functions.h"
 
+// TODO: change names of variables and functions following Google C style
 
 // Computation of gamma function
 // Taken from Numerical Recipes ("numerical.recipes/book/book.html")

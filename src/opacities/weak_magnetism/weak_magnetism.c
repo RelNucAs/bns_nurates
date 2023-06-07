@@ -11,6 +11,11 @@
 //        emission/absorption on nucleons and elastic scattering on nucleons
 //        Ref: Horowitz, 2002 (https://journals.aps.org/prd/abstract/10.1103/PhysRevD.65.043001)
 
+
+// TODO: change names of variables and functions following Google C style
+
+
+
 // TODO: function that computes WM both for abs on n and p
 //       (useful only if there exists a single function for the two reactions) 
 
