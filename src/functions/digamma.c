@@ -3,6 +3,8 @@
 
 #include "functions.h"
 
+// TODO: change names of variables and functions following Google C style
+ 
 /*
  * Computation of Psi (digamma) function 
  *  Adapted from GNU Scientific Library (GSL 2.7.1)

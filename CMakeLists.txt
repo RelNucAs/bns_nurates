@@ -17,7 +17,11 @@ add_executable(bns_nurates
         src/integration/integration.h
         src/opacities/kernels/kernels.h
         src/opacities/weak_magnetism/weak_magnetism.h
-        src/opacities/opacities.h
+#        src/opacities/weak_magnetism/weak_magnetism.c
+#        src/opacities/weak_magnetism/nucfrmfac.c
+	src/opacities/opacities.h
+#        src/opacities/nu_abs_em.c
+#        src/opacities/nu_elastic_scatt.c
         src/output/outputs.h
         src/eos/eos.h
         tests/tests.h
