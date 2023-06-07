@@ -12,23 +12,24 @@
 #include "integration.h"
 #include "../functions/functions.h"
 
-// Compute Gauss-Legendre quadratures
-
-/* Inputs:
- * 	quad: MyQuadrature structure to hold quadrature data
-*/
-void gauss_legendre(MyQuadrature *quad) {
+/* Generate Gauss-Legendre quadratures in [x1,x2].
+ * For this routine to generate data successfully, quad struct
+ * must have dim, type, n, x1, x2 metadata populated.
+ *
+ * Inputs:
+ *      quad: A MyQuadrature structure to hold quadratures.
+ *            This already contains metadata for the quadrature, the routine
+ *            only populates the quadrature points and weights
+ */
+void GaussLegendre(MyQuadrature *quad) {
 
   const double kEps = 1.0e-10; //1.0e-14;
 
   assert(quad->dim == 1);
-  assert(quad->type == kGaulag);
+  assert(quad->type == kGauleg);
 
   quad->x = (double *) malloc(quad->n * sizeof(double));
   quad->w = (double *) malloc(quad->n * sizeof(double));
-
-  double *x = quad->x;
-  double *w = quad->w;
 
   double z1, z, xm, xl, pp, p3, p2, p1;
 
@@ -54,26 +55,32 @@ void gauss_legendre(MyQuadrature *quad) {
 
     } while (fabs(z - z1) > kEps);
 
-    x[i] = xm - xl * z;
-    x[n - 1 - i] = xm + xl * z;
-    w[i] = 2.0 * xl / ((1.0 - z * z) * pp * pp);
-    w[n - 1 - i] = w[i];
+    quad->x[i] = xm - xl * z;
+    quad->x[n - 1 - i] = xm + xl * z;
+    quad->w[i] = 2.0 * xl / ((1.0 - z * z) * pp * pp);
+    quad->w[n - 1 - i] = quad->w[i];
 
   }
+
 }
 
-// Compute Gauss-Laguerre quadratures
-
-/* Inputs:
- * 	quad: MyQuadrature structure to hold quadrature data
-*/
-void gauss_laguerre(MyQuadrature *quad, const double alpha) {
+/* Generate Gauss-Laguerre quadratures in [0,inf].
+ * For this routine to generate data successfully, quad struct
+ * must have dim, type, n metadata populated.
+ *
+ * Inputs:
+ *      quad:   A MyQuadrature structure to hold quadratures.
+ *              This already contains metadata for the quadrature, the routine
+ *              only populates the quadrature points and weights
+ *      alpha:  The alpha of weighting function W(x) = x^alpha e^-x
+ */
+void GaussLaguerre(MyQuadrature *quad, const double alpha) {
 
   const int kMaxit = 10;
   const double kEps = 1.0e-14;
 
   assert(quad->dim == 1);
-  assert(quad->type == kGauleg);
+  assert(quad->type == kGaulag);
 
   quad->x = (double *) malloc(quad->n * sizeof(double));
   quad->w = (double *) malloc(quad->n * sizeof(double));
@@ -107,8 +114,12 @@ void gauss_laguerre(MyQuadrature *quad, const double alpha) {
       z = z1 - p1 / pp;
       if (fabs(z - z1) <= kEps) { break; }
     }
-    if (its >= kMaxit) {throw("too many iterations in gaulag")};
+    if (its >= kMaxit) {
+      throw("too many iterations in gaulag")
+    };
+
     x[i] = z;
     w[i] = -exp(Gammln(alpha + n) - Gammln(((double) n))) / (pp * n * p2);
+
   }
 }
