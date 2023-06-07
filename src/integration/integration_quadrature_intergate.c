@@ -25,32 +25,46 @@ double DoIntegration(const int n, const double *wgt, const double *fnarray) {
   return integral;
 }
 
-double GaussLaguerreIntegrate(const int n, MyFunction F, double alpha) {
-  MyQuadrature quad;
-  double f[n];
+/* Integrate a function from 0 to inf using a Gauss-Legendre quadrature by
+ * breaking the integral into two parts, from [0,t] and [t,inf]
+ *
+ * Inputs:
+ *    quad: A properly populated Gauss-Legendre quadrature struct
+ *    F:    The function struct to be integrated
+ *    t:    The value of x at which to break the integral
+ */
+double GaussLegendreIntegrateZeroInf(MyQuadrature *quad, MyFunction *F, double t) {
 
-  /* LoadQuadrature(quad, n, 1, kGaulag, 0, 1, -42, -42, alpha); */
+  double f[quad->n];
+  double f1[quad->n], f2[quad->n];
 
-  if (alpha == 0.) {
-    for (int i = 0; i < n; i++) f[i] = F.function(quad.x[i], F.params) * exp(quad.x[i]);
+  for (int i = 0; i < quad->n; i++) {
+    f1[i] = F->function(t * quad->x[i], F->params);
+    f2[i] = F->function(t / quad->x[i], F->params) / (quad->x[i] * quad->x[i]);
+  }
+
+  return t * (DoIntegration(quad->n, quad->w, f1) + DoIntegration(quad->n, quad->w, f2));
+}
+
+/* Integrate a function from 0 to inf using a Gauss-Laguerre quadrature
+ *
+ * Inputs:
+ *    quad: A properly populated Gauss-Laguerre quadrature struct
+ *    F:    The function struct to be integrated
+ */
+double GaussLaguerreIntegrateZeroInf(MyQuadrature *quad, MyFunction *F) {
+
+  double f[quad->n];
+
+  if (quad->alpha == 0.) {
+    for (int i = 0; i < quad->n; i++) {
+      f[i] = F->function(quad->x[i], F->params) * exp(quad->x[i]);
+    }
   } else {
-    for (int i = 0; i < n; i++) f[i] = F.function(quad.x[i], F.params) * exp(quad.x[i]) / pow(quad.x[i], alpha);
+    for (int i = 0; i < quad->n; i++) f[i] = F->function(quad->x[i], F->params) * exp(quad->x[i]) / pow(quad->x[i], quad->alpha);
   }
 
-  return DoIntegration(n, quad.x, f);
+  return DoIntegration(quad->n, quad->x, f);
+
 }
 
-double GaussLegendreIntegrate(const int n, MyFunction F, double t) {
-  MyQuadrature quad;
-  double f[n];
-  double f1[n], f2[n];
-
-  /* LoadQuadrature(quad, n, 1, kGaulag, 0, 1, -42, -42, -42.); */
-
-  for (int i = 0; i < n; i++) {
-    f1[i] = F.function(t * quad.x[i], F.params);
-    f2[i] = F.function(t / quad.x[i], F.params) / (quad.x[i] * quad.x[i]);
-  }
-
-  return t * (DoIntegration(n, quad.w, f1) + DoIntegration(n, quad.w, f2));
-}
