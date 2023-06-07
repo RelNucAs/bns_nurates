@@ -34,10 +34,10 @@ double GSL_integration(const int n,
 // Constraints: alpha > -1, b > 0 (beta is ignored)
 double GSL_lag_quadr(const int n, 
                      const double a, const double b, 
-                     const double alpha, const double beta, 
+                     const double alpha, 
                      const gsl_function *f) {
   const gsl_integration_fixed_type * lag_type = gsl_integration_fixed_laguerre;	
-  return GSL_integration(n, a, b, alpha, beta, f, lag_type);
+  return GSL_integration(n, a, b, alpha, 0., f, lag_type);
 }
 
 
@@ -46,10 +46,9 @@ double GSL_lag_quadr(const int n,
 // Constraints: b > a (alpha and beta are ignored)
 double GSL_leg_quadr(const int n, 
                      const double a, const double b, 
-                     const double alpha, const double beta, 
                      const gsl_function *f) {
   const gsl_integration_fixed_type * leg_type = gsl_integration_fixed_legendre;	
-  return GSL_integration(n, a, b, alpha, beta, f, leg_type);
+  return GSL_integration(n, a, b, 0., 0., f, leg_type);
 }
 
 // Specific GSL implementation of Gauss-Legendre integration

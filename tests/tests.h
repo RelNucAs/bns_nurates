@@ -16,7 +16,7 @@
 // Gauss-Laguerre integration
 double GSL_lag_quadr(const int n,
                      const double a, const double b,
-                     const double alpha, const double beta,
+                     const double alpha,
                      const gsl_function *f);
 
 
@@ -24,7 +24,6 @@ double GSL_lag_quadr(const int n,
 /* Using general fixed-quadrature framework */
 double GSL_leg_quadr(const int n,
                      const double a, const double b,
-                     const double alpha, const double beta,
                      const gsl_function *f);
 
 
