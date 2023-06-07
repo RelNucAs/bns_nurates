@@ -52,7 +52,6 @@ struct MyQuadrature {
 };
 typedef struct MyQuadrature MyQuadrature;
 
-
 struct MyFunction {
   int dim;
   double (*function)(double var, void *params);
@@ -61,8 +60,18 @@ struct MyFunction {
 typedef struct MyFunction MyFunction;
 
 struct MyKernel {
-  double absoption;
+  double absorption;
   double production;
 };
+typedef struct MyKernel MyKernel;
+
+struct MyParams {
+  double omega;
+  double omega_prime;
+  double temp;
+  double nb;
+  double m_N;
+};
+typedef struct MyParams MyParams;
 
 #endif //BNS_NURATES_SRC_BNS_NURATES_H_

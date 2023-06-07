@@ -111,3 +111,44 @@ double BremKernelG(double y, double eta_star) {
   return g;
 
 }
+/* Compute the production and absorption kernels for the Bremsstrahlung process
+ */
+MyKernel BremKernels(MyParams *params) {
+
+  double omega = params->omega;
+  double omega_prime = params->omega_prime;
+  double nb = params->nb;
+  double temp = params->temp;
+  double m_N = params->m_N;
+
+  // temperature in units of 10 MeV
+  double temp_10 = temp / 10.;
+
+  // neutron degeneracy parameter, Eqn. (36) using baryon number density instead of matter density
+  double eta_star = pow(3. * kPi * kPi * nb, 2. / 3.) * (kH * kH * kMeV / (4. * kPi * kPi)) / (2. * m_N * temp);
+
+  // spin-fluctuation rate gamma, Eqn. (37)
+  double gamma = 1.63 * pow(eta_star, 3. / 2.) * temp_10;
+
+  // pion mass parameter y, Eqn. (38)
+  double y = 1.94 / temp_10;
+
+  // dimensionless neutrino energy sum
+  double x = (omega + omega_prime) / temp;
+
+  // dimensionless fitting parameter s, N.B.: x and y values are not changed by the function
+  double sb = BremKernelS(x, y, eta_star);
+
+  // dimensionless fitting parameter g, N.B.: x and y values are not changed by the function
+  const double gb = BremKernelG(y, eta_star);
+
+  // differential absoption kernel, Eqn. (35)
+  double s_kernel_abs = gamma / (x * x + pow(0.5 * gamma * gb, 2.)) * sb / temp;
+
+  // differential emission kernel from detail balance
+  double s_kernel_prod = s_kernel_abs * exp(-x);
+
+  MyKernel brem_kernel = {.absorption = s_kernel_abs, .production = s_kernel_prod};
+
+  return brem_kernel;
+}

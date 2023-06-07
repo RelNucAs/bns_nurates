@@ -8,8 +8,12 @@
 #ifndef BNS_NURATES_SRC_OPACITIES_KERNELS_KERNELS_H_
 #define BNS_NURATES_SRC_OPACITIES_KERNELS_KERNELS_H_
 
+#include "../../bns_nurates.h"
+
 // bremsstrahlung helper functions and kernels
 double BremKernelS(double x, double y, double eta_star);
 double BremKernelG(double y, double eta_star);
+
+MyKernel BremKernels(MyParams *params);
 
 #endif //BNS_NURATES_SRC_OPACITIES_KERNELS_KERNELS_H_
