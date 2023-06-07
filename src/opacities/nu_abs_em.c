@@ -27,11 +27,11 @@ const int use_dU = 1;    // flag for activating dU correction
 
 
 // Definition of constants
-const double g0 = 0.5 * h * c / pi;
-const double g1 = (GF*GF/pi) / (g0 * g0 * g0 * g0); // (GF*GF/pi) / pow(hbar*c,4.),
+const double g0 = 0.5 * kH * kClight / kPi;
+const double g1 = (kGf*kGf/kPi) / (g0 * g0 * g0 * g0); // (GF*GF/pi) / pow(hbar*c,4.),
                                                     // constant in front of
                                                     // Eq.(C13,C15,C19,C20)
-const double g2 = gV*gV+3.*gA*gA; // constant in Eq.(C13,C15,C19,C20)
+const double g2 = kGv*kGv+3.*kGa*kGa; // constant in Eq.(C13,C15,C19,C20)
 const double g3 = g1 * g2;
 const double mu_thres = 1.E-02;   // mu_hat threshold value in eta_NN evaluation
 
@@ -100,7 +100,7 @@ MyOpacity nu_n_abs(const double omega,
   // Nucleon interaction correction to chemical potential
   if (use_dU == 1) dU = deltaU; // [MeV]
  
-  Qprime = Q + dU;     // [MeV], Eq.(79) in Hempel
+  Qprime = kQ + dU;     // [MeV], Eq.(79) in Hempel
   E = omega + Qprime;  // [MeV]
   mu_np = mu_hat - dU; // [MeV], Eq.(80,86) in Hempel
 
@@ -109,7 +109,7 @@ MyOpacity nu_n_abs(const double omega,
 
   // Check kinematics constraint for the reaction
   if (E-lep_mass > 0.) {
-    tmp = R * c * g3 * E * E * sqrt(1.-pow(lep_mass/E,2.));
+    tmp = R * kClight * g3 * E * E * sqrt(1.-pow(lep_mass/E,2.));
     fd  = FermiDistr(mu_l,E,temp);
     // TODO: eventually think about a specifically designed function for (1-FermiDistr)
     
@@ -145,7 +145,7 @@ MyOpacity nu_p_abs(const double omega,
   // Nucleon interaction correction to chemical potential
   if (use_dU == 1) dU = deltaU; // [MeV]
 	
-  Qprime = Q + dU;     // [MeV], Eq.(79) in Hempel
+  Qprime = kQ + dU;     // [MeV], Eq.(79) in Hempel
   E = omega - Qprime;  // [MeV]
   mu_np = mu_hat - dU; // [MeV], Eq.(80,86) in Hempel
 
@@ -154,7 +154,7 @@ MyOpacity nu_p_abs(const double omega,
 	
   // Check kinematics constraint for the reaction
   if (E-lep_mass > 0.) {
-    tmp = Rbar * c * g3 * E * E * sqrt(1.-pow(lep_mass/E,2.));
+    tmp = Rbar * kClight * g3 * E * E * sqrt(1.-pow(lep_mass/E,2.));
     fd  = FermiDistr(-mu_l,E,temp);
     // TODO: eventually think about a specifically designed function for (1-FermiDistr)
 

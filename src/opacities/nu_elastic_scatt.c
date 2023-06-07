@@ -20,12 +20,12 @@ const int use_WM_sc = 0; // flag for activating weak magnetism (and related) cor
 // 0: not active, 1: active
 
 // Definition of constants
-const double hbar = 0.5*h/pi; //[MeV*s]       
-const double c0 = (2.*pi*GF*GF)/h;
-const double h0_p = c0 * (hpv*hpv + 3.*hpa*hpa); // 0th Leg coeff, protons
-const double h1_p = c0 * (hpv*hpv -    hpa*hpa); // 1st Leg coeff, protons
-const double h0_n = c0 * (hnv*hnv + 3.*hna*hna); // 0th Leg coeff, neutrons
-const double h1_n = c0 * (hnv*hnv -    hna*hna); // 1st Leg coeff, neutrons
+const double hbar = 0.5 * kH / kPi; //[MeV*s]       
+const double c0 = (2. * kPi * kGf * kGf) / kH;
+const double h0_p = c0 * (kHpv*kHpv + 3.*kHpa*kHpa); // 0th Leg coeff, protons
+const double h1_p = c0 * (kHpv*kHpv -    kHpa*kHpa); // 1st Leg coeff, protons
+const double h0_n = c0 * (kHnv*kHnv + 3.*kHna*kHna); // 0th Leg coeff, neutrons
+const double h1_n = c0 * (kHnv*kHnv -    kHna*kHna); // 1st Leg coeff, neutrons
 
 /* Inputs:
  *      omega    [MeV] : (anti)neutrino energy
@@ -44,7 +44,7 @@ double eta_NN_sc(const double nb, const double temp, const double yN) {
   if (nN <= 0.) return 0.;  // Enforce zero rates if no nucleons are present
   
   // Linear interpolation between degenerate and nondegnerate limit in Eq.(C37)
-  const double eFN = 0.5*hbar*hbar * pow(3.*pi*pi*nN,2./3.) / mb * MeV; // [MeV]
+  const double eFN = 0.5*hbar*hbar * pow(3.*kPi*kPi*nN,2./3.) / kMb * kMeV; // [MeV]
   const double tmp = 1.5*temp/eFN;
   return nN*tmp/sqrt(1.+tmp*tmp); // [cm-3]
   
@@ -80,7 +80,7 @@ double nu_N_scatt_kern(const double omega, const double mu_ang,
   return omega * omega * ker; // scattering kernel * enu**2, Eq.(C36)
 
   // TODO: understand where to add the constant in front
-  //       (2.*pi/c)/pow(2.*pi*hbar*c,3.)
+  //       (2.*kPi/kClight)/pow(2.*kPi*hbar*kClight,3.)
 }
 
 

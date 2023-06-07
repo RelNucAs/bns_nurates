@@ -41,7 +41,7 @@ const double lamn = -1.913; // neutron magnetic moment
 
 void nucfrmfac(const double E, double* cv, double* ca, double* F2, const int reacflag) {
   /* (Anti)neutrino energy rescaled by the nucleon mass */
-  const double ehor = E * MeV/(mb*c*c); //Eq.(4), dimensionless
+  const double ehor = E * kMeV/(kMb*kClight*kClight); //Eq.(4), dimensionless
 
   const double tau = 0.5*ehor*ehor/(1.+ehor);       //Eq.(B10) 
   const double eta = 1./(1.+5.6*tau);               //Eq.(B16)
@@ -55,16 +55,16 @@ void nucfrmfac(const double E, double* cv, double* ca, double* F2, const int rea
 
   /* Different parametrization depending on the reaction */
   if (reacflag == 1) {
-    frm1  = (0.5-2.*sinsqthetaw)*Fp1 - 0.5*Fn1; //Eq.(B1)
-    frm2  = 0.5*(gA-gS)/pow(1.+3.53*tau,2.);    //Eq.(B2)
-    frm3  = (0.5-2.*sinsqthetaw)*Fp2 - 0.5*Fn2; //Eq.(B3)
+    frm1  = (0.5-2.*kSinsqthetaw)*Fp1 - 0.5*Fn1; //Eq.(B1)
+    frm2  = 0.5*(kGa-kGs)/pow(1.+3.53*tau,2.);    //Eq.(B2)
+    frm3  = (0.5-2.*kSinsqthetaw)*Fp2 - 0.5*Fn2; //Eq.(B3)
   } else if (reacflag == 2) {
-    frm1 = (0.5-2.*sinsqthetaw)*Fn1 - 0.5*Fp1;  //Eq.(B4)
-    frm2 = -0.5*(gA+gS)/pow(1.+3.53*tau,2.);    //Eq.(B5)
-    frm3 = (0.5-2.*sinsqthetaw)*Fn2 - 0.5*Fp2;  //Eq.(B6)
+    frm1 = (0.5-2.*kSinsqthetaw)*Fn1 - 0.5*Fp1;  //Eq.(B4)
+    frm2 = -0.5*(kGa+kGs)/pow(1.+3.53*tau,2.);    //Eq.(B5)
+    frm3 = (0.5-2.*kSinsqthetaw)*Fn2 - 0.5*Fp2;  //Eq.(B6)
   } else if (reacflag == 3) {
     frm1 = Fp1 - Fn1;                           //Eq.(B7)
-    frm2 = gA/pow(1.+3.53*tau,2.);              //Eq.(B8)
+    frm2 = kGa/pow(1.+3.53*tau,2.);              //Eq.(B8)
     frm3 = Fp2 - Fn2;                           //Eq.(B9)
   } else {
     printf("Error: reacflag out of range in nucfrmfac\n");
