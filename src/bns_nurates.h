@@ -60,4 +60,9 @@ struct MyFunction {
 };
 typedef struct MyFunction MyFunction;
 
+struct MyKernel {
+  double absoption;
+  double production;
+};
+
 #endif //BNS_NURATES_SRC_BNS_NURATES_H_

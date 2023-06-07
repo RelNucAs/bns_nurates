@@ -3,6 +3,7 @@
 #include "src/bns_nurates.h"
 #include "src/integration/integration.h"
 #include "tests/tests.h"
+#include "src/opacities/kernels/kernels.h"
 
 struct FD_params {
   int k;
@@ -11,19 +12,18 @@ struct FD_params {
 typedef struct FD_params FD_params;
 
 double FD_legendre(double x, void *p) {
-  struct FD_params * params = (struct FD_params *)p;
+  struct FD_params *params = (struct FD_params *) p;
   int k = (params->k);
   double eta = (params->eta);
-  return pow(x,k) / (exp(x-eta)+1.);
+  return pow(x, k) / (exp(x - eta) + 1.);
 }
 
 double FD_laguerre(double x, void *p) {
-  struct FD_params * params = (struct FD_params *)p;
+  struct FD_params *params = (struct FD_params *) p;
   int k = (params->k);
   double eta = (params->eta);
-  return pow(x,k) / (exp(-eta)+exp(-x)); // FD_legendre divided by weight exp(-x)
+  return pow(x, k) / (exp(-eta) + exp(-x)); // FD_legendre divided by weight exp(-x)
 }
-
 
 int main() {
 

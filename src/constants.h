@@ -58,4 +58,8 @@ const double kAlpha2X = 2. * kSinsqthetaw;          // Table 1, Pons et. al. (19
 const double kAlpha1[2] = {kAlpha1E, kAlpha1X};
 const double kAlpha2[2] = {kAlpha2E, kAlpha2X};
 
+// Constants for the bremsstrahlung reaction
+const double kBremXmin = 1.e-10;
+const double kBremYmin = 1.e-10;
+const double kBremEtamin = 1.e-10;
 #endif //BNS_NURATES_SRC_CONSTANTS_H_
