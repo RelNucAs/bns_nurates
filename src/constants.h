@@ -30,7 +30,7 @@ const double kMb = 1.674e-24;             // [g]
 const double kMu = 1.66054e-24;           // [g]
 
 // Physical constants
-const double kHbar = 6.582 * (10e-22);    // [MeV s]
+const double kHbar = 6.582119569e-22;     // [MeV s]
 const double kH = 4.1356943e-21;          // [MeV s]
 const double kClight = 2.997924562e+10;   // [cm s^-1]
 const double kGf = 8.957e-44;             // [MeV cm^3]
