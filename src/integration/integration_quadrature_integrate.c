@@ -12,14 +12,14 @@
  *
  * Inputs:
  *    n:        number of points in the quadrature scheme
- *    wgt:      array of quadrature weights
+ *    wtarray:  array of quadrature weights
  *    fnarray:  array of function values at corresponding quadrature positions
  */
-double DoIntegration(const int n, const double *wgt, const double *fnarray) {
+double DoIntegration(const int n, const double *wtarray, const double *fnarray) {
   double integral = 0.;
 
   for (int i = 0; i < n; i++) {
-    integral += wgt[i] * fnarray[i];
+    integral += wtarray[i] * fnarray[i];
   }
 
   return integral;
@@ -33,7 +33,7 @@ double DoIntegration(const int n, const double *wgt, const double *fnarray) {
  *
  * Inputs:
  *    quad: A properly populated Gauss-Legendre quadrature struct from x1 = 0 to x2 = 1.
- *    func:    The function struct to be integrated
+ *    func: The function struct to be integrated
  *    t:    The value of x at which to break the integral into two
  */
 double GaussLegendreIntegrateZeroInf(MyQuadrature *quad, MyFunction *func, double t) {

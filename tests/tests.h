@@ -14,10 +14,10 @@
 // GSL_code/integration_GSL.c
 
 // Gauss-Laguerre integration
-double GSL_lag_quadr(const int n,
-                     const double a, const double b,
-                     const double alpha,
-                     const gsl_function *f);
+double GSLLagQuadrature(const int n,
+                        const double a, const double b,
+                        const double alpha,
+                        const gsl_function *f);
 
 
 // Gauss-Legendre integration
@@ -54,12 +54,15 @@ int MNewt2d_fd_GSL(double *xi, double *xf, gsl_multiroot_function *f);
 
 // ===================================================================
 
-// tests with the quadrature and integration routines
+// tests with the quadrature generation and input/output
 void PrintGaussLegendreQuadrature(const int n, const double x1, const double x2);
 void TestGaussLegendreQuadrature();
 void PrintGaussLaguerreQuadrature(const int n, const double alpha);
 void TestGaussLaguerreQuadrature();
 void TestQuadratureInputOutput(char *filedir);
+
+// tests with integration and comparison with GSL
+void TestQuadratureWithGSL();
 
 #endif //BNS_NURATES_TESTS_TESTS_H_
 

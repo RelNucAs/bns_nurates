@@ -32,10 +32,10 @@ double GSL_integration(const int n,
 // Gauss-Laguerre integration (a,+inf): gauss_type -> gsl_integration_fixed_laguerre
 // w(x) = (x-a)^alpha * exp(-b*(x-a))
 // Constraints: alpha > -1, b > 0 (beta is ignored)
-double GSL_lag_quadr(const int n, 
-                     const double a, const double b, 
-                     const double alpha, 
-                     const gsl_function *f) {
+double GSLLagQuadrature(const int n,
+                        const double a, const double b,
+                        const double alpha,
+                        const gsl_function *f) {
   const gsl_integration_fixed_type * lag_type = gsl_integration_fixed_laguerre;	
   return GSL_integration(n, a, b, alpha, 0., f, lag_type);
 }

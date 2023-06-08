@@ -3,7 +3,7 @@
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
 //! \file  tests_quadrature.c
-//  \brief perform tests with the quadrature routines
+//  \brief perform tests with quadrature generation and IO
 
 #include <stdio.h>
 #include <stdlib.h>
