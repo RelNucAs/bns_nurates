@@ -44,17 +44,17 @@ double GSLLagQuadrature(const int n,
 // Gauss-Legendre integration (a,b): gauss_type -> gsl_integration_fixed_legendre
 // w(x) = 1
 // Constraints: b > a (alpha and beta are ignored)
-double GSL_leg_quadr(const int n, 
-                     const double a, const double b, 
-                     const gsl_function *f) {
+double GSLLegQuadrature(const int n,
+                        const double a, const double b,
+                        const gsl_function *f) {
   const gsl_integration_fixed_type * leg_type = gsl_integration_fixed_legendre;	
   return GSL_integration(n, a, b, 0., 0., f, leg_type);
 }
 
 // Specific GSL implementation of Gauss-Legendre integration
-double GSL_leg_integ(const int n,
-		     const double a, const double b,
-		     const gsl_function *f) {
+double GSLLegIntegrate(const int n,
+                       const double a, const double b,
+                       const gsl_function *f) {
   gsl_integration_glfixed_table * t;
   t = gsl_integration_glfixed_table_alloc(n);
   double result = gsl_integration_glfixed(f, a, b, t);
@@ -65,7 +65,7 @@ double GSL_leg_integ(const int n,
 
 // Computation of (0,+inf) integral using two-piece Gauss-Legendre integration
 // Split at s in two integrals and map them into (0,1) integration thorugh a change of variables
-double GSL_leg_split(const int n, const gsl_function *f, const double s) {
+double GslLegInfSplit(const int n, const gsl_function *f, const double s) {
   double xi, wi;
   double result = 0.;
   gsl_integration_glfixed_table * t;

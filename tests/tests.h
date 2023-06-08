@@ -22,17 +22,17 @@ double GSLLagQuadrature(const int n,
 
 // Gauss-Legendre integration
 /* Using general fixed-quadrature framework */
-double GSL_leg_quadr(const int n,
-                     const double a, const double b,
-                     const gsl_function *f);
+double GSLLegQuadrature(const int n,
+                        const double a, const double b,
+                        const gsl_function *f);
 
 /* Specific implementation */
-double GSL_leg_integ(const int n,
-                     const double a, const double b,
-                     const gsl_function *f);
+double GSLLegIntegrate(const int n,
+                       const double a, const double b,
+                       const gsl_function *f);
 
 // Computation of (0,+inf) integral using two-piece Gauss-Legendre integration
-double GSL_leg_split(const int n, const gsl_function *f, const double s);
+double GslLegInfSplit(const int n, const gsl_function *f, const double s);
 
 /*===========================================================================*/
 

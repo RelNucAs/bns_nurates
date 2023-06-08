@@ -28,6 +28,8 @@ void GaussLegendre(MyQuadrature *quad) {
   assert(quad->dim == 1);
   assert(quad->type == kGauleg);
 
+  quad->x = NULL;
+  quad->w = NULL;
   quad->x = (double *) malloc(quad->n * sizeof(double));
   quad->w = (double *) malloc(quad->n * sizeof(double));
 
@@ -81,6 +83,8 @@ void GaussLaguerre(MyQuadrature *quad) {
   assert(quad->dim == 1);
   assert(quad->type == kGaulag);
 
+  quad->x = NULL;
+  quad->w = NULL;
   quad->x = (double *) malloc(quad->n * sizeof(double));
   quad->w = (double *) malloc(quad->n * sizeof(double));
 

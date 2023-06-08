@@ -47,6 +47,10 @@ double FermiDiracLaguerre(double x, void *p) {
   return pow(x, k) / (exp(-eta) + exp(-x));
 }
 
+double SimpleLaguerreFunc(double x, void *p) {
+  return 1./(x*x*exp(x));
+}
+
 void TestQuadratureWithGSL() {
 
   // function and parameters
@@ -60,9 +64,9 @@ void TestQuadratureWithGSL() {
   fermi.params = &fd_p;
 
   // test Gauss-Laguerre implementation
-  const int n = 32;
+  const int n = 35;
   const double alpha = 0.;
-  MyQuadrature quad = {.n = n, .dim = 1, .type = kGaulag, .alpha = alpha};
+  MyQuadrature quad = {.n = n, .dim = 1, .type = kGaulag, .x1 = 0., .x2 = 1., .alpha = alpha};
   GaussLaguerre(&quad);
 
   // Gauss-Laguerre integration (weight = (x-a)^alpha * exp(-b*(x-a)))
@@ -73,19 +77,34 @@ void TestQuadratureWithGSL() {
   printf("Gauss-Laguerre integration from 0 to inf (GSL):   %.5e\n", gaulag_result_gsl);
   printf("Gauss-Laguerre integration from 0 to inf (our):   %.5e\n", gaulag_result);
 
+  // Gauss-Legendre integration tests
   f.function = &FermiDiracLegendre;
   fermi.function = &FermiDiracLegendre;
-  // Gauss-Legendre integration from a to b (weight = 1)
-  // First version
-  double gLeg_1 = GSL_leg_quadr(n, a, b, &f);
-  printf("Gauss-Legendre integration from a to b (1): %.5e\n", gLeg_1);
 
-  // Second version
-  double gLeg_2 = GSL_leg_integ(n, a, b, &f);
-  printf("Gauss-Legendre integration from a to b (2): %.5e\n", gLeg_2);
+
+  // Gauss-Legendre integration from 0 to 1 (weight = 1)
+  // first version
+  double gauleg_result_gsl_1 = GSLLegQuadrature(n, a, b, &f);
+  printf("\n");
+  printf("Gauss-Legendre integration from 0 to 1 (GSL type 1): %.5e\n", gauleg_result_gsl_1);
+  // second version
+  double gauleg_result_gsl_2 = GSLLegIntegrate(n, a, b, &f);
+  printf("Gauss-Legendre integration from 0 to 1 (GSL type 2): %.5e\n", gauleg_result_gsl_2);
+  // our version
+  quad.type = kGauleg;
+  GaussLegendre(&quad);
+  double gauleg_result = 0.;
+  for (int i = 0; i < quad.n; i++) {
+    gauleg_result += FermiDiracLegendre(quad.x[i], &fd_p) * quad.w[i];
+  }
+  printf("Gauss-Legendre integration from 0 to 1 (   ours   ): %.5e\n", gauleg_result);
 
   // Gauss-Legendre integration from 0 to inf (integral split at s)
   double s = 10.;
-  double gLeg_inf = GSL_leg_split(n, &f, s);
-  printf("Gauss-Legendre integration from 0 to inf:   %.5e\n", gLeg_inf);
+  double gauleg_inf_gsl = GslLegInfSplit(n, &f, s);
+  double gauleg_inf = GaussLegendreIntegrateZeroInf(&quad, &fermi, s);
+  printf("\n");
+  printf("Gauss-Legendre integration of Fermi function from 0 to inf (GSL):   %.5e\n", gauleg_inf_gsl);
+  printf("Gauss-Legendre integration of Fermi function from 0 to inf (our):   %.5e\n", gauleg_inf);
+
 }
