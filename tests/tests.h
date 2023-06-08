@@ -26,12 +26,10 @@ double GSL_leg_quadr(const int n,
                      const double a, const double b,
                      const gsl_function *f);
 
-
 /* Specific implementation */
 double GSL_leg_integ(const int n,
                      const double a, const double b,
                      const gsl_function *f);
-
 
 // Computation of (0,+inf) integral using two-piece Gauss-Legendre integration
 double GSL_leg_split(const int n, const gsl_function *f, const double s);
@@ -52,11 +50,16 @@ double MNewt1d_GSL(const double guess, gsl_function_fdf *fdf);
 int MNewt2d_GSL(double *xi, double *xf, gsl_multiroot_function_fdf *fdf);
 
 // 2D Newton-Raphson with finite difference Jacobian
-int MNewt2d_fd_GSL(double *xi, double *xf, gsl_multiroot_function * f);
+int MNewt2d_fd_GSL(double *xi, double *xf, gsl_multiroot_function *f);
 
 // ===================================================================
-void PrintGaussLegendreQuadrature(const int n, const double x1, const double  x2);
+
+// tests with the quadrature and integration routines
+void PrintGaussLegendreQuadrature(const int n, const double x1, const double x2);
+void TestGaussLegendreQuadrature();
 void PrintGaussLaguerreQuadrature(const int n, const double alpha);
+void TestGaussLaguerreQuadrature();
+void TestQuadratureInputOutput(char *filedir);
 
 #endif //BNS_NURATES_TESTS_TESTS_H_
 

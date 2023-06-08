@@ -64,9 +64,9 @@ void GaussLegendre(MyQuadrature *quad) {
 
 }
 
-/* Generate Gauss-Laguerre quadratures in [0,inf].
+/* Generate Gauss-Laguerre quadratures in [0,inf).
  * For this routine to generate data successfully, quad struct
- * must have dim, type, n metadata populated.
+ * must have dim, type, n, alpha metadata populated.
  *
  * Inputs:
  *      quad:   A MyQuadrature structure to hold quadratures.
@@ -75,7 +75,7 @@ void GaussLegendre(MyQuadrature *quad) {
  */
 void GaussLaguerre(MyQuadrature *quad) {
 
-  const int kMaxit = 10;
+  const int kMaxIt = 10;
   const double kEps = 1.0e-14;
 
   assert(quad->dim == 1);
@@ -100,7 +100,7 @@ void GaussLaguerre(MyQuadrature *quad) {
       ai = i - 1;
       z += ((1.0 + 2.55 * ai) / (1.9 * ai) + 1.26 * ai * quad->alpha / (1.0 + 3.5 * ai)) * (z - x[i - 2]) / (1.0 + 0.3 * quad->alpha);
     }
-    for (its = 0; its < kMaxit; its++) {
+    for (its = 0; its < kMaxIt; its++) {
       p1 = 1.0;
       p2 = 0.0;
       for (j = 0; j < n; j++) {
@@ -113,8 +113,8 @@ void GaussLaguerre(MyQuadrature *quad) {
       z = z1 - p1 / pp;
       if (fabs(z - z1) <= kEps) { break; }
     }
-    if (its >= kMaxit) {
-      throw("too many iterations in gaulag")
+    if (its >= kMaxIt) {
+      throw("Too many iterations for Gauss-Laguerre!")
     };
 
     x[i] = z;

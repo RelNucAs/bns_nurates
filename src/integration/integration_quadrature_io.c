@@ -11,7 +11,9 @@
 #include "integration.h"
 #include "../functions/functions.h"
 
-/* Generate and save quadratures
+/* Generate and save quadratures for integration. Saves files to the
+ * filedir and loads the quadrature data to a quad struct provided that
+ * the quad struct has properly filled metadata
  *
  * Inputs:
  *    filedir:  location of save directory
@@ -26,14 +28,15 @@ void SaveQuadrature(char *filedir, MyQuadrature *quad) {
 
   FILE *fptr;
 
+  // To add a nre quadrature, add another if/else case here
   if (quad->type == kGauleg && quad->dim == 1) {
     sprintf(fileHeader, "# Abscissas and weights for Gauss-Legendre integration from x1 = %.3lf to x2 = %.3lf\n", quad->x1, quad->x2);
     GaussLegendre(quad);
-    sprintf(outname, "/GaussLegQuad_n_%d.txt", quad->n);
+    sprintf(outname, "/GaussLegQuad_n_%d_x_%f_%f.txt", quad->n, quad->x1, quad->x2);
   } else if (quad->type == kGaulag && quad->dim == 1) {
     sprintf(fileHeader, "# Abscissas and weights for Gauss-Laguerre integration\n");
     GaussLaguerre(quad);
-    sprintf(outname, "/GaussLagQuad_n_%d_alf_%d.txt", quad->n, quad->alpha);
+    sprintf(outname, "/GaussLagQuad_n_%d_alf_%f.txt", quad->n, quad->alpha);
   } else {
     printf("The requested quadrature is not implemented!\n");
     exit(1);
@@ -50,6 +53,7 @@ void SaveQuadrature(char *filedir, MyQuadrature *quad) {
 
   fprintf(fptr, fileHeader);
 
+  // @TODO: only works for the 1d case, generalize for 2d case later
   for (int i = 0; i < quad->n; i++) {
     sprintf(fileline, "%0.16e \t %0.16e\n", quad->x[i], quad->w[i]);
     fprintf(fptr, fileline);
@@ -59,7 +63,8 @@ void SaveQuadrature(char *filedir, MyQuadrature *quad) {
 
 }
 
-/* Load quadrature from disk. If not present, generate and save to disk
+/* Load quadrature from disk to struct quad. If not present on disk,
+ * generate and save to disk as well.
  *
  * Inputs:
  *    filedir:  location of save directory
@@ -77,10 +82,10 @@ void LoadQuadrature(char *filedir, MyQuadrature *quad) {
 
   if (quad->type == kGauleg && quad->dim == 1) {
     sprintf(fileHeader, "# Abscissas and weights for Gauss-Legendre integration from x1 = %.3lf to x2 = %.3lf\n", quad->x1, quad->x2);
-    sprintf(outname, "/GaussLegQuad_n_%d.txt", quad->n);
+    sprintf(outname, "/GaussLegQuad_n_%d_x_%f_%f.txt", quad->n, quad->x1, quad->x2);
   } else if (quad->type == kGaulag && quad->dim == 1) {
     sprintf(fileHeader, "# Abscissas and weights for Gauss-Laguerre integration\n");
-    sprintf(outname, "/GaussLagQuad_n_%d_alf_%d.txt", quad->n, quad->alpha);
+    sprintf(outname, "/GaussLagQuad_n_%d_alf_%f.txt", quad->n, quad->alpha);
   } else {
     printf("The requested quadrature is not implemented!\n");
     exit(1);
@@ -91,20 +96,22 @@ void LoadQuadrature(char *filedir, MyQuadrature *quad) {
   fptr = fopen(filepath, "r");
 
   if (fptr == NULL) {
-    printf("The file %s does not exist!\n", filepath);
+    printf("The file %s does not exist! Creating ...\n", filepath);
     SaveQuadrature(filedir, quad);
-    exit(1);
   } else {
-    quad->x = (double *) malloc(quad->n * sizeof(double));
-    quad->w = (double *) malloc(quad->n * sizeof(double));
+    quad->x = (double *) realloc(quad->x, quad->n * sizeof(double));
+    quad->w = (double *) realloc(quad->w, quad->n * sizeof(double));
 
     fscanf(fptr, fileHeader);
 
+    // @TODO: currently works only for 1d quadratures, generalize for 2d later
     for (int i = 0; i < quad->n; i++) {
       fscanf(fptr, "%.16e %.16e\n", quad->x[i], quad->w[i]);
     }
   }
 
-  fclose(fptr);
+  if (fptr != NULL) {
+    fclose(fptr);
+  }
 
 }

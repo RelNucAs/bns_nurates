@@ -26,21 +26,23 @@ double DoIntegration(const int n, const double *wgt, const double *fnarray) {
 }
 
 /* Integrate a function from 0 to inf using a Gauss-Legendre quadrature by
- * breaking the integral into two parts, from [0,t] and [t,inf]
+ * breaking the integral into two parts, from [0,t] and [t,inf].
+ *
+ * Note: Uses (4.4.2) of Numerical Recipes 3rd edition (Press et. al.) to compute the integral from [t,inf]
+ *       The quad struct should contain a Gauss-Legendre quadrature in [0,1] only!
  *
  * Inputs:
- *    quad: A properly populated Gauss-Legendre quadrature struct
- *    F:    The function struct to be integrated
- *    t:    The value of x at which to break the integral
+ *    quad: A properly populated Gauss-Legendre quadrature struct from x1 = 0 to x2 = 1.
+ *    func:    The function struct to be integrated
+ *    t:    The value of x at which to break the integral into two
  */
-double GaussLegendreIntegrateZeroInf(MyQuadrature *quad, MyFunction *F, double t) {
+double GaussLegendreIntegrateZeroInf(MyQuadrature *quad, MyFunction *func, double t) {
 
-  double f[quad->n];
   double f1[quad->n], f2[quad->n];
 
   for (int i = 0; i < quad->n; i++) {
-    f1[i] = F->function(t * quad->x[i], F->params);
-    f2[i] = F->function(t / quad->x[i], F->params) / (quad->x[i] * quad->x[i]);
+    f1[i] = func->function(t * quad->x[i], func->params);
+    f2[i] = func->function(t / quad->x[i], func->params) / (quad->x[i] * quad->x[i]);
   }
 
   return t * (DoIntegration(quad->n, quad->w, f1) + DoIntegration(quad->n, quad->w, f2));
@@ -50,21 +52,20 @@ double GaussLegendreIntegrateZeroInf(MyQuadrature *quad, MyFunction *F, double t
  *
  * Inputs:
  *    quad: A properly populated Gauss-Laguerre quadrature struct
- *    F:    The function struct to be integrated
+ *    func:    The function struct to be integrated
  */
-double GaussLaguerreIntegrateZeroInf(MyQuadrature *quad, MyFunction *F) {
+double GaussLaguerreIntegrateZeroInf(MyQuadrature *quad, MyFunction *func) {
 
   double f[quad->n];
 
   if (quad->alpha == 0.) {
     for (int i = 0; i < quad->n; i++) {
-      f[i] = F->function(quad->x[i], F->params) * exp(quad->x[i]);
+      f[i] = func->function(quad->x[i], func->params) * exp(quad->x[i]);
     }
   } else {
-    for (int i = 0; i < quad->n; i++) f[i] = F->function(quad->x[i], F->params) * exp(quad->x[i]) / pow(quad->x[i], quad->alpha);
+    for (int i = 0; i < quad->n; i++) f[i] = func->function(quad->x[i], func->params) * exp(quad->x[i]) / pow(quad->x[i], quad->alpha);
   }
 
   return DoIntegration(quad->n, quad->x, f);
 
 }
-
