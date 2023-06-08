@@ -69,7 +69,7 @@ void Invert2DMat(double *in, double *out) {
  * Input:
  * 	- x (dim = 2) --> initial guess
  * 	- C (dim = 2) --> inhomogeneous term
- *	- F (dim = 2) --> calculated using pointer to fdf(x,C,fvec,fjac) function
+ *	- PairF (dim = 2) --> calculated using pointer to fdf(x,C,fvec,fjac) function
  * Output:
  * 	- x (1x2 matrix) --> Newton-Raphson solution after convergence
  *

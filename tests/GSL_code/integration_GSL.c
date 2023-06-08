@@ -11,7 +11,7 @@
 
 /*
  * n : Number of quadrature points
- * F : Function to be integrated (GSL variable: struct with func + void pointer to params) 
+ * PairF : Function to be integrated (GSL variable: struct with func + void pointer to params)
  * gauss_type: type of weighting function
 */
 

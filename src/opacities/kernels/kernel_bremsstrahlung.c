@@ -14,7 +14,7 @@
  * neutrino bremsstrahlung and inelastic scattering in a nucleon field
  *
  * Inputs:
- *      x:        dimensionless energy omega/T
+ *      x:        dimensionless energy omega/PairT
  *      y:        pion mass parameter defined in Eqn. (38)
  *      eta_star: neutron degeneracy parameter
  *
@@ -50,11 +50,11 @@ double BremKernelS(double x, double y, double eta_star) {
 
   double s_d = 3. * pow(0.5 * kPi, 2.5) * pow(eta_star, -2.5) * (x * x + 4. * kPi * kPi) * x * f_u / (4. * kPi * kPi * (1. - exp(-x)));
 
-  // F, Eqn. (50)
+  // PairF, Eqn. (50)
   double f_denominator = (3. + pow(x - 1.2, 2.) + pow(x, -4.)) * (1. + eta_star * eta_star) * (1. + pow(y, 4.));
   double f_brem = 1. + 1. / f_denominator; //Eq.(50)
 
-  // G, Eqn. (50)
+  // PairG, Eqn. (50)
   double g_brem = 1. - 0.0044 * pow(x, 1.1) * y / (0.8 + 0.06 * pow(y, 1.05)) * sqrt(eta_star) / (eta_star + 0.2);
 
   // C, Eqn. (50)

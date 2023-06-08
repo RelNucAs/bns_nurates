@@ -8,7 +8,6 @@
 #include <math.h>
 #include <assert.h>
 #include "kernels.h"
-//#include "../../constants.h"
 #include "../../bns_nurates.h"
 
 /* Compute T_l(alpha) as defined in Appendix B of Pons et. al. (1998)
@@ -26,7 +25,7 @@
  * Output:
  *    T_l(alpha) = sum_{n=1..inf} (-1)^{n+1} e^{-n alpha} / n^l
  */
-double T(int l, double alpha, double tolerance) {
+double PairT(int l, double alpha, double tolerance) {
 
   assert(alpha >= 0 && l >= 1);
 
@@ -47,4 +46,181 @@ double T(int l, double alpha, double tolerance) {
     }
     return result;
   }
+}
+
+/* Compute F_k(eta,x1) as defined in Appendix B of Pons et. al. (1998)
+ *
+ * Inputs:
+ *    k:    an integer
+ *    eta:  double
+ *    x1:   double
+ *
+ * Output:
+ *  F_k:    as defined below
+ *
+ * eta < 0:         F_k(eta,x1) = k! [T_{k+1}(-eta) - sum_{l=0..k} T_{k+1-l}(x1-eta) x1^l / l!]
+ * 0 <= eta <= x1:  F_k(eta,x1) = eta^{k+1}/(k+1)
+ *                              + k! [2 sum_{l=0..int((k-1)/2)} T_{2l+2}(0) eta^{k-1-2l}/(k-1-2l)!
+ *                                    + (-1)^k T_{k+1}(eta)
+ *                                    - sum_{l=0..k} T_{k+1-l}(x1-eta) x1^l / l!]
+ * x1 < eta:        F_k(eta,x1) = x1^{k+1}/(k+1)
+ *                              + k! [(-1)^k T_{k+1}(eta)
+ *                                     - sum_{l=0..k} (-1)^{k-l} T_{k+1-l}(eta-x1) x1^l / l!]
+ */
+double PairF(int k, double eta, double x1) {
+
+  double result = 0.;
+  double tol = 1e-6;
+
+  if (eta < 0.) {
+    double sum = 0.;
+    for (int l = 0; l <= k; l++) {
+      sum += PairT(k + 1 - l, x1 - eta, tol) * pow(x1, l) / tgamma(l + 1);
+    }
+    result = tgamma(k + 1) * (PairT(k + 1., -eta, tol) - sum);
+
+  } else if (k != 0 && 0. <= eta && eta <= x1) {
+
+    double sum = 0.;
+    for (int l = 0; l <= (int) ((k - 1.) / 2.); l++) {
+      sum += PairT(2 * l + 2, 0., tol) * pow(eta, k - 1. - 2. * l) / tgamma(k - 1 - 2 * l + 1);
+    }
+
+    double sum_2 = 0.;
+    for (int l = 0; l <= k; l++) {
+      sum_2 += PairT(k + 1 - l, x1 - eta, tol) * pow(x1, l) / tgamma(l + 1);
+    }
+
+    result = pow(eta, k + 1.) / (k + 1.) + tgamma(k + 1) * (2.0 * sum + pow(-1., k) * PairT(k + 1, eta, tol) - sum_2);
+
+  } else if (k == 0 && 0. <= eta && eta <= x1) {
+
+    double sum = 0.;
+    for (int l = 0; l <= k; l++) {
+      sum += PairT(k + 1 - l, x1 - eta, tol) * pow(x1, l) / tgamma(l + 1);
+    }
+
+    result = pow(eta, k + 1.) / (k + 1.) + tgamma(k + 1) * (pow(-1., k) * PairT(k + 1, eta, tol) - sum);
+
+  } else {
+
+    double sum = 0.;
+    for (int l = 0; l <= k; l++) {
+      sum += pow(-1., k - l) * PairT(k + 1 - l, eta - x1, tol) * pow(x1, l) / tgamma(l + 1);
+    }
+    result = pow(x1, k + 1.) / (k + 1.) + tgamma(k + 1) * (pow(-1., k) * PairT(k + 1, eta, tol) - sum);
+
+  }
+
+  return result;
+}
+
+/* Calculate G_n(a,b) from Eqn. (12) of Pons et. al. (1998)
+ *
+ * Inputs:
+ *    n:            integer
+ *    a,b,eta,y,z:  double
+ *
+ * Output:
+ *    G_n(a,b,eta,y,z) = F_n(eta,b) - F_n(eta,a) - F_n(eta+y+z,b) + F_n(eta+y+z,a)
+ * */
+double PairG(int n, double a, double b, double eta, double y, double z) {
+
+  double result = 0.;
+  result = PairF(n, eta, b) - PairF(n, eta, a) - PairF(n, eta + y + z, b) + PairF(n, eta + y + z, a);
+
+  return result;
+}
+
+/* Calculate Psi_l(y,z) from Eqn. (11) of Pons et. al.
+ *
+ * Inputs:
+ *      l:    integer (mode number)
+ *      y:    dimensionless energy
+ *      z:    dimensionless energy
+ *      eta:  electron degenracy parameter
+ *
+ * Output:
+ *      Psi_l(y,z) = sum_{n=0..2} [c_{ln} G_n(y,y+z) + d_{ln} G_n(z,y+z)] + sum_{n=3..(2l+5)} a_{ln} [G_n(0,min(y,z)) - G_n(max(y,z),y+z)]
+ */
+double Psi(int l, double y, double z, double eta) {
+
+  assert(0 <= l && l <= 3);
+
+  double a[4][12], c[4][3], d[4][3];
+
+  a[0][3] = 8. / (3. * y * y);
+  a[0][4] = -4. / (3. * y * y * z);
+  a[0][5] = 4. / (15. * y * y * z * z);
+  c[0][0] = (4. * y / (z * z)) * (2. * z * z / 3. + y * z + 2. * y * y / 5.);
+  c[0][1] = -(4. * y / (3. * z * z)) * (3. * y + 4. * z);
+  c[0][2] = 8. * y / (3. * z * z);
+  d[0][0] = 4. * z * z * z / (15. * y * y);
+  d[0][1] = -4. * z * z / (3. * y * y);
+  d[0][2] = 8. * z / (3. * y * y);
+
+  // Coefficients for l = 1
+  a[1][3] = 8. / (3. * y * y);
+  a[1][4] = -4. * (4. * y + 3. * z) / (3. * y * y * y * z);
+  a[1][5] = 4. * (13. * y + 18. * z) / (15. * y * y * y * z * z);
+  a[1][6] = -4. * (y + 3. * z) / (5. * y * y * y * z * z * z);
+  a[1][7] = 16. / (35. * y * y * y * z * z * z);
+  c[1][0] = -(4. * y / (z * z * z)) *
+      (2. * y * y * y / 7. + 4. * y * y * z / 5. + 4. * y * z * z / 5. + z * z * z / 3.);
+  c[1][1] = (4. * y / (z * z * z)) * (4. * y * y / 5. + 7. * y * z / 5. + 2. * z * z / 3.);
+  c[1][2] = -(4. * y / (z * z * z)) * (3. * y / 5. + z / 3.);
+  d[1][0] = -(4. * z * z * z / (105. * y * y * y)) * (14. * y + 9. * z);
+  d[1][1] = (4. * z * z / (5. * y * y * y)) * (7. * y / 3. + 2. * z);
+  d[1][2] = -(4. * z / (y * y * y)) * (y / 3. + 3. * z / 5.);
+
+  // Coefficients for l = 2
+  a[2][3] = 8. / (3. * y * y);
+  a[2][4] = -4. * (10. * y + 9. * z) / (3. * y * y * y * z);
+  a[2][5] = 4. * (73. * y * y + 126. * y * z + 36. * z * z) / (15. * y * y * y * y * z * z);
+  a[2][6] = -12. * (y * y + 3. * y * z + 8. * z * z / 5.) / (y * y * y * y * z * z * z);
+  a[2][7] = 48. * (2. * y * y + 13. * y * z + 12. * z * z) / (35. * y * y * y * y * z * z * z * z);
+  a[2][8] = -24. * (y + 2. * z) / (7. * y * y * y * y * z * z * z * z);
+  a[2][9] = 8. / (7. * y * y * y * y * z * z * z * z);
+  c[2][0] = 4. * y * (2. * y * y * y * y / 7. + 6. * y * y * y * z / 7 + 32. * y * y * z * z / 35. +
+      2. * y * z * z * z / 5. + z * z * z * z / 15.) / (z * z * z * z);
+  c[2][1] =
+      -4. * y * (6. * y * y * y / 7. + 12. * y * y * z / 7. + y * z * z + 2. * z * z * z / 15.) / (z * z * z *
+          z);
+  c[2][2] = 8. * y * (z * z / 6. + 3 * y * z / 2. + 12 * y * y / 7.) / (5. * z * z * z * z);
+  d[2][0] = 4. * z * z * z * (16. * y * y + 27. * y * z + 12. * z * z) / (105. * y * y * y * y);
+  d[2][1] = -4. * z * z * (18. * z * z / 35. + 6. * y * z / 7. + y * y / 3.) / (y * y * y * y);
+  d[2][2] = 8. * z * (y * y / 6. + 3. * y * z / 2. + 12. * z * z / 7.) / (5. * y * y * y * y);
+
+  // Coefficients for l = 3
+  a[3][3] = 8. / (3. * y * y);
+  a[3][4] = -4. * (19. * y + 18. * z) / (3. * y * y * y * z);
+  a[3][5] = 4. * (253. * y * y + 468. * y * z + 180. * z * z) / (15. * y * y * y * y * z * z);
+  a[3][6] = -8. * (149. * y * y * y + 447. * y * y * z + 330. * y * z * z + 50. * z * z * z) / (15. * y * y * y * y * y * z * z * z);
+  a[3][7] = 8. * (116. * y * y * y + 2916. * y * y * z / 5. + 696. * y * z * z + 200. * z * z * z) / (21. * y * y * y * y * y * z * z * z * z);
+  a[3][8] = -40. * (5. * y * y * y + 54. * y * y * z + 108. * y * z * z + 50. * z * z * z) / (21. * y * y * y * y * y * z * z * z * z * z);
+  a[3][9] = 40. * (10. * y * y + 43. * y * z + 100. * z * z / 3.) / (21. * y * y * y * y * y * z * z * z * z * z);
+  a[3][10] = -40. * (3. * y + 5. * z) / (9. * y * y * y * y * y * z * z * z * z * z);
+  a[3][11] = 320. / (99. * y * y * y * y * y * z * z * z * z * z);
+  c[3][0] = -4. * y * y * (10. * y * y * y * y / 33. + 20. * y * y * y * z / 21. + 68. * y * y * z * z / 63. + 18. * y * z * z * z / 35. + 3. * z * z * z * z / 35.)
+      / (z * z * z * z * z);
+  c[3][1] = 4. * y * y * (20. * y * y * y / 21. + 130. * y * y * z / 63. + 48. * y * z * z / 35. + 9. * z * z * z / 35.) / (z * z * z * z * z);
+  c[3][2] = -4. * y * y * (50. * y * y / 63. + 6. * y * z / 7. + 6. * z * z / 35.) / (z * z * z * z * z);
+  d[3][0] = -4. * z * z * z * (9. * y * y * y + 34. * y * y * z + 40. * y * z * z + 500. * z * z * z / 33.) / (105. * y * y * y * y * y);
+  d[3][1] = 4. * z * z * (3. * y * y * y + 24. * y * y * z + 130. * y * z * z / 3. + 200. * z * z * z / 9.) / (35. * y * y * y * y * y);
+  d[3][2] = -4. * z * z * (50. * z * z / 63. + 6. * z * y / 7. + 6. * y * y / 35.) / (y * y * y * y * y);
+
+  double result = 0.;
+
+  for (int n = 0; n <= 2; n++) {
+    result += c[l][n] * PairG(n, y, y + z, eta, y, z) + d[l][n] * PairG(n, z, y + z, eta, y, z);
+  }
+
+  double min_yz = (y > z) ? z : y;
+  double max_yz = (y > z) ? y : z;
+
+  for (int n = 3; n <= 2 * l + 5; n++) {
+    result += a[l][n] * (PairG(n, 0, min_yz, eta, y, z) - PairG(n, max_yz, y + z, eta, y, z));
+  }
+
+  return result;
 }
