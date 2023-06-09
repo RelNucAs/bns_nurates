@@ -37,7 +37,7 @@ void NRcatch(NRerror err) {
 
 // digamma.c
 
-// Evaluation of Psi (Digamma) function
+// Evaluation of PairPsi (Digamma) function
 double SFPsi(const double x);
 
 /*===========================================================================*/

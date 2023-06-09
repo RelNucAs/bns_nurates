@@ -9,6 +9,7 @@
 #include <assert.h>
 #include "kernels.h"
 #include "../../bns_nurates.h"
+#include "../../constants.h"
 
 /* Compute T_l(alpha) as defined in Appendix B of Pons et. al. (1998)
  * upto a given accuracy
@@ -143,7 +144,7 @@ double PairG(int n, double a, double b, double eta, double y, double z) {
  * Output:
  *      Psi_l(y,z) = sum_{n=0..2} [c_{ln} G_n(y,y+z) + d_{ln} G_n(z,y+z)] + sum_{n=3..(2l+5)} a_{ln} [G_n(0,min(y,z)) - G_n(max(y,z),y+z)]
  */
-double Psi(int l, double y, double z, double eta) {
+double PairPsi(int l, double y, double z, double eta) {
 
   assert(0 <= l && l <= 3);
 
@@ -221,6 +222,33 @@ double Psi(int l, double y, double z, double eta) {
   for (int n = 3; n <= 2 * l + 5; n++) {
     result += a[l][n] * (PairG(n, 0, min_yz, eta, y, z) - PairG(n, max_yz, y + z, eta, y, z));
   }
+
+  return result;
+}
+
+/* Calculate Phi_l(y,z) from Eqn. (10) of Pons et. al. (1998)
+ *
+ * Inputs:
+ *      l:            mode number
+ *      omega:        neutrino energy [MeV]
+ *      omega_prime:  anti-neutrino energy [MeV]
+ *      temp:         temperature [MeV]
+ *      e_x:          neutrino species type (0: elentron, 1: mu/tau)
+ *
+ * Output:
+ *      Phi_l(y,z) = (G^2 temp^2)/(pi (1 - e^{y+z})) [alpha1 Psi_l(y,z) + alpha2 Psi_l(z,y)]
+ */
+double Phi(int l, double omega, double omega_prime, double eta, double temp, int e_x) {
+
+  assert(e_x >= 0 && e_x <= 1);
+
+  double y = omega / temp;
+  double z = omega_prime / temp;
+
+  double psi_1 = PairPsi(l, y, z, eta);
+  double psi_2 = PairPsi(l, z, y, eta);
+
+  double result = kGSqr * temp * temp * (kAlpha1[e_x] * kAlpha1[e_x] * psi_1 + kAlpha2[e_x] * kAlpha2[e_x] * psi_2) / (kPi * (1. - exp(y + z)));
 
   return result;
 }
