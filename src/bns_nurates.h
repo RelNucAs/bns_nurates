@@ -60,8 +60,10 @@ struct MyFunction {
 typedef struct MyFunction MyFunction;
 
 struct MyKernel {
-  double absorption;
-  double production;
+  double absorption_e;
+  double production_e;
+  double absorption_x;
+  double production_x;
 };
 typedef struct MyKernel MyKernel;
 
@@ -71,6 +73,10 @@ struct MyParams {
   double temp;
   double nb;
   double m_N;
+  int lmax;
+  double filt;
+  double eta;
+  double cos_theta;
 };
 typedef struct MyParams MyParams;
 

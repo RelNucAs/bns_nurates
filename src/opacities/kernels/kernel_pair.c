@@ -252,3 +252,48 @@ double Phi(int l, double omega, double omega_prime, double eta, double temp, int
 
   return result;
 }
+
+/* Calculates the production and absorption kernels for the pair process from Eqns. (2) and (3) of Pons et. al.
+ *
+ * R^p_{TP}(omega,omega',cos theta) = sum_{l} ((2l+1)/2) Phi_l(omega,omega') P_l(cos theta)
+ * R^a_{TP}(omega,omega',cos theta) = e^{(omega+omega')/T} R^p_{TP}(omega,omega',cos theta)
+ *
+ * l is an integer.
+ * */
+MyKernel PairKernels(MyParams *pars) {
+
+  double omega = pars->omega;
+  double omega_prime = pars->omega_prime;
+  double cos_theta = pars->cos_theta;
+  double eta = pars->eta;
+  double temp = pars->temp;
+  int lmax = pars->lmax;
+  double filterpar = pars->filt;
+
+  double pair_kernel_production_e = 0.;
+  double pair_kernel_absorption_e = 0.;
+  double pair_kernel_production_x = 0.;
+  double pair_kernel_absorption_x = 0.;
+  double pair_phi_e = 0.;
+  double pair_phi_x = 0.;
+
+  assert(lmax >= 0 && lmax <= 3);
+
+  for (int l = 0; l <= lmax; l++) {
+    //double legendre_l = boost::math::legendre_p<double>(l, cos_theta);
+    double legendre_l = 0.0; // @TODO: fixme
+    pair_phi_e = Phi(l, omega, omega_prime, eta, temp, 0);
+    pair_phi_x = Phi(l, omega, omega_prime, eta, temp, 1);
+
+    pair_kernel_production_e += (1. / (1. + filterpar * l * l * (l + 1) * (l + 1))) * (2. * l + 1.) * pair_phi_e * legendre_l / 2.;
+    pair_kernel_production_x += (1. / (1. + filterpar * l * l * (l + 1) * (l + 1))) * (2. * l + 1.) * pair_phi_x * legendre_l / 2.;
+  }
+
+  pair_kernel_absorption_e = exp((omega + omega_prime) / temp) * pair_kernel_production_e;
+  pair_kernel_absorption_x = exp((omega + omega_prime) / temp) * pair_kernel_production_x;
+
+  MyKernel pair_kernel = {.absorption_e = pair_kernel_absorption_e, .production_e = pair_kernel_production_e, .absorption_x = pair_kernel_absorption_x, .production_x = pair_kernel_production_x};
+
+  return pair_kernel;
+
+}
