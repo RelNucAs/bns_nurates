@@ -60,12 +60,12 @@ double GaussLaguerreIntegrateZeroInf(MyQuadrature *quad, MyFunction *func) {
 
   if (quad->alpha == 0.) {
     for (int i = 0; i < quad->n; i++) {
-      f[i] = func->function(quad->x[i], func->params) * exp(quad->x[i]);
+      f[i] = func->function(quad->x[i], func->params); // * exp(quad->x[i]);
     }
   } else {
-    for (int i = 0; i < quad->n; i++) f[i] = func->function(quad->x[i], func->params) * exp(quad->x[i]) / pow(quad->x[i], quad->alpha);
+    for (int i = 0; i < quad->n; i++) f[i] = func->function(quad->x[i], func->params); // * exp(quad->x[i]) / pow(quad->x[i], quad->alpha);
   }
 
-  return DoIntegration(quad->n, quad->x, f);
+  return DoIntegration(quad->n, quad->w, f);
 
 }
