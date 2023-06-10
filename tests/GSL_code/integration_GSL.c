@@ -23,6 +23,12 @@ double GSL_integration(const int n,
   gsl_integration_fixed_workspace *w;
   double result;
   w = gsl_integration_fixed_alloc(gauss_type, n, a, b, alpha, beta);
+  // Uncomment the following block to print nodes, weights etc.
+  //double * nodes = gsl_integration_fixed_nodes(w);
+  //double * wghts = gsl_integration_fixed_weights(w);
+  //printf("GSL integration nodes, weights and integrand:\n");
+  //for (int i=0; i<n; i++) printf("n = %d: x = %.5e, w = %.5e, f(x) = %.5e\n",
+  //                                i+1, wghts[i], f->function(nodes[i],f->params)); 
   gsl_integration_fixed(f, &result, w);
   gsl_integration_fixed_free(w);
   return result;
