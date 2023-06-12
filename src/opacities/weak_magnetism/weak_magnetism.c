@@ -12,11 +12,11 @@
 //        Ref: Horowitz, 2002 (https://journals.aps.org/prd/abstract/10.1103/PhysRevD.65.043001)
 
 
-// TODO: change names of variables and functions following Google C style
+// @TODO: change names of variables and functions following Google C style
 
 
 
-// TODO: function that computes WM both for abs on n and p
+// @TODO: function that computes WM both for abs on n and p
 //       (useful only if there exists a single function for the two reactions) 
 
 // Correction for electron neutrino absorption on neutron (nue + n -> e- + p): reacflag = 3
@@ -61,7 +61,7 @@ void WM_scatt(const double e_nu, double* R0, double* R1, const int reacflag) {
   nucfrmfac(e_nu, &cv, &ca, &F2, reacflag); //nuclear form factors
   //nucfrmfac(0., &cv_0, &ca_0, &F2_0, reacflag); //nuclear form factors at Q^2=0
  
-  // TODO: evaluate this at compile time  
+  // @TODO: evaluate this at compile time  
   if (reacflag == 1) {
     h0 = kHpv*kHpv + 3.*kHpa*kHpa;
     h1 = kHpv*kHpv -    kHpa*kHpa;

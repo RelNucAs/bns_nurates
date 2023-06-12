@@ -2,7 +2,7 @@
 
 #include "functions.h"
 
-// TODO: change names of variables and functions following Google C style
+// @TODO: change names of variables and functions following Google C style
 
 // Computation of Fermi-Dirac distribution function
 

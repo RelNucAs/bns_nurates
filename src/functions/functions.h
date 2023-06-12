@@ -8,9 +8,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// @TODO: change names of variables and functions following Google C style
+
+
 
 // Exception handling from Numerical Recipes
-// TODO: decide how to handling errors in the code
+// @TODO: decide how to handling errors in the code
 
 #ifndef _USENRERRORCLASS_
 #define throw(message) { \

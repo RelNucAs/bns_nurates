@@ -12,10 +12,10 @@
 #include "../constants.h"
 #include "weak_magnetism/weak_magnetism.h"
 
-// TODO: change names of variables and functions following Google C style
+// @TODO: change names of variables and functions following Google C style
 
 // Definition of parameters
-// TODO: decide how to switch on/off corrections to the rates
+// @TODO: decide how to switch on/off corrections to the rates
 const int use_WM_sc = 0; // flag for activating weak magnetism (and related) corrections
 // 0: not active, 1: active
 
@@ -53,7 +53,7 @@ double eta_NN_sc(const double nb, const double temp, const double yN) {
   //etann = yn / (T*mu*dmudrho); //[1/cm^3]
 }
 
-// TODO: elastic scattering is kind of a middle-case between closed-form
+// @TODO: elastic scattering is kind of a middle-case between closed-form
 //       opacity and opacity integrated from kernel, since it requires
 //       only angular intergration. Specific implementation is possibly required
 // Legendre expansion of scattering kernel up to l=1
@@ -79,7 +79,7 @@ double nu_N_scatt_kern(const double omega, const double mu_ang,
 
   return omega * omega * ker; // scattering kernel * enu**2, Eq.(C36)
 
-  // TODO: understand where to add the constant in front
+  // @TODO: understand where to add the constant in front
   //       (2.*kPi/kClight)/pow(2.*kPi*hbar*kClight,3.)
 }
 

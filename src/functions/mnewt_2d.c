@@ -2,10 +2,10 @@
 
 #include "functions.h"
 
-// TODO: change names of variables and functions following Google C style
+// @TODO: change names of variables and functions following Google C style
 
 // Ansatz for neutrino distribution function in optically thick and thin regimes, respectively
-// TODO: Eventually move this somewhere else (f_nu reconstruction section)
+// @TODO: Eventually move this somewhere else (f_nu reconstruction section)
 // 	 and understand how to implement computation of Fermi integrals in the code
 //
 //void thick_fdf(double *x, double *C, double *fvec, double *fjac) {
@@ -39,7 +39,7 @@
 //  return;
 //}
 
-
+// @TODO: add here 1D Newton-Raphson implementation
 
 // Invert two-dimensional matrix
 /*
@@ -77,7 +77,7 @@ void Invert2DMat(double *in, double *out) {
  * - fjac: Jacobian matrix of A (dim = 2x2)
 */
 
-// TODO: do some tests and optimize the following parameters
+// @TODO: do some tests and optimize the following parameters
 const int ntrial = 1000;    // Max number of NR iterations
 const double tolx = 1.e-5;  // Accuracy level on the variable
 const double tolf = 1.e-7;  // Accuracy level on the functions

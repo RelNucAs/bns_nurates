@@ -16,11 +16,11 @@
 #include "../functions/functions.h"
 #include "weak_magnetism/weak_magnetism.h"
 
-// TODO: change names of variables and functions following Google C style
+// @TODO: change names of variables and functions following Google C style
 
 
 // Definition of parameters
-// TODO: decide how to switch on/off corrections to the rates
+// @TODO: decide how to switch on/off corrections to the rates
 const int use_WM_ab = 0; // flag for activating weak magnetism (and related) corrections
 const int use_dU = 1;    // flag for activating dU correction
 // 0: not active, 1: active
@@ -79,7 +79,7 @@ double eta_pn(const double nn, const double np,
   return eta_NN_abs(np, nn, -mu_hat, temp);
 }
 
-// TODO: optimized function which computes abs on p and n at the same time
+// @TODO: optimized function which computes abs on p and n at the same time
 
 // Neutrino absorption on neutron (nul + n -> l- + p)
 MyOpacity nu_n_abs(const double omega,
@@ -111,7 +111,7 @@ MyOpacity nu_n_abs(const double omega,
   if (E-lep_mass > 0.) {
     tmp = R * kClight * g3 * E * E * sqrt(1.-pow(lep_mass/E,2.));
     fd  = FermiDistr(mu_l,E,temp);
-    // TODO: eventually think about a specifically designed function for (1-FermiDistr)
+    // @TODO: eventually think about a specifically designed function for (1-FermiDistr)
     
     // Absoprtivity [s-1]
     out.ab = eta_np(np,nn,mu_np,temp) * tmp * (1 - fd); // Eq.(C13)
@@ -156,7 +156,7 @@ MyOpacity nu_p_abs(const double omega,
   if (E-lep_mass > 0.) {
     tmp = Rbar * kClight * g3 * E * E * sqrt(1.-pow(lep_mass/E,2.));
     fd  = FermiDistr(-mu_l,E,temp);
-    // TODO: eventually think about a specifically designed function for (1-FermiDistr)
+    // @TODO: eventually think about a specifically designed function for (1-FermiDistr)
 
     // Absorptivity [s-1]
     out.ab = eta_pn(np,nn,mu_np,temp) * tmp * (1. - fd); // Eq.(C19)
@@ -198,7 +198,7 @@ MyOpacity nu_p_abs_stim(const double omega,
 }
 
 
-// TODO: move the following somewhere else
+// @TODO: move the following somewhere else
 // Theta step function 
 double theta(const double x) {
   if (x < 0.) return 0.;

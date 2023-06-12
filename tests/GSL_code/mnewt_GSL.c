@@ -4,13 +4,14 @@
 // GNU Scientific Library root-finding routines
 // Based on GSL 2.7.1
 
+// @TODO: change names of variables and functions following Google C style
 
 /*===========================================================================*/
 
 // One-dimensional root finding functions
 // Doc: https://www.gnu.org/software/gsl/doc/html/roots.html
 
-// TODO: find suitable values for the following parameters (current are taken from GSL examples)
+// @TODO: find suitable values for the following parameters (current are taken from GSL examples)
 // 1D root-finding parameters
 const int max_iter_1d  = 100;
 const double epsabs_1d = 0.;
@@ -56,7 +57,7 @@ double MNewt1d_GSL(const double guess, gsl_function_fdf *fdf) {
 // Two-dimensional root finding functions
 // Doc: https://www.gnu.org/software/gsl/doc/html/multiroots.html
 
-// TODO: find suitable values for the following parameters (current are taken from GSL examples)
+// @TODO: find suitable values for the following parameters (current are taken from GSL examples)
 // 2D root-finding parameters
 const int max_iter_2d  = 1000;
 const double epsabs_2d = 1.E-07;
