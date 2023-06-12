@@ -38,6 +38,8 @@ struct PairKernelParams {
   double omega;
   double omega_prime;
   double cos_theta;
+  double mu;
+  double mu_prime;
   double lmax;
   double filter;
 };
@@ -49,7 +51,7 @@ double PairF(int k, double eta, double x1);
 double PairG(int n, double a, double b, double eta, double y, double z);
 double PairPhi(int l, double omega, double omega_prime, double eta, double temp, int e_x);
 MyKernel PairKernels(PairKernelParams *kernel_pars, MyEOSParams *eos_pars);
-
+MyKernel PairKernelsPhiIntegrated(PairKernelParams *kernel_pars, MyEOSParams *eos_pars);
 // End of pair process kernel
 // ===============================================================================
 

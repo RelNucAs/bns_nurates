@@ -301,3 +301,54 @@ MyKernel PairKernels(PairKernelParams *kernel_pars, MyEOSParams *eos_pars) {
   return pair_kernel;
 
 }
+
+/* Calculates the production and absorption kernels for the pair process from Eqns. (2) and (3) of Pons et. al.
+ * integrated over the phi variable
+ *
+ * R^p_{TP}(omega,omega',cos theta) = sum_{l} ((2l+1)/2) Phi_l(omega,omega') P_l(mu) P_l(mu_prime) 2 pi
+ * R^a_{TP}(omega,omega',cos theta) = e^{(omega+omega')/T} R^p_{TP}(omega,omega',cos theta)
+ *
+ * l is an integer.
+ */
+MyKernel PairKernelsPhiIntegrated(PairKernelParams *kernel_pars, MyEOSParams *eos_pars) {
+
+  // kernel specific parameters
+  double omega = kernel_pars->omega;
+  double omega_prime = kernel_pars->omega_prime;
+  double mu = kernel_pars->mu;
+  double mu_prime = kernel_pars->mu_prime;
+  int lmax = kernel_pars->lmax;
+  double filterpar = kernel_pars->filter;
+
+  // EOS specific parameters
+  double eta = eos_pars->mu_e / eos_pars->temp;
+  double temp = eos_pars->temp;
+
+  double pair_kernel_production_e = 0.;
+  double pair_kernel_absorption_e = 0.;
+  double pair_kernel_production_x = 0.;
+  double pair_kernel_absorption_x = 0.;
+  double pair_phi_e = 0.;
+  double pair_phi_x = 0.;
+
+  assert(lmax >= 0 && lmax <= 3);
+
+  for (int l = 0; l <= lmax; l++) {
+    double legendre_l_mu = gsl_sf_legendre_Pl(l, mu);
+    double legendre_l_mu_prime = gsl_sf_legendre_Pl(l, mu_prime);
+    pair_phi_e = PairPhi(l, omega, omega_prime, eta, temp, 0);
+    pair_phi_x = PairPhi(l, omega, omega_prime, eta, temp, 1);
+
+    pair_kernel_production_e += 2. * kPi * (1. / (1. + filterpar * l * l * (l + 1) * (l + 1))) * (2. * l + 1.) * pair_phi_e * legendre_l_mu * legendre_l_mu_prime / 2.;
+    pair_kernel_production_x += 2. * kPi * (1. / (1. + filterpar * l * l * (l + 1) * (l + 1))) * (2. * l + 1.) * pair_phi_x * legendre_l_mu * legendre_l_mu_prime / 2.;
+  }
+
+  pair_kernel_absorption_e = exp((omega + omega_prime) / temp) * pair_kernel_production_e;
+  pair_kernel_absorption_x = exp((omega + omega_prime) / temp) * pair_kernel_production_x;
+
+  MyKernel pair_kernel =
+      {.absorption_e = pair_kernel_absorption_e, .production_e = pair_kernel_production_e, .absorption_x = pair_kernel_absorption_x, .production_x = pair_kernel_production_x};
+
+  return pair_kernel;
+
+}
