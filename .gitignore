@@ -93,6 +93,9 @@ dkms.conf
 # CMake
 cmake-build-*/
 
+# VSCode
+.vscode/*
+
 # Mongo Explorer plugin
 .idea/**/mongoSettings.xml
 
