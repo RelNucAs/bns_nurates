@@ -67,7 +67,7 @@ struct MyKernel {
 };
 typedef struct MyKernel MyKernel;
 
-struct MyParams {
+struct MyEOSParams {
   double omega;
   double omega_prime;
   double temp;
@@ -78,7 +78,7 @@ struct MyParams {
   double eta;
   double cos_theta;
 };
-typedef struct MyParams MyParams;
+typedef struct MyEOSParams MyEOSParams;
 
 // @FIXME: decide with Maitraya what to use for this
 // Temporary struct for storing output of emissivity/absorptivity functions

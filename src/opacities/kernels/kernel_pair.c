@@ -7,8 +7,10 @@
 
 #include <math.h>
 #include <assert.h>
+#include <stddef.h>
+#include <gsl/gsl_sf_legendre.h>
+#include <gsl/gsl_sf_zeta.h>
 #include "kernels.h"
-#include "../../bns_nurates.h"
 #include "../../constants.h"
 
 /* Compute T_l(alpha) as defined in Appendix B of Pons et. al. (1998)
@@ -31,8 +33,7 @@ double PairT(int l, double alpha, double tolerance) {
   assert(alpha >= 0 && l >= 1);
 
   if (alpha == 0 && l != 1) {
-    //return pow(2., -l) * (pow(2., l) - 2.) * boost::math::zeta<double>(l);  // Computed in Mathematica
-    // @TODO: fix
+    return pow(2., -l) * (pow(2., l) - 2.) * gsl_sf_zeta_int(l);  // Computed in Mathematica
   } else if (alpha == 0 && l == 1) {
     return log(2.0);
   } else {
@@ -238,7 +239,7 @@ double PairPsi(int l, double y, double z, double eta) {
  * Output:
  *      Phi_l(y,z) = (G^2 temp^2)/(pi (1 - e^{y+z})) [alpha1 Psi_l(y,z) + alpha2 Psi_l(z,y)]
  */
-double Phi(int l, double omega, double omega_prime, double eta, double temp, int e_x) {
+double PairPhi(int l, double omega, double omega_prime, double eta, double temp, int e_x) {
 
   assert(e_x >= 0 && e_x <= 1);
 
@@ -260,15 +261,16 @@ double Phi(int l, double omega, double omega_prime, double eta, double temp, int
  *
  * l is an integer.
  * */
-MyKernel PairKernels(MyParams *pars) {
+MyKernel PairKernels(PairKernelParams *kernel_pars, MyEOSParams *eos_pars) {
 
-  double omega = pars->omega;
-  double omega_prime = pars->omega_prime;
-  double cos_theta = pars->cos_theta;
-  double eta = pars->eta;
-  double temp = pars->temp;
-  int lmax = pars->lmax;
-  double filterpar = pars->filt;
+  double omega = kernel_pars->omega;
+  double omega_prime = kernel_pars->omega_prime;
+  double cos_theta = kernel_pars->cos_theta;
+  int lmax = kernel_pars->lmax;
+  double filterpar = kernel_pars->filter;
+
+  double eta = eos_pars->eta;
+  double temp = eos_pars->temp;
 
   double pair_kernel_production_e = 0.;
   double pair_kernel_absorption_e = 0.;
@@ -280,10 +282,9 @@ MyKernel PairKernels(MyParams *pars) {
   assert(lmax >= 0 && lmax <= 3);
 
   for (int l = 0; l <= lmax; l++) {
-    //double legendre_l = boost::math::legendre_p<double>(l, cos_theta);
-    double legendre_l = 0.0; // @TODO: fixme
-    pair_phi_e = Phi(l, omega, omega_prime, eta, temp, 0);
-    pair_phi_x = Phi(l, omega, omega_prime, eta, temp, 1);
+    double legendre_l = gsl_sf_legendre_Pl(l, cos_theta);
+    pair_phi_e = PairPhi(l, omega, omega_prime, eta, temp, 0);
+    pair_phi_x = PairPhi(l, omega, omega_prime, eta, temp, 1);
 
     pair_kernel_production_e += (1. / (1. + filterpar * l * l * (l + 1) * (l + 1))) * (2. * l + 1.) * pair_phi_e * legendre_l / 2.;
     pair_kernel_production_x += (1. / (1. + filterpar * l * l * (l + 1) * (l + 1))) * (2. * l + 1.) * pair_phi_x * legendre_l / 2.;
@@ -292,7 +293,8 @@ MyKernel PairKernels(MyParams *pars) {
   pair_kernel_absorption_e = exp((omega + omega_prime) / temp) * pair_kernel_production_e;
   pair_kernel_absorption_x = exp((omega + omega_prime) / temp) * pair_kernel_production_x;
 
-  MyKernel pair_kernel = {.absorption_e = pair_kernel_absorption_e, .production_e = pair_kernel_production_e, .absorption_x = pair_kernel_absorption_x, .production_x = pair_kernel_production_x};
+  MyKernel pair_kernel =
+      {.absorption_e = pair_kernel_absorption_e, .production_e = pair_kernel_production_e, .absorption_x = pair_kernel_absorption_x, .production_x = pair_kernel_production_x};
 
   return pair_kernel;
 

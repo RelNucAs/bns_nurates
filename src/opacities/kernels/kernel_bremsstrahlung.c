@@ -113,7 +113,7 @@ double BremKernelG(double y, double eta_star) {
 }
 /* Compute the production and absorption kernels for the Bremsstrahlung process
  */
-MyKernel BremKernels(MyParams *params) {
+MyKernel BremKernels(MyEOSParams *params) {
 
   double omega = params->omega;
   double omega_prime = params->omega_prime;
