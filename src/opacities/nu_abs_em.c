@@ -22,7 +22,7 @@
 // Definition of parameters
 // @TODO: decide how to switch on/off corrections to the rates
 const int use_WM_ab = 0; // flag for activating weak magnetism (and related) corrections
-const int use_dU = 1;    // flag for activating dU correction
+const int use_dU = 0;    // flag for activating dU correction
 // 0: not active, 1: active
 
 
@@ -110,14 +110,14 @@ MyOpacity nu_n_abs(const double omega,
   // Check kinematics constraint for the reaction
   if (E-lep_mass > 0.) {
     tmp = R * kClight * g3 * E * E * sqrt(1.-pow(lep_mass/E,2.));
-    fd  = FermiDistr(mu_l,E,temp);
+    fd  = FermiDistr(E,temp,mu_l);
     // @TODO: eventually think about a specifically designed function for (1-FermiDistr)
     
     // Absoprtivity [s-1]
-    out.ab = eta_np(np,nn,mu_np,temp) * tmp * (1 - fd); // Eq.(C13)
+    out.ab = eta_np(nn,np,mu_np,temp) * tmp * (1 - fd); // Eq.(C13)
 		
     // Emissivity [s-1]
-    out.em = eta_pn(np,nn,mu_np,temp) * tmp * fd;       // Eq.(C15)
+    out.em = eta_pn(nn,np,mu_np,temp) * tmp * fd;       // Eq.(C15)
   }
 
   /* Emissivity from detailed balance (NOT TESTED) */
@@ -155,14 +155,14 @@ MyOpacity nu_p_abs(const double omega,
   // Check kinematics constraint for the reaction
   if (E-lep_mass > 0.) {
     tmp = Rbar * kClight * g3 * E * E * sqrt(1.-pow(lep_mass/E,2.));
-    fd  = FermiDistr(-mu_l,E,temp);
+    fd  = FermiDistr(E,temp,-mu_l);
     // @TODO: eventually think about a specifically designed function for (1-FermiDistr)
 
     // Absorptivity [s-1]
-    out.ab = eta_pn(np,nn,mu_np,temp) * tmp * (1. - fd); // Eq.(C19)
+    out.ab = eta_pn(nn,np,mu_np,temp) * tmp * (1. - fd); // Eq.(C19)
 
     // Emissivity [s-1]
-    out.em = eta_np(np,nn,mu_np,temp) * tmp * fd;          // Eq.(C20)
+    out.em = eta_np(nn,np,mu_np,temp) * tmp * fd;          // Eq.(C20)
   }
 
   /* Emissivity from detailed balance (NOT TESTED) */

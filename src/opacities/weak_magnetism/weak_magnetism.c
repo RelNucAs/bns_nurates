@@ -1,10 +1,7 @@
 #include <math.h>
 
-//#include "../../constants.h"
+#include "../../constants.h"
 #include "weak_magnetism.h"
-//#include "parameters.hpp"             //Header file for code parameters
-//#include "physics/nucfrmfac.hpp"      //Header file for nucleon form factors
-//#include "physics/weak_magnetism.hpp" //Header file for weak magnetism correction
 
 // !\file weak_magnetism.c
 // \brief Evaluation of phase space/recoil/weak magnetism correction for (anti)neutrino
