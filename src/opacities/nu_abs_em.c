@@ -12,9 +12,9 @@
 #include <math.h>
 
 #include "opacities.h"
+#include "weak_magnetism/weak_magnetism.h"
 #include "../constants.h"
 #include "../functions/functions.h"
-#include "weak_magnetism/weak_magnetism.h"
 
 // @TODO: change names of variables and functions following Google C style
 

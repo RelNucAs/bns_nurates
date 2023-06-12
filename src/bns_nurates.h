@@ -80,4 +80,13 @@ struct MyParams {
 };
 typedef struct MyParams MyParams;
 
+// @FIXME: decide with Maitraya what to use for this
+// Temporary struct for storing output of emissivity/absorptivity functions
+struct MyOpacity {
+  double em;
+  double ab;
+};
+typedef struct MyOpacity MyOpacity;
+
+
 #endif //BNS_NURATES_SRC_BNS_NURATES_H_

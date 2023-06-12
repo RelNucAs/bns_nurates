@@ -5,13 +5,7 @@
 #ifndef BNS_NURATES_SRC_OPACITIES_OPACITIES_H_
 #define BNS_NURATES_SRC_OPACITIES_OPACITIES_H_
 
-// FIXME: coordinate with Maitraya about a common solution for this
-// Temporary struct for storing output of emissivity/absorptivity functions
-struct MyOpacity {
-  double em;
-  double ab;
-};
-typedef struct MyOpacity MyOpacity;
+#include "../bns_nurates.h"
 
 /*===========================================================================*/
 
