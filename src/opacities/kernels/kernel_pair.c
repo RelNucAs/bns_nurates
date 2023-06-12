@@ -260,16 +260,18 @@ double PairPhi(int l, double omega, double omega_prime, double eta, double temp,
  * R^a_{TP}(omega,omega',cos theta) = e^{(omega+omega')/T} R^p_{TP}(omega,omega',cos theta)
  *
  * l is an integer.
- * */
+ */
 MyKernel PairKernels(PairKernelParams *kernel_pars, MyEOSParams *eos_pars) {
 
+  // kernel specific parameters
   double omega = kernel_pars->omega;
   double omega_prime = kernel_pars->omega_prime;
   double cos_theta = kernel_pars->cos_theta;
   int lmax = kernel_pars->lmax;
   double filterpar = kernel_pars->filter;
 
-  double eta = eos_pars->eta;
+  // EOS specific parameters
+  double eta = eos_pars->mu_e / eos_pars->temp;
   double temp = eos_pars->temp;
 
   double pair_kernel_production_e = 0.;

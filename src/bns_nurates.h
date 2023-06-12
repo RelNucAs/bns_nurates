@@ -1,17 +1,12 @@
-//
-// Created by maitraya on 6/2/23.
-//
-
-
-#ifndef BNS_NURATES_SRC_BNS_NURATES_H_
-#define BNS_NURATES_SRC_BNS_NURATES_H_
-
 // ================================================
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
 //! \file bns_nurates.h
 //  \brief essential data structures for the library
+
+#ifndef BNS_NURATES_SRC_BNS_NURATES_H_
+#define BNS_NURATES_SRC_BNS_NURATES_H_
 
 // -------------------------------------------------
 // Quadrature specific data structures
@@ -23,42 +18,47 @@ typedef enum Quadrature Quadrature;
 
 // MyQuadrature struct
 // Contains quadrature information, supports 1d/2d
-
-/* Members:
- *
- * type:  type of quadrature
- * dim:   dimension of quadrature (1d/2d)
- * n:     number of points in scheme
- * x1:    lower end point in x
- * x2:    upper end point in x
- * y1:    lower endpoint in y (optional)
- * y2:    upper endpoint in y (optional)
- * x:     points for quadrature scheme (x)
- * y:     points for quadrature scheme (y, optional)
- * w:     weights for quadrature scheme
- */
 struct MyQuadrature {
-  enum Quadrature type;
-  int n;
-  int dim;
-  double alpha;
-  double x1;
-  double x2;
-  double y1;
-  double y2;
-  double *x;
-  double *y;
-  double *w;
+  enum Quadrature type;   // type of quadrature
+  int dim;                // dimension of quadrature (1d/2d)
+  int n;                  // number of points in the quadrature scheme
+  double alpha;           // parameter for Gauss-Laguerre qaudrature (optional)
+  double x1;              // lower limit of x
+  double x2;              // upper limit of x
+  double y1;              // lower limit of y (optional)
+  double y2;              // upper limit of y (optional)
+  double *x;              // points for the quadrature scheme (x)
+  double *y;              // points for the quadrature scheme (y, optional)
+  double *w;              // weights for the quadrature scheme
 };
 typedef struct MyQuadrature MyQuadrature;
 
+// MyEOSParams struct
+// Parameters which come from the EOS
+struct MyEOSParams {
+  double nb;      // baryon number density
+  double temp;    // temperature
+  double yp;      // proton fraction
+  double yn;      // neutron fraction
+  double mu_p;    // proton chemical potential
+  double mu_n;    // neutron chemical potential
+  double mu_e;    // electron chemical potential
+  double mu_mu;   // muon chemical potential (this will be needed when including muon-dependent reactions)
+  double dU;      // nuclear interaction correction on nuclear chemical potentials (as in Hempel 2015)
+};
+typedef struct MyEOSParams MyEOSParams;
+
+// MyFunction struct
+// A struct holding a function and its parameters
 struct MyFunction {
-  int dim;
-  double (*function)(double var, void *params);
-  void *params;
+  int dim;                                      // number of function variables (1/2)
+  double (*function)(double var, void *params); // the function
+  void *params;                                 // all parameters of the function
 };
 typedef struct MyFunction MyFunction;
 
+// MyKernel sctruct
+// Returns the absorption and production kernels for electron (e) and mu/tau (x) neutrinos
 struct MyKernel {
   double absorption_e;
   double production_e;
@@ -67,19 +67,6 @@ struct MyKernel {
 };
 typedef struct MyKernel MyKernel;
 
-struct MyEOSParams {
-  double omega;
-  double omega_prime;
-  double temp;
-  double nb;
-  double m_N;
-  int lmax;
-  double filt;
-  double eta;
-  double cos_theta;
-};
-typedef struct MyEOSParams MyEOSParams;
-
 // @FIXME: decide with Maitraya what to use for this
 // Temporary struct for storing output of emissivity/absorptivity functions
 struct MyOpacity {
@@ -87,6 +74,5 @@ struct MyOpacity {
   double ab;
 };
 typedef struct MyOpacity MyOpacity;
-
 
 #endif //BNS_NURATES_SRC_BNS_NURATES_H_

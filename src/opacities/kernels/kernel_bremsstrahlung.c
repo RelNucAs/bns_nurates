@@ -113,13 +113,16 @@ double BremKernelG(double y, double eta_star) {
 }
 /* Compute the production and absorption kernels for the Bremsstrahlung process
  */
-MyKernel BremKernels(MyEOSParams *params) {
+MyKernel BremKernels(BremKernelParams *kernel_params, MyEOSParams *eos_params) {
 
-  double omega = params->omega;
-  double omega_prime = params->omega_prime;
-  double nb = params->nb;
-  double temp = params->temp;
-  double m_N = params->m_N;
+  // EOS parameters
+  double nb = eos_params->nb;
+  double temp = eos_params->temp;
+
+  // kernel parameters
+  double omega = kernel_params->omega;
+  double omega_prime = kernel_params->omega_prime;
+  double m_N = kernel_params->m_N;
 
   // temperature in units of 10 MeV
   double temp_10 = temp / 10.;
