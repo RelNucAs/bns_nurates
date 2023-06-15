@@ -64,17 +64,24 @@ double eta_NN_sc(const double nb, const double temp, const double yN) {
 }
 
 // Legendre expansion of scattering kernel up to l=1
-MyKernel nu_N_scatt_kern(const double omega, const double mu, const double mu_prime,
-		       const double nb, const double temp, const double yN,
-		       const int reacflag) {
+MyKernel nu_N_scatt_kern(ElasticScattParams *kernel_pars,
+                         MyEOSParams *eos_pars,
+                         const double yN, const int reacflag) {
   double R0 = 1., R1 = 1.;
   double tmp, ker;
 	
-  const double etaNN = eta_NN_sc(nb, temp, yN); //degeneracy parameter eta_NN, Eq.(C37)
+  const double omega    = kernel_pars->omega;    // (Anti)neutrino energy [MeV]
+  const double mu       = kernel_pars->mu;       // cosine of polar angle for nu
+  const double mu_prime = kernel_pars->mu_prime; // cosine of polar angle for nu'
+  
+  const double nb   = eos_pars->nb;   // Number baryon density [cm-3]
+  const double temp = eos_pars->temp; // Temperature [MeV]
+
+  const double etaNN = eta_NN_sc(nb, temp, yN); // degeneracy parameter eta_NN, Eq.(C37)
 
   // Phase space, recoil and weak magnetism corrections
   // R0 (R1) is the correction to the zeroth (first) Legendre coefficient
-  if (use_WM_sc != 0)  WM_scatt(omega, &R0, &R1, reacflag);
+  if (kernel_pars->use_WM_sc)  WM_scatt(omega, &R0, &R1, reacflag);
 
   if (reacflag == 1) {
     // Scattering on proton
@@ -97,15 +104,12 @@ MyKernel nu_N_scatt_kern(const double omega, const double mu, const double mu_pr
 
 // Scattering kernel for neutrino-proton scattering
 MyKernel nu_p_scatt_kern(ElasticScattParams *kernel_params, MyEOSParams *eos_pars) {
-  return nu_N_scatt_kern(kernel_params->omega, kernel_params->mu,
-                         kernel_params->mu_prime, eos_pars->nb, eos_pars->temp, eos_pars->yp, 1);
+  return nu_N_scatt_kern(kernel_params, eos_pars, eos_pars->yp, 1);
 }
 
 // Scattering kernel for neutrino-neutron scattering
 MyKernel nu_n_scatt_kern(ElasticScattParams *kernel_params, MyEOSParams *eos_pars) {
-  return nu_N_scatt_kern(kernel_params->omega, kernel_params->mu,
-                         kernel_params->mu_prime, eos_pars->nb,
-                         eos_pars->temp, eos_pars->yn, 2);
+  return nu_N_scatt_kern(kernel_params, eos_pars, eos_pars->yn, 2);
 }
 
 // Sum of scattering kernels for neutrino-nucleon scattering (protons + neutrons)

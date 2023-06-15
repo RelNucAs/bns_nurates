@@ -8,6 +8,8 @@
 #ifndef BNS_NURATES_SRC_OPACITIES_KERNELS_KERNELS_H_
 #define BNS_NURATES_SRC_OPACITIES_KERNELS_KERNELS_H_
 
+#include <stdbool.h>
+
 #include "../../bns_nurates.h"
 
 // @TODO: Rename elastic scattering stuff
@@ -64,9 +66,10 @@ MyKernel PairKernelsPhiIntegrated(PairKernelParams *kernel_pars, MyEOSParams *eo
 
 // elastic scattering specific parameters
 struct ElasticScattParams {
-  double omega;
-  double mu;
-  double mu_prime;
+  double omega;    // (anti)neutrino energy [MeV]
+  double mu;       // cosine of polar angle for nu
+  double mu_prime; // cosine of polar angle for nu'
+  bool use_WM_sc;  // flag for WM correction (and related) on scattering rates
 };
 typedef struct ElasticScattParams ElasticScattParams;
 
