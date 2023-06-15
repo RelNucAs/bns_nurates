@@ -25,7 +25,7 @@ const int use_WM_ab = 0; // flag for activating weak magnetism (and related) cor
 const int use_dU = 0;    // flag for activating dU correction
 // 0: not active, 1: active
 
-
+// @TODO: align with constant definitions for opacities coming from kernel integration
 // Definition of constants
 const double g0 = 0.5 * kH * kClight / kPi;
 const double g1 = (kGf*kGf/kPi) / (g0 * g0 * g0 * g0); // (GF*GF/pi) / pow(hbar*c,4.),
@@ -79,122 +79,112 @@ double eta_pn(const double nn, const double np,
   return eta_NN_abs(np, nn, -mu_hat, temp);
 }
 
-// @TODO: optimized function which computes abs on p and n at the same time
-
 // Neutrino absorption on neutron (nul + n -> l- + p)
-MyOpacity nu_n_abs(const double omega,
-                   const double nb, const double temp,
-		   const double lep_mass,
-		   const double yp, const double yn,
-		   const double mu_l, const double mu_hat,
-		   const double deltaU) {
-  const double nn = nb*yn; // neutron number density [cm-3]
-  const double np = nb*yp; // proton number density  [cm-3]
-  double Qprime, E, mu_np;
+// Antineutrino absorption on neutron (anul + p -> l+ + n)
+void nu_N_abs(const double omega,
+              const double mLep, const double muLep,
+              MyEOSParams *eos_pars, double *out) {   // out[0] --> nu_abs
+                                                      // out[1] --> nu_em
+                                                      // out[2] --> anu_abs
+                                                      // out[3] --> anu_em
+  double Qprime, mu_np;
+  double etanp, etapn;
+  double E_e, E_p;
+  double tmp, fd_e, fd_p;
+  double R = 1., Rbar = 1.;
   double dU = 0.;
-  double R = 1.;
-  double tmp, fd;
 
-  MyOpacity out = {0.0, 0.0}; // {em, ab}
+  const double nb     = eos_pars->nb;      // Number baryon density [cm-3]
+  const double temp   = eos_pars->temp;    // Temperature [MeV]
+  const double yp     = eos_pars->yp;      // Proton fraction
+  const double yn     = eos_pars->yn;      // Neutron fraction
+  const double mu_p   = eos_pars->mu_p;    // Proton chemical potential [MeV]
+  const double mu_n   = eos_pars->mu_n;    // Neutron chemical potential [MeV]
 
+  const double nn = nb*yn; // Neutron number density [cm-3]
+  const double np = nb*yp; // Proton number density  [cm-3]
+
+  // Neutron minus proton chem. potentials (corrected for the mass difference)
+  const double mu_hat = mu_n - mu_p - kQ; // [MeV] //kQ needed if mu_p and mu_n are relativistic chem. potentials
+  
   // Nucleon interaction correction to chemical potential
-  if (use_dU == 1) dU = deltaU; // [MeV]
- 
+  if (use_dU == 1) dU = eos_pars->dU; // [MeV]
+
   Qprime = kQ + dU;     // [MeV], Eq.(79) in Hempel
-  E = omega + Qprime;  // [MeV]
-  mu_np = mu_hat - dU; // [MeV], Eq.(80,86) in Hempel
+  mu_np  = mu_hat - dU; // [MeV], Eq.(80,86) in Hempel
+                                           
+  etanp = eta_np(nn,np,mu_np,temp); // Eq. (C14)
+  etapn = eta_pn(nn,np,mu_np,temp);
+
+	E_e = omega + Qprime;  // Electron energy [MeV]
+  E_p = omega - Qprime;  // Positron energy [MeV]
 
   // Phase space, recoil and weak magnetism correction
-  if (use_WM_ab == 1) R = WM_nue_abs(omega);
+  if (use_WM_ab == 1) WM_abs(omega, &R, &Rbar);
 
-  // Check kinematics constraint for the reaction
-  if (E-lep_mass > 0.) {
-    tmp = R * kClight * g3 * E * E * sqrt(1.-pow(lep_mass/E,2.));
-    fd  = FermiDistr(E,temp,mu_l);
+  // @TODO: Leonardo -> look for smartest choice to check kinematics constraints
+  // Check kinematics constraint for neutrino absorption
+  if (E_e-mLep > 0.) {
+    tmp  = R * kClight * g3 * E_e * E_e * sqrt(1.-pow(mLep/E_e,2.)); // remove c to get output in cm-1
+    fd_e = FermiDistr(E_e,temp,muLep);
     // @TODO: eventually think about a specifically designed function for (1-FermiDistr)
-    
-    // Absoprtivity [s-1]
-    out.ab = eta_np(nn,np,mu_np,temp) * tmp * (1 - fd); // Eq.(C13)
-		
-    // Emissivity [s-1]
-    out.em = eta_pn(nn,np,mu_np,temp) * tmp * fd;       // Eq.(C15)
+    out[0] = etanp * tmp * (1 - fd_e); // Neutrino absopritvity [s-1], Eq.(C13)
+    out[1] = etapn * tmp * fd_e;       // Neutrino emissivity   [s-1], Eq.(C15)
   }
 
+  // Check kinematics constraint for antineutrino absorption
+  if (E_p-mLep > 0.) {
+    tmp  = Rbar * kClight * g3 * E_p * E_p * sqrt(1.-pow(mLep/E_p,2.)); // remove c to get output in cm-1
+    fd_p = FermiDistr(E_p,temp,-muLep);
+    // @TODO: eventually think about a specifically designed function for (1-FermiDistr)
+    out[2] = etapn * tmp * (1. - fd_p); // Antineutrino absopritvity [s-1], Eq.(C19)
+    out[3] = etanp * tmp * fd_p;        // Antineutrino emissivity   [s-1], Eq.(C20)
+  }
   /* Emissivity from detailed balance (NOT TESTED) */
   //double em = ab * c * exp(-(omega-(mu_l-mu_hat-delta_np))/temp);
-
-  return out;
-}
-
-// Antineutrino absorption on neutron (anul + p -> l+ + n)
-MyOpacity nu_p_abs(const double omega,
-                   const double nb, const double temp,
-		   const double lep_mass,
-		   const double yp, const double yn,
-		   const double mu_l, const double mu_hat,
-		   const double deltaU) {
-  const double nn = nb*yn; //neutron number density [cm-3]
-  const double np = nb*yp; //proton number density  [cm-3]
-  double Qprime, E, mu_np;
-  double dU = 0.;
-  double Rbar = 1.;
-  double tmp, fd;
-
-  MyOpacity out = {0.0, 0.0}; // {em, ab}
-
-  // Nucleon interaction correction to chemical potential
-  if (use_dU == 1) dU = deltaU; // [MeV]
-	
-  Qprime = kQ + dU;     // [MeV], Eq.(79) in Hempel
-  E = omega - Qprime;  // [MeV]
-  mu_np = mu_hat - dU; // [MeV], Eq.(80,86) in Hempel
-
-  // Phase space, recoil and weak magnetism correction
-  if (use_WM_ab == 1)  Rbar = WM_anue_abs(omega);
-	
-  // Check kinematics constraint for the reaction
-  if (E-lep_mass > 0.) {
-    tmp = Rbar * kClight * g3 * E * E * sqrt(1.-pow(lep_mass/E,2.));
-    fd  = FermiDistr(E,temp,-mu_l);
-    // @TODO: eventually think about a specifically designed function for (1-FermiDistr)
-
-    // Absorptivity [s-1]
-    out.ab = eta_pn(nn,np,mu_np,temp) * tmp * (1. - fd); // Eq.(C19)
-
-    // Emissivity [s-1]
-    out.em = eta_np(nn,np,mu_np,temp) * tmp * fd;          // Eq.(C20)
-  }
-
-  /* Emissivity from detailed balance (NOT TESTED) */
   //double em = ab * c * exp(-(omega_bar-(mu_hat+delta_np-mu_l))/temp);
 
-  return out;
+  return;
 }
 
+MyOpacity AbsOpacity(const double omega, MyEOSParams *eos_pars) {
+  MyOpacity MyOut = {0.0}; // initialize to zero
 
-// Stimulated absoption versions
-MyOpacity nu_n_abs_stim(const double omega,
-                        const double nb, const double temp,
-		       	const double lep_mass,
-		       	const double yp, const double yn,
-		       	const double mu_l, const double mu_hat,
-		       	const double deltaU) {
-  MyOpacity in = nu_n_abs(omega, nb, temp, lep_mass, yp, yn, mu_l, mu_hat, deltaU);
-  MyOpacity out = {in.em, in.em + in.ab}; // stimulated absorption
+  double el_out[4] = {0.0};
+  nu_N_abs(omega, kMe, eos_pars->mu_e, eos_pars, el_out);
 
-  return out;
+  MyOut.ab_nue   = el_out[0];
+  MyOut.em_nue   = el_out[1];
+  MyOut.ab_anue  = el_out[2];
+  MyOut.em_anue  = el_out[3];
+
+  // Uncomment the following when considering also muons 
+  //double mu_out[4] = {0.0};
+  //nu_N_abs(omega, kMmu, eos_pars->mu_mu, eos_pars, mu_out);
+
+  //MyOut.ab_num   = mu_out[0];
+  //MyOut.em_num   = mu_out[1];
+  //MyOut.ab_anum  = mu_out[2];
+  //MyOut.em_anum  = mu_out[3];
+  
+  return MyOut;
 }
 
-MyOpacity nu_p_abs_stim(const double omega,
-                        const double nb, const double temp,
-                        const double lep_mass,
-                        const double yp, const double yn,
-                        const double mu_l, const double mu_hat,
-                        const double deltaU) {
-  MyOpacity in = nu_p_abs(omega, nb, temp, lep_mass, yp, yn, mu_l, mu_hat, deltaU);
-  MyOpacity out = {in.em, in.em + in.ab}; // stimulated absorption
-
-  return out;
+// Stimulated absorption versions
+MyOpacity StimAbsOpacity(const double omega, MyEOSParams *eos_pars) {
+  MyOpacity abs_opacity = AbsOpacity(omega, eos_pars);
+  MyOpacity stim_abs_opacity = {.ab_nue  = abs_opacity.ab_nue  + abs_opacity.em_nue,
+                                .em_nue  = abs_opacity.em_nue,
+                                .ab_anue = abs_opacity.ab_anue + abs_opacity.em_anue,
+                                .em_anue = abs_opacity.em_anue,
+                                //.ab_num  = abs_opacity.ab_num  + abs_opacity.em_num,
+                                //.em_num  = abs_opacity.em_num,
+                                //.ab_anum = abs_opacity.ab_anum + abs_opacity.em_anum,
+                                //.em_anum = abs_opacity.em_anum,
+                                .ab_nux  = 0.,
+                                .em_nux  = 0.};
+                                
+  return stim_abs_opacity;
 }
 
 
