@@ -13,9 +13,9 @@
 
 // @TODO: find suitable values for the following parameters (current are taken from GSL examples)
 // 1D root-finding parameters
-const int max_iter_1d  = 100;
-const double epsabs_1d = 0.;
-const double epsrel_1d = 1.E-03;
+const int  max_iter_1d_gsl = 100;
+const double epsabs_1d_gsl = 0.;
+const double epsrel_1d_gsl = 1.E-03;
 
 // Print root-finding solver state 
 void print_state_1d(size_t iter, const double f, const gsl_root_fdfsolver * s) {
@@ -42,10 +42,10 @@ double MNewt1d_GSL(const double guess, gsl_function_fdf *fdf) {
     //print_state_1d(iter, fdf->f(s->root,fdf->params), s);
     x0 = x;
     x = gsl_root_fdfsolver_root(s);
-    status = gsl_root_test_delta(x, x0, epsabs_1d, epsrel_1d); // check if |x-x0| < epsabs + epsrel*|x_1|
-    //status = gsl_root_test_residual(s->f, epsabs_1d); // check if |f| < epsabs
+    status = gsl_root_test_delta(x, x0, epsabs_1d_gsl, epsrel_1d_gsl); // check if |x-x0| < epsabs + epsrel*|x_1|
+    //status = gsl_root_test_residual(s->f, epsabs_1d_gsl); // check if |f| < epsabs
     //if (status == GSL_SUCCESS) printf ("Converged:\n");
-  } while (status == GSL_CONTINUE && iter < max_iter_1d);
+  } while (status == GSL_CONTINUE && iter < max_iter_1d_gsl);
 
   gsl_root_fdfsolver_free(s);  
   return x;
@@ -59,9 +59,9 @@ double MNewt1d_GSL(const double guess, gsl_function_fdf *fdf) {
 
 // @TODO: find suitable values for the following parameters (current are taken from GSL examples)
 // 2D root-finding parameters
-const int max_iter_2d  = 1000;
-const double epsabs_2d = 1.E-07;
-const double epsrel_2d = 1.E-07;
+const int  max_iter_2d_gsl = 1000;
+const double epsabs_2d_gsl = 1.E-07;
+const double epsrel_2d_gsl = 1.E-07;
 
 // Print root-finding solver state 
 void print_state_2d(size_t iter, const gsl_multiroot_fdfsolver * s) {
@@ -96,9 +96,9 @@ int MNewt2d_GSL(double *xi, double *xf, gsl_multiroot_function_fdf *fdf) {
     status = gsl_multiroot_fdfsolver_iterate(s);
     //print_state_2d(iter, s);
     if (status)  break;
-    status = gsl_multiroot_test_residual(s->f, epsabs_2d); // check if \sum |f_i| < epsabs
-    //status = gsl_multiroot_test_delta(s->df, s->f, epsabs_2d, epsrel_2d); // check if |dx_i| < epsabs + epsrel*|x_i|
-  } while (status == GSL_CONTINUE && iter < max_iter_2d);
+    status = gsl_multiroot_test_residual(s->f, epsabs_2d_gsl); // check if \sum |f_i| < epsabs
+    //status = gsl_multiroot_test_delta(s->df, s->f, epsabs_2d_gsl, epsrel_2d_gsl); // check if |dx_i| < epsabs + epsrel*|x_i|
+  } while (status == GSL_CONTINUE && iter < max_iter_2d_gsl);
 
   //printf("status = %s\n", gsl_strerror (status));
 
@@ -133,10 +133,10 @@ int MNewt2d_fd_GSL(double *xi, double *xf, gsl_multiroot_function * f) {
     //print_state_2d(iter, s);
 
     if (status) break;
-    status = gsl_multiroot_test_residual(s->f, epsabs_2d); // check if \sum |f_i| < epsabs
-    //status = gsl_multiroot_test_delta(s->df, s->f, epsabs_2d, epsrel_2d); // check if |dx_i| < epsabs + epsrel*|x_i|
+    status = gsl_multiroot_test_residual(s->f, epsabs_2d_gsl); // check if \sum |f_i| < epsabs
+    //status = gsl_multiroot_test_delta(s->df, s->f, epsabs_2d_gsl, epsrel_2d_gsl); // check if |dx_i| < epsabs + epsrel*|x_i|
 
-  } while (status == GSL_CONTINUE && iter < max_iter_2d);
+  } while (status == GSL_CONTINUE && iter < max_iter_2d_gsl);
 
   //printf("status = %s\n", gsl_strerror (status));
 

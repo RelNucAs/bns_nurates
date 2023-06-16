@@ -12,7 +12,7 @@ add_executable(bns_nurates
         src/functions/digamma.c
         src/functions/fermi.c
         src/functions/gamma.c
-        src/functions/mnewt_2d.c
+        src/functions/mnewt.c
         src/functions/safe_exp.c
         src/integration/integration.h
         src/opacities/kernels/kernels.h
