@@ -11,11 +11,6 @@
 
 // @TODO: change names of variables and functions following Google C style
 
-
-
-// @TODO: function that computes WM both for abs on n and p
-//       (useful only if there exists a single function for the two reactions) 
-
 // R    -> Correction for electron     neutrino absorption on neutron (nu_l + n -> l- + p)
 // Rbar -> Correction for electron antineutrino absorption on proton (anu_l + p -> l+ + n)
 // reacflag = 3 (for nuclear form factors)

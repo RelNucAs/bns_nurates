@@ -13,8 +13,8 @@
 
 // Computation of single nucleon form factors
 void nucfrmfac(const double E,
-	       double* cv, double* ca, double* F2,
-	       const int reacflag);
+	           double* cv, double* ca, double* F2,
+	           const int reacflag);
 
 /*===========================================================================*/
 

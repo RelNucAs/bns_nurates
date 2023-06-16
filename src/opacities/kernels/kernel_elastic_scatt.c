@@ -19,11 +19,6 @@
 
 // @TODO: change names of variables and functions following Google C style
 
-// Definition of parameters
-// @TODO: decide how to switch on/off corrections to the rates
-const int use_WM_sc = 0; // flag for activating weak magnetism (and related) corrections
-// 0: not active, 1: active
-
 // Definition of constants
 const double c0 = (2. * kPi *  kGf * kGf) / kHbar; // constant in (C36) [MeV cm^6 s-1], 
                                                    // Gf^2/hbar = 1.2E-65 MeV cm^6 s^-1 from (C40)

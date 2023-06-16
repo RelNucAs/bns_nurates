@@ -19,12 +19,6 @@
 // @TODO: change names of variables and functions following Google C style
 
 
-// Definition of parameters
-// @TODO: decide how to switch on/off corrections to the rates
-const int use_WM_ab = 0; // flag for activating weak magnetism (and related) corrections
-const int use_dU = 0;    // flag for activating dU correction
-// 0: not active, 1: active
-
 // @TODO: align with constant definitions for opacities coming from kernel integration
 // Definition of constants
 const double g0 = 0.5 * kH * kClight / kPi;
