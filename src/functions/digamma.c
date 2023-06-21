@@ -6,7 +6,7 @@
 // @TODO: change names of variables and functions following Google C style
  
 /*
- * Computation of PairPsi (digamma) function
+ * Computation of Psi (Digamma) function
  *  Adapted from GNU Scientific Library (GSL 2.7.1)
 */
 
@@ -133,7 +133,7 @@ void cheb_eval_e(const ChebSeries * cs,
 }
 
 
-// Evaluation of PairPsi (Digamma) function (result && error)
+// Evaluation of Psi (Digamma) function (result && error)
 /* digamma for x both positive and negative; we do both
  * cases here because of the way we use even/odd parts
  * of the function
@@ -214,7 +214,7 @@ void psi_x(const double x, SFResult * result) {
   }
 }
 
-// Evaluation of PairPsi (Digamma) function (only result)
+// Evaluation of Psi (Digamma) function (only result)
 double SFPsi(const double x) {
   SFResult result;
   psi_x(x, &result);

@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../bns_nurates.h"
+
 // @TODO: change names of variables and functions following Google C style
 
 
@@ -59,7 +61,12 @@ double Gammln(const double xx);
 
 /*===========================================================================*/
 
-// mnewt2d.c
+// mnewt.c
+
+// Implementation of 1D Newton-Raphson root finding
+double MNewt1d(double x, double guess,
+             double x1, double x2, double f0,
+             MyFunction *func, MyFunction *dfunc);
 
 // Implementation of 2D Newton-Raphson root finding
 void MNewt2d(double *x,

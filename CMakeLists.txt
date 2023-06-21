@@ -12,16 +12,16 @@ add_executable(bns_nurates
         src/functions/digamma.c
         src/functions/fermi.c
         src/functions/gamma.c
-        src/functions/mnewt_2d.c
+        src/functions/mnewt.c
         src/functions/safe_exp.c
         src/integration/integration.h
         src/opacities/kernels/kernels.h
+        src/opacities/kernels/kernel_elastic_scatt.c
         src/opacities/weak_magnetism/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
 	src/opacities/opacities.h
         src/opacities/nu_abs_em.c
-        src/opacities/nu_elastic_scatt.c
         src/output/outputs.h
         src/eos/eos.h
         tests/tests.h

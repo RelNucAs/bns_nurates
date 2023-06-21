@@ -35,6 +35,7 @@ typedef struct MyQuadrature MyQuadrature;
 
 // MyEOSParams struct
 // Parameters which come from the EOS
+// @TODO: decide if using standard or non-rel chemical potentials
 struct MyEOSParams {
   double nb;      // baryon number density
   double temp;    // temperature
@@ -57,7 +58,7 @@ struct MyFunction {
 };
 typedef struct MyFunction MyFunction;
 
-// MyKernel sctruct
+// MyKernel struct
 // Returns the absorption and production kernels for electron (e) and mu/tau (x) neutrinos
 struct MyKernel {
   double production;
@@ -72,10 +73,20 @@ struct MyOpacityIntegrand {
 typedef struct MyOpacityIntegrand MyOpacityIntegrand;
 
 // @FIXME: decide with Maitraya what to use for this
-// Temporary struct for storing output of emissivity/absorptivity functions
+// Temporary struct for storing output of emissivity/absorptivity opacity output
+// For the moment let's consider muonic (anti)neutrinos as nux
+// Add in ab_(a)num, em_(a)num when we also muons will be considered
 struct MyOpacity {
-  double em;
-  double ab;
+  double ab_nue;    // electron neutrino absorptivity
+  double em_nue;    // electron neutrino emissivity
+  double ab_anue;   // electron antineutrino absorptivity
+  double em_anue;   // electron antineutrino emissivity
+  //double ab_num;    // muon neutrino absorptivity
+  //double em_num;    // muon neutrino emissivity
+  //double ab_anum;   // muon antineutrino absorptivity
+  //double em_anum;   // muon antineutrino emissivity
+  double ab_nux;    // heavy (anti)neutrino absorptivity
+  double em_nux;    // heavy (anti)neutrino emissivity
 };
 typedef struct MyOpacity MyOpacity;
 

@@ -13,21 +13,19 @@
 
 // Computation of single nucleon form factors
 void nucfrmfac(const double E,
-	       double* cv, double* ca, double* F2,
-	       const int reacflag);
+	           double* cv, double* ca, double* F2,
+	           const int reacflag);
 
 /*===========================================================================*/
 
 // weak_magnetism.c
 
-// Correction for electron neutrino absorption on neutron (nue + n -> e- + p)
-double WM_nue_abs(const double e_nu);
-
+// Correction for neutrino absorption on neutron (nue + n -> e- + p) +
 // Correction for electron antineutrino absorption on proton (anue + p -> e+ + n)
-double WM_anue_abs(const double e_nu);
+void WM_abs(const double omega, double* R, double* Rbar);
 
 // Correction for (anti)neutrino scattering on nucleons (nu + N -> nu + N)
-void WM_scatt(const double e_nu, double* R0, double* R1, const int reacflag);
+void WM_scatt(const double omega, double* R0, double* R1, const int reacflag);
 
 /*===========================================================================*/
 
