@@ -17,13 +17,6 @@
 // ===============================================================================
 // (1) Bremsstrahlung kernel
 
-struct BremKernelParams {
-  double omega;
-  double omega_prime;
-  double m_N;
-};
-typedef struct BremKernelParams BremKernelParams;
-
 // bremsstrahlung helper functions and kernels
 double BremKernelS(double x, double y, double eta_star);
 double BremKernelG(double y, double eta_star);
@@ -36,18 +29,6 @@ MyKernel BremKernels(BremKernelParams *kernel_params, MyEOSParams *eos_params);
 
 // ===============================================================================
 // (2) Pair process kernel
-
-// pair kernel specific parameters
-struct PairKernelParams {
-  double omega;
-  double omega_prime;
-  double cos_theta;
-  double mu;
-  double mu_prime;
-  double lmax;
-  double filter;
-};
-typedef struct PairKernelParams PairKernelParams;
 
 // pair helper functions and kernels
 double PairT(int l, double alpha, double tolerance);
@@ -63,15 +44,6 @@ MyKernel PairKernelsPhiIntegrated(PairKernelParams *kernel_pars, MyEOSParams *eo
 
 // ===============================================================================
 // (2) Elastic scattering on nucleons kernel
-
-// elastic scattering specific parameters
-struct ElasticScattParams {
-  double omega;    // (anti)neutrino energy [MeV]
-  double mu;       // cosine of polar angle for nu
-  double mu_prime; // cosine of polar angle for nu'
-  bool use_WM_sc;  // flag for WM correction (and related) on scattering rates
-};
-typedef struct ElasticScattParams ElasticScattParams;
 
 // bremsstrahlung helper functions and kernels
 

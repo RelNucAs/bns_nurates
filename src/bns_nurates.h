@@ -8,6 +8,8 @@
 #ifndef BNS_NURATES_SRC_BNS_NURATES_H_
 #define BNS_NURATES_SRC_BNS_NURATES_H_
 
+#include <stdbool.h>
+
 // -------------------------------------------------
 // Quadrature specific data structures
 
@@ -58,6 +60,43 @@ struct MyFunction {
 };
 typedef struct MyFunction MyFunction;
 
+// bremsstrahlung kernel specific parameters
+struct BremKernelParams {
+  double omega;
+  double omega_prime;
+  double m_N;
+};
+typedef struct BremKernelParams BremKernelParams;
+
+// pair kernel specific parameters
+struct PairKernelParams {
+  double omega;
+  double omega_prime;
+  double cos_theta;
+  double mu;
+  double mu_prime;
+  double lmax;
+  double filter;
+};
+typedef struct PairKernelParams PairKernelParams;
+
+// elastic scattering specific parameters
+struct ElasticScattParams {
+  double omega;    // (anti)neutrino energy [MeV]
+  double mu;       // cosine of polar angle for nu
+  double mu_prime; // cosine of polar angle for nu'
+  bool use_WM_sc;  // flag for WM correction (and related) on scattering rates
+};
+typedef struct ElasticScattParams ElasticScattParams;
+
+// unified kernel params
+struct MyKernelParams {
+  PairKernelParams pair_kernel_params;
+  BremKernelParams brem_kernel_params;
+  ElasticScattParams elastic_scatt_params;
+};
+typedef struct MyKernelParams MyKernelParams;
+
 // MyKernel struct
 // Returns the absorption and production kernels for electron (e) and mu/tau (x) neutrinos
 struct MyKernel {
@@ -70,6 +109,27 @@ struct MyKernel {
 };
 typedef struct MyKernel MyKernel;
 
+// MyOpacityQuantity struct
+// holds emission/absorption quantities for two neutrino species
+struct MyOpacityQuantity {
+  double em_e;    // quantity related to emission/production for e neutrinos
+  double abs_e;   // quantity related to absorption for e neutrinos
+  double em_x;    // quantity related to emission/production for x neutrinos
+  double abs_x;   // quantity related to absorption for x neutrinos
+};
+typedef struct MyOpacityQuantity MyOpacityQuantity;
+
+// special function struct
+// function returns 4 values
+struct MyFunctionSpecial {
+  int dim;                                                                                // number of function variables (1/2)
+  MyOpacityQuantity (*function)(double var, MyEOSParams *my_eos_params, void *my_params);  // the function
+  MyEOSParams *eos_params;                                                                // all eos parameters of the function
+  MyKernelParams *kernel_params;                                                           // all other parameters
+};
+typedef struct MyFunctionSpecial MyFunctionSpecial;
+
+// @TODO: remove this!
 struct MyOpacityIntegrand {
   double em;
   double ab;

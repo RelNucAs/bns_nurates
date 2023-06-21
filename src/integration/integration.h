@@ -19,8 +19,9 @@ void SaveQuadrature(char *filedir, MyQuadrature *quad);
 void LoadQuadrature(char *filedir, MyQuadrature *quad);
 
 // routines for integrating functions
+double DoIntegration(const int n, const double *wtarray, const double *fnarray);
 double GaussLegendreIntegrateZeroInf(MyQuadrature *quad, MyFunction *func, double t);
-MyOpacity GaussLegendreIntegrateZeroInfSpecial(MyQuadrature *quad, MyFunction *func, double t);
+MyOpacityQuantity GaussLegendreIntegrateZeroInfSpecial(MyQuadrature *quad, MyFunctionSpecial *func, double t);
 double GaussLaguerreIntegrateZeroInf(MyQuadrature *quad, MyFunction *func);
 
 #endif //BNS_NURATES_SRC_INTEGRATION_INTEGRATION_H_

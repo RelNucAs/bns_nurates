@@ -347,9 +347,9 @@ MyKernel PairKernelsPhiIntegrated(PairKernelParams *kernel_pars, MyEOSParams *eo
   pair_kernel_absorption_e = exp((omega + omega_prime) / temp) * pair_kernel_production_e;
   pair_kernel_absorption_x = exp((omega + omega_prime) / temp) * pair_kernel_production_x;
 
-  //MyKernel pair_kernel =
-  //    {.absorption_e = pair_kernel_absorption_e, .production = pair_kernel_production_e, .absorption_x = pair_kernel_absorption_x, .production_x = pair_kernel_production_x};
-  MyKernel pair_kernel = {};
+  MyKernel pair_kernel =
+      {.absorption_e = pair_kernel_absorption_e, .production = pair_kernel_production_e, .absorption_x = pair_kernel_absorption_x, .production_x = pair_kernel_production_x};
+
   return pair_kernel;
 
 }
