@@ -20,6 +20,7 @@ void LoadQuadrature(char *filedir, MyQuadrature *quad);
 
 // routines for integrating functions
 double GaussLegendreIntegrateZeroInf(MyQuadrature *quad, MyFunction *func, double t);
+MyOpacity GaussLegendreIntegrateZeroInfSpecial(MyQuadrature *quad, MyFunction *func, double t);
 double GaussLaguerreIntegrateZeroInf(MyQuadrature *quad, MyFunction *func);
 
 #endif //BNS_NURATES_SRC_INTEGRATION_INTEGRATION_H_

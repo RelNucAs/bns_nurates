@@ -151,7 +151,7 @@ MyKernel BremKernels(BremKernelParams *kernel_params, MyEOSParams *eos_params) {
   // differential emission kernel from detail balance
   double s_kernel_prod = s_kernel_abs * exp(-x);
 
-  MyKernel brem_kernel = {.absorption_e = s_kernel_abs, .production_e = s_kernel_prod};
+  MyKernel brem_kernel = {.absorption = s_kernel_abs, .production = s_kernel_prod};
 
   return brem_kernel;
 }

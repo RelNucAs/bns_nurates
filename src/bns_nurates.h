@@ -60,12 +60,16 @@ typedef struct MyFunction MyFunction;
 // MyKernel sctruct
 // Returns the absorption and production kernels for electron (e) and mu/tau (x) neutrinos
 struct MyKernel {
-  double absorption_e;
-  double production_e;
-  double absorption_x;
-  double production_x;
+  double production;
+  double absorption;
 };
 typedef struct MyKernel MyKernel;
+
+struct MyOpacityIntegrand {
+  double em;
+  double ab;
+};
+typedef struct MyOpacityIntegrand MyOpacityIntegrand;
 
 // @FIXME: decide with Maitraya what to use for this
 // Temporary struct for storing output of emissivity/absorptivity functions

@@ -295,9 +295,10 @@ MyKernel PairKernels(PairKernelParams *kernel_pars, MyEOSParams *eos_pars) {
   pair_kernel_absorption_e = exp((omega + omega_prime) / temp) * pair_kernel_production_e;
   pair_kernel_absorption_x = exp((omega + omega_prime) / temp) * pair_kernel_production_x;
 
-  MyKernel pair_kernel =
-      {.absorption_e = pair_kernel_absorption_e, .production_e = pair_kernel_production_e, .absorption_x = pair_kernel_absorption_x, .production_x = pair_kernel_production_x};
-
+  //MyKernel pair_kernel =
+  //    {.absorption_e = pair_kernel_absorption_e, .production = pair_kernel_production_e, .absorption_x = pair_kernel_absorption_x, .production_x = pair_kernel_production_x};
+  // @TODO: fixme
+  MyKernel pair_kernel = {};
   return pair_kernel;
 
 }
@@ -306,7 +307,7 @@ MyKernel PairKernels(PairKernelParams *kernel_pars, MyEOSParams *eos_pars) {
  * integrated over the phi variable
  *
  * R^p_{TP}(omega,omega',cos theta) = sum_{l} ((2l+1)/2) Phi_l(omega,omega') P_l(mu) P_l(mu_prime) 2 pi
- * R^a_{TP}(omega,omega',cos theta) = e^{(omega+omega')/T} R^p_{TP}(omega,omega',cos theta)
+ * R^a_{TP}(omega,omega',cos theta) = e^{(omega+omega')/T} R^p_{TP}
  *
  * l is an integer.
  */
@@ -346,9 +347,9 @@ MyKernel PairKernelsPhiIntegrated(PairKernelParams *kernel_pars, MyEOSParams *eo
   pair_kernel_absorption_e = exp((omega + omega_prime) / temp) * pair_kernel_production_e;
   pair_kernel_absorption_x = exp((omega + omega_prime) / temp) * pair_kernel_production_x;
 
-  MyKernel pair_kernel =
-      {.absorption_e = pair_kernel_absorption_e, .production_e = pair_kernel_production_e, .absorption_x = pair_kernel_absorption_x, .production_x = pair_kernel_production_x};
-
+  //MyKernel pair_kernel =
+  //    {.absorption_e = pair_kernel_absorption_e, .production = pair_kernel_production_e, .absorption_x = pair_kernel_absorption_x, .production_x = pair_kernel_production_x};
+  MyKernel pair_kernel = {};
   return pair_kernel;
 
 }
