@@ -61,6 +61,10 @@ typedef struct MyFunction MyFunction;
 // MyKernel struct
 // Returns the absorption and production kernels for electron (e) and mu/tau (x) neutrinos
 struct MyKernel {
+  double production_e;
+  double absorption_e;
+  double production_x;
+  double absorption_x;
   double production;
   double absorption;
 };
