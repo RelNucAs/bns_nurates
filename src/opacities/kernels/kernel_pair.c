@@ -261,7 +261,7 @@ double PairPhi(int l, double omega, double omega_prime, double eta, double temp,
  *
  * l is an integer.
  */
-MyKernel PairKernels(PairKernelParams *kernel_pars, MyEOSParams *eos_pars) {
+MyOpacityQuantity PairKernels(MyEOSParams *eos_pars, PairKernelParams *kernel_pars) {
 
   // kernel specific parameters
   double omega = kernel_pars->omega;
@@ -295,10 +295,9 @@ MyKernel PairKernels(PairKernelParams *kernel_pars, MyEOSParams *eos_pars) {
   pair_kernel_absorption_e = exp((omega + omega_prime) / temp) * pair_kernel_production_e;
   pair_kernel_absorption_x = exp((omega + omega_prime) / temp) * pair_kernel_production_x;
 
-  //MyKernel pair_kernel =
-  //    {.absorption_e = pair_kernel_absorption_e, .production = pair_kernel_production_e, .absorption_x = pair_kernel_absorption_x, .production_x = pair_kernel_production_x};
-  // @TODO: fixme
-  MyKernel pair_kernel = {};
+  MyOpacityQuantity pair_kernel =
+      {.abs_e = pair_kernel_absorption_e, .em_e = pair_kernel_production_e, .abs_x = pair_kernel_absorption_x, .em_x = pair_kernel_production_x};
+
   return pair_kernel;
 
 }

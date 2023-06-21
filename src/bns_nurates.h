@@ -123,7 +123,7 @@ typedef struct MyOpacityQuantity MyOpacityQuantity;
 // function returns 4 values
 struct MyFunctionSpecial {
   int dim;                                                                                // number of function variables (1/2)
-  MyOpacityQuantity (*function)(double var, MyEOSParams *my_eos_params, void *my_params);  // the function
+  MyOpacityQuantity (*function)(double var, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);  // the function
   MyEOSParams *eos_params;                                                                // all eos parameters of the function
   MyKernelParams *kernel_params;                                                           // all other parameters
 };

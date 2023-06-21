@@ -20,7 +20,6 @@
 // bremsstrahlung helper functions and kernels
 double BremKernelS(double x, double y, double eta_star);
 double BremKernelG(double y, double eta_star);
-
 MyKernel BremKernels(BremKernelParams *kernel_params, MyEOSParams *eos_params);
 
 // End of Bremsstrahlung kernel
@@ -35,8 +34,8 @@ double PairT(int l, double alpha, double tolerance);
 double PairF(int k, double eta, double x1);
 double PairG(int n, double a, double b, double eta, double y, double z);
 double PairPhi(int l, double omega, double omega_prime, double eta, double temp, int e_x);
-MyKernel PairKernels(PairKernelParams *kernel_pars, MyEOSParams *eos_pars);
-MyKernel PairKernelsPhiIntegrated(PairKernelParams *kernel_pars, MyEOSParams *eos_pars);
+MyOpacityQuantity PairKernels(MyEOSParams *eos_pars, PairKernelParams *kernel_pars);
+
 // End of pair process kernel
 // ===============================================================================
 /*===========================================================================*/
