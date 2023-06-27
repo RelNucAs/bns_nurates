@@ -32,8 +32,7 @@ MyOpacity StimAbsOpacity(OpacityParams *opacity_pars, MyEOSParams *eos_pars);
 
 // pair opacities
 MyOpacityQuantity PairEmissivityAbsorptivityIntegrandFermi(double omega_prime, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);
-MyOpacityQuantity PairOpacitiesFermi(MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);
-
+MyOpacityQuantity PairOpacitiesFermi(MyQuadrature *quad, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);
 // bremsstrahlung opacities
 MyOpacityQuantity BremEmissivityAbsorptivityIntegrandFermi(double omega_prime, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);
 MyOpacityQuantity BremOpacitiesFermi(MyQuadrature *quad, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);
