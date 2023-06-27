@@ -33,6 +33,7 @@ MyKernel BremKernels(BremKernelParams *kernel_params, MyEOSParams *eos_params);
 double PairT(int l, double alpha, double tolerance);
 double PairF(int k, double eta, double x1);
 double PairG(int n, double a, double b, double eta, double y, double z);
+double PairPsi(int l, double y, double z, double eta);
 double PairPhi(int l, double omega, double omega_prime, double eta, double temp, int e_x);
 MyOpacityQuantity PairKernels(MyEOSParams *eos_pars, PairKernelParams *kernel_pars);
 

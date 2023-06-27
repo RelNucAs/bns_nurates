@@ -64,6 +64,12 @@ void TestQuadratureInputOutput(char *filedir);
 // tests with integration and comparison with GSL
 void TestQuadratureWithGSL();
 
+// tests for the pair process
+void TestPairT();
+void TestPairF();
+void TestPairG();
+void TestPairPsi();
+void TestPairPhi();
 #endif //BNS_NURATES_TESTS_TESTS_H_
 
 

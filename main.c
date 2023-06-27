@@ -15,7 +15,16 @@ int main() {
   //PrintGaussLegendreQuadrature(10, -1., 1.);
   printf("\n");
   PrintGaussLaguerreQuadrature(5, 0.);
-
+  TestQuadratureWithGSL();
+  TestPairT();
+  printf("\n");
+  TestPairF();
+  printf("\n");
+  TestPairG();
+  printf("\n");
+  TestPairPsi();
+  printf("\n");
+  TestPairPhi();
   //MyQuadrature quad;
   //quad.n = 3;
   //quad.dim = 1;
@@ -26,7 +35,7 @@ int main() {
 
   //SaveQuadrature("/var/home/maitraya/Documents/bns_nurates/src/quadratures/", &quad);
 
-  TestQuadratureWithGSL();
+
 
   return 0;
 }
