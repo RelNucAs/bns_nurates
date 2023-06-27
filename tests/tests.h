@@ -70,6 +70,7 @@ void TestPairF();
 void TestPairG();
 void TestPairPsi();
 void TestPairPhi();
+void TestPairKernels();
 #endif //BNS_NURATES_TESTS_TESTS_H_
 
 
