@@ -17,8 +17,6 @@
 #include "../../constants.h"
 #include "../weak_magnetism/weak_magnetism.h"
 
-// @TODO: change names of variables and functions following Google C style
-
 // Definition of constants
 const double c0 = (2. * kPi *  kGf * kGf) / kHbar; // constant in (C36) [MeV cm^6 s-1], 
                                                    // Gf^2/hbar = 1.2E-65 MeV cm^6 s^-1 from (C40)
@@ -43,7 +41,7 @@ const double h1_n = c1 * (kHnv*kHnv -    kHna*kHna); // 1st Leg coeff, neutrons
 
 
 /* Computation of degeneracy parameter eta_NN */
-double eta_NN_sc(const double nb, const double temp, const double yN) {
+double EtaNNsc(const double nb, const double temp, const double yN) {
   const double nN = yN*nb;
 
   if (nN <= 0.) return 0.;  // Enforce zero rates if no nucleons are present
@@ -59,7 +57,7 @@ double eta_NN_sc(const double nb, const double temp, const double yN) {
 }
 
 // Legendre expansion of scattering kernel up to l=1
-MyKernel nu_N_scatt_kern(ElasticScattParams *kernel_pars,
+MyKernel IsoScattNucleonKernels(IsoKernelParams *kernel_pars,
                          MyEOSParams *eos_pars,
                          const double yN, const int reacflag) {
   double R0 = 1., R1 = 1.;
@@ -72,7 +70,7 @@ MyKernel nu_N_scatt_kern(ElasticScattParams *kernel_pars,
   const double nb   = eos_pars->nb;   // Number baryon density [cm-3]
   const double temp = eos_pars->temp; // Temperature [MeV]
 
-  const double etaNN = eta_NN_sc(nb, temp, yN); // degeneracy parameter eta_NN, Eq.(C37)
+  const double etaNN = EtaNNsc(nb, temp, yN); // degeneracy parameter eta_NN, Eq.(C37)
 
   // Phase space, recoil and weak magnetism corrections
   // R0 (R1) is the correction to the zeroth (first) Legendre coefficient
@@ -98,19 +96,19 @@ MyKernel nu_N_scatt_kern(ElasticScattParams *kernel_pars,
 
 
 // Scattering kernel for neutrino-proton scattering
-MyKernel nu_p_scatt_kern(ElasticScattParams *kernel_params, MyEOSParams *eos_pars) {
-  return nu_N_scatt_kern(kernel_params, eos_pars, eos_pars->yp, 1);
+MyKernel IsoScattProtonKernels(IsoKernelParams *kernel_params, MyEOSParams *eos_pars) {
+  return IsoScattNucleonKernels(kernel_params, eos_pars, eos_pars->yp, 1);
 }
 
 // Scattering kernel for neutrino-neutron scattering
-MyKernel nu_n_scatt_kern(ElasticScattParams *kernel_params, MyEOSParams *eos_pars) {
-  return nu_N_scatt_kern(kernel_params, eos_pars, eos_pars->yn, 2);
+MyKernel IsoScattNeutronKernels(IsoKernelParams *kernel_params, MyEOSParams *eos_pars) {
+  return IsoScattNucleonKernels(kernel_params, eos_pars, eos_pars->yn, 2);
 }
 
 // Sum of scattering kernels for neutrino-nucleon scattering (protons + neutrons)
-MyKernel nu_N_scatt_kern_tot(ElasticScattParams *kernel_params, MyEOSParams *eos_pars) {
-  MyKernel nu_p_ker = nu_p_scatt_kern(kernel_params, eos_pars); // proton contribution
-  MyKernel nu_n_ker = nu_n_scatt_kern(kernel_params, eos_pars); // neutron contribution
+MyKernel IsoScattTotalKernels(IsoKernelParams *kernel_params, MyEOSParams *eos_pars) {
+  MyKernel nu_p_ker = IsoScattProtonKernels(kernel_params, eos_pars); // proton contribution
+  MyKernel nu_n_ker = IsoScattNeutronKernels(kernel_params, eos_pars); // neutron contribution
 
   MyKernel elastic_kernel = {.absorption_e = nu_p_ker.absorption_e + nu_p_ker.absorption_e,
                              .production_e = nu_p_ker.production_e + nu_p_ker.production_e,

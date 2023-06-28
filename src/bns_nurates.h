@@ -80,20 +80,20 @@ struct PairKernelParams {
 };
 typedef struct PairKernelParams PairKernelParams;
 
-// elastic scattering specific parameters
-struct ElasticScattParams {
+// isoenergetic scattering specific parameters
+struct IsoKernelParams {
   double omega;    // (anti)neutrino energy [MeV]
   double mu;       // cosine of polar angle for nu
   double mu_prime; // cosine of polar angle for nu'
   bool use_WM_sc;  // flag for WM correction (and related) on scattering rates
 };
-typedef struct ElasticScattParams ElasticScattParams;
+typedef struct IsoKernelParams IsoKernelParams;
 
 // unified kernel params
 struct MyKernelParams {
   PairKernelParams pair_kernel_params;
   BremKernelParams brem_kernel_params;
-  ElasticScattParams elastic_scatt_params;
+  IsoKernelParams   iso_kernel_params;
 };
 typedef struct MyKernelParams MyKernelParams;
 

@@ -12,8 +12,6 @@
 
 #include "../../bns_nurates.h"
 
-// @TODO: Rename elastic scattering stuff
-
 // ===============================================================================
 // (1) Bremsstrahlung kernel
 
@@ -43,20 +41,20 @@ MyOpacityQuantity PairKernels(MyEOSParams *eos_pars, PairKernelParams *kernel_pa
 
 
 // ===============================================================================
-// (2) Elastic scattering on nucleons kernel
+// (2) Isoenergetic scattering on nucleons kernel
 
-// bremsstrahlung helper functions and kernels
+// isoenergetic scattering helper functions and kernels
 
-// Scattering kernel for neutrino-neutron scatyytering
-MyKernel nu_p_scatt_kern(ElasticScattParams *kernel_params, MyEOSParams *eos_pars);
+// Scattering kernel for neutrino-proton scattering
+MyKernel IsoScattProtonKernels(IsoKernelParams *kernel_params, MyEOSParams *eos_pars);
 
-// Scattering kernel for neutrino-neutron scatyytering
-MyKernel nu_n_scatt_kern(ElasticScattParams *kernel_params, MyEOSParams *eos_pars);
+// Scattering kernel for neutrino-neutron scattering
+MyKernel IsoScattNeutronKernels(IsoKernelParams *kernel_params, MyEOSParams *eos_pars);
 
 // Sum of scattering kernels for neutrino-nucleon scattering (protons + neutrons)
-MyKernel nu_N_scatt_kern_tot(ElasticScattParams *kernel_params, MyEOSParams *eos_pars);
+MyKernel IsoScattTotalKernels(IsoKernelParams *kernel_params, MyEOSParams *eos_pars);
 
-// End of elastic scattering on nucleons kernel
+// End of isoenergetic scattering on nucleons kernel
 // ===============================================================================
 /*===========================================================================*/
 

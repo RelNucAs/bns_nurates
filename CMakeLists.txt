@@ -16,7 +16,7 @@ add_executable(bns_nurates
         src/functions/safe_exp.c
         src/integration/integration.h
         src/opacities/kernels/kernels.h
-        src/opacities/kernels/kernel_elastic_scatt.c
+        src/opacities/kernels/kernel_iso_scatt.c
         src/opacities/weak_magnetism/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
