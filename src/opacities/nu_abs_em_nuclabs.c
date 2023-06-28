@@ -115,7 +115,7 @@ void AbsOpacitySingleLep(OpacityParams* opacity_pars,
   E_p = omega - Qprime;  // Positron energy [MeV]
 
   // Phase space, recoil and weak magnetism correction
-  if (opacity_pars->use_WM_ab) WM_abs(omega, &R, &Rbar);
+  if (opacity_pars->use_WM_ab) WMAbsEm(omega, &R, &Rbar);
 
   // @TODO: Leonardo -> look for smartest choice to check kinematics constraints
   // Check kinematics constraint for neutrino absorption

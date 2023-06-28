@@ -39,7 +39,7 @@ const double lamn = -1.913; // neutron magnetic moment
  *
 */
 
-void nucfrmfac(const double E, double* cv, double* ca, double* F2, const int reacflag) {
+void NucFrmFac(const double E, double* cv, double* ca, double* F2, const int reacflag) {
   /* (Anti)neutrino energy rescaled by the nucleon mass */
   const double ehor = E * kMeV/(kMb*kClight*kClight); //Eq.(4), dimensionless
 
@@ -67,7 +67,7 @@ void nucfrmfac(const double E, double* cv, double* ca, double* F2, const int rea
     frm2 = kGa/pow(1.+3.53*tau,2.);              //Eq.(B8)
     frm3 = Fp2 - Fn2;                           //Eq.(B9)
   } else {
-    printf("Error: reacflag out of range in nucfrmfac\n");
+    printf("Error: reacflag out of range in NucFrmFac\n");
     exit(EXIT_FAILURE);
   }
 

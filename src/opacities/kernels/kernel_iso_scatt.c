@@ -74,7 +74,7 @@ MyKernel IsoScattNucleonKernels(IsoKernelParams *kernel_pars,
 
   // Phase space, recoil and weak magnetism corrections
   // R0 (R1) is the correction to the zeroth (first) Legendre coefficient
-  if (kernel_pars->use_WM_sc)  WM_scatt(omega, &R0, &R1, reacflag);
+  if (kernel_pars->use_WM_sc)  WMScatt(omega, &R0, &R1, reacflag);
 
   if (reacflag == 1) {
     // Scattering on proton

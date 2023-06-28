@@ -12,7 +12,7 @@
 // nucfrmfac.h
 
 // Computation of single nucleon form factors
-void nucfrmfac(const double E,
+void NucFrmFac(const double E,
 	           double* cv, double* ca, double* F2,
 	           const int reacflag);
 
@@ -22,10 +22,10 @@ void nucfrmfac(const double E,
 
 // Correction for neutrino absorption on neutron (nue + n -> e- + p) +
 // Correction for electron antineutrino absorption on proton (anue + p -> e+ + n)
-void WM_abs(const double omega, double* R, double* Rbar);
+void WMAbsEm(const double omega, double* R, double* Rbar);
 
 // Correction for (anti)neutrino scattering on nucleons (nu + N -> nu + N)
-void WM_scatt(const double omega, double* R0, double* R1, const int reacflag);
+void WMScatt(const double omega, double* R0, double* R1, const int reacflag);
 
 /*===========================================================================*/
 

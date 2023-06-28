@@ -15,11 +15,11 @@
 // Rbar -> Correction for electron antineutrino absorption on proton (anu_l + p -> l+ + n)
 // reacflag = 3 (for nuclear form factors)
 // Input: omega -> neutrino energy [MeV]
-void WM_abs(const double omega, double* R, double* Rbar) { 
+void WMAbsEm(const double omega, double* R, double* Rbar) { 
   double cv, ca, F2;
   double R_nu, R_anu;
 
-  nucfrmfac(omega, &cv, &ca, &F2, 3); //nuclear form factors
+  NucFrmFac(omega, &cv, &ca, &F2, 3); //nuclear form factors
   
   const double ehor = omega * kMeV/(kMb*kClight*kClight); //Eq.(4)
   const double tmp1 = cv*cv*(1.+4.*ehor+16./3.*ehor*ehor) + 3.*ca*ca*pow(1.+4./3.*ehor,2.) + 8./3.*cv*F2*ehor*ehor + 5./3.*ehor*ehor*(1.+2./5.*ehor)*F2*F2;
@@ -39,13 +39,13 @@ void WM_abs(const double omega, double* R, double* Rbar) {
 // Correction for (anti)neutrino scattering on nucleons (nu + N -> nu + N): reacflag = 1 | 2
 // Input: omega -> neutrino energy [MeV]
 // Output: correction to zeroth (R0) and first Legendre (R1) coefficients of scattering kernel
-void WM_scatt(const double omega, double* R0, double* R1, const int reacflag) {
+void WMScatt(const double omega, double* R0, double* R1, const int reacflag) {
   double cv, ca, F2;
   double h0, h1;
   double wm_0, wm_1;
 
-  nucfrmfac(omega, &cv, &ca, &F2, reacflag); //nuclear form factors
-  //nucfrmfac(0., &cv_0, &ca_0, &F2_0, reacflag); //nuclear form factors at Q^2=0
+  NucFrmFac(omega, &cv, &ca, &F2, reacflag); //nuclear form factors
+  //NucFrmFac(0., &cv_0, &ca_0, &F2_0, reacflag); //nuclear form factors at Q^2=0
  
   // @TODO: evaluate this at compile time  
   if (reacflag == 1) {
