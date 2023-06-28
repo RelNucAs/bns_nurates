@@ -64,7 +64,6 @@ typedef struct MyFunction MyFunction;
 struct BremKernelParams {
   double omega;
   double omega_prime;
-  double m_N;
 };
 typedef struct BremKernelParams BremKernelParams;
 

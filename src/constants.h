@@ -58,8 +58,4 @@ static const double kAlpha2X = 2. * kSinsqthetaw;          // Table 1, Pons et. 
 static const double kAlpha1[2] = {kAlpha1E, kAlpha1X};
 static const double kAlpha2[2] = {kAlpha2E, kAlpha2X};
 
-// Constants for the bremsstrahlung reaction
-static const double kBremXmin = 1.e-10;
-static const double kBremYmin = 1.e-10;
-static const double kBremEtamin = 1.e-10;
 #endif //BNS_NURATES_SRC_CONSTANTS_H_
