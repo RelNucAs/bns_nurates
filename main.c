@@ -25,6 +25,10 @@ int main() {
   TestPairPsi();
   printf("\n");
   TestPairPhi();
+  printf("\n");
+  TestPairKernels();
+  printf("\n");
+  TestPairOpacities();
   //MyQuadrature quad;
   //quad.n = 3;
   //quad.dim = 1;
