@@ -21,7 +21,7 @@ add_executable(bns_nurates
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
 	src/opacities/opacities.h
-        src/opacities/nu_abs_em.c
+        src/opacities/nu_abs_em_nuclabs.c
         src/output/outputs.h
         src/eos/eos.h
         tests/tests.h
