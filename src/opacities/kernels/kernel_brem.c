@@ -225,12 +225,6 @@ MyOpacityQuantity BremKernels(BremKernelParams *kernel_params, MyEOSParams *eos_
   double s_abs_tot = kBremConst * nb * (xn * s_abs_nn + xp * s_abs_pp + 28. / 3. * x_mean * s_abs_np);
   // total production kernel (from detailed balance)
   double s_em_tot = s_abs_tot * SafeExp(-x);
-  double production_e;
-  double absorption_e;
-  double production_x;
-  double absorption_x;
-  double production;
-  double absorption;
   MyOpacityQuantity brem_kernel = {.abs_e = s_abs_tot, .em_e = s_em_tot, .abs_x = s_abs_tot, .em_x = s_em_tot};
 
   return brem_kernel;
