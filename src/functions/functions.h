@@ -10,9 +10,6 @@
 
 #include "../bns_nurates.h"
 
-// @TODO: change names of variables and functions following Google C style
-
-
 
 // Exception handling from Numerical Recipes
 // @TODO: decide how to handling errors in the code
@@ -78,7 +75,7 @@ void MNewt2d(double *x,
 // safe_exp.c
 
 // Safe exp function to avoid underflow/overflow
-double SafeExp (const double x);
+double SafeExp(const double x);
 
 /*===========================================================================*/
 

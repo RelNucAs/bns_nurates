@@ -3,8 +3,6 @@
 
 #include "functions.h"
 
-// @TODO: change names of variables and functions following Google C style
- 
 /*
  * Computation of Psi (Digamma) function
  *  Adapted from GNU Scientific Library (GSL 2.7.1)
@@ -101,7 +99,7 @@ ChebSeries apsi_cs = {apsics_data,
                       9};
 
 // Evaluation of the Chebyshev series cs at a given point x
-void cheb_eval_e(const ChebSeries * cs,
+void ChebEvalE(const ChebSeries * cs,
                  const double x,
                  SFResult * result) {
   int j;
@@ -138,7 +136,7 @@ void cheb_eval_e(const ChebSeries * cs,
  * cases here because of the way we use even/odd parts
  * of the function
  */
-void psi_x(const double x, SFResult * result) {
+void SFPsiOutput(const double x, SFResult * result) {
   const double y = fabs(x);
 
   if (x == 0.0 || x == -1.0 || x == -2.0) {
@@ -149,7 +147,7 @@ void psi_x(const double x, SFResult * result) {
   } else if (y >= 2.0) {
     const double t = 8.0/(y*y)-1.0;
     SFResult result_c;
-    cheb_eval_e(&apsi_cs, t, &result_c);
+    ChebEvalE(&apsi_cs, t, &result_c);
     if (x < 0.0) {
       const double s = sin(M_PI_VAL*x);
       const double c = cos(M_PI_VAL*x);
@@ -179,7 +177,7 @@ void psi_x(const double x, SFResult * result) {
       const double t1 = 1.0/x;
       const double t2 = 1.0/(x+1.0);
       const double t3 = 1.0/v;
-      cheb_eval_e(&psi_cs, 2.0*v-1.0, &result_c);
+      ChebEvalE(&psi_cs, 2.0*v-1.0, &result_c);
 
       result->val  = -(t1 + t2 + t3) + result_c.val;
       result->err  = EPSILON * (fabs(t1) + fabs(x/(t2*t2)) + fabs(x/(t3*t3)));
@@ -190,7 +188,7 @@ void psi_x(const double x, SFResult * result) {
       const double v  = x + 1.0;
       const double t1 = 1.0/x;
       const double t2 = 1.0/v;
-      cheb_eval_e(&psi_cs, 2.0*v-1.0, &result_c);
+      ChebEvalE(&psi_cs, 2.0*v-1.0, &result_c);
 
       result->val  = -(t1 + t2) + result_c.val;
       result->err  = EPSILON * (fabs(t1) + fabs(x/(t2*t2)));
@@ -199,7 +197,7 @@ void psi_x(const double x, SFResult * result) {
       return; //GSL_SUCCESS;
     } else if (x < 1.0) { /* x = v */
       const double t1 = 1.0/x;
-      cheb_eval_e(&psi_cs, 2.0*x-1.0, &result_c);
+      ChebEvalE(&psi_cs, 2.0*x-1.0, &result_c);
 
       result->val  = -t1 + result_c.val;
       result->err  = EPSILON * t1;
@@ -208,7 +206,7 @@ void psi_x(const double x, SFResult * result) {
       return; // GSL_SUCCESS;
     } else { /* x = 1 + v */
       const double v = x - 1.0;
-      cheb_eval_e(&psi_cs, 2.0*v-1.0, result);
+      ChebEvalE(&psi_cs, 2.0*v-1.0, result);
       return;
     }
   }
@@ -217,7 +215,7 @@ void psi_x(const double x, SFResult * result) {
 // Evaluation of Psi (Digamma) function (only result)
 double SFPsi(const double x) {
   SFResult result;
-  psi_x(x, &result);
+  SFPsiOutput(x, &result);
   return result.val;
 }
 

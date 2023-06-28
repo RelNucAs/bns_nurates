@@ -9,8 +9,6 @@
 //        Ref: Horowitz, 2002 (https://journals.aps.org/prd/abstract/10.1103/PhysRevD.65.043001)
 
 
-// @TODO: change names of variables and functions following Google C style
-
 // R    -> Correction for electron     neutrino absorption on neutron (nu_l + n -> l- + p)
 // Rbar -> Correction for electron antineutrino absorption on proton (anu_l + p -> l+ + n)
 // reacflag = 3 (for nuclear form factors)

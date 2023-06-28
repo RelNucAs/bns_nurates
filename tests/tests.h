@@ -41,16 +41,16 @@ double GslLegInfSplit(const int n, const gsl_function *f, const double s);
 /* One-dimensional root finding functions */
 
 // 1D Newton-Raphson with analytic derivative 
-double MNewt1d_GSL(const double guess, gsl_function_fdf *fdf);
+double MNewt1dGSL(const double guess, gsl_function_fdf *fdf);
 
 
 /* Two-dimensional root finding functions */
 
 // 2D Newton-Raphson with analytic Jacobian
-int MNewt2d_GSL(double *xi, double *xf, gsl_multiroot_function_fdf *fdf);
+int MNewt2dGSL(double *xi, double *xf, gsl_multiroot_function_fdf *fdf);
 
 // 2D Newton-Raphson with finite difference Jacobian
-int MNewt2d_fd_GSL(double *xi, double *xf, gsl_multiroot_function *f);
+int MNewt2dGSL_fd(double *xi, double *xf, gsl_multiroot_function *f);
 
 // ===================================================================
 

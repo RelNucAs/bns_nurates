@@ -17,8 +17,6 @@
 //   reacflag = 1: (anti)neutrino scattering on neutron (nu n -> nu n)
 //   reacflag = 2: (anti)neutrino absorption on nucleon (nue n -> e- p, anue p -> e+ n)
 
-// @TODO: change names of variables and functions following Google C style
-
 
 // Nucleon constants
 const double lamp =  1.793; //  proton magnetic moment?

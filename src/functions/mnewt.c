@@ -2,7 +2,6 @@
 
 #include "functions.h"
 
-// @TODO: change names of variables and functions following Google C style
 
 // Ansatz for neutrino distribution function in optically thick and thin regimes, respectively
 // @TODO: Eventually move this somewhere else (f_nu reconstruction section)
