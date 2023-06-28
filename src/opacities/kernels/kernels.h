@@ -18,7 +18,7 @@
 // bremsstrahlung helper functions and kernels
 double BremKernelS(double x, double y, double eta_star);
 double BremKernelG(double y, double eta_star);
-MyKernel BremKernels(BremKernelParams *kernel_params, MyEOSParams *eos_params);
+MyOpacityQuantity BremKernels(BremKernelParams *kernel_params, MyEOSParams *eos_params);
 
 // End of Bremsstrahlung kernel
 // ===============================================================================

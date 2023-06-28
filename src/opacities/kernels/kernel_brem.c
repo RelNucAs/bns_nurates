@@ -17,13 +17,13 @@
 #include "../../functions/functions.h"
 
 // Constants for the bremsstrahlung reaction
-static const double kBremXmin   = 1.e-10;
-static const double kBremYmin   = 1.e-10;
+static const double kBremXmin = 1.e-10;
+static const double kBremYmin = 1.e-10;
 static const double kBremEtamin = 1.e-10;
 static const double kPiSquared = kPi * kPi;
-static const double kHSquared  = kH  * kH;
-static const double kFiveThirds = 5./3.;
-static const double kFiveSixths = 5./6.;
+static const double kHSquared = kH * kH;
+static const double kFiveThirds = 5. / 3.;
+static const double kFiveSixths = 5. / 6.;
 static const double kCa = -1.26 / 2.;
 // @TODO: decide how to define the following constant
 static const double kGfBrem = 1.1663787e-11; //MeV-2
@@ -58,7 +58,7 @@ double BremKernelS(double x, double y, double eta_star) {
   // compute non-degenerate approximation, s_nd in Eqn. (45)
   // @TODO: compute kSqrtPi and kPi2OneEighth only once
   const double kSqrtPi = sqrt(kPi);
-  const double kPi2OneEighth = pow(kPi,1./8.);
+  const double kPi2OneEighth = pow(kPi, 1. / 8.);
   double s_nd_numerator = 2. * kSqrtPi * pow(x + 2. - exp(-y / 12.), 1.5) * (x * x + 2. * x * y + kFiveThirds * y * y + 1.);
   double s_nd_denominator = kSqrtPi + pow(kPi2OneEighth + x + y, 4.);
   double s_nd = s_nd_numerator / s_nd_denominator;
@@ -69,14 +69,14 @@ double BremKernelS(double x, double y, double eta_star) {
   }
 
   // compute degenerate approximation, s_d in Eqn. (46)
-  double u     = sqrt(y / (2. * eta_star)) + 1.e-10;
-  double u2    = u * u;
+  double u = sqrt(y / (2. * eta_star)) + 1.e-10;
+  double u2 = u * u;
   double u_arg = u2 / (2. * sqrt(2. * u2 + 4.));
-  double f_u   = 1. - kFiveSixths * u * atan(2. / u) + u2 / (3. * (u2 + 4.)) + atan(1. / u_arg) * u_arg / 3.;
+  double f_u = 1. - kFiveSixths * u * atan(2. / u) + u2 / (3. * (u2 + 4.)) + atan(1. / u_arg) * u_arg / 3.;
 
   // @TODO: compute pow(0.5 * kPi, 2.5) constant only once
   double s_d = 3. * pow(0.5 * kPi, 2.5) * pow(eta_star, -2.5) * (x * x + 4. * kPiSquared) * x * f_u / (4. * kPiSquared * (1. - SafeExp(-x)));
-  
+
   //if (s_d < 0.) {
   //  printf("s_D = %.5e\n"              , s_d);
   //  printf("one minus exp(-x) = %.5e\n", 1.-SafeExp(-x));
@@ -104,7 +104,7 @@ double BremKernelS(double x, double y, double eta_star) {
 
   // @TODO: decide what to do here in case of errors
   if (s_nd < 0.) printf("\ns_ND = %.5e\n", s_nd);
-  if (s_d  < 0.)  printf(  "s_D  = %.5e\n", s_d);
+  if (s_d < 0.) printf("s_D  = %.5e\n", s_d);
 
   // interpolated formula for s in Eqn. (49)
   double s_brem = pow(pow(s_nd, -p_brem) + pow(s_d, -p_brem), -1. / p_brem) * f_brem * (1. + c_brem * g_brem);
@@ -193,19 +193,19 @@ double BremSingleChannelAbsKernel(double n_nuc, double m_nuc, BremKernelParams *
   return s_kernel_abs;
 }
 
-/* Compute the production and absorption kernels for theBremsstrahlung reactions by summing
+/* Compute the production and absorption kernels for the Bremsstrahlung reactions by summing
  the contributions of all NN channels */
-MyKernel BremKernels(BremKernelParams *kernel_params, MyEOSParams *eos_params) {
+MyOpacityQuantity BremKernels(BremKernelParams *kernel_params, MyEOSParams *eos_params) {
   // @TODO: compute the following constant only once
   const double kBremConst = kClight * pow(kHbar * kClight, 5.) * kCa * kCa * kGfBrem * kGfBrem;
 
   // EOS parameters
-  double nb   = eos_params->nb;
+  double nb = eos_params->nb;
   double temp = eos_params->temp;
-  double xn   = eos_params->yn;
-  double xp   = eos_params->yp;
+  double xn = eos_params->yn;
+  double xp = eos_params->yp;
 
-  double x_mean = sqrt(xn*xp);
+  double x_mean = sqrt(xn * xp);
 
   // kernel parameters
   double omega = kernel_params->omega;
@@ -215,26 +215,23 @@ MyKernel BremKernels(BremKernelParams *kernel_params, MyEOSParams *eos_params) {
   double x = (omega + omega_prime) / temp;
 
   // compute single channel kernels
-  double s_abs_nn = BremSingleChannelAbsKernel(nb*xn, kMnGrams, kernel_params, eos_params);
-  double s_abs_pp = BremSingleChannelAbsKernel(nb*xp, kMpGrams, kernel_params, eos_params);
+  double s_abs_nn = BremSingleChannelAbsKernel(nb * xn, kMnGrams, kernel_params, eos_params);
+  double s_abs_pp = BremSingleChannelAbsKernel(nb * xp, kMpGrams, kernel_params, eos_params);
   // @TODO: compute sqrt(kMnGrams*kMpGrams) only once
-  double s_abs_np = BremSingleChannelAbsKernel(nb*x_mean, sqrt(kMnGrams*kMpGrams), kernel_params, eos_params);
- 
+  double s_abs_np = BremSingleChannelAbsKernel(nb * x_mean, sqrt(kMnGrams * kMpGrams), kernel_params, eos_params);
+
   // @TODO: compute 28./3. only once
   // total absorption kernel
-  double s_abs_tot = kBremConst * nb * (xn * s_abs_nn + xp * s_abs_pp + 28./3. * x_mean * s_abs_np);
+  double s_abs_tot = kBremConst * nb * (xn * s_abs_nn + xp * s_abs_pp + 28. / 3. * x_mean * s_abs_np);
   // total production kernel (from detailed balance)
-  double s_em_tot  = s_abs_tot * SafeExp(-x);
+  double s_em_tot = s_abs_tot * SafeExp(-x);
   double production_e;
   double absorption_e;
   double production_x;
   double absorption_x;
   double production;
   double absorption;
-  MyKernel brem_kernel = {.absorption_e = s_abs_tot,
-                          .production_e = s_em_tot,
-                          .absorption_x = s_abs_tot,
-                          .production_x = s_em_tot};
+  MyOpacityQuantity brem_kernel = {.abs_e = s_abs_tot, .em_e = s_em_tot, .abs_x = s_abs_tot, .em_x = s_em_tot};
 
   return brem_kernel;
 }
