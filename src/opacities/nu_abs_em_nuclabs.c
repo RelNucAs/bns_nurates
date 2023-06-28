@@ -16,8 +16,6 @@
 #include "../constants.h"
 #include "../functions/functions.h"
 
-// @TODO: change names of variables and functions following Google C style
-
 
 // @TODO: align with constant definitions for opacities coming from kernel integration
 // Definition of constants
@@ -27,7 +25,7 @@ const double g1 = (kGf*kGf/kPi) / (g0 * g0 * g0 * g0); // (GF*GF/pi) / pow(hbar*
                                                     // Eq.(C13,C15,C19,C20)
 const double g2 = kGv*kGv+3.*kGa*kGa; // constant in Eq.(C13,C15,C19,C20)
 const double g3 = g1 * g2;
-const double mu_thres = 1.E-02;   // mu_hat threshold value in eta_NN evaluation
+const double mu_thres = 1.E-02;   // mu_hat threshold value in EtaNNAbs evaluation
 
 /* Inputs:
  * 	omega    [MeV] : (anti)neutrino energy
@@ -43,7 +41,7 @@ const double mu_thres = 1.E-02;   // mu_hat threshold value in eta_NN evaluation
 
 
 // Generic function for nucleon phase space integration
-double eta_NN_abs(const double n_in, const double n_out,
+double EtaNNAbs(const double n_in, const double n_out,
 	          const double mu_hat,
 		  const double temp) {
   if (n_in == 0.) return 0.; // enforce zero rates if no nucleons 
@@ -60,22 +58,22 @@ double eta_NN_abs(const double n_in, const double n_out,
 }
 
 // Nucleon phase space integration for X + n -> X + p 
-double eta_np(const double nn, const double np,
+double EtaNP(const double nn, const double np,
 	      const double mu_hat,
 	      const double temp) {
-  return eta_NN_abs(nn, np, mu_hat, temp);
+  return EtaNNAbs(nn, np, mu_hat, temp);
 }
 
 // Nucleon phase space integration for X + p -> X + n 
-double eta_pn(const double nn, const double np,
+double EtaPN(const double nn, const double np,
               const double mu_hat,
 	      const double temp) {
-  return eta_NN_abs(np, nn, -mu_hat, temp);
+  return EtaNNAbs(np, nn, -mu_hat, temp);
 }
 
 // Neutrino absorption on neutron (nul + n -> l- + p)
 // Antineutrino absorption on neutron (anul + p -> l+ + n)
-void nu_N_abs(OpacityParams* opacity_pars,
+void AbsOpacitySingleLep(OpacityParams* opacity_pars,
               MyEOSParams *eos_pars,
               const double mLep, const double muLep,
               double *out) {   // out[0] --> nu_abs
@@ -110,8 +108,8 @@ void nu_N_abs(OpacityParams* opacity_pars,
   Qprime = kQ + dU;     // [MeV], Eq.(79) in Hempel
   mu_np  = mu_hat - dU; // [MeV], Eq.(80,86) in Hempel
                                            
-  etanp = eta_np(nn,np,mu_np,temp); // Eq. (C14)
-  etapn = eta_pn(nn,np,mu_np,temp);
+  etanp = EtaNP(nn,np,mu_np,temp); // Eq. (C14)
+  etapn = EtaPN(nn,np,mu_np,temp);
 
 	E_e = omega + Qprime;  // Electron energy [MeV]
   E_p = omega - Qprime;  // Positron energy [MeV]
@@ -147,8 +145,9 @@ void nu_N_abs(OpacityParams* opacity_pars,
 MyOpacity AbsOpacity(OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
   MyOpacity MyOut = {0.0}; // initialize to zero
 
+  // Electron (anti)neutrino
   double el_out[4] = {0.0};
-  nu_N_abs(opacity_pars, eos_pars, kMe, eos_pars->mu_e, el_out);
+  AbsOpacitySingleLep(opacity_pars, eos_pars, kMe, eos_pars->mu_e, el_out);
 
   MyOut.ab_nue   = el_out[0];
   MyOut.em_nue   = el_out[1];
@@ -156,8 +155,9 @@ MyOpacity AbsOpacity(OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
   MyOut.em_anue  = el_out[3];
 
   // Uncomment the following when considering also muons 
+  // // Muon (anti)neutrino
   //double mu_out[4] = {0.0};
-  //nu_N_abs(opacity_pars, eos_pars, kMmu, eos_pars->mu_mu, mu_out);
+  //AbsOpacitySingleLep(opacity_pars, eos_pars, kMmu, eos_pars->mu_mu, mu_out);
 
   //MyOut.ab_num   = mu_out[0];
   //MyOut.em_num   = mu_out[1];
