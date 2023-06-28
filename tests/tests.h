@@ -72,6 +72,11 @@ void TestPairPsi();
 void TestPairPhi();
 void TestPairKernels();
 void TestPairOpacities();
+
+// tests for the bremsstrahlung process
+void TestBremKernelS(char *filedir);
+void TestBremKernelG(char *filedir);
+
 #endif //BNS_NURATES_TESTS_TESTS_H_
 
 

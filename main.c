@@ -28,7 +28,12 @@ int main() {
   printf("\n");
   TestPairKernels();
   printf("\n");
-  TestPairOpacities();
+  //TestPairOpacities();
+  printf("\n");
+  TestBremKernelS("/var/home/maitraya/Documents/");
+
+  BremKernelS(-0.5, 0., 0.31);
+  //TestBremKernelG("/var/home/maitraya/Documents/");
   //MyQuadrature quad;
   //quad.n = 3;
   //quad.dim = 1;

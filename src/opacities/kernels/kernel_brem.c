@@ -2,7 +2,7 @@
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
-//! \file  kernel_bremsstrahlung.c
+//! \file  kernel_brem.c
 //  \brief contains bremsstrahlung kernels and associated helper functions
 //
 // Computation of nucleon-nucleon bremsstrahlung kernel using the analytic
@@ -32,6 +32,8 @@ static const double kMpGrams = kMp * kMeV / (kClight * kClight); // proton mass 
 
 /* Compute the analytical fit for the s-component of the kernel for
  * neutrino bremsstrahlung and inelastic scattering in a nucleon field
+ *
+ * Note: Does not support negative x!
  *
  * Inputs:
  *      x:        rescaled total neutrino energy (w+wp/T)
