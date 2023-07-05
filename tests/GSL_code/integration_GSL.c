@@ -6,11 +6,11 @@
 // Based on GSL 2.7.1 (https://www.gnu.org/software/gsl/doc/html/integration.html)
 
 
-// Fixed-point quadrature integration with generic weight w(x)
-// For integrals written as \int_{a}^{b} f(x)*w(x) dx
+// Fixed-point quadrature integration with generic weight w(points)
+// For integrals written as \int_{a}^{b} f(points)*w(points) dx
 
 /*
- * n : Number of quadrature points
+ * nx : Number of quadrature points
  * PairF : Function to be integrated (GSL variable: struct with func + void pointer to params)
  * gauss_type: type of weighting function
 */
@@ -26,8 +26,8 @@ double GSL_integration(const int n,
   // Uncomment the following block to print nodes, weights etc.
   //double * nodes = gsl_integration_fixed_nodes(w);
   //double * wghts = gsl_integration_fixed_weights(w);
-  //printf("GSL integration nodes, weights and integrand:\n");
-  //for (int i=0; i<n; i++) printf("n = %d: x = %.5e, w = %.5e, f(x) = %.5e\n",
+  //printf("GSL integration nodes, weights and integrand:\nx");
+  //for (int i=0; i<nx; i++) printf("nx = %d: points = %.5e, w = %.5e, f(points) = %.5e\npoints",
   //                                i+1, wghts[i], f->function(nodes[i],f->params)); 
   gsl_integration_fixed(f, &result, w);
   gsl_integration_fixed_free(w);
@@ -36,7 +36,7 @@ double GSL_integration(const int n,
 
 
 // Gauss-Laguerre integration (a,+inf): gauss_type -> gsl_integration_fixed_laguerre
-// w(x) = (x-a)^alpha * exp(-b*(x-a))
+// w(points) = (points-a)^alpha * exp(-b*(points-a))
 // Constraints: alpha > -1, b > 0 (beta is ignored)
 double GSLLagQuadrature(const int n,
                         const double a, const double b,
@@ -48,7 +48,7 @@ double GSLLagQuadrature(const int n,
 
 
 // Gauss-Legendre integration (a,b): gauss_type -> gsl_integration_fixed_legendre
-// w(x) = 1
+// w(points) = 1
 // Constraints: b > a (alpha and beta are ignored)
 double GSLLegQuadrature(const int n,
                         const double a, const double b,

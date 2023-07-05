@@ -11,11 +11,11 @@
 /* Make a convolution between sampled function and weights
  *
  * Inputs:
- *    n:        number of points in the quadrature scheme
+ *    nx:        number of points in the quadrature scheme
  *    wtarray:  array of quadrature weights
  *    fnarray:  array of function values at corresponding quadrature positions
  */
-double DoIntegration(const int n, const double *wtarray, const double *fnarray) {
+inline double DoIntegration(const int n, const double *wtarray, const double *fnarray) {
   double integral = 0.;
 
   for (int i = 0; i < n; i++) {
@@ -34,18 +34,35 @@ double DoIntegration(const int n, const double *wtarray, const double *fnarray) 
  * Inputs:
  *    quad: A properly populated Gauss-Legendre quadrature struct from x1 = 0 to x2 = 1.
  *    func: The function struct to be integrated
- *    t:    The value of x at which to break the integral into two
+ *    t:    The value of points at which to break the integral into two
  */
 double GaussLegendreIntegrateZeroInf(MyQuadrature *quad, MyFunction *func, double t) {
 
-  double f1[quad->n], f2[quad->n];
+  double f1_x[quad->nx], f2_x[quad->nx], f_y[quad->ny], f_z[quad->nz];
+  double w_y[quad->ny], w_z[quad->nz];
+  var3d var = var3d_default;
 
-  for (int i = 0; i < quad->n; i++) {
-    f1[i] = func->function(t * quad->x[i], func->params);
-    f2[i] = func->function(t / quad->x[i], func->params) / (quad->x[i] * quad->x[i]);
+  for (int k = 0; k < quad->nz; k++) {
+    for (int j = 0; j < quad->ny; j++) {
+      for (int i = 0; i < quad->nx; i++) {
+        var.x = t * quad->points[i];
+        var.y = quad->points[quad->nx + j];
+        var.z = quad->points[quad->nx + quad->ny + k];
+
+        f1_x[i] = func->function(&var, func->params);
+
+        var.x = t / quad->points[i];
+
+        f2_x[i] = func->function(&var, func->params) / (quad->points[i] * quad->points[i]);
+      }
+      f_y[j] = t * (DoIntegration(quad->nx, quad->w, f1_x) + DoIntegration(quad->nx * quad->ny * quad->nz, quad->w, f2_x));
+      w_y[j] = quad->w[quad->nx + j];
+    }
+    f_z[k] = DoIntegration(quad->ny, w_y, f_y);
+    w_z[k] = quad->w[quad->nx + quad->ny + k];
   }
 
-  return t * (DoIntegration(quad->n, quad->w, f1) + DoIntegration(quad->n, quad->w, f2));
+  return DoIntegration(quad->nz, f_z, w_z);
 }
 
 /* Integrate a function from 0 to inf using a Gauss-Laguerre quadrature
@@ -56,16 +73,16 @@ double GaussLegendreIntegrateZeroInf(MyQuadrature *quad, MyFunction *func, doubl
  */
 double GaussLaguerreIntegrateZeroInf(MyQuadrature *quad, MyFunction *func) {
 
-  double f[quad->n];
+  double f[quad->nx];
 
   if (quad->alpha == 0.) {
-    for (int i = 0; i < quad->n; i++) {
-      f[i] = func->function(quad->x[i], func->params); // * exp(quad->x[i]);
+    for (int i = 0; i < quad->nx; i++) {
+      f[i] = func->function(&quad->points[i], func->params); // * exp(quad->points[i]);
     }
   } else {
-    for (int i = 0; i < quad->n; i++) f[i] = func->function(quad->x[i], func->params); // * exp(quad->x[i]) / pow(quad->x[i], quad->alpha);
+    for (int i = 0; i < quad->nx; i++) f[i] = func->function(&quad->points[i], func->params); // * exp(quad->points[i]) / pow(quad->points[i], quad->alpha);
   }
 
-  return DoIntegration(quad->n, quad->w, f);
+  return DoIntegration(quad->nx, quad->w, f);
 
 }

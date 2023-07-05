@@ -23,28 +23,35 @@ typedef struct FermiDiracParams FermiDiracParams;
 /* Fermi-Dirac function
  *
  * Inputs:
- *      x:  the integration variable
+ *      points:  the integration variable
  *      p:  function parameters
  */
-double FermiDiracLegendre(double x, void *p) {
+double FermiDiracLegendre(double *x, void *p) {
   struct FermiDiracParams *params = (struct FermiDiracParams *) p;
   int k = (params->k);
   double eta = (params->eta);
-  return pow(x, k) / (exp(x - eta) + 1.);
+  return pow(*x, k) / (exp(*x - eta) + 1.);
 }
 
-/* Fermi-Dirac function divided by exp(-x) designed for use
+double FermiDiracLegendreGSL(double x, void *p) {
+  return FermiDiracLegendre(&x, p);
+}
+/* Fermi-Dirac function divided by exp(-points) designed for use
  * with Gauss-Laguerre routines
  *
  * Inputs:
- *      x:  the integration variable
+ *      points:  the integration variable
  *      p:  function parameters
  */
-double FermiDiracLaguerre(double x, void *p) {
+double FermiDiracLaguerre(double *x, void *p) {
   struct FermiDiracParams *params = (struct FermiDiracParams *) p;
   int k = (params->k);
   double eta = (params->eta);
-  return pow(x, k) / (exp(-eta) + exp(-x));
+  return pow(*x, k) / (exp(-eta) + exp(-*x));
+}
+
+double FermiDiracLaguerreGSL(double x, void *p) {
+  return FermiDiracLaguerre(&x, p);
 }
 
 double SimpleLaguerreFunc(double x, void *p) {
@@ -56,7 +63,7 @@ void TestQuadratureWithGSL() {
   // function and parameters
   FermiDiracParams fd_p = {.k = 5, .eta = 10};
   gsl_function f;
-  f.function = &FermiDiracLaguerre;
+  f.function = &FermiDiracLaguerreGSL;
   f.params = &fd_p;
 
   MyFunction fermi;
@@ -66,10 +73,10 @@ void TestQuadratureWithGSL() {
   // test Gauss-Laguerre implementation
   const int n = 35;
   const double alpha = 0.;
-  MyQuadrature quad = {.n = n, .dim = 1, .type = kGaulag, .x1 = 0., .x2 = 1., .alpha = alpha};
+  MyQuadrature quad = {.nx = n, .dim = 1, .type = kGaulag, .x1 = 0., .x2 = 1., .alpha = alpha};
   GaussLaguerre(&quad);
 
-  // Gauss-Laguerre integration (weight = (x-a)^alpha * exp(-b*(x-a)))
+  // Gauss-Laguerre integration (weight = (points-a)^alpha * exp(-b*(points-a)))
   const double a = 0.;
   const double b = 1.;
   double gaulag_result_gsl = GSLLagQuadrature(n, a, b, alpha, &f);
@@ -78,7 +85,7 @@ void TestQuadratureWithGSL() {
   printf("Gauss-Laguerre integration from 0 to inf (our):   %.5e\n", gaulag_result);
 
   // Gauss-Legendre integration tests
-  f.function = &FermiDiracLegendre;
+  f.function = &FermiDiracLegendreGSL;
   fermi.function = &FermiDiracLegendre;
 
 
@@ -94,8 +101,8 @@ void TestQuadratureWithGSL() {
   quad.type = kGauleg;
   GaussLegendre(&quad);
   double gauleg_result = 0.;
-  for (int i = 0; i < quad.n; i++) {
-    gauleg_result += FermiDiracLegendre(quad.x[i], &fd_p) * quad.w[i];
+  for (int i = 0; i < quad.nx; i++) {
+    gauleg_result += FermiDiracLegendre(&quad.points[i], &fd_p) * quad.w[i];
   }
   printf("Gauss-Legendre integration from 0 to 1 (   ours   ): %.5e\n", gauleg_result);
 

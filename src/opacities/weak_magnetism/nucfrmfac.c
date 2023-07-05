@@ -14,8 +14,8 @@
 
 // Reactions are distinguished using the following indices:
 //   reacflag = 0: (anti)neutrino scattering on proton  (nu p -> nu p)
-//   reacflag = 1: (anti)neutrino scattering on neutron (nu n -> nu n)
-//   reacflag = 2: (anti)neutrino absorption on nucleon (nue n -> e- p, anue p -> e+ n)
+//   reacflag = 1: (anti)neutrino scattering on neutron (nu nx -> nu nx)
+//   reacflag = 2: (anti)neutrino absorption on nucleon (nue nx -> e- p, anue p -> e+ nx)
 
 
 // Nucleon constants

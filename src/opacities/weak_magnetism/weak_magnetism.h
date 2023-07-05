@@ -20,8 +20,8 @@ void NucFrmFac(const double E,
 
 // weak_magnetism.c
 
-// Correction for neutrino absorption on neutron (nue + n -> e- + p) +
-// Correction for electron antineutrino absorption on proton (anue + p -> e+ + n)
+// Correction for neutrino absorption on neutron (nue + nx -> e- + p) +
+// Correction for electron antineutrino absorption on proton (anue + p -> e+ + nx)
 void WMAbsEm(const double omega, double* R, double* Rbar);
 
 // Correction for (anti)neutrino scattering on nucleons (nu + N -> nu + N)

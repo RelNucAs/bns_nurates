@@ -8,7 +8,7 @@
  *  Adapted from GNU Scientific Library (GSL 2.7.1)
 */
 
-/* Chebyshev fits from SLATEC code for psi(x)
+/* Chebyshev fits from SLATEC code for psi(points)
 
  Series for PSI        on the interval  0.         to  1.00000D+00
                                        with weighted error   2.03E-17
@@ -98,7 +98,7 @@ ChebSeries apsi_cs = {apsics_data,
                       -1, 1,
                       9};
 
-// Evaluation of the Chebyshev series cs at a given point x
+// Evaluation of the Chebyshev series cs at a given point points
 void ChebEvalE(const ChebSeries * cs,
                  const double x,
                  SFResult * result) {
@@ -132,7 +132,7 @@ void ChebEvalE(const ChebSeries * cs,
 
 
 // Evaluation of Psi (Digamma) function (result && error)
-/* digamma for x both positive and negative; we do both
+/* digamma for points both positive and negative; we do both
  * cases here because of the way we use even/odd parts
  * of the function
  */
@@ -169,10 +169,10 @@ void SFPsiOutput(const double x, SFResult * result) {
       result->err += EPSILON * fabs(result->val);
       return; // GSL_SUCCESS;
     }
-  } else { /* -2 < x < 2 */
+  } else { /* -2 < points < 2 */
     SFResult result_c;
 
-    if (x < -1.0) { /* x = -2 + v */
+    if (x < -1.0) { /* points = -2 + v */
       const double v  = x + 2.0;
       const double t1 = 1.0/x;
       const double t2 = 1.0/(x+1.0);
@@ -184,7 +184,7 @@ void SFPsiOutput(const double x, SFResult * result) {
       result->err += result_c.err;
       result->err += EPSILON * fabs(result->val);
       return; // GSL_SUCCESS;
-    } else if (x < 0.0) { /* x = -1 + v */
+    } else if (x < 0.0) { /* points = -1 + v */
       const double v  = x + 1.0;
       const double t1 = 1.0/x;
       const double t2 = 1.0/v;
@@ -195,7 +195,7 @@ void SFPsiOutput(const double x, SFResult * result) {
       result->err += result_c.err;
       result->err += EPSILON * fabs(result->val);
       return; //GSL_SUCCESS;
-    } else if (x < 1.0) { /* x = v */
+    } else if (x < 1.0) { /* points = v */
       const double t1 = 1.0/x;
       ChebEvalE(&psi_cs, 2.0*x-1.0, &result_c);
 
@@ -204,7 +204,7 @@ void SFPsiOutput(const double x, SFResult * result) {
       result->err += result_c.err;
       result->err += EPSILON * fabs(result->val);
       return; // GSL_SUCCESS;
-    } else { /* x = 1 + v */
+    } else { /* points = 1 + v */
       const double v = x - 1.0;
       ChebEvalE(&psi_cs, 2.0*v-1.0, result);
       return;

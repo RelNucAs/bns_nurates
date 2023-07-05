@@ -16,7 +16,7 @@
 /* Compute T_l(alpha) as defined in Appendix B of Pons et. al. (1998)
  * upto a given accuracy
  *
- * T_l(alpha) = sum_{n=1..inf} (-1)^{n+1} e^{-n alpha} / n^l
+ * T_l(alpha) = sum_{nx=1..inf} (-1)^{nx+1} e^{-nx alpha} / nx^l
  *
  * This is well-defined for alpha > 0 and l >= 1.
  *
@@ -26,7 +26,7 @@
  *    tolerance:  a measure of accuracy of the computation (1e-6 is a good number)
  *
  * Output:
- *    T_l(alpha) = sum_{n=1..inf} (-1)^{n+1} e^{-n alpha} / n^l
+ *    T_l(alpha) = sum_{nx=1..inf} (-1)^{nx+1} e^{-nx alpha} / nx^l
  */
 double PairT(int l, double alpha, double tolerance) {
 
@@ -120,7 +120,7 @@ double PairF(int k, double eta, double x1) {
 /* Calculate G_n(a,b) from Eqn. (12) of Pons et. al. (1998)
  *
  * Inputs:
- *    n:            integer
+ *    nx:            integer
  *    a,b,eta,y,z:  double
  *
  * Output:
@@ -143,7 +143,7 @@ double PairG(int n, double a, double b, double eta, double y, double z) {
  *      eta:  electron degenracy parameter
  *
  * Output:
- *      Psi_l(y,z) = sum_{n=0..2} [c_{ln} G_n(y,y+z) + d_{ln} G_n(z,y+z)] + sum_{n=3..(2l+5)} a_{ln} [G_n(0,min(y,z)) - G_n(max(y,z),y+z)]
+ *      Psi_l(y,z) = sum_{nx=0..2} [c_{ln} G_n(y,y+z) + d_{ln} G_n(z,y+z)] + sum_{nx=3..(2l+5)} a_{ln} [G_n(0,min(y,z)) - G_n(max(y,z),y+z)]
  */
 double PairPsi(int l, double y, double z, double eta) {
 

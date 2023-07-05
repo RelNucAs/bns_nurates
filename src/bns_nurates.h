@@ -18,22 +18,40 @@
 enum Quadrature { kGauleg, kGaulag };
 typedef enum Quadrature Quadrature;
 
-// MyQuadrature struct
-// Contains quadrature information, supports 1d/2d
+/* MyQuadrature struct
+ *
+ * Stores quadrature data and metadata, supports integration upto three dimensions
+ * A default structure with metadata initialized is provided as quadrature_default which specifies
+ * a 1d integration from 0 to 1 with Gauss-Legendre and with 32 points. It is recommended that all
+ * MyQuadrature data types are initialized with this before anything else is done with them:
+ *
+ * MyQuadrature quad = quadrature_default;
+ *
+ * Only the metadata is populated, so they have to be passed through the necessary quadrature generation
+ * routines to populate the points and weights arrays.
+ *
+ * Note: The weights and points array, irrespective of the number of dimensions of the integration are always
+ * stored in a single 1d array. Any dimension which is unused is populated with 1 in the weight and points arrays.
+ *
+ */
 struct MyQuadrature {
-  enum Quadrature type;   // type of quadrature
-  int dim;                // dimension of quadrature (1d/2d)
-  int n;                  // number of points in the quadrature scheme
-  double alpha;           // parameter for Gauss-Laguerre qaudrature (optional)
-  double x1;              // lower limit of x
-  double x2;              // upper limit of x
-  double y1;              // lower limit of y (optional)
-  double y2;              // upper limit of y (optional)
-  double *x;              // points for the quadrature scheme (x)
-  double *y;              // points for the quadrature scheme (y, optional)
-  double *w;              // weights for the quadrature scheme
+  enum Quadrature type;   // type of quadrature (for the integration in the points variable, others are always kGauleg)
+  double alpha;           // parameter for Gauss-Laguerre quadrature (optional)
+  int dim;                // dimension of quadrature, can be 1,2,3
+  int nx;                 // number of points in the quadrature scheme in the points direction
+  int ny;                 // number of points in the quadrature scheme in the y direction, set to 1 if not needed
+  int nz;                 // number of points in the quadrature scheme in the z direction, set to 1 if not needed
+  double x1;              // lower limit of points, set to -42 if unused
+  double x2;              // upper limit of points, set to -42 if unused
+  double y1;              // lower limit of y, set to -42 if unused
+  double y2;              // upper limit of y, set to -42 if unused
+  double z1;              // lower limit of z, set to -42 if unused
+  double z2;              // upper limit of z, set to -42 if unused
+  double *points;         // points for the quadrature scheme (store points in the points direction, then y and z in one flat array)
+  double *w;              // weights for the quadrature scheme (store points in the points direction, then y and z in one flat array)
 };
 typedef struct MyQuadrature MyQuadrature;
+static MyQuadrature quadrature_default = {.type=kGauleg, .dim=1, .nx=32, .ny=1, .nz=1, .alpha=0., .x1=0., .x2=1., .y1=-42., .y2=-42., .z1=-42., .z2=-42.};
 
 // MyEOSParams struct
 // Parameters which come from the EOS
@@ -51,11 +69,19 @@ struct MyEOSParams {
 };
 typedef struct MyEOSParams MyEOSParams;
 
+struct var3d {
+  double x;
+  double y;
+  double z;
+};
+typedef struct var3d var3d;
+static var3d var3d_default = {.x = 0., .y = 0., .z = 0.};
+
 // MyFunction struct
 // A struct holding a function and its parameters
 struct MyFunction {
   int dim;                                      // number of function variables (1/2)
-  double (*function)(double var, void *params); // the function
+  double (*function)(double *var3d, void *params); // the function
   void *params;                                 // all parameters of the function
 };
 typedef struct MyFunction MyFunction;
@@ -92,12 +118,12 @@ typedef struct IsoKernelParams IsoKernelParams;
 struct MyKernelParams {
   PairKernelParams pair_kernel_params;
   BremKernelParams brem_kernel_params;
-  IsoKernelParams   iso_kernel_params;
+  IsoKernelParams iso_kernel_params;
 };
 typedef struct MyKernelParams MyKernelParams;
 
 // MyKernel struct
-// Returns the absorption and production kernels for electron (e) and mu/tau (x) neutrinos
+// Returns the absorption and production kernels for electron (e) and mu/tau (points) neutrinos
 struct MyKernel {
   double production_e;
   double absorption_e;
@@ -113,8 +139,8 @@ typedef struct MyKernel MyKernel;
 struct MyOpacityQuantity {
   double em_e;    // quantity related to emission/production for e neutrinos
   double abs_e;   // quantity related to absorption for e neutrinos
-  double em_x;    // quantity related to emission/production for x neutrinos
-  double abs_x;   // quantity related to absorption for x neutrinos
+  double em_x;    // quantity related to emission/production for points neutrinos
+  double abs_x;   // quantity related to absorption for points neutrinos
 };
 typedef struct MyOpacityQuantity MyOpacityQuantity;
 

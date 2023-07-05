@@ -14,7 +14,7 @@
 
 /* Generate Gauss-Legendre quadratures in [x1,x2].
  * For this routine to generate data successfully, quad struct
- * must have dim, type, n, x1, x2 metadata populated.
+ * must have dim, type, nx, x1, x2 metadata populated.
  *
  * Inputs:
  *      quad: A MyQuadrature structure to hold quadratures.
@@ -28,14 +28,14 @@ void GaussLegendre(MyQuadrature *quad) {
   assert(quad->dim == 1);
   assert(quad->type == kGauleg);
 
-  quad->x = NULL;
+  quad->points = NULL;
   quad->w = NULL;
-  quad->x = (double *) malloc(quad->n * sizeof(double));
-  quad->w = (double *) malloc(quad->n * sizeof(double));
+  quad->points = (double *) malloc(quad->nx * sizeof(double));
+  quad->w = (double *) malloc(quad->nx * sizeof(double));
 
   double z1, z, xm, xl, pp, p3, p2, p1;
 
-  int n = quad->n;
+  int n = quad->nx;
   int m = (n + 1) / 2;
   xm = 0.5 * (quad->x2 + quad->x1);
   xl = 0.5 * (quad->x2 - quad->x1);
@@ -57,8 +57,8 @@ void GaussLegendre(MyQuadrature *quad) {
 
     } while (fabs(z - z1) > kEps);
 
-    quad->x[i] = xm - xl * z;
-    quad->x[n - 1 - i] = xm + xl * z;
+    quad->points[i] = xm - xl * z;
+    quad->points[n - 1 - i] = xm + xl * z;
     quad->w[i] = 2.0 * xl / ((1.0 - z * z) * pp * pp);
     quad->w[n - 1 - i] = quad->w[i];
 
@@ -68,7 +68,7 @@ void GaussLegendre(MyQuadrature *quad) {
 
 /* Generate Gauss-Laguerre quadratures in [0,inf).
  * For this routine to generate data successfully, quad struct
- * must have dim, type, n, alpha metadata populated.
+ * must have dim, type, nx, alpha metadata populated.
  *
  * Inputs:
  *      quad:   A MyQuadrature structure to hold quadratures.
@@ -83,17 +83,17 @@ void GaussLaguerre(MyQuadrature *quad) {
   assert(quad->dim == 1);
   assert(quad->type == kGaulag);
 
-  quad->x = NULL;
+  quad->points = NULL;
   quad->w = NULL;
-  quad->x = (double *) malloc(quad->n * sizeof(double));
-  quad->w = (double *) malloc(quad->n * sizeof(double));
+  quad->points = (double *) malloc(quad->nx * sizeof(double));
+  quad->w = (double *) malloc(quad->nx * sizeof(double));
 
-  double *x = quad->x;
+  double *x = quad->points;
   double *w = quad->w;
 
   int i, its, j;
   double ai, p1, p2, p3, pp, z, z1;
-  int n = quad->n;
+  int n = quad->nx;
 
   for (i = 0; i < n; i++) {
     if (i == 0) {

@@ -7,34 +7,34 @@
 // @TODO: Eventually move this somewhere else (f_nu reconstruction section)
 // 	 and understand how to implement computation of Fermi integrals in the code
 //
-//void thick_fdf(double *x, double *C, double *fvec, double *fjac) {
+//void thick_fdf(double *points, double *C, double *fvec, double *fjac) {
 //	const double n_nu = C[0];
 //	const double J_nu = C[1];
 //	
-//	fvec[0] = n_nu*pow(h*c,3.) - 4.*pi*Fermi_integral_p2(x[1])/pow(x[0],3.);
-//	fvec[1] = J_nu*pow(h*c,3.) - 4.*pi*Fermi_integral_p3(x[1])/pow(x[0],4.);
+//	fvec[0] = n_nu*pow(h*c,3.) - 4.*pi*Fermi_integral_p2(points[1])/pow(points[0],3.);
+//	fvec[1] = J_nu*pow(h*c,3.) - 4.*pi*Fermi_integral_p3(points[1])/pow(points[0],4.);
 //
-//	fjac[0] =  3. * 4.*pi*Fermi_integral_p2(x[1])/pow(x[0],4.);
-//      fjac[1] = -2. * 4.*pi*Fermi_integral_p1(x[1])/pow(x[0],3.);
-//      fjac[2] =  4. * 4.*pi*Fermi_integral_p3(x[1])/pow(x[0],5.);
-//      fjac[3] = -3. * 4.*pi*Fermi_integral_p2(x[1])/pow(x[0],4.);
+//	fjac[0] =  3. * 4.*pi*Fermi_integral_p2(points[1])/pow(points[0],4.);
+//      fjac[1] = -2. * 4.*pi*Fermi_integral_p1(points[1])/pow(points[0],3.);
+//      fjac[2] =  4. * 4.*pi*Fermi_integral_p3(points[1])/pow(points[0],5.);
+//      fjac[3] = -3. * 4.*pi*Fermi_integral_p2(points[1])/pow(points[0],4.);
 //      return;
 //}
 
-//void thin_fdf(double *x, double *C, double *fvec, double *fjac) {
+//void thin_fdf(double *points, double *C, double *fvec, double *fjac) {
 //  const double n_nu = C[0];
 //  const double J_nu = C[1];
-//  fvec[0] = n_nu*pow(h*c,3.) - 4.*pi*exp(Gammln(x[0]+3.))/pow(x[1],x[0]+3.);
-//  fvec[1] = J_nu*pow(h*c,3.) - 4.*pi*exp(Gammln(x[0]+4.))/pow(x[1],x[0]+4.);
+//  fvec[0] = n_nu*pow(h*c,3.) - 4.*pi*exp(Gammln(points[0]+3.))/pow(points[1],points[0]+3.);
+//  fvec[1] = J_nu*pow(h*c,3.) - 4.*pi*exp(Gammln(points[0]+4.))/pow(points[1],points[0]+4.);
   
-//  fjac[0] = 4.*pi*exp(Gammln(x[0]+3.))/pow(x[1],x[0]+3.)*(log(x[1])-SFPsi(x[0]+3.));
-//  fjac[1] = 4.*pi*(x[0]+3.)*exp(Gammln(x[0]+3.))/pow(x[1],x[0]+4.);
-//  fjac[2] = 4.*pi*exp(Gammln(x[0]+4.))/pow(x[1],x[0]+4.)*(log(x[1])-SFPsi(x[0]+4.));
-//  fjac[3] = 4.*pi*(x[0]+4.)*exp(Gammln(x[0]+4.))/pow(x[1],x[0]+5.);
-//  //fjac[0] = 4.*pi*exp(gammln(x[0]+3.)/pow(x[1],x[0]+3.)*(log(x[1])-gsl_sf_psi(x[0]+3.));
-//  //fjac[1] = 4.*pi*(x[0]+3.)*exp(gammln(x[0]+3.)/pow(x[1],x[0]+4.);
-//  //fjac[2] = 4.*pi*exp(gammln(x[0]+4.)/pow(x[1],x[0]+4.)*(log(x[1])-gsl_sf_psi(x[0]+4.));
-//  //fjac[3] = 4.*pi*(x[0]+4.)*exp(gammln(x[0]+4.)/pow(x[1],x[0]+5.);
+//  fjac[0] = 4.*pi*exp(Gammln(points[0]+3.))/pow(points[1],points[0]+3.)*(log(points[1])-SFPsi(points[0]+3.));
+//  fjac[1] = 4.*pi*(points[0]+3.)*exp(Gammln(points[0]+3.))/pow(points[1],points[0]+4.);
+//  fjac[2] = 4.*pi*exp(Gammln(points[0]+4.))/pow(points[1],points[0]+4.)*(log(points[1])-SFPsi(points[0]+4.));
+//  fjac[3] = 4.*pi*(points[0]+4.)*exp(Gammln(points[0]+4.))/pow(points[1],points[0]+5.);
+//  //fjac[0] = 4.*pi*exp(gammln(points[0]+3.)/pow(points[1],points[0]+3.)*(log(points[1])-gsl_sf_psi(points[0]+3.));
+//  //fjac[1] = 4.*pi*(points[0]+3.)*exp(gammln(points[0]+3.)/pow(points[1],points[0]+4.);
+//  //fjac[2] = 4.*pi*exp(gammln(points[0]+4.)/pow(points[1],points[0]+4.)*(log(points[1])-gsl_sf_psi(points[0]+4.));
+//  //fjac[3] = 4.*pi*(points[0]+4.)*exp(gammln(points[0]+4.)/pow(points[1],points[0]+5.);
 //  return;
 //}
 
@@ -51,14 +51,14 @@ const double xacc_1d = 1.0E-07;  // Set the accuracy for Newton Raphson
 double MNewt1d(double x, double guess, double x1, double x2, double f0,
                MyFunction *func, MyFunction *dfunc) {
 // Using a combination of Newton-Raphson and bisection, return the solution
-// of f(x) = f0 bracketed between x1 and x2. The root will be refined
+// of f(points) = f0 bracketed between x1 and x2. The root will be refined
 // until its accuracy is known within xacc. f is a user-supplied struct
-// that returns the function value at the point x. df is a user-supplied
+// that returns the function value at the point points. df is a user-supplied
 // struct that returns the value of the function first derivative at the
-// point x.
+// point points.
   double xh, xl;
-  double fl = func->function(x1, func->params) - f0;
-  double fh = func->function(x2, func->params) - f0;
+  double fl = func->function(&x1, func->params) - f0;
+  double fh = func->function(&x2, func->params) - f0;
   
   if ((fl > 0.0 && fh > 0.0) || (fl < 0.0 && fh < 0.0)) {
     printf("xl = %.3e, fl = %.3e\n", x1, fl);
@@ -81,8 +81,8 @@ double MNewt1d(double x, double guess, double x1, double x2, double f0,
   double dxold=fabs(x2-x1);         // the “stepsize before last,”
   double dx=dxold;                  // and the last step.
 
-  double  f =  func->function(rts,  func->params) - f0;
-  double df = dfunc->function(rts, dfunc->params);
+  double  f =  func->function(&rts,  func->params) - f0;
+  double df = dfunc->function(&rts, dfunc->params);
   
   for (int j=0;j<ntrial_1d;j++) { //Loop over allowed iterations.
     if ((((rts-xh)*df-f)*((rts-xl)*df-f) > 0.0) || (fabs(2.0*f) > fabs(dxold*df))) { //Bisect if Newton out of range, or not decreasing fast enough.
@@ -100,8 +100,8 @@ double MNewt1d(double x, double guess, double x1, double x2, double f0,
 
     if (fabs(dx) < xacc_1d) return rts; //Convergence criterion.
 
-    f =  func->function(rts,  func->params) - f0; // The one new function evaluation per iteration.
-    df = dfunc->function(rts, dfunc->params);           
+    f =  func->function(&rts,  func->params) - f0; // The one new function evaluation per iteration.
+    df = dfunc->function(&rts, dfunc->params);
 
     if (f < 0.0) { // Maintain the bracket on the root.
        xl=rts;
@@ -139,14 +139,14 @@ void Invert2DMat(double *in, double *out) {
 // Implementation of 2D Newton-Raphson root finding
 
 /*
- * Finding solution of A = C - F[x] = 0 (system of two non-linear coupled equations) 
+ * Finding solution of A = C - F[points] = 0 (system of two non-linear coupled equations)
  *
  * Input:
- * 	- x (dim = 2) --> initial guess
+ * 	- points (dim = 2) --> initial guess
  * 	- C (dim = 2) --> inhomogeneous term
- *	- PairF (dim = 2) --> calculated using pointer to fdf(x,C,fvec,fjac) function
+ *	- PairF (dim = 2) --> calculated using pointer to fdf(points,C,fvec,fjac) function
  * Output:
- * 	- x (1x2 matrix) --> Newton-Raphson solution after convergence
+ * 	- points (1x2 matrix) --> Newton-Raphson solution after convergence
  *
  * - fvec: A (dim = 2)
  * - fjac: Jacobian matrix of A (dim = 2x2)
@@ -177,7 +177,7 @@ void MNewt2d(double *x,
     for (i=0;i<n;i++) {
       errx += fabs(p[i]);
       x[i] += p[i];
-      //printf("x[%d] = %.3e\n", i, x[i]);
+      //printf("points[%d] = %.3e\npoints", i, points[i]);
     }
     if (errx <= tolx_2d) return;
   }

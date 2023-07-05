@@ -9,8 +9,8 @@
 //        Ref: Horowitz, 2002 (https://journals.aps.org/prd/abstract/10.1103/PhysRevD.65.043001)
 
 
-// R    -> Correction for electron     neutrino absorption on neutron (nu_l + n -> l- + p)
-// Rbar -> Correction for electron antineutrino absorption on proton (anu_l + p -> l+ + n)
+// R    -> Correction for electron     neutrino absorption on neutron (nu_l + nx -> l- + p)
+// Rbar -> Correction for electron antineutrino absorption on proton (anu_l + p -> l+ + nx)
 // reacflag = 3 (for nuclear form factors)
 // Input: omega -> neutrino energy [MeV]
 void WMAbsEm(const double omega, double* R, double* Rbar) { 

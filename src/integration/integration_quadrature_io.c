@@ -32,11 +32,11 @@ void SaveQuadrature(char *filedir, MyQuadrature *quad) {
   if (quad->type == kGauleg && quad->dim == 1) {
     sprintf(fileHeader, "# Abscissas and weights for Gauss-Legendre integration from x1 = %.3lf to x2 = %.3lf\n", quad->x1, quad->x2);
     GaussLegendre(quad);
-    sprintf(outname, "/GaussLegQuad_n_%d_x_%f_%f.txt", quad->n, quad->x1, quad->x2);
+    sprintf(outname, "/GaussLegQuad_n_%d_x_%f_%f.txt", quad->nx, quad->x1, quad->x2);
   } else if (quad->type == kGaulag && quad->dim == 1) {
     sprintf(fileHeader, "# Abscissas and weights for Gauss-Laguerre integration\n");
     GaussLaguerre(quad);
-    sprintf(outname, "/GaussLagQuad_n_%d_alf_%f.txt", quad->n, quad->alpha);
+    sprintf(outname, "/GaussLagQuad_n_%d_alf_%f.txt", quad->nx, quad->alpha);
   } else {
     printf("The requested quadrature is not implemented!\n");
     exit(1);
@@ -54,8 +54,8 @@ void SaveQuadrature(char *filedir, MyQuadrature *quad) {
   fprintf(fptr, fileHeader);
 
   // @TODO: only works for the 1d case, generalize for 2d case later
-  for (int i = 0; i < quad->n; i++) {
-    sprintf(fileline, "%0.16e \t %0.16e\n", quad->x[i], quad->w[i]);
+  for (int i = 0; i < quad->nx; i++) {
+    sprintf(fileline, "%0.16e \t %0.16e\n", quad->points[i], quad->w[i]);
     fprintf(fptr, fileline);
   }
 
@@ -82,10 +82,10 @@ void LoadQuadrature(char *filedir, MyQuadrature *quad) {
 
   if (quad->type == kGauleg && quad->dim == 1) {
     sprintf(fileHeader, "# Abscissas and weights for Gauss-Legendre integration from x1 = %.3lf to x2 = %.3lf\n", quad->x1, quad->x2);
-    sprintf(outname, "/GaussLegQuad_n_%d_x_%f_%f.txt", quad->n, quad->x1, quad->x2);
+    sprintf(outname, "/GaussLegQuad_n_%d_x_%f_%f.txt", quad->nx, quad->x1, quad->x2);
   } else if (quad->type == kGaulag && quad->dim == 1) {
     sprintf(fileHeader, "# Abscissas and weights for Gauss-Laguerre integration\n");
-    sprintf(outname, "/GaussLagQuad_n_%d_alf_%f.txt", quad->n, quad->alpha);
+    sprintf(outname, "/GaussLagQuad_n_%d_alf_%f.txt", quad->nx, quad->alpha);
   } else {
     printf("The requested quadrature is not implemented!\n");
     exit(1);
@@ -99,14 +99,14 @@ void LoadQuadrature(char *filedir, MyQuadrature *quad) {
     printf("The file %s does not exist! Creating ...\n", filepath);
     SaveQuadrature(filedir, quad);
   } else {
-    quad->x = (double *) realloc(quad->x, quad->n * sizeof(double));
-    quad->w = (double *) realloc(quad->w, quad->n * sizeof(double));
+    quad->points = (double *) realloc(quad->points, quad->nx * sizeof(double));
+    quad->w = (double *) realloc(quad->w, quad->nx * sizeof(double));
 
     fscanf(fptr, fileHeader);
 
     // @TODO: currently works only for 1d quadratures, generalize for 2d later
-    for (int i = 0; i < quad->n; i++) {
-      fscanf(fptr, "%.16e %.16e\n", quad->x[i], quad->w[i]);
+    for (int i = 0; i < quad->nx; i++) {
+      fscanf(fptr, "%.16e %.16e\n", quad->points[i], quad->w[i]);
     }
   }
 

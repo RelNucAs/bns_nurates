@@ -57,22 +57,22 @@ double EtaNNAbs(const double n_in, const double n_out,
   return etanp;
 }
 
-// Nucleon phase space integration for X + n -> X + p 
+// Nucleon phase space integration for X + nx -> X + p
 double EtaNP(const double nn, const double np,
 	      const double mu_hat,
 	      const double temp) {
   return EtaNNAbs(nn, np, mu_hat, temp);
 }
 
-// Nucleon phase space integration for X + p -> X + n 
+// Nucleon phase space integration for X + p -> X + nx
 double EtaPN(const double nn, const double np,
               const double mu_hat,
 	      const double temp) {
   return EtaNNAbs(np, nn, -mu_hat, temp);
 }
 
-// Neutrino absorption on neutron (nul + n -> l- + p)
-// Antineutrino absorption on neutron (anul + p -> l+ + n)
+// Neutrino absorption on neutron (nul + nx -> l- + p)
+// Antineutrino absorption on neutron (anul + p -> l+ + nx)
 void AbsOpacitySingleLep(OpacityParams* opacity_pars,
               MyEOSParams *eos_pars,
               const double mLep, const double muLep,

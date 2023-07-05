@@ -33,10 +33,10 @@ static const double kMpGrams = kMp * kMeV / (kClight * kClight); // proton mass 
 /* Compute the analytical fit for the s-component of the kernel for
  * neutrino bremsstrahlung and inelastic scattering in a nucleon field
  *
- * Note: Does not support negative x!
+ * Note: Does not support negative points!
  *
  * Inputs:
- *      x:        rescaled total neutrino energy (w+wp/T)
+ *      points:        rescaled total neutrino energy (w+wp/T)
  *      y:        pion mass parameter defined in Eqn. (38)
  *      eta_star: nucleon degeneracy parameter
  *
@@ -78,20 +78,20 @@ double BremKernelS(double x, double y, double eta_star) {
   double s_d = 3. * pow(0.5 * kPi, 2.5) * pow(eta_star, -2.5) * (x * x + 4. * kPiSquared) * x * f_u / (4. * kPiSquared * (1. - SafeExp(-x)));
 
   //if (s_d < 0.) {
-  //  printf("s_D = %.5e\n"              , s_d);
-  //  printf("one minus exp(-x) = %.5e\n", 1.-SafeExp(-x));
-  //  printf("x = %.5e\n"                , x);
-  //  printf("y = %.5e\n"                , y);
-  //  printf("u = %.5e\n"                , u);
-  //  printf("eta_star = %.5e\n"         , eta_star);
-  //  printf("f_u = %.5e\n"              , f_u);
+  //  printf("s_D = %.5e\nx"              , s_d);
+  //  printf("one minus exp(-points) = %.5e\npoints", 1.-SafeExp(-points));
+  //  printf("points = %.5e\npoints"                , points);
+  //  printf("y = %.5e\nx"                , y);
+  //  printf("u = %.5e\nx"                , u);
+  //  printf("eta_star = %.5e\nx"         , eta_star);
+  //  printf("f_u = %.5e\nx"              , f_u);
   //}
 
   // F, Eqn. (50)
   double f_denominator = (3. + pow(x - 1.2, 2.) + pow(x, -4.)) * (1. + eta_star * eta_star) * (1. + pow(y, 4.));
   double f_brem = 1. + 1. / f_denominator; //Eq.(50)
 
-  // @TODO: compute pow(x, 1.1) only once
+  // @TODO: compute pow(points, 1.1) only once
   // G, Eqn. (50)
   double g_brem = 1. - 0.0044 * pow(x, 1.1) * y / (0.8 + 0.06 * pow(y, 1.05)) * sqrt(eta_star) / (eta_star + 0.2);
 
@@ -181,10 +181,10 @@ double BremSingleChannelAbsKernel(double n_nuc, double m_nuc, BremKernelParams *
   // dimensionless neutrino energy sum
   double x = (omega + omega_prime) / temp;
 
-  // dimensionless fitting parameter s, N.B.: x and y values are not changed by the function
+  // dimensionless fitting parameter s, N.B.: points and y values are not changed by the function
   const double sb = BremKernelS(x, y, eta_star);
 
-  // dimensionless fitting parameter g, N.B.: x and y values are not changed by the function
+  // dimensionless fitting parameter g, N.B.: points and y values are not changed by the function
   const double gb = BremKernelG(y, eta_star);
 
   // differential absorption kernel, Eqn. (35)
