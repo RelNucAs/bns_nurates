@@ -162,7 +162,7 @@ void TestPairPhi() {
       -1.5966596697987114e-40
   };
 
-  printf("PairPhi 'points' comparison\n");
+  printf("PairPhi 'x' comparison\n");
   printf("======================\n");
   printf("Phi(ours) \t\t Phi(python) \t\t |diff|\n");
   for (int i = 0; i < 3; i++) {
@@ -235,7 +235,7 @@ void TestPairOpacities() {
   int lmax = 0;
   int filter = 0.;
 
-  double data_albino[12][3] = { //omega(MeV) emissivity (km^-1) mean free path (km) [points neutrinos]
+  double data_albino[12][3] = { //omega(MeV) emissivity (km^-1) mean free path (km) [x neutrinos]
       {2.0000000000000000, 1208.8403883182957, 235.74209542285573},
       {3.0398221659058673, 1788.6544282931936, 153.90515091871933},
       {4.6202594001663186, 2610.0591334007413, 100.06698725757252},

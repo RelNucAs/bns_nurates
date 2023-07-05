@@ -35,7 +35,7 @@ int main() {
   BremKernelS(-0.5, 0., 0.31);
   //TestBremKernelG("/var/home/maitraya/Documents/");
   //MyQuadrature quad;
-  //quad.nx = 3;
+  //quad.n = 3;
   //quad.dim = 1;
   //quad.type = kGaulag;
   //quad.x1 = -1.;

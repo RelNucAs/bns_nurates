@@ -17,8 +17,8 @@ const double epsrel_1d_gsl = 1.E-03;
 
 // Print root-finding solver state 
 void PrintState1d(size_t iter, const double f, const gsl_root_fdfsolver * s) {
-  printf ("iter = %3lu points = % .3f "
-          "f(points) = % .3e\n",
+  printf ("iter = %3lu x = % .3f "
+          "f(x) = % .3e\n",
           iter,
           s->root,
           f);
@@ -40,9 +40,9 @@ double MNewt1dGSL(const double guess, gsl_function_fdf *fdf) {
     //PrintState1d(iter, fdf->f(s->root,fdf->params), s);
     x0 = x;
     x = gsl_root_fdfsolver_root(s);
-    status = gsl_root_test_delta(x, x0, epsabs_1d_gsl, epsrel_1d_gsl); // check if |points-x0| < epsabs + epsrel*|x_1|
+    status = gsl_root_test_delta(x, x0, epsabs_1d_gsl, epsrel_1d_gsl); // check if |x-x0| < epsabs + epsrel*|x_1|
     //status = gsl_root_test_residual(s->f, epsabs_1d_gsl); // check if |f| < epsabs
-    //if (status == GSL_SUCCESS) printf ("Converged:\nx");
+    //if (status == GSL_SUCCESS) printf ("Converged:\n");
   } while (status == GSL_CONTINUE && iter < max_iter_1d_gsl);
 
   gsl_root_fdfsolver_free(s);  
@@ -63,8 +63,8 @@ const double epsrel_2d_gsl = 1.E-07;
 
 // Print root-finding solver state 
 void PrintState2d(size_t iter, const gsl_multiroot_fdfsolver * s) {
-  printf ("iter = %3lu points = % .3f % .3f "
-          "f(points) = % .3e % .3e\n",
+  printf ("iter = %3lu x = % .3f % .3f "
+          "f(x) = % .3e % .3e\n",
           iter,
           gsl_vector_get (s->x, 0),
           gsl_vector_get (s->x, 1),
@@ -98,7 +98,7 @@ int MNewt2dGSL(double *xi, double *xf, gsl_multiroot_function_fdf *fdf) {
     //status = gsl_multiroot_test_delta(s->df, s->f, epsabs_2d_gsl, epsrel_2d_gsl); // check if |dx_i| < epsabs + epsrel*|x_i|
   } while (status == GSL_CONTINUE && iter < max_iter_2d_gsl);
 
-  //printf("status = %s\nx", gsl_strerror (status));
+  //printf("status = %s\n", gsl_strerror (status));
 
   xf[0] = gsl_vector_get(s->x, 0),
   xf[1] = gsl_vector_get(s->x, 1),
@@ -136,7 +136,7 @@ int MNewt2dGSL_fd(double *xi, double *xf, gsl_multiroot_function * f) {
 
   } while (status == GSL_CONTINUE && iter < max_iter_2d_gsl);
 
-  //printf("status = %s\nx", gsl_strerror (status));
+  //printf("status = %s\n", gsl_strerror (status));
 
   xf[0] = gsl_vector_get(s->x, 0),
   xf[1] = gsl_vector_get(s->x, 1),
