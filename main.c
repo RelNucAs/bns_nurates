@@ -11,7 +11,9 @@ int main() {
 
   //TestQuadratureInputOutput("/var/home/maitraya/Documents/bns_nurates/src/quadratures/");
 
-  TestGaussLegendreQuadratureMultiD();
+  //TestGaussLegendreQuadratureMultiD();
+  //TestQuadratureWithGSL();
+  TestIntegrationMultiD();
   //PrintGaussLegendreQuadrature(10, -1., 1.);
   //printf("\n");
   //PrintGaussLaguerreQuadrature(5, 0.);

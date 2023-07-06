@@ -30,7 +30,7 @@ double FermiDiracLegendre(double *x, void *p) {
   struct FermiDiracParams *params = (struct FermiDiracParams *) p;
   int k = (params->k);
   double eta = (params->eta);
-  return pow(*x, k) / (exp(*x - eta) + 1.);
+  return pow(x[0], k) / (exp(x[0] - eta) + 1.);
 }
 
 double FermiDiracLegendreGSL(double x, void *p) {
@@ -98,8 +98,9 @@ void TestQuadratureWithGSL() {
   double gauleg_result_gsl_2 = GSLLegIntegrate(n, a, b, &f);
   printf("Gauss-Legendre integration from 0 to 1 (GSL type 2): %.5e\n", gauleg_result_gsl_2);
   // our version
+  quad = quadrature_default;
   quad.type = kGauleg;
-  GaussLegendre(&quad);
+  GaussLegendreMultiD(&quad);
   double gauleg_result = 0.;
   for (int i = 0; i < quad.nx; i++) {
     gauleg_result += FermiDiracLegendre(&quad.points[i], &fd_p) * quad.w[i];
@@ -118,4 +119,40 @@ void TestQuadratureWithGSL() {
 
 void TestIntegrationMultiD() {
 
+  // function and parameters
+  FermiDiracParams fd_p = {.k = 5, .eta = 10};
+  gsl_function f;
+  f.function = &FermiDiracLaguerreGSL;
+  f.params = &fd_p;
+
+  MyFunction fermi;
+  fermi.function = &FermiDiracLegendre;
+  fermi.params = &fd_p;
+
+  MyQuadrature quad = quadrature_default;
+  quad.dim = 3;
+  quad.type = kGauleg;
+  quad.x1 = 0.;
+  quad.x2 = 1.;
+  quad.nx = 35;
+  quad.y1 = -1.;
+  quad.y2 = 1.;
+  quad.ny = 35;
+  quad.z1 = 0.;
+  quad.z2 = 3;
+  quad.nz = 35;
+
+  GaussLegendreMultiD(&quad);
+
+  f.function = &FermiDiracLegendreGSL;
+  fermi.function = &FermiDiracLegendre;
+
+  // Gauss-Legendre integration from 0 to inf (integral split at s)
+  double s = 10.;
+  double gauleg_inf_gsl = GslLegInfSplit(35, &f, s);
+  double gauleg_inf = GaussLegendreIntegrateZeroInf(&quad, &fermi, s);
+
+  printf("Integrate Fermi(x) dx dy dz from x = 0 to inf, y = -1 to 1, z = 0 to 3!\n");
+  printf("Result (GSL):   %.5e\n", 6.*gauleg_inf_gsl);
+  printf("Result (our):   %.5e\n", gauleg_inf);
 }
