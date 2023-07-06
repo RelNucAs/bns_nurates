@@ -12,6 +12,7 @@
 
 // routines for generating quadratures
 void GaussLegendre(MyQuadrature *quad);
+void GaussLegendreMultiD(MyQuadrature *quad);
 void GaussLaguerre(MyQuadrature *quad);
 
 // routines for saving and loading quadratures

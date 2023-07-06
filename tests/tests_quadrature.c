@@ -10,7 +10,7 @@
 #include "../src/bns_nurates.h"
 #include "../src/integration/integration.h"
 
-/* Print Gauss-Legendre quadrature
+/* Print the 1d Gauss-Legendre quadrature
  *
  * Inputs:
  *      nx:  the number of quadrature points
@@ -46,7 +46,92 @@ void TestGaussLegendreQuadrature() {
   PrintGaussLegendreQuadrature(5, -1., 1.);
 }
 
-/* Print Gauss-Laguerre quadrature
+/* Generate Gauss-Legendre quadrature table from Wolfram:
+ * https://mathworld.wolfram.com/Legendre-GaussQuadrature.html
+ */
+void TestGaussLegendreQuadratureMultiD() {
+  MyQuadrature quad = quadrature_default;
+
+  // Generate 1d quadratures
+  printf("Generating Gauss-Legendre quadratures in 1d ... \n");
+  quad.x1 = -1.;
+  quad.x2 = 1.;
+  quad.nx = 3;
+
+  GaussLegendreMultiD(&quad);
+
+  printf("x1 = %f \t x2 = %f \t nx = %d \t y1 = %f \t y2 = %f \t ny = %d \t z1 = %f \t z2 = %f \t nz = %d\n",
+         quad.x1, quad.x2, quad.nx, quad.y1, quad.y2, quad.ny, quad.z1, quad.z2, quad.nz);
+  printf("\n");
+
+  for (int i = 0; i < quad.nx + quad.ny + quad.nz; i++) {
+    if (i == quad.nx || i == quad.nx + quad.ny) {
+      printf("\n");
+    }
+
+    printf("%f \t %f\n", quad.points[i], quad.w[i]);
+
+  }
+
+  printf("\n");
+
+  // Generate 2d quadratures
+  printf("Generating Gauss-Legendre quadratures in 2d ... \n");
+  quad.dim = 2;
+  quad.x1 = -1.;
+  quad.x2 = 1.;
+  quad.nx = 3;
+  quad.y1 = -1.;
+  quad.y2 = 1.;
+  quad.ny = 4;
+
+  GaussLegendreMultiD(&quad);
+
+  printf("x1 = %f \t x2 = %f \t nx = %d \t y1 = %f \t y2 = %f \t ny = %d \t z1 = %f \t z2 = %f \t nz = %d\n",
+         quad.x1, quad.x2, quad.nx, quad.y1, quad.y2, quad.ny, quad.z1, quad.z2, quad.nz);
+  printf("\n");
+
+  for (int i = 0; i < quad.nx + quad.ny + quad.nz; i++) {
+    if (i == quad.nx || i == quad.nx + quad.ny) {
+      printf("\n");
+    }
+
+    printf("%f \t %f\n", quad.points[i], quad.w[i]);
+
+  }
+
+  printf("\n");
+
+  // Generate 2d quadratures
+  printf("Generating Gauss-Legendre quadratures in 3d ... \n");
+  quad.dim = 3;
+  quad.x1 = -1.;
+  quad.x2 = 1.;
+  quad.nx = 3;
+  quad.y1 = -1.;
+  quad.y2 = 1.;
+  quad.ny = 4;
+  quad.z1 = -1;
+  quad.z2 = 1;
+  quad.nz = 5;
+
+  GaussLegendreMultiD(&quad);
+
+  printf("x1 = %f \t x2 = %f \t nx = %d \t y1 = %f \t y2 = %f \t ny = %d \t z1 = %f \t z2 = %f \t nz = %d\n",
+         quad.x1, quad.x2, quad.nx, quad.y1, quad.y2, quad.ny, quad.z1, quad.z2, quad.nz);
+  printf("\n");
+
+  for (int i = 0; i < quad.nx + quad.ny + quad.nz; i++) {
+    if (i == quad.nx || i == quad.nx + quad.ny) {
+      printf("\n");
+    }
+
+    printf("%f \t %f\n", quad.points[i], quad.w[i]);
+
+  }
+
+}
+/* Print Gauss-Laguerre quadrature in 1d
  *
  * Inputs:
  *      nx:      the number of quadrature points
@@ -82,7 +167,7 @@ void TestGaussLaguerreQuadrature() {
 }
 
 /* Test the input/output routines for the quadratures
- *
+ * Note: The save only works for 1d quadratures.
  * Input:
  *    filedir:  quadrature save directory path
  */

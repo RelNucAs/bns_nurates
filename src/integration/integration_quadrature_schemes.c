@@ -99,13 +99,18 @@ void GaussLegendreMultiD(MyQuadrature *quad) {
   // Note: first nx elements contain quadrature for x variable, then ny elements for y variable and then nx for z
   quad->points = NULL;
   quad->w = NULL;
-  quad->points = (double *) malloc(quad->nx + quad->ny + quad->nz * sizeof(double));
-  quad->w = (double *) malloc(quad->nx + quad->ny + quad->nz * sizeof(double));
+  quad->points = (double *) malloc((quad->nx + quad->ny + quad->nz) * sizeof(double));
+  quad->w = (double *) malloc((quad->nx + quad->ny + quad->nz) * sizeof(double));
+
+  for (int i = 0; i < quad->nx + quad->ny + quad->nz; i++) {
+    quad->points[i] = 1;
+    quad->w[i] = 1;
+  }
 
   // local quadrature which contain 1d quadrature along each variable
   MyQuadrature quad_local = quadrature_default;
 
-  if (quad->dim == 1) {
+  if (quad->dim >= 1) {
     quad_local.nx = quad->nx;
     quad_local.x1 = quad->x1;
     quad_local.x2 = quad->x2;
@@ -116,14 +121,10 @@ void GaussLegendreMultiD(MyQuadrature *quad) {
       quad->points[i] = quad_local.points[i];
       quad->w[i] = quad_local.w[i];
     }
-    quad->points[quad->nx] = 1.;
-    quad->w[quad->nx] = 1.;
-    quad->points[quad->nx + 1] = 1.;
-    quad->w[quad->nx + 1] = 1.;
 
   }
 
-  if (quad->dim == 2) {
+  if (quad->dim >= 2) {
     quad_local.nx = quad->ny;
     quad_local.x1 = quad->y1;
     quad_local.x2 = quad->y2;
@@ -134,13 +135,9 @@ void GaussLegendreMultiD(MyQuadrature *quad) {
       quad->points[quad->nx + i] = quad_local.points[i];
       quad->w[quad->nx + i] = quad_local.w[i];
     }
-    quad->points[quad->nx + quad->ny] = 1.;
-    quad->w[quad->nx + quad->ny] = 1.;
-    quad->points[quad->nx + quad->ny + 1] = 1.;
-    quad->w[quad->nx + quad->ny + 1] = 1.;
   }
 
-  if (quad->dim == 3) {
+  if (quad->dim >= 3) {
     quad_local.nx = quad->nz;
     quad_local.x1 = quad->z1;
     quad_local.x2 = quad->z2;
@@ -149,12 +146,9 @@ void GaussLegendreMultiD(MyQuadrature *quad) {
 
     for (int i = 0; i < quad->nz; i++) {
       quad->points[quad->nx + quad->ny + i] = quad_local.points[i];
-      quad->w[quad->nx + quad->ny + quad->ny + i] = quad_local.w[i];
+      quad->w[quad->nx + quad->ny + i] = quad_local.w[i];
     }
   }
-
-  free(quad_local.points);
-  free(quad_local.w);
 
 }
 

@@ -57,6 +57,7 @@ int MNewt2dGSL_fd(double *xi, double *xf, gsl_multiroot_function *f);
 // tests with the quadrature generation and input/output
 void PrintGaussLegendreQuadrature(const int n, const double x1, const double x2);
 void TestGaussLegendreQuadrature();
+void TestGaussLegendreQuadratureMultiD();
 void PrintGaussLaguerreQuadrature(const int n, const double alpha);
 void TestGaussLaguerreQuadrature();
 void TestQuadratureInputOutput(char *filedir);
