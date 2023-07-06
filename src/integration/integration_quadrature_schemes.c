@@ -13,6 +13,9 @@
 #include "../functions/functions.h"
 
 /* Generate Gauss-Legendre quadratures in [x1,x2].
+ *
+ * Note: This routine can only generate quadrature in 1d.
+ *
  * For this routine to generate data successfully, quad struct
  * must have dim, type, nx, x1, x2 metadata populated.
  *
@@ -63,6 +66,95 @@ void GaussLegendre(MyQuadrature *quad) {
     quad->w[n - 1 - i] = quad->w[i];
 
   }
+
+}
+
+/* Generate quadratures in multiple dimensions
+ *
+ * Note: For almost all practical cases, this routine should be called and not the 1d routine!
+ *
+ * Generates 1d/2d/3d quadratures. Provide a quadrature structure with properly populated metadata.
+ * This routine populates the quadrature points & weights arrays with (nx + ny + nz) elements each.
+ *
+ * The first nx elements contain quadrature information for the x variable, the next ny for the y variable
+ * and so on.
+ *
+ * For the 1d case, the quadrature arrays are of the length (nx + 2) each, with the weight and point information
+ * in the y and z direction being populated with 1.
+ *
+ * Similarly, for the 2d case, the quadrature arrays are of length (nx + ny + 1) each.
+ *
+ * Inputs:
+ *      quad: A MyQuadrature structure to hold quadratures.
+ *            This already contains metadata for the quadrature, the routine
+ *            only populates the quadrature points and weights
+ */
+void GaussLegendreMultiD(MyQuadrature *quad) {
+
+  //perform checks
+  assert(quad->type == kGauleg);
+  assert(quad->dim == 1 || quad->dim == 2 || quad->dim == 3);
+
+  // reallocate memory for the weights and points
+  // Note: first nx elements contain quadrature for x variable, then ny elements for y variable and then nx for z
+  quad->points = NULL;
+  quad->w = NULL;
+  quad->points = (double *) malloc(quad->nx + quad->ny + quad->nz * sizeof(double));
+  quad->w = (double *) malloc(quad->nx + quad->ny + quad->nz * sizeof(double));
+
+  // local quadrature which contain 1d quadrature along each variable
+  MyQuadrature quad_local = quadrature_default;
+
+  if (quad->dim == 1) {
+    quad_local.nx = quad->nx;
+    quad_local.x1 = quad->x1;
+    quad_local.x2 = quad->x2;
+
+    GaussLegendre(&quad_local);
+
+    for (int i = 0; i < quad->nx; i++) {
+      quad->points[i] = quad_local.points[i];
+      quad->w[i] = quad_local.w[i];
+    }
+    quad->points[quad->nx] = 1.;
+    quad->w[quad->nx] = 1.;
+    quad->points[quad->nx + 1] = 1.;
+    quad->w[quad->nx + 1] = 1.;
+
+  }
+
+  if (quad->dim == 2) {
+    quad_local.nx = quad->ny;
+    quad_local.x1 = quad->y1;
+    quad_local.x2 = quad->y2;
+
+    GaussLegendre(&quad_local);
+
+    for (int i = 0; i < quad->ny; i++) {
+      quad->points[quad->nx + i] = quad_local.points[i];
+      quad->w[quad->nx + i] = quad_local.w[i];
+    }
+    quad->points[quad->nx + quad->ny] = 1.;
+    quad->w[quad->nx + quad->ny] = 1.;
+    quad->points[quad->nx + quad->ny + 1] = 1.;
+    quad->w[quad->nx + quad->ny + 1] = 1.;
+  }
+
+  if (quad->dim == 3) {
+    quad_local.nx = quad->nz;
+    quad_local.x1 = quad->z1;
+    quad_local.x2 = quad->z2;
+
+    GaussLegendre(&quad_local);
+
+    for (int i = 0; i < quad->nz; i++) {
+      quad->points[quad->nx + quad->ny + i] = quad_local.points[i];
+      quad->w[quad->nx + quad->ny + quad->ny + i] = quad_local.w[i];
+    }
+  }
+
+  free(quad_local.points);
+  free(quad_local.w);
 
 }
 

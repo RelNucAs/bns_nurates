@@ -63,6 +63,7 @@ void TestQuadratureInputOutput(char *filedir);
 
 // tests with integration and comparison with GSL
 void TestQuadratureWithGSL();
+void TestIntegrationMultiD();
 
 // tests for the pair process
 void TestPairT();

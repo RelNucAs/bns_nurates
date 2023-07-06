@@ -115,3 +115,7 @@ void TestQuadratureWithGSL() {
   printf("Gauss-Legendre integration of Fermi function from 0 to inf (our):   %.5e\n", gauleg_inf);
 
 }
+
+void TestIntegrationMultiD() {
+
+}
