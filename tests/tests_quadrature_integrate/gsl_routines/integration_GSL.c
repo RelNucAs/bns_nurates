@@ -1,6 +1,6 @@
 #include <gsl/gsl_integration.h>
 
-#include "../tests.h"
+#include "../../tests.h"
 
 // GSL implementation of numerical fixed-point quadrature integration routines
 // Based on GSL 2.7.1 (https://www.gnu.org/software/gsl/doc/html/integration.html)

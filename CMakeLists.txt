@@ -25,9 +25,9 @@ add_executable(bns_nurates
         src/output/outputs.h
         src/eos/eos.h
         tests/tests.h
-        tests/GSL_code/integration_GSL.c
-        tests/GSL_code/mnewt_GSL.c
-        tests/GSL_code/integration_GSL.c
+        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
+        tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.c
+        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
@@ -129,6 +129,66 @@ add_executable(test_pair_opacities
 target_link_libraries(test_pair_opacities GSL::gsl GSL::gslcblas)
 target_link_libraries(test_pair_opacities m)
 
+# test gauss legendre quadrature 1d
+add_executable(test_gauss_legendre_1d
+        tests/tests_quadrature_integrate/test_gauss_legendre_1d.c
+        src/constants.h
+        src/bns_nurates.h
+        src/functions/functions.h
+        src/functions/digamma.c
+        src/functions/fermi.c
+        src/functions/gamma.c
+        src/functions/mnewt.c
+        src/functions/safe_exp.c
+        src/integration/integration.h
+        src/integration/integration_quadrature_schemes.c
+        src/integration/integration_quadrature_io.c
+        src/integration/integration_quadrature_integrate.c
+        )
+
+target_link_libraries(test_gauss_legendre_1d GSL::gsl GSL::gslcblas)
+target_link_libraries(test_gauss_legendre_1d m)
+
+# test gauss legendre quadrature 2d
+add_executable(test_gauss_legendre_2d
+        tests/tests_quadrature_integrate/test_gauss_legendre_2d.c
+        src/constants.h
+        src/bns_nurates.h
+        src/functions/functions.h
+        src/functions/digamma.c
+        src/functions/fermi.c
+        src/functions/gamma.c
+        src/functions/mnewt.c
+        src/functions/safe_exp.c
+        src/integration/integration.h
+        src/integration/integration_quadrature_schemes.c
+        src/integration/integration_quadrature_io.c
+        src/integration/integration_quadrature_integrate.c
+        )
+
+target_link_libraries(test_gauss_legendre_2d GSL::gsl GSL::gslcblas)
+target_link_libraries(test_gauss_legendre_2d m)
+
+# test gauss legendre quadrature 3d
+add_executable(test_gauss_legendre_3d
+        tests/tests_quadrature_integrate/test_gauss_legendre_3d.c
+        src/constants.h
+        src/bns_nurates.h
+        src/functions/functions.h
+        src/functions/digamma.c
+        src/functions/fermi.c
+        src/functions/gamma.c
+        src/functions/mnewt.c
+        src/functions/safe_exp.c
+        src/integration/integration.h
+        src/integration/integration_quadrature_schemes.c
+        src/integration/integration_quadrature_io.c
+        src/integration/integration_quadrature_integrate.c
+        )
+
+target_link_libraries(test_gauss_legendre_3d GSL::gsl GSL::gslcblas)
+target_link_libraries(test_gauss_legendre_3d m)
+
 enable_testing()
 
 # unit tests
@@ -146,3 +206,9 @@ add_test(NAME test_pair_kernels
         COMMAND $<TARGET_FILE:test_pair_kernels>)
 add_test(NAME test_pair_opacities
         COMMAND $<TARGET_FILE:test_pair_opacities>)
+add_test(NAME test_gauss_legendre_1d
+        COMMAND $<TARGET_FILE:test_gauss_legendre_1d>)
+add_test(NAME test_gauss_legendre_2d
+        COMMAND $<TARGET_FILE:test_gauss_legendre_2d>)
+add_test(NAME test_gauss_legendre_3d
+        COMMAND $<TARGET_FILE:test_gauss_legendre_3d>)
