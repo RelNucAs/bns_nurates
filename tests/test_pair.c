@@ -250,11 +250,27 @@ void TestPairOpacities() {
       {199.99999999999986, 637.21742237179706, 0.61609418279642836}
   };
 
-  const int n = 35;
+  const int n = 50;
   const double a = 0.;
   const double b = 1.;
-  MyQuadrature quad = {.dim =1, .type = kGauleg, .x1=a, .x2=b, .nx = n};
-  GaussLegendre(&quad);
+  MyQuadrature quad = quadrature_default;
+  quad.dim = 1;
+  quad.type = kGauleg;
+  quad.x1 = a;
+  quad.x2 = b;
+  quad.nx = n;
+
+  GaussLegendreMultiD(&quad);
+
+  printf("Quadrature information:\n");
+  printf("points \t\t weights\n");
+  for (int i = 0; i < (quad.nx + quad.ny + quad.nz); i++) {
+    if (i == quad.nx || i == quad.nx + quad.ny) {
+      printf("\n");
+    }
+    printf("%f \t %f\n", quad.points[i], quad.w[i]);
+  }
+  printf("\n");
 
   MyKernelParams my_kernel_params;
   my_kernel_params.pair_kernel_params.filter = filter;
@@ -265,6 +281,10 @@ void TestPairOpacities() {
   my_kernel_params.pair_kernel_params.omega = 0.;
   my_kernel_params.pair_kernel_params.omega_prime = 0.;
 
+  printf("Pair kernel parameters:\n");
+  printf("Filter parameter = %f\n", my_kernel_params.pair_kernel_params.filter);
+  printf("lmax = %f\n", my_kernel_params.pair_kernel_params.lmax);
+
   MyEOSParams my_eos_params;
   my_eos_params.mu_e = mu_e;
   my_eos_params.temp = temp;
@@ -273,6 +293,6 @@ void TestPairOpacities() {
     my_kernel_params.pair_kernel_params.omega = data_albino[0][i];
     MyOpacityQuantity result = PairOpacitiesFermi(&quad, &my_eos_params, &my_kernel_params);
 
-    printf("%0.16e %.16f %0.16f\n", data_albino[i][0], result.em_x, result.abs_x);
+    printf("%0.16e %.16f %0.16f\n", data_albino[i][0], result.em_x, 1./result.abs_x);
   }
 }

@@ -12,21 +12,9 @@
 #include "../functions/functions.h"
 #include "../integration/integration.h"
 
-MyOpacityQuantity BremEmissivityAbsorptivityIntegrandFermi(double omega_prime, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params) {
-  my_kernel_params->brem_kernel_params.omega_prime = omega_prime;
-  MyOpacityQuantity brem_kernel = PairKernels(my_eos_params, &my_kernel_params->pair_kernel_params); // @TODO: fixme!
+MyOpacityQuantity BremEmissivityAbsorptivityIntegrandFermi(double *omega_prime, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params) {
 
-  double fermi_e = FermiDistr(omega_prime, my_eos_params->temp, my_eos_params->mu_e / my_eos_params->temp);
-  double fermi_x = FermiDistr(omega_prime, my_eos_params->temp, 0.);
-
-  MyOpacityQuantity result;
-  double prefactor = kGSqr * 1. / (pow(2. * kPi, 2.)); // @TODO: fixme!
-
-  result.em_e = prefactor * omega_prime * omega_prime * (1. - fermi_e) * brem_kernel.em_e;
-  result.em_x = prefactor * omega_prime * omega_prime * (1. - fermi_x) * brem_kernel.em_x;
-  result.abs_e = prefactor * omega_prime * omega_prime * fermi_e * brem_kernel.abs_e;
-  result.abs_x = prefactor * omega_prime * omega_prime * fermi_x * brem_kernel.abs_x;
-
+  MyOpacityQuantity result = {.em_e = 0., .abs_e = 0., .em_x = 0., .abs_x = 0.};
   return result;
 }
 

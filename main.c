@@ -13,7 +13,8 @@ int main() {
 
   //TestGaussLegendreQuadratureMultiD();
   //TestQuadratureWithGSL();
-  TestIntegrationMultiD();
+  //TestIntegrationMultiD();
+  TestPairOpacities();
   //PrintGaussLegendreQuadrature(10, -1., 1.);
   //printf("\n");
   //PrintGaussLaguerreQuadrature(5, 0.);

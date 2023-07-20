@@ -22,35 +22,59 @@
  */
 MyOpacityQuantity GaussLegendreIntegrateZeroInfSpecial(MyQuadrature *quad, MyFunctionSpecial *func, double t) {
 
-  double f1_em_e[quad->nx], f2_em_e[quad->nx];
-  double f1_abs_e[quad->nx], f2_abs_e[quad->nx];
-  double f1_em_x[quad->nx], f2_em_x[quad->nx];
-  double f1_abs_x[quad->nx], f2_abs_x[quad->nx];
+  double f1_em_e[quad->nx], f2_em_e[quad->nx];    // emissivity e neutrino
+  double f1_abs_e[quad->nx], f2_abs_e[quad->nx];  // absoptivity e neutrino
+  double f1_em_x[quad->nx], f2_em_x[quad->nx];    // emissivity mu/tau neutrino
+  double f1_abs_x[quad->nx], f2_abs_x[quad->nx];  // absorptivity mu/tau neutrino
 
-  for (int i = 0; i < quad->nx; i++) {
-    func->kernel_params->brem_kernel_params.omega_prime = quad->points[i];
-    func->kernel_params->pair_kernel_params.omega_prime = quad->points[i];
+  double f_em_e_y[quad->ny];   // emissivity e neutrino
+  double f_abs_e_y[quad->ny];  // absoptivity e neutrino
+  double f_em_x_y[quad->ny];    // emissivity mu/tau neutrino
+  double f_abs_x_y[quad->ny];  // absorptivity mu/tau neutrino
 
-    MyOpacityQuantity f1_vals = func->function(t * quad->points[i], func->eos_params, func->kernel_params);
-    MyOpacityQuantity f2_vals = func->function(t / quad->points[i], func->eos_params, func->kernel_params);
+  double f_em_e_z[quad->ny];    // emissivity e neutrino
+  double f_abs_e_z[quad->ny];  // absoptivity e neutrino
+  double f_em_x_z[quad->ny];    // emissivity mu/tau neutrino
+  double f_abs_x_z[quad->ny];  // absorptivity mu/tau neutrino
 
-    f1_em_e[i] = f1_vals.em_e;
-    f1_abs_e[i] = f1_vals.abs_e;
-    f1_em_x[i] = f1_vals.em_x;
-    f1_abs_x[i] = f1_vals.abs_x;
+  double w_y[quad->ny], w_z[quad->nz];
+  double var[3];
 
-    f2_em_e[i] = f2_vals.em_e / (quad->points[i] * quad->points[i]);
-    f2_abs_e[i] = f2_vals.abs_e / (quad->points[i] * quad->points[i]);
-    f2_em_x[i] = f2_vals.em_x / (quad->points[i] * quad->points[i]);
-    f2_abs_x[i] = f2_vals.abs_x / (quad->points[i] * quad->points[i]);
+  for (int k = 0; k < quad->nz; k++) {
+    for (int j = 0; j < quad->ny; j++) {
+      for (int i = 0; i < quad->nx; i++) {
+        var[0] = t * quad->points[i];
+        var[1] = quad->points[quad->nx + j];
+        var[2] = quad->points[quad->nx + quad->ny + k];
+
+        MyOpacityQuantity f1_vals = func->function(var, func->eos_params, func->kernel_params);
+        f1_em_e[i] = f1_vals.em_e;
+        f1_abs_e[i] = f1_vals.abs_e;
+        f1_em_x[i] = f1_vals.em_x;
+        f1_abs_x[i] = f1_vals.abs_x;
+
+        var[0] = t / quad->points[i];
+        MyOpacityQuantity f2_vals = func->function(var, func->eos_params, func->kernel_params);
+        f2_em_e[i] = f2_vals.em_e / (quad->points[i] * quad->points[i]);
+        f2_abs_e[i] = f2_vals.abs_e / (quad->points[i] * quad->points[i]);
+        f2_em_x[i] = f2_vals.em_x / (quad->points[i] * quad->points[i]);
+        f2_abs_x[i] = f2_vals.abs_x / (quad->points[i] * quad->points[i]);
+      }
+      f_em_e_y[j] = t * (DoIntegration(quad->nx, quad->w, f1_em_e) + DoIntegration(quad->nx, quad->w, f2_em_e));
+      f_abs_e_y[j] = t * (DoIntegration(quad->nx, quad->w, f1_abs_e) + DoIntegration(quad->nx, quad->w, f2_abs_e));
+      f_em_x_y[j] = t * (DoIntegration(quad->nx, quad->w, f1_em_x) + DoIntegration(quad->nx, quad->w, f2_em_x));
+      f_abs_x_y[j] = t * (DoIntegration(quad->nx, quad->w, f1_abs_x) + DoIntegration(quad->nx, quad->w, f2_abs_x));
+      w_y[j] = quad->w[quad->nx + j];
+    }
+    f_em_e_z[k] = DoIntegration(quad->ny, w_y, f_em_e_y);
+    f_abs_e_z[k] = DoIntegration(quad->ny, w_y, f_abs_e_y);
+    f_em_x_z[k] = DoIntegration(quad->ny, w_y, f_em_x_y);
+    f_abs_x_z[k] = DoIntegration(quad->ny, w_y, f_abs_x_y);
+    w_z[k] = quad->w[quad->nx + quad->ny + k];
   }
 
-  double result_em_e = t * (DoIntegration(quad->nx, quad->w, f1_em_e) + DoIntegration(quad->nx, quad->w, f2_em_e));
-  double result_abs_e = t * (DoIntegration(quad->nx, quad->w, f1_abs_e) + DoIntegration(quad->nx, quad->w, f2_abs_e));
-  double result_em_x = t * (DoIntegration(quad->nx, quad->w, f1_em_x) + DoIntegration(quad->nx, quad->w, f2_em_x));
-  double result_abs_x = t * (DoIntegration(quad->nx, quad->w, f1_abs_x) + DoIntegration(quad->nx, quad->w, f2_abs_x));
-
-  MyOpacityQuantity result = {.em_e = result_em_e, .abs_e = result_abs_e, .em_x = result_em_x, .abs_x = result_abs_x};
+  MyOpacityQuantity result = {.em_e = DoIntegration(quad->nz, f_em_e_z, w_z), .abs_e = DoIntegration(quad->nz, f_abs_e_z, w_z),
+      .em_x = DoIntegration(quad->nz, f_em_x_z, w_z), .abs_x = DoIntegration(quad->nz, f_abs_x_z, w_z)};
 
   return result;
 
