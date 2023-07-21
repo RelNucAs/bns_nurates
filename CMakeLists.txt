@@ -189,6 +189,112 @@ add_executable(test_gauss_legendre_3d
 target_link_libraries(test_gauss_legendre_3d GSL::gsl GSL::gslcblas)
 target_link_libraries(test_gauss_legendre_3d m)
 
+# test gauss laguerre quadrature 1d
+add_executable(test_gauss_laguerre_1d
+        tests/tests_quadrature_integrate/test_gauss_laguerre_1d.c
+        src/constants.h
+        src/bns_nurates.h
+        src/functions/functions.h
+        src/functions/digamma.c
+        src/functions/fermi.c
+        src/functions/gamma.c
+        src/functions/mnewt.c
+        src/functions/safe_exp.c
+        src/integration/integration.h
+        src/integration/integration_quadrature_schemes.c
+        src/integration/integration_quadrature_io.c
+        src/integration/integration_quadrature_integrate.c
+        )
+
+target_link_libraries(test_gauss_laguerre_1d GSL::gsl GSL::gslcblas)
+target_link_libraries(test_gauss_laguerre_1d m)
+
+# test quadrature I/O
+add_executable(test_quadrature_io
+        tests/tests_quadrature_integrate/test_quadrature_io.c
+        src/constants.h
+        src/bns_nurates.h
+        src/functions/functions.h
+        src/functions/digamma.c
+        src/functions/fermi.c
+        src/functions/gamma.c
+        src/functions/mnewt.c
+        src/functions/safe_exp.c
+        src/integration/integration.h
+        src/integration/integration_quadrature_schemes.c
+        src/integration/integration_quadrature_io.c
+        src/integration/integration_quadrature_integrate.c
+        )
+
+target_link_libraries(test_quadrature_io GSL::gsl GSL::gslcblas)
+target_link_libraries(test_quadrature_io m)
+
+# test 1d integration
+add_executable(test_integration_1d
+        tests/tests_quadrature_integrate/test_integration_1d.c
+        tests/tests_quadrature_integrate/gsl_routines/integration_gsl.h
+        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
+        src/constants.h
+        src/bns_nurates.h
+        src/functions/functions.h
+        src/functions/digamma.c
+        src/functions/fermi.c
+        src/functions/gamma.c
+        src/functions/mnewt.c
+        src/functions/safe_exp.c
+        src/integration/integration.h
+        src/integration/integration_quadrature_schemes.c
+        src/integration/integration_quadrature_io.c
+        src/integration/integration_quadrature_integrate.c
+        )
+
+target_link_libraries(test_integration_1d GSL::gsl GSL::gslcblas)
+target_link_libraries(test_integration_1d m)
+
+# test 2d integration
+add_executable(test_integration_2d
+        tests/tests_quadrature_integrate/test_integration_2d.c
+        tests/tests_quadrature_integrate/gsl_routines/integration_gsl.h
+        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
+        src/constants.h
+        src/bns_nurates.h
+        src/functions/functions.h
+        src/functions/digamma.c
+        src/functions/fermi.c
+        src/functions/gamma.c
+        src/functions/mnewt.c
+        src/functions/safe_exp.c
+        src/integration/integration.h
+        src/integration/integration_quadrature_schemes.c
+        src/integration/integration_quadrature_io.c
+        src/integration/integration_quadrature_integrate.c
+        )
+
+target_link_libraries(test_integration_2d GSL::gsl GSL::gslcblas)
+target_link_libraries(test_integration_2d m)
+
+# test 2d integration
+add_executable(test_integration_3d
+        tests/tests_quadrature_integrate/test_integration_3d.c
+        tests/tests_quadrature_integrate/gsl_routines/integration_gsl.h
+        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
+        src/constants.h
+        src/bns_nurates.h
+        src/functions/functions.h
+        src/functions/digamma.c
+        src/functions/fermi.c
+        src/functions/gamma.c
+        src/functions/mnewt.c
+        src/functions/safe_exp.c
+        src/integration/integration.h
+        src/integration/integration_quadrature_schemes.c
+        src/integration/integration_quadrature_io.c
+        src/integration/integration_quadrature_integrate.c
+        )
+
+target_link_libraries(test_integration_3d GSL::gsl GSL::gslcblas)
+target_link_libraries(test_integration_3d m)
+
 enable_testing()
 
 # unit tests
@@ -212,3 +318,13 @@ add_test(NAME test_gauss_legendre_2d
         COMMAND $<TARGET_FILE:test_gauss_legendre_2d>)
 add_test(NAME test_gauss_legendre_3d
         COMMAND $<TARGET_FILE:test_gauss_legendre_3d>)
+add_test(NAME test_gauss_laguerre_1d
+        COMMAND $<TARGET_FILE:test_gauss_laguerre_1d>)
+add_test(NAME test_quadrature_io
+        COMMAND $<TARGET_FILE:test_quadrature_io>)
+add_test(NAME test_integration_1d
+        COMMAND $<TARGET_FILE:test_integration_1d>)
+add_test(NAME test_integration_2d
+        COMMAND $<TARGET_FILE:test_integration_2d>)
+add_test(NAME test_integration_3d
+        COMMAND $<TARGET_FILE:test_integration_3d>)

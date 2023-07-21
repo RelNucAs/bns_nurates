@@ -2,16 +2,16 @@
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
-//! \file  tests_integration.c
-//  \brief test integration routines
+//! \file  test_integration_1d.c
+//  \brief test 1d integration routine
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <gsl/gsl_math.h>
-#include "tests.h"
-#include "../src/bns_nurates.h"
-#include "../src/integration/integration.h"
+#include "gsl_routines/integration_gsl.h"
+#include "../../src/bns_nurates.h"
+#include "../../src/integration/integration.h"
 
 // parameters for test functions
 struct FermiDiracParams {
@@ -36,6 +36,7 @@ double ModifiedFermiDiracLegendre(double *x, void *p) {
 double FermiDiracLegendreGSL(double x, void *p) {
   return ModifiedFermiDiracLegendre(&x, p);
 }
+
 /* Fermi-Dirac function divided by exp(-points) designed for use
  * with Gauss-Laguerre routines
  *
@@ -55,10 +56,16 @@ double FermiDiracLaguerreGSL(double x, void *p) {
 }
 
 double SimpleLaguerreFunc(double x, void *p) {
-  return 1./(x*x*exp(x));
+  return 1. / (x * x * exp(x));
 }
 
-void TestQuadratureWithGSL() {
+int main() {
+
+  printf("===================================\n");
+  printf("Testing 1d integration routines ...\n");
+  printf("===================================\n");
+
+  double max_error = -42.;
 
   // function and parameters
   FermiDiracParams fd_p = {.k = 5, .eta = 10};
@@ -81,13 +88,20 @@ void TestQuadratureWithGSL() {
   const double b = 1.;
   double gaulag_result_gsl = GSLLagQuadrature(n, a, b, alpha, &f);
   double gaulag_result = GaussLaguerreIntegrateZeroInf(&quad, &fermi);
+
+  printf("Integrate Fermi-Dirac function ...\n");
+  printf("\n");
   printf("Gauss-Laguerre integration from 0 to inf (GSL):   %.5e\n", gaulag_result_gsl);
   printf("Gauss-Laguerre integration from 0 to inf (our):   %.5e\n", gaulag_result);
+  printf("Max error for Gauss-Laguerre result: %0.16e\n", fabs(gaulag_result - gaulag_result_gsl));
+
+  if (fabs(gaulag_result - gaulag_result_gsl) > max_error) {
+    max_error = fabs(gaulag_result - gaulag_result_gsl);
+  }
 
   // Gauss-Legendre integration tests
   f.function = &FermiDiracLegendreGSL;
   fermi.function = &ModifiedFermiDiracLegendre;
-
 
   // Gauss-Legendre integration from 0 to 1 (weight = 1)
   // first version
@@ -106,6 +120,15 @@ void TestQuadratureWithGSL() {
     gauleg_result += ModifiedFermiDiracLegendre(&quad.points[i], &fd_p) * quad.w[i];
   }
   printf("Gauss-Legendre integration from 0 to 1 (   ours   ): %.5e\n", gauleg_result);
+  printf("Maximum error between our result & GSL type 1: %0.16e\n", fabs(gauleg_result - gauleg_result_gsl_1));
+  printf("Maximum error between our result & GSL type 2: %0.16e\n", fabs(gauleg_result - gauleg_result_gsl_2));
+
+  if (fabs(gauleg_result - gauleg_result_gsl_1) > max_error) {
+    max_error = fabs(gauleg_result - gauleg_result_gsl_1);
+  }
+  if (fabs(gauleg_result - gauleg_result_gsl_2) > max_error) {
+    max_error = fabs(gauleg_result - gauleg_result_gsl_2);
+  }
 
   // Gauss-Legendre integration from 0 to inf (integral split at s)
   double s = 10.;
@@ -114,45 +137,16 @@ void TestQuadratureWithGSL() {
   printf("\n");
   printf("Gauss-Legendre integration of Fermi function from 0 to inf (GSL):   %.5e\n", gauleg_inf_gsl);
   printf("Gauss-Legendre integration of Fermi function from 0 to inf (our):   %.5e\n", gauleg_inf);
+  printf("Maximum error: %0.16e\n", fabs(gauleg_inf - gauleg_inf_gsl));
 
-}
+  if (fabs(gauleg_inf - gauleg_inf_gsl) > max_error) {
+    max_error = fabs(gauleg_inf - gauleg_inf_gsl);
+  }
 
-void TestIntegrationMultiD() {
+  if (max_error < 1e-5) {
+    return 0;
+  } else {
+    return 1;
+  }
 
-  // function and parameters
-  FermiDiracParams fd_p = {.k = 5, .eta = 10};
-  gsl_function f;
-  f.function = &FermiDiracLaguerreGSL;
-  f.params = &fd_p;
-
-  MyFunction fermi;
-  fermi.function = &ModifiedFermiDiracLegendre;
-  fermi.params = &fd_p;
-
-  MyQuadrature quad = quadrature_default;
-  quad.dim = 3;
-  quad.type = kGauleg;
-  quad.x1 = 0.;
-  quad.x2 = 1.;
-  quad.nx = 35;
-  quad.y1 = -1.;
-  quad.y2 = 1.;
-  quad.ny = 35;
-  quad.z1 = 0.;
-  quad.z2 = 3;
-  quad.nz = 35;
-
-  GaussLegendreMultiD(&quad);
-
-  f.function = &FermiDiracLegendreGSL;
-  fermi.function = &ModifiedFermiDiracLegendre;
-
-  // Gauss-Legendre integration from 0 to inf (integral split at s)
-  double s = 10.;
-  double gauleg_inf_gsl = GslLegInfSplit(35, &f, s);
-  double gauleg_inf = GaussLegendreIntegrateZeroInf(&quad, &fermi, s);
-
-  printf("Integrate Fermi(x) dx dy dz from x = 0 to inf, y = -1 to 1, z = 0 to 3!\n");
-  printf("Result (GSL):   %.5e\n", 6.*gauleg_inf_gsl);
-  printf("Result (our):   %.5e\n", gauleg_inf);
 }
