@@ -31,10 +31,8 @@ add_executable(bns_nurates
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
-        tests/tests_quadrature.c
         src/opacities/kernels/kernel_brem.c
         src/opacities/kernels/kernel_pair.c
-        tests/tests_integration.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
         src/integration/integration_quadrature_integrate_kernels.c tests/test_pair.c tests/test_brem.c)
