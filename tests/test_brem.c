@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include "tests.h"
+//#include "tests.h"
 #include "../src/bns_nurates.h"
 #include "../src/opacities/kernels/kernels.h"
 #include "../src/integration/integration.h"

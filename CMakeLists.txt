@@ -24,7 +24,6 @@ add_executable(bns_nurates
         src/opacities/nu_abs_em_nuclabs.c
         src/output/outputs.h
         src/eos/eos.h
-        tests/tests.h
         tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
         tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.c
         tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
