@@ -30,15 +30,19 @@ int main() {
 
   double max_error = -42.;
 
-  printf("PairF comparison\n");
-  printf("================\n");
-  printf("F(ours) \t\t F(python) \t\t\t |diff|\n");
+  printf("==================================================\n");
+  printf("Pair procrss: Comparison of F with old Python code\n");
+  printf("==================================================\n");
+
+  printf("F(ours) \t\t F(python) \t |diff|\n");
   for (int i = 0; i < 6; i++) {
-    printf("%0.16e \t %0.16e \t %0.16e\n", pair_f[i], pair_f_python[i], fabs(pair_f[i] - pair_f_python[i]));
+    printf("%0.6e \t %0.6e \t %0.6e\n", pair_f[i], pair_f_python[i], fabs(pair_f[i] - pair_f_python[i]));
     if (fabs(pair_f[i] - pair_f_python[i]) > max_error) {
       max_error = fabs(pair_f[i] - pair_f_python[i]);
     }
   }
+
+  printf("Maximum error: %.16e\n", max_error);
 
   if (max_error < 1e-10) {
     return 0;

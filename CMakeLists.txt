@@ -35,7 +35,7 @@ add_executable(bns_nurates
         src/opacities/kernels/kernel_pair.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
-        src/integration/integration_quadrature_integrate_kernels.c tests/test_pair.c tests/test_brem.c)
+        src/integration/integration_quadrature_integrate_kernels.c tests/test_brem.c)
 
 target_link_libraries(bns_nurates GSL::gsl GSL::gslcblas)
 target_link_libraries(bns_nurates m)
@@ -293,6 +293,29 @@ add_executable(test_integration_3d
 target_link_libraries(test_integration_3d GSL::gsl GSL::gslcblas)
 target_link_libraries(test_integration_3d m)
 
+# test integration special
+add_executable(test_integration_special
+        tests/tests_quadrature_integrate/test_integration_special.c
+        tests/tests_quadrature_integrate/gsl_routines/integration_gsl.h
+        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
+        src/constants.h
+        src/bns_nurates.h
+        src/functions/functions.h
+        src/functions/digamma.c
+        src/functions/fermi.c
+        src/functions/gamma.c
+        src/functions/mnewt.c
+        src/functions/safe_exp.c
+        src/integration/integration.h
+        src/integration/integration_quadrature_schemes.c
+        src/integration/integration_quadrature_io.c
+        src/integration/integration_quadrature_integrate.c
+        src/integration/integration_quadrature_integrate_kernels.c
+        )
+
+target_link_libraries(test_integration_special GSL::gsl GSL::gslcblas)
+target_link_libraries(test_integration_special m)
+
 enable_testing()
 
 # unit tests
@@ -326,3 +349,5 @@ add_test(NAME test_integration_2d
         COMMAND $<TARGET_FILE:test_integration_2d>)
 add_test(NAME test_integration_3d
         COMMAND $<TARGET_FILE:test_integration_3d>)
+add_test(NAME test_integration_special
+        COMMAND $<TARGET_FILE:test_integration_special>)

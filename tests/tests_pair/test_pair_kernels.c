@@ -37,8 +37,10 @@ int main() {
 
   double pair_kernels[18][7];
 
-  printf("Pair Kernel comparison\n");
-  printf("======================\n");
+  printf("=============================================================\n");
+  printf("Pair process: Comparison of pair kernels with old Python code\n");
+  printf("=============================================================\n");
+
   printf(
       "omega omega' cos_theta R_em_e (new) R_em_e (python) %% err  R_abs_e (new)    R_abs_e (python) %% err  R_em_x (new)     R_em_x (python)  %% err  R_abs_x (new)    R_abs_x (python) %% err\n");
 
@@ -79,6 +81,7 @@ int main() {
     }
   }
 
+  printf("Maximum percentage error: %.16e\n", max_percentage_error);
   if (max_percentage_error < 0.9) {
     return 0;
   } else {

@@ -27,15 +27,19 @@ int main() {
 
   double max_error = -42.;
 
-  printf("PairT comparison\n");
-  printf("================\n");
-  printf("T(ours) \t\t T(python) \t\t\t |diff|\n");
+  printf("==================================================\n");
+  printf("Pair process: Comparison of T with old Python code\n");
+  printf("==================================================\n");
+
+  printf("T(ours) \t\t T(python) \t |diff|\n");
   for (int i = 0; i < 5; i++) {
-    printf("%0.16e \t %0.16e \t %0.16e\n", pair_t[i], pair_t_python[i], fabs(pair_t[i] - pair_t_python[i]));
+    printf("%0.6e \t %0.6e \t %0.6e\n", pair_t[i], pair_t_python[i], fabs(pair_t[i] - pair_t_python[i]));
     if (fabs(pair_t[i] - pair_t_python[i]) > max_error) {
       max_error = fabs(pair_t[i] - pair_t_python[i]);
     }
   }
+
+  printf("Maximum error: %0.16e\n", max_error);
 
   if (max_error < 1e-10) {
     return 0;

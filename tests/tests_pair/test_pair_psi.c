@@ -34,15 +34,19 @@ int main() {
 
   double max_error = -42.;
 
-  printf("PairPsi comparison\n");
-  printf("==================\n");
-  printf("Psi(ours) \t\t Psi(python) \t\t |diff|\n");
+  printf("====================================================\n");
+  printf("Pair process: Comparison of Psi with old Python code\n");
+  printf("====================================================\n");
+
+  printf("Psi(ours) \t\t Psi(python) \t |diff|\n");
   for (int i = 0; i < 8; i++) {
-    printf("%0.16e  %0.16e  %0.16e\n", pair_psi[i], pair_psi_python[i], fabs(pair_psi[i] - pair_psi_python[i]));
+    printf("%0.6e \t %0.6e \t %0.6e\n", pair_psi[i], pair_psi_python[i], fabs(pair_psi[i] - pair_psi_python[i]));
     if (fabs(pair_psi[i] - pair_psi_python[i]) > max_error) {
       max_error = fabs(pair_psi[i] - pair_psi_python[i]);
     }
   }
+
+  printf("Maximum error: %.16e\n", max_error);
 
   if (max_error < 1e-6) {
     return 0;

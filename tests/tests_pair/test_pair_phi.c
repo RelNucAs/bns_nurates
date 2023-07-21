@@ -25,15 +25,18 @@ int main() {
       2.999896383246949e-39
   };
 
-  printf("PairPhi 'e' comparison\n");
-  printf("==================\n");
-  printf("Phi(ours) \t\t Phi(python) \t\t |diff|\n");
+  printf("====================================================\n");
+  printf("Pair process: Comparison of Phi with old Python code\n");
+  printf("====================================================\n");
+  printf("Test 1: 'e' neutrinos\n");
+  printf("Phi(ours) \t\t Phi(python) \t |diff|\n");
   for (int i = 0; i < 3; i++) {
-    printf("%0.16e  %0.16e  %0.16e\n", pair_phi_e[i], pair_phi_e_python[i], fabs(pair_phi_e[i] - pair_phi_e_python[i]));
+    printf("%0.6e \t %0.6e \t %0.6e\n", pair_phi_e[i], pair_phi_e_python[i], fabs(pair_phi_e[i] - pair_phi_e_python[i]));
     if (fabs(pair_phi_e[i] - pair_phi_e_python[i]) > max_error) {
       max_error = fabs(pair_phi_e[i] - pair_phi_e_python[i]);
     }
   }
+  printf("Maximum error: %.16e\n", max_error);
 
   double pair_phi_x[3];
 
@@ -47,15 +50,17 @@ int main() {
       -1.5966596697987114e-40
   };
 
-  printf("PairPhi 'x' comparison\n");
-  printf("======================\n");
-  printf("Phi(ours) \t\t Phi(python) \t\t |diff|\n");
+  printf("\n");
+  printf("Test 2: 'x' neutrinos\n");
+  printf("Phi(ours) \t\t Phi(python) \t |diff|\n");
   for (int i = 0; i < 3; i++) {
-    printf("%0.16e  %0.16e  %0.16e\n", pair_phi_x[i], pair_phi_x_python[i], fabs(pair_phi_x[i] - pair_phi_x_python[i]));
+    printf("%0.6e \t %0.6e \t %0.6e\n", pair_phi_x[i], pair_phi_x_python[i], fabs(pair_phi_x[i] - pair_phi_x_python[i]));
     if (fabs(pair_phi_x[i] - pair_phi_x_python[i]) > max_error) {
       max_error = fabs(pair_phi_x[i] - pair_phi_x_python[i]);
     }
   }
+
+  printf("Maximum error: %.16e\n", max_error);
 
   if (max_error < 1e-14) {
     return 0;

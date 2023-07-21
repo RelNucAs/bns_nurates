@@ -28,15 +28,18 @@ int main() {
 
   double max_error = -42.;
 
-  printf("PairG comparison\n");
-  printf("================\n");
-  printf("G(ours) \t\t G(python) \t\t\t |diff|\n");
+  printf("==================================================\n");
+  printf("Pair process: Comparison of G with old Python code\n");
+  printf("==================================================\n");
+  printf("G(ours) \t\t G(python) \t |diff|\n");
   for (int i = 0; i < 6; i++) {
-    printf("%0.16e \t %0.16e \t %0.16e\n", pair_g[i], pair_g_python[i], fabs(pair_g[i] - pair_g_python[i]));
+    printf("%0.6e \t %0.6e \t %0.6e\n", pair_g[i], pair_g_python[i], fabs(pair_g[i] - pair_g_python[i]));
     if (fabs(pair_g[i] - pair_g_python[i]) > max_error) {
       max_error = fabs(pair_g[i] - pair_g_python[i]);
     }
   }
+
+  printf("Maximum error: %.16e\n", max_error);
 
   if (max_error < 1e-10) {
     return 0;

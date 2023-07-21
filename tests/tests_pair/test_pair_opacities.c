@@ -2,23 +2,21 @@
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
-//! \file  tests_pair_kernels.c
+//! \file  tests_pair_opacities.c
 //  \brief Generate emissivity and absorptivity tables considering thermal equilibrium and compare with Albino's result
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <math.h>
 #include "../../src/bns_nurates.h"
-#include "../../src/opacities/kernels/kernels.h"
 #include "../../src/integration/integration.h"
 #include "../../src/opacities/opacities.h"
 
 int main() {
+
+  int max_error = -42.;
+
+  // Data from Albino
   double temp = 30.;
   double mu_e = 4. * 30;
-  int lmax = 0;
-  int filter = 0.;
 
   double data_albino[12][3] = { //omega(MeV) emissivity (km^-1) mean free path (km) [x neutrinos]
       {2.0000000000000000, 1208.8403883182957, 235.74209542285573},
@@ -35,15 +33,15 @@ int main() {
       {199.99999999999986, 637.21742237179706, 0.61609418279642836}
   };
 
-  const int n = 50;
-  const double a = 0.;
-  const double b = 1.;
+
+  int lmax = 0;
+  int filter = 0.;
   MyQuadrature quad = quadrature_default;
   quad.dim = 1;
   quad.type = kGauleg;
-  quad.x1 = a;
-  quad.x2 = b;
-  quad.nx = n;
+  quad.x1 = 0.;
+  quad.x2 = 1.;
+  quad.nx = 45;
 
   GaussLegendreMultiD(&quad);
 
@@ -80,4 +78,6 @@ int main() {
 
     printf("%0.16e %.16f %0.16f\n", data_albino[i][0], result.em_x, 1. / result.abs_x);
   }
+
+  return 1;
 }
