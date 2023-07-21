@@ -29,8 +29,8 @@ MyOpacityQuantity PairEmissivityAbsorptivityIntegrandFermi(double *var, MyEOSPar
   result.em_e = var[0] * var[0] * (1. - fermi_e) * pair_kernel.em_e;
   result.em_x = var[0] * var[0] * (1. - fermi_x) * pair_kernel.em_x;
 
-  result.abs_e = var[0] * var[0] * fermi_e * exp((my_kernel_params->pair_kernel_params.omega + var[0]) / my_eos_params->temp) * pair_kernel.abs_e;
-  result.abs_x = var[0] * var[0] * fermi_x * exp((my_kernel_params->pair_kernel_params.omega + var[0]) / my_eos_params->temp) * pair_kernel.abs_x;
+  result.abs_e = var[0] * var[0] * fermi_e * pair_kernel.abs_e;
+  result.abs_x = var[0] * var[0] * fermi_x * pair_kernel.abs_x;
 
   return result;
 

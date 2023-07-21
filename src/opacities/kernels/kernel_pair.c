@@ -11,6 +11,7 @@
 #include <gsl/gsl_sf_legendre.h>
 #include <gsl/gsl_sf_zeta.h>
 #include "kernels.h"
+#include "../../functions/functions.h"
 #include "../../constants.h"
 
 /* Compute T_l(alpha) as defined in Appendix B of Pons et. al. (1998)
@@ -371,8 +372,8 @@ MyOpacityQuantity PairKernelsPhiMuIntegrated(MyEOSParams *eos_pars, PairKernelPa
   double pair_kernel_production_e = 2. * kPi * pair_phi_e;
   double pair_kernel_production_x = 2. * kPi * pair_phi_x;
 
-  double pair_kernel_absorption_e = exp((omega + omega_prime) / temp) * pair_kernel_production_e;
-  double pair_kernel_absorption_x = exp((omega + omega_prime) / temp) * pair_kernel_production_x;
+  double pair_kernel_absorption_e = SafeExp((omega + omega_prime) / temp) * pair_kernel_production_e;
+  double pair_kernel_absorption_x = SafeExp((omega + omega_prime) / temp) * pair_kernel_production_x;
 
   const double kPrefactor = 1. / (kClight * pow(kH * kClight, 3.));
   //const double kPrefactor = 1.;
