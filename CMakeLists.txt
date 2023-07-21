@@ -34,7 +34,7 @@ add_executable(bns_nurates
         src/opacities/kernels/kernel_pair.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
-        src/integration/integration_quadrature_integrate_kernels.c tests/test_brem.c)
+        src/integration/integration_quadrature_integrate_kernels.c)
 
 target_link_libraries(bns_nurates GSL::gsl GSL::gslcblas)
 target_link_libraries(bns_nurates m)
@@ -100,6 +100,17 @@ add_executable(test_pair_kernels
 
 target_link_libraries(test_pair_kernels GSL::gsl GSL::gslcblas)
 target_link_libraries(test_pair_kernels m)
+
+# test pair kernel Kernels phi integrated
+add_executable(test_pair_kernels_phi_mu_integrated
+        tests/tests_pair/test_pair_kernels_phi_mu_integrated.c
+        src/constants.h
+        src/opacities/kernels/kernels.h
+        src/opacities/kernels/kernel_pair.c
+        )
+
+target_link_libraries(test_pair_kernels_phi_mu_integrated GSL::gsl GSL::gslcblas)
+target_link_libraries(test_pair_kernels_phi_mu_integrated m)
 
 # test pair kernel opacities
 add_executable(test_pair_opacities
@@ -330,6 +341,8 @@ add_test(NAME test_pair_phi
         COMMAND $<TARGET_FILE:test_pair_phi>)
 add_test(NAME test_pair_kernels
         COMMAND $<TARGET_FILE:test_pair_kernels>)
+add_test(NAME test_pair_kernels_phi_mu_integrated
+        COMMAND $<TARGET_FILE:test_pair_kernels_phi_mu_integrated>)
 add_test(NAME test_pair_opacities
         COMMAND $<TARGET_FILE:test_pair_opacities>)
 add_test(NAME test_gauss_legendre_1d

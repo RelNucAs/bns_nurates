@@ -12,10 +12,14 @@
 #include "../functions/functions.h"
 #include "../integration/integration.h"
 
+// Calculate the 4 integrands needed for computing pair opacities (assuming no dependence on mu' and phi')
+// var[3]: [omega' mu' phi'] can in generally have 3 variables but the kernel we are considering has already
+// been integrated over mu' and phi' and therefore only depends on the anti-neutrino energy (nu') and EOS/Kernel
+// parameters.
 MyOpacityQuantity PairEmissivityAbsorptivityIntegrandFermi(double *var, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params) {
 
   my_kernel_params->pair_kernel_params.omega_prime = var[0];
-  MyOpacityQuantity pair_kernel = PairKernelsPhiMuIntegrated(&my_kernel_params->pair_kernel_params, my_eos_params);
+  MyOpacityQuantity pair_kernel = PairKernelsPhiMuIntegrated(my_eos_params, &my_kernel_params->pair_kernel_params);
 
   double fermi_e = FermiDistr(var[0], my_eos_params->temp, my_eos_params->mu_e / my_eos_params->temp);
   double fermi_x = FermiDistr(var[0], my_eos_params->temp, 0.);
@@ -24,16 +28,17 @@ MyOpacityQuantity PairEmissivityAbsorptivityIntegrandFermi(double *var, MyEOSPar
 
   result.em_e = var[0] * var[0] * (1. - fermi_e) * pair_kernel.em_e;
   result.em_x = var[0] * var[0] * (1. - fermi_x) * pair_kernel.em_x;
-  result.abs_e = var[0] * var[0] * fermi_e * pair_kernel.abs_e;
-  result.abs_x = var[0] * var[0] * fermi_x * pair_kernel.abs_x;
+
+  result.abs_e = var[0] * var[0] * fermi_e * exp((my_kernel_params->pair_kernel_params.omega + var[0]) / my_eos_params->temp) * pair_kernel.abs_e;
+  result.abs_x = var[0] * var[0] * fermi_x * exp((my_kernel_params->pair_kernel_params.omega + var[0]) / my_eos_params->temp) * pair_kernel.abs_x;
 
   return result;
+
 }
 
 MyOpacityQuantity PairOpacitiesFermi(MyQuadrature *quad, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params) {
 
-  //double t = 1.5 * my_eos_params->temp;
-  double t = 1.;
+  double t = 1.5 * my_eos_params->temp;
   MyFunctionSpecial func;
   func.function = &PairEmissivityAbsorptivityIntegrandFermi;
   func.dim = 1;

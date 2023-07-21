@@ -48,7 +48,7 @@ double SFPsi(const double x);
 
 // Computation of Fermi-Dirac distribution function
 double FermiDistr(const double e, const double temp, const double mu);
-
+double pair_fermi_dirac(double omega_prime, double eta_prime_electron, double Temp);
 /*===========================================================================*/
 
 // gamma.c
@@ -62,13 +62,13 @@ double Gammln(const double xx);
 
 // Implementation of 1D Newton-Raphson root finding
 double MNewt1d(double x, double guess,
-             double x1, double x2, double f0,
-             MyFunction *func, MyFunction *dfunc);
+               double x1, double x2, double f0,
+               MyFunction *func, MyFunction *dfunc);
 
 // Implementation of 2D Newton-Raphson root finding
 void MNewt2d(double *x,
              double C[2],
-             void (*fdf)(double*, double*, double*, double*));
+             void (*fdf)(double *, double *, double *, double *));
 
 /*===========================================================================*/
 

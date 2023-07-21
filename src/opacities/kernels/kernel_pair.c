@@ -310,7 +310,7 @@ MyOpacityQuantity PairKernels(MyEOSParams *eos_pars, PairKernelParams *kernel_pa
  *
  * l is an integer.
  */
-MyKernel PairKernelsPhiIntegrated(PairKernelParams *kernel_pars, MyEOSParams *eos_pars) {
+MyKernel PairKernelsPhiIntegrated(MyEOSParams *eos_pars, PairKernelParams *kernel_pars) {
 
   // kernel specific parameters
   double omega = kernel_pars->omega;
@@ -353,7 +353,7 @@ MyKernel PairKernelsPhiIntegrated(PairKernelParams *kernel_pars, MyEOSParams *eo
 
 }
 
-MyOpacityQuantity PairKernelsPhiMuIntegrated(PairKernelParams *kernel_pars, MyEOSParams *eos_pars) {
+MyOpacityQuantity PairKernelsPhiMuIntegrated(MyEOSParams *eos_pars, PairKernelParams *kernel_pars) {
 
   // kernel specific parameters
   double omega = kernel_pars->omega;
@@ -375,6 +375,7 @@ MyOpacityQuantity PairKernelsPhiMuIntegrated(PairKernelParams *kernel_pars, MyEO
   double pair_kernel_absorption_x = exp((omega + omega_prime) / temp) * pair_kernel_production_x;
 
   const double kPrefactor = 1. / (kClight * pow(kH * kClight, 3.));
+  //const double kPrefactor = 1.;
 
   MyOpacityQuantity pair_kernel = {.abs_e = kPrefactor * pair_kernel_absorption_e, .em_e = kPrefactor * pair_kernel_production_e,
       .abs_x = kPrefactor * pair_kernel_absorption_x, .em_x = kPrefactor * pair_kernel_production_x};

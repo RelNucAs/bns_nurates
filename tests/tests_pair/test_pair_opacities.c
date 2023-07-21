@@ -73,10 +73,10 @@ int main() {
   my_eos_params.temp = temp;
 
   for (int i = 0; i < 12; i++) {
-    my_kernel_params.pair_kernel_params.omega = data_albino[0][i];
+    my_kernel_params.pair_kernel_params.omega = data_albino[i][0];
     MyOpacityQuantity result = PairOpacitiesFermi(&quad, &my_eos_params, &my_kernel_params);
 
-    printf("%0.16e %.16f %0.16f\n", data_albino[i][0], result.em_x, 1. / result.abs_x);
+    printf("%0.16e %.16e %0.16e %0.16e %0.16e\n", data_albino[i][0], data_albino[i][1], result.em_x, data_albino[i][2], result.abs_e);
   }
 
   return 1;
