@@ -179,4 +179,29 @@ struct MyOpacity {
 };
 typedef struct MyOpacity MyOpacity;
 
+// SourceCoeffs struct
+// structure needed for storing the values of the 
+// emissivity and absoprtion/scattering coefficients
+// for the different neutrino species as in Radice
+// et al. (2022)
+struct SourceCoeffs {
+  double R_nue;    // number, electron-type neutrino
+  double R_anue;   // number, electron-type antineutrino
+  //double R_num;    // number, muon-type neutrino
+  //double R_anum;   // number, muon-type antineutrino
+  double R_nux;    // number, heavy-type (anti)neutrino
+  double Q_nue;    // energy, electron-type neutrino
+  double Q_anue;   // energy, electron-type antineutrino
+  //double Q_num;    // energy, muon-type neutrino
+  //double Q_anum;   // energy, muon-type antineutrino
+  double Q_nux;    // energy, heavy-type (anti)neutrino
+};
+typedef struct SourceCoeffs SourceCoeffs;
+
+// NuDistributionParams struct
+// structure needed for storing the parameters of the 
+// neutrino distribution function
+//struct NuDistributionParams {
+  
+//}
 #endif //BNS_NURATES_SRC_BNS_NURATES_H_

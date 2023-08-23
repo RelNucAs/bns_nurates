@@ -48,7 +48,7 @@ const int  ntrial_1d = 150;      // Maximum allowed number of iterations.
 const double xacc_1d = 1.0E-07;  // Set the accuracy for Newton Raphson
 
 // 1D Newton-Raphson with analytic derivative 
-double MNewt1d(double x, double guess, double x1, double x2, double f0,
+double MNewt1d(double guess, double x1, double x2, double f0,
                MyFunction *func, MyFunction *dfunc) {
 // Using a combination of Newton-Raphson and bisection, return the solution
 // of f(x) = f0 bracketed between x1 and x2. The root will be refined

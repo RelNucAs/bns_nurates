@@ -14,7 +14,6 @@ struct OpacityParams {
   double omega;    // (anti)neutrino energy [MeV]
   bool use_dU;     // flag for dU correction
   bool use_WM_ab;  // flag for WM correction (and related) on absorption rates
-  bool use_WM_sc;  // flag for WM correction (and related) on scattering rates
 };
 typedef struct OpacityParams OpacityParams;
 
@@ -27,6 +26,9 @@ MyOpacity AbsOpacity(OpacityParams *opacity_pars, MyEOSParams *eos_pars);
 
 // Stimulated absoption version
 MyOpacity StimAbsOpacity(OpacityParams *opacity_pars, MyEOSParams *eos_pars);
+
+// Emission coefficients
+SourceCoeffs NuclAbsEmissionCoeffs(MyEOSParams *eos_pars);
 
 /*===========================================================================*/
 

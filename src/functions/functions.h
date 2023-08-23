@@ -61,8 +61,7 @@ double Gammln(const double xx);
 // mnewt.c
 
 // Implementation of 1D Newton-Raphson root finding
-double MNewt1d(double x, double guess,
-               double x1, double x2, double f0,
+double MNewt1d(double guess, double x1, double x2, double f0,
                MyFunction *func, MyFunction *dfunc);
 
 // Implementation of 2D Newton-Raphson root finding
