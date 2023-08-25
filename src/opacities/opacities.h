@@ -19,7 +19,7 @@ typedef struct OpacityParams OpacityParams;
 
 /*===========================================================================*/
 
-// nu_abs_em_nuclabs.h
+// nu_abs_em_beta.h
 
 // (Anti)neutrino absorption on nucleons
 MyOpacity AbsOpacity(OpacityParams *opacity_pars, MyEOSParams *eos_pars);

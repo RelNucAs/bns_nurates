@@ -26,7 +26,7 @@ void WMAbsEm(const double omega, double* R, double* Rbar) {
   const double tmp3 = (kGv*kGv+3.0*kGa*kGa)*pow(1.+2.*ehor,3.);
   
   R_nu  = (tmp1+tmp2)/tmp3; // Eq.(22) 
-  R_anu = (tmp1-tmp2)/tmp3; //Eq.(22)
+  R_anu = (tmp1-tmp2)/tmp3; // Eq.(22)
 
   R     = &R_nu;
   Rbar = &R_anu;

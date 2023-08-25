@@ -198,10 +198,13 @@ struct SourceCoeffs {
 };
 typedef struct SourceCoeffs SourceCoeffs;
 
-// NuDistributionParams struct
-// structure needed for storing the parameters of the 
-// neutrino distribution function
-//struct NuDistributionParams {
-  
-//}
+struct M1Quantities {
+  double n;    // radiation number density
+  double J;    // radiation energy density
+  double H[4]; // radiation flux components(only three are independent since
+               //                           H^alpha u_alpha = 0)
+  double chi;  // closure
+};
+typedef struct M1Quantities M1Quantities;
+
 #endif //BNS_NURATES_SRC_BNS_NURATES_H_

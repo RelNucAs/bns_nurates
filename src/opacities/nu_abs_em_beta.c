@@ -1,4 +1,4 @@
-// \file nu_abs_em_nuclabs.c
+// \file nu_abs_em_beta.c
 // \brief Computation of emissivity and absorptivity for neutrino absorption on neutron
 //        (and inverse reaction) and for antineutrino absorption on proton (and inverse reaction)
 //        Ref: Bruenn, 1985 (https://articles.adsabs.harvard.edu/pdf/1985ApJS...58..771B)

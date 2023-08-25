@@ -58,6 +58,13 @@ double Gammln(const double xx);
 
 /*===========================================================================*/
 
+// lambert.c
+
+// Recursive formula for W0 real branch of Lambert function
+double W0(double x);
+
+/*===========================================================================*/
+
 // mnewt.c
 
 // Implementation of 1D Newton-Raphson root finding

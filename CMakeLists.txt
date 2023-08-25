@@ -8,10 +8,15 @@ add_executable(bns_nurates
         main.c
         src/constants.h
         src/bns_nurates.h
+        src/distribution/distribution.h
+        src/distribution/opt_thick.c
+        src/distribution/opt_thin.c
+        src/distribution/total_distr_func.c
         src/functions/functions.h
         src/functions/digamma.c
         src/functions/fermi.c
         src/functions/gamma.c
+        src/functions/lambert.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
         src/integration/integration.h
@@ -21,7 +26,7 @@ add_executable(bns_nurates
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
         src/opacities/opacities.h
-        src/opacities/nu_abs_em_nuclabs.c
+        src/opacities/nu_abs_em_beta.c
         src/output/outputs.h
         src/eos/eos.h
         tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
@@ -43,6 +48,7 @@ target_link_libraries(bns_nurates m)
 add_executable(test_pair_t
         tests/tests_pair/test_pair_t.c
         src/constants.h
+        src/functions/safe_exp.c
         src/opacities/kernels/kernels.h
         src/opacities/kernels/kernel_pair.c)
 
@@ -53,6 +59,7 @@ target_link_libraries(test_pair_t m)
 add_executable(test_pair_f
         tests/tests_pair/test_pair_f.c
         src/constants.h
+        src/functions/safe_exp.c
         src/opacities/kernels/kernels.h
         src/opacities/kernels/kernel_pair.c)
 
@@ -63,6 +70,7 @@ target_link_libraries(test_pair_f m)
 add_executable(test_pair_g
         tests/tests_pair/test_pair_g.c
         src/constants.h
+        src/functions/safe_exp.c
         src/opacities/kernels/kernels.h
         src/opacities/kernels/kernel_pair.c)
 
@@ -73,6 +81,7 @@ target_link_libraries(test_pair_g m)
 add_executable(test_pair_psi
         tests/tests_pair/test_pair_psi.c
         src/constants.h
+        src/functions/safe_exp.c
         src/opacities/kernels/kernels.h
         src/opacities/kernels/kernel_pair.c)
 
@@ -83,6 +92,7 @@ target_link_libraries(test_pair_psi m)
 add_executable(test_pair_phi
         tests/tests_pair/test_pair_phi.c
         src/constants.h
+        src/functions/safe_exp.c
         src/opacities/kernels/kernels.h
         src/opacities/kernels/kernel_pair.c
         )
@@ -94,6 +104,7 @@ target_link_libraries(test_pair_phi m)
 add_executable(test_pair_kernels
         tests/tests_pair/test_pair_kernels.c
         src/constants.h
+        src/functions/safe_exp.c
         src/opacities/kernels/kernels.h
         src/opacities/kernels/kernel_pair.c
         )
@@ -105,6 +116,7 @@ target_link_libraries(test_pair_kernels m)
 add_executable(test_pair_kernels_phi_mu_integrated
         tests/tests_pair/test_pair_kernels_phi_mu_integrated.c
         src/constants.h
+        src/functions/safe_exp.c
         src/opacities/kernels/kernels.h
         src/opacities/kernels/kernel_pair.c
         )
@@ -136,6 +148,27 @@ add_executable(test_pair_opacities
 
 target_link_libraries(test_pair_opacities GSL::gsl GSL::gslcblas)
 target_link_libraries(test_pair_opacities m)
+
+# test gray coefficients
+add_executable(test_gray_beta
+        tests/test_gray_beta.c
+        src/constants.h
+        src/bns_nurates.h
+        src/opacities/opacities.h
+        src/opacities/nu_abs_em_beta.c
+        src/opacities/weak_magnetism/weak_magnetism.h
+        src/opacities/weak_magnetism/nucfrmfac.c
+        src/opacities/weak_magnetism/weak_magnetism.c
+        src/integration/integration_quadrature_schemes.c
+        src/integration/integration_quadrature_io.c
+        src/integration/integration_quadrature_integrate.c
+        src/functions/functions.h
+        src/functions/fermi.c
+        src/functions/gamma.c
+        src/functions/safe_exp.c
+        ) 
+
+target_link_libraries(test_gray_beta m)
 
 # test gauss legendre quadrature 1d
 add_executable(test_gauss_legendre_1d

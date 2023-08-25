@@ -1,6 +1,4 @@
 #include <math.h>
-
-#include <math.h>
 #include "functions.h"
 
 // Computation of Fermi-Dirac distribution function
