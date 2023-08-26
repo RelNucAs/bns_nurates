@@ -30,8 +30,8 @@ typedef struct NuDistributionParams NuDistributionParams;
 double NuFThick(double omega, NuDistributionParams *distr_pars);
 
 // Recover parameters of thick distribution function from M1 quantities
-void ThickFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars,
-                 NuDistributionParams *out_distr_pars);
+void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars,
+                                NuDistributionParams *out_distr_pars);
 
 /*===========================================================================*/
 
