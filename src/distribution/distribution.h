@@ -41,7 +41,7 @@ void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars,
 double NuFThin(double omega, NuDistributionParams *distr_pars);
 
 // Recover parameters of thin distribution function from M1 quantities
-void ThinFromM1(M1Quantities *M1_pars, NuDistributionParams *out_distr_pars);
+void CalculateThinParamsFromM1(M1Quantities *M1_pars, NuDistributionParams *out_distr_pars);
 
 /*===========================================================================*/
 

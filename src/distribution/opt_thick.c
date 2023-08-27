@@ -22,9 +22,6 @@ double NuFThick(double omega, NuDistributionParams *distr_pars) {
   return FermiDistr(omega, temp, mu);
 }
 
-// Recover parameters of thick distribution function from M1 quantities
-// Input  -> n, J from M1Quantities, T from MyEOSParams
-// Output -> temp_t, eta_t in NuDistributionParams
 /* Recover distribution function parameters for optically thick regime from M1 quantities
  *
  * M1_params:       uses n (neutrino number density) and J (neutrino energy density)

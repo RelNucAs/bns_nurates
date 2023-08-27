@@ -20,7 +20,7 @@ NuDistributionParams DistrParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_p
   NuDistributionParams out_distr_pars;
 
   CalculateThickParamsFromM1(M1_pars, eos_pars, &out_distr_pars);
-  ThinFromM1(M1_pars, &out_distr_pars);
+  CalculateThinParamsFromM1(M1_pars, &out_distr_pars);
                             
   return out_distr_pars;
 }
