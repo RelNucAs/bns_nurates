@@ -9,9 +9,9 @@ add_executable(bns_nurates
         src/constants.h
         src/bns_nurates.h
         src/distribution/distribution.h
-        src/distribution/opt_thick.c
-        src/distribution/opt_thin.c
-        src/distribution/total_distr_func.c
+        src/distribution/distribution_opt_thick.c
+        src/distribution/distribution_opt_thin.c
+        src/distribution/distribution_total.c
         src/functions/functions.h
         src/functions/digamma.c
         src/functions/fermi.c

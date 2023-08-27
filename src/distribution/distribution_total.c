@@ -1,27 +1,39 @@
-#include <math.h>
+// ================================================
+// bns-nurates neutrino opacities code
+// Copyright(C) XXX, licensed under the YYY License
+// ================================================
+//! \file distribution_total.h
+//  \brief functions for constructing the total neutrino distribution function by combining the optically thick and thin regimes
 
 #include "distribution.h"
-#include "../bns_nurates.h"
 #include "../integration/integration.h"
 
-// Total neutrino distribution combining optically thick and thin regimes
+/* Total neutrino distribution combining optically thick and thin regimes
+ *
+ * omega:       neutrino energy
+ * distr_pars:  neutrino distribution parameters for thick and thin regimes
+ */
 double TotalNuF(double omega, NuDistributionParams *distr_pars) {
   double w_t = distr_pars->w_t;
   double w_f = distr_pars->w_f;
-  
+
   double f_thick = NuFThick(omega, distr_pars);
-  double f_thin  = NuFThin(omega, distr_pars);
+  double f_thin = NuFThin(omega, distr_pars);
 
   return w_t * f_thick + w_f * f_thin;
 }
 
-// Recover parameters of thick and thin distribution function from M1 quantities
-NuDistributionParams DistrParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars) {
+/* Calculate distribution function parameters in the thick and thin regime from M1 quantities
+ *
+ * M1_params:   M1 quantities
+ * eos_params:  parameters from EOS
+ */
+NuDistributionParams CalculateDistrParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars) {
   NuDistributionParams out_distr_pars;
 
   CalculateThickParamsFromM1(M1_pars, eos_pars, &out_distr_pars);
   CalculateThinParamsFromM1(M1_pars, &out_distr_pars);
-                            
+
   return out_distr_pars;
 }
 
