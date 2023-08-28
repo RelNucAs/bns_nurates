@@ -39,23 +39,4 @@ MyOpacityQuantity PairKernelsPhiMuIntegrated( MyEOSParams *eos_pars, PairKernelP
 // ===============================================================================
 /*===========================================================================*/
 
-
-// ===============================================================================
-// (2) Isoenergetic scattering on nucleons kernel
-
-// isoenergetic scattering helper functions and kernels
-
-// Scattering kernel for neutrino-proton scattering
-MyKernel IsoScattProtonKernels(IsoKernelParams *kernel_params, MyEOSParams *eos_pars);
-
-// Scattering kernel for neutrino-neutron scattering
-MyKernel IsoScattNeutronKernels(IsoKernelParams *kernel_params, MyEOSParams *eos_pars);
-
-// Sum of scattering kernels for neutrino-nucleon scattering (protons + neutrons)
-MyKernel IsoScattTotalKernels(IsoKernelParams *kernel_params, MyEOSParams *eos_pars);
-
-// End of isoenergetic scattering on nucleons kernel
-// ===============================================================================
-/*===========================================================================*/
-
 #endif //BNS_NURATES_SRC_OPACITIES_KERNELS_KERNELS_H_

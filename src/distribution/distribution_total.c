@@ -2,7 +2,7 @@
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
-//! \file distribution_total.h
+//! \file distribution_total.c
 //  \brief functions for constructing the total neutrino distribution function by combining the optically thick and thin regimes
 
 #include "distribution.h"

@@ -11,6 +11,7 @@
 #include "../src/constants.h"
 #include "../src/bns_nurates.h"
 #include "../src/opacities/opacities.h"
+#include "../src/distribution/distribution.h"
 
 int main() {
 
@@ -34,13 +35,50 @@ int main() {
                           .mu_n = mu_hat + kQ,
                           .dU = 0.};
 
-  // Compute emission coefficient (in stimulated absorption framework)
-  SourceCoeffs coeffs = NuclAbsEmissionCoeffs(&EOS_pars);
+  OpacityParams opacity_pars = {.use_dU = 0, .use_WM_ab = 0, .use_WM_sc = 0};
+
+  // Compute emission coefficients (in stimulated absorption framework)
+  SourceCoeffs em_coeffs = NuclAbsEmissionCoeffs(&EOS_pars);
+
+  // Print results to screen
+  printf("Emission coefficients output:\n");
+  printf("R_nue = %.5e, R_anue = %.5e, R_nux = %.5e\n", em_coeffs.R_nue, em_coeffs.R_anue , em_coeffs.R_nux);
+  printf("Q_nue = %.5e, Q_anue = %.5e, Q_nux = %.5e\n", em_coeffs.Q_nue, em_coeffs.Q_anue , em_coeffs.Q_nux);
+  printf("\n");
+
+  // Parameter definition for neutrino distribution function (thick + thin)
+  NuDistributionParams distr_pars = {.w_t = 1., .temp_t = 10., .eta_t = 4.,
+                                     .w_f = 0., .temp_f = 10., .c_f = 0.};
+
+  double n = NuNumber(&distr_pars);
+  double J = NuEnergy(&distr_pars);
+
+  printf("Neutrino number density: %.5e\n", 4. * kPi * n / pow(kH * kClight, 3.));
+  printf("Neutrino energy density: %.5e\n", 4. * kPi * J / pow(kH * kClight, 3.));
+  printf("Average neutrino energy: %.5e\n", J / n);
+  printf("\n");
+
+  GreyOpacityParams grey_pars = {.opacity_pars = opacity_pars,
+                                 .eos_pars = EOS_pars,
+                                 .distr_pars = distr_pars};
+
+  // Compute opacity coefficients (in stimulated absorption framework)
+  SourceCoeffs ab_coeffs = NuclAbsOpacityCoeffs(&grey_pars);
 
   // Print result to screen
-  printf("Emission coefficients output:\n");
-  printf("R_nue = %.5e, R_anue = %.5e, R_nux = %.5e\n", coeffs.R_nue, coeffs.R_anue , coeffs.R_nux);
-  printf("Q_nue = %.5e, Q_anue = %.5e, Q_nux = %.5e\n", coeffs.Q_nue, coeffs.Q_anue , coeffs.Q_nux);
-    
+  printf("Opacity coefficients output:\n");
+  printf("R_nue = %.5e, R_anue = %.5e, R_nux = %.5e\n", ab_coeffs.R_nue, ab_coeffs.R_anue , ab_coeffs.R_nux);
+  printf("Q_nue = %.5e, Q_anue = %.5e, Q_nux = %.5e\n", ab_coeffs.Q_nue, ab_coeffs.Q_anue , ab_coeffs.Q_nux);
+  printf("\n");
+
+  // Compute scattering coefficients 
+  SourceCoeffs sc_coeffs = IsoScattCoeffs(&grey_pars);
+
+  // Print result to screen
+  printf("Scattering coefficients output:\n");
+  printf("R_nue = %.5e, R_anue = %.5e, R_nux = %.5e\n", sc_coeffs.R_nue, sc_coeffs.R_anue , sc_coeffs.R_nux);
+  printf("Q_nue = %.5e, Q_anue = %.5e, Q_nux = %.5e\n", sc_coeffs.Q_nue, sc_coeffs.Q_anue , sc_coeffs.Q_nux);
+  printf("\n");
+
   return 0;
 }

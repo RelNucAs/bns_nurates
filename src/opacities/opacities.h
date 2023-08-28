@@ -9,26 +9,51 @@
 
 #include "../bns_nurates.h"
 
-// Opacity parameters
-struct OpacityParams {
-  double omega;    // (anti)neutrino energy [MeV]
-  bool use_dU;     // flag for dU correction
-  bool use_WM_ab;  // flag for WM correction (and related) on absorption rates
-};
-typedef struct OpacityParams OpacityParams;
 
 /*===========================================================================*/
 
-// nu_abs_em_beta.h
+// nu_abs_em_beta.c
 
 // (Anti)neutrino absorption on nucleons
-MyOpacity AbsOpacity(OpacityParams *opacity_pars, MyEOSParams *eos_pars);
+MyOpacity AbsOpacity(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars);
 
 // Stimulated absoption version
-MyOpacity StimAbsOpacity(OpacityParams *opacity_pars, MyEOSParams *eos_pars);
+MyOpacity StimAbsOpacity(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars);
 
 // Emission coefficients
 SourceCoeffs NuclAbsEmissionCoeffs(MyEOSParams *eos_pars);
+
+// Absoprtion coefficients
+SourceCoeffs NuclAbsOpacityCoeffs(GreyOpacityParams *grey_pars);
+
+/*===========================================================================*/
+
+// nu_scatt_iso.c
+
+// Isoenergetic scattering on protons
+double IsoScattProton(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars);
+
+// Isoenergetic scattering on neutrons
+double IsoScattNeutron(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars);
+
+// Sum of the two contributions for neutrino-nucleon scattering (protons + neutrons)
+double IsoScattTotal(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars);
+
+// Scattering coefficients
+SourceCoeffs IsoScattCoeffs(GreyOpacityParams *grey_pars);
+
+/*===========================================================================*/
+
+// nu_grey_total.c
+
+// Total emission coefficients
+SourceCoeffs EmissionCoeffs(MyEOSParams *eos_pars);
+
+// Total opacity coefficients
+SourceCoeffs OpacityCoeffs(GreyOpacityParams *grey_pars);
+
+// Total scattering coefficients
+SourceCoeffs ScatteringCoeffs(GreyOpacityParams *grey_pars);
 
 /*===========================================================================*/
 

@@ -21,12 +21,13 @@ add_executable(bns_nurates
         src/functions/safe_exp.c
         src/integration/integration.h
         src/opacities/kernels/kernels.h
-        src/opacities/kernels/kernel_iso_scatt.c
         src/opacities/weak_magnetism/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
         src/opacities/opacities.h
         src/opacities/nu_abs_em_beta.c
+        src/opacities/nu_scatt_iso.c
+        src/opacities/nu_grey_total.c
         src/output/outputs.h
         src/eos/eos.h
         tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
@@ -154,8 +155,16 @@ add_executable(test_gray_beta
         tests/test_gray_beta.c
         src/constants.h
         src/bns_nurates.h
+        src/distribution/distribution.h
+        src/distribution/distribution_opt_thick.c 
+        src/distribution/distribution_opt_thin.c
+        src/distribution/distribution_total.c
+        src/functions/functions.h
+        src/functions/lambert.c
         src/opacities/opacities.h
         src/opacities/nu_abs_em_beta.c
+        src/opacities/nu_scatt_iso.c
+        src/opacities/nu_grey_total.c
         src/opacities/weak_magnetism/weak_magnetism.h
         src/opacities/weak_magnetism/nucfrmfac.c
         src/opacities/weak_magnetism/weak_magnetism.c

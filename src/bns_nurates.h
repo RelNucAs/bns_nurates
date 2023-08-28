@@ -105,20 +105,11 @@ struct PairKernelParams {
 };
 typedef struct PairKernelParams PairKernelParams;
 
-// isoenergetic scattering specific parameters
-struct IsoKernelParams {
-  double omega;    // (anti)neutrino energy [MeV]
-  double mu;       // cosine of polar angle for nu
-  double mu_prime; // cosine of polar angle for nu'
-  bool use_WM_sc;  // flag for WM correction (and related) on scattering rates
-};
-typedef struct IsoKernelParams IsoKernelParams;
 
 // unified kernel params
 struct MyKernelParams {
   PairKernelParams pair_kernel_params;
   BremKernelParams brem_kernel_params;
-  IsoKernelParams iso_kernel_params;
 };
 typedef struct MyKernelParams MyKernelParams;
 
@@ -154,12 +145,6 @@ struct MyFunctionSpecial {
 };
 typedef struct MyFunctionSpecial MyFunctionSpecial;
 
-// @TODO: remove this!
-struct MyOpacityIntegrand {
-  double em;
-  double ab;
-};
-typedef struct MyOpacityIntegrand MyOpacityIntegrand;
 
 // @FIXME: decide with Maitraya what to use for this
 // Temporary struct for storing output of emissivity/absorptivity opacity output
@@ -178,6 +163,39 @@ struct MyOpacity {
   double em_nux;    // heavy (anti)neutrino emissivity
 };
 typedef struct MyOpacity MyOpacity;
+
+// Opacity parameters
+struct OpacityParams {
+  bool use_dU;     // flag for dU correction
+  bool use_WM_ab;  // flag for WM correction (and related) on absorption rates
+  bool use_WM_sc;  // flag for WM correction (and related) on scattering rates
+};
+typedef struct OpacityParams OpacityParams;
+
+// NuDistributionParams struct
+// structure needed for storing the parameters of the 
+// neutrino distribution function
+struct NuDistributionParams {
+  // optically thick
+  double w_t;
+  double temp_t;
+  double eta_t;
+  // optically thin
+  double w_f;
+  double temp_f;
+  double c_f;
+};
+typedef struct NuDistributionParams NuDistributionParams;
+
+// GreyOpacityParams struct
+// structure for storing the parameters needed for the 
+// computation of grey source coefficients
+struct GreyOpacityParams {
+  OpacityParams opacity_pars;      // spectral opacity input parameters
+  MyEOSParams eos_pars;            // eos parameters
+  NuDistributionParams distr_pars; // neutrino distribution function parameters
+};
+typedef struct GreyOpacityParams GreyOpacityParams;
 
 // SourceCoeffs struct
 // structure needed for storing the values of the 
@@ -201,8 +219,8 @@ typedef struct SourceCoeffs SourceCoeffs;
 struct M1Quantities {
   double n;    // radiation number density
   double J;    // radiation energy density
-  double H[4]; // radiation flux components(only three are independent since
-               //                           H^alpha u_alpha = 0)
+  double H[4]; // radiation flux components (only three are independent since
+               //                            H^alpha u_alpha = 0)
   double chi;  // closure
 };
 typedef struct M1Quantities M1Quantities;

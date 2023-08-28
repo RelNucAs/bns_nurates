@@ -7,21 +7,6 @@
 
 #include "../bns_nurates.h"
 
-// NuDistributionParams struct
-// structure needed for storing the parameters of the 
-// neutrino distribution function
-struct NuDistributionParams {
-  // optically thick
-  double w_t;
-  double temp_t;
-  double eta_t;
-  // optically thin
-  double w_f;
-  double temp_f;
-  double c_f;
-};
-typedef struct NuDistributionParams NuDistributionParams;
-
 /*===========================================================================*/
 
 // opt_thick.c
@@ -52,6 +37,12 @@ double TotalNuF(double omega, NuDistributionParams *distr_pars);
 
 // Recover parameters of thick and thin distribution function from M1 quantities
 NuDistributionParams CalculateDistrParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars);
+
+// Neutrino number density (besides 4*pi factor)
+double NuNumber(NuDistributionParams *distr_pars);
+
+// Neutrino energy density (besides 4*pi factor)
+double NuEnergy(NuDistributionParams *distr_pars);
 
 /*===========================================================================*/
 

@@ -14,6 +14,7 @@
 #include "opacities.h"
 #include "weak_magnetism/weak_magnetism.h"
 #include "../constants.h"
+#include "../distribution/distribution.h"
 #include "../functions/functions.h"
 #include "../integration/integration.h"
 
@@ -74,7 +75,8 @@ double EtaPN(const double nn, const double np,
 
 // Neutrino absorption on neutron (nul + n -> l- + p)
 // Antineutrino absorption on neutron (anul + p -> l+ + n)
-void AbsOpacitySingleLep(OpacityParams* opacity_pars,
+void AbsOpacitySingleLep(double omega,
+                         OpacityParams* opacity_pars,
                          MyEOSParams *eos_pars,
                          const double mLep, const double muLep,
                          double *out) {   // out[0] --> nu_abs
@@ -87,8 +89,6 @@ void AbsOpacitySingleLep(OpacityParams* opacity_pars,
   double tmp, fd_e, fd_p;
   double R = 1., Rbar = 1.;
   double dU = 0.;
-
-  const double omega  = opacity_pars->omega; // (Anti)neutrino energy [MeV]
 
   const double nb     = eos_pars->nb;      // Number baryon density [cm-3]
   const double temp   = eos_pars->temp;    // Temperature [MeV]
@@ -143,12 +143,12 @@ void AbsOpacitySingleLep(OpacityParams* opacity_pars,
   return;
 }
 
-MyOpacity AbsOpacity(OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
+MyOpacity AbsOpacity(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
   MyOpacity MyOut = {0.0}; // initialize to zero
 
   // Electron (anti)neutrino
   double el_out[4] = {0.0};
-  AbsOpacitySingleLep(opacity_pars, eos_pars, kMe, eos_pars->mu_e, el_out);
+  AbsOpacitySingleLep(omega, opacity_pars, eos_pars, kMe, eos_pars->mu_e, el_out);
 
   MyOut.ab_nue   = el_out[0];
   MyOut.em_nue   = el_out[1];
@@ -169,8 +169,8 @@ MyOpacity AbsOpacity(OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
 }
 
 // Stimulated absorption versions
-MyOpacity StimAbsOpacity(OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
-  MyOpacity abs_opacity = AbsOpacity(opacity_pars, eos_pars);
+MyOpacity StimAbsOpacity(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
+  MyOpacity abs_opacity = AbsOpacity(omega, opacity_pars, eos_pars);
   MyOpacity stim_abs_opacity = {.ab_nue  = abs_opacity.ab_nue  + abs_opacity.em_nue,
                                 .em_nue  = abs_opacity.em_nue,
                                 .ab_anue = abs_opacity.ab_anue + abs_opacity.em_anue,
@@ -194,11 +194,10 @@ double NueAbsNumberEmissivityIntegrand(double *x, void *p) {
   MyEOSParams *eos_pars = (MyEOSParams *) p;
   
   // @TODO: modify way in which corrections can be included
-  OpacityParams opacity_pars = {.omega = x[0],
-                                .use_dU = 0,
+  OpacityParams opacity_pars = {.use_dU = 0,
                                 .use_WM_ab = 0};
                                 
-  MyOpacity out = AbsOpacity(&opacity_pars, eos_pars);
+  MyOpacity out = AbsOpacity(x[0], &opacity_pars, eos_pars);
 
   return x[0] * x[0] * out.em_nue;
 }
@@ -210,18 +209,7 @@ double NueAbsNumberEmissivityIntegrand(double *x, void *p) {
 // integration)
 double NueAbsEnergyEmissivityIntegrand(double *x, void *p) {
   return x[0] * NueAbsNumberEmissivityIntegrand(x, p); 
-  //MyEOSParams *eos_pars = (MyEOSParams *) p;
-  
-  // @TODO: modify way in which corrections can be included
-  //OpacityParams opacity_pars = {.omega = x[0],
-  //                              .use_dU = 0,
-  //                              .use_WM_ab = 0};
-                                
-  //MyOpacity out = AbsOpacity(&opacity_pars, eos_pars);
-
-  //return x[0] * x[0] * x[0] * out.em_nue;
 }
-
 
 // ANueAbsNumberEmissivityIntegrand function
 // integrand for the computation of the number emission
@@ -232,11 +220,10 @@ double ANueAbsNumberEmissivityIntegrand(double *x, void *p) {
   MyEOSParams *eos_pars = (MyEOSParams *) p;
   
   // @TODO: modify way in which corrections can be included
-  OpacityParams opacity_pars = {.omega = x[0],
-                                .use_dU = 0,
+  OpacityParams opacity_pars = {.use_dU = 0,
                                 .use_WM_ab = 0};
                                 
-  MyOpacity out = AbsOpacity(&opacity_pars, eos_pars);
+  MyOpacity out = AbsOpacity(x[0], &opacity_pars, eos_pars);
 
   return x[0] * x[0] * out.em_anue;
 }
@@ -250,6 +237,56 @@ double ANueAbsEnergyEmissivityIntegrand(double *x, void *p) {
   return x[0] * ANueAbsNumberEmissivityIntegrand(x, p); 
 }
 
+// NueAbsNumberOpacityIntegrand function
+// integrand for the computation of the number opacity
+// coefficient for electron-type neutrino with
+// stimulated absorption formalism
+// (v**2 * kappa(nu) * g(nu), constants are added after the
+// integration)
+double NueAbsNumberOpacityIntegrand(double *x, void *p) {
+  GreyOpacityParams *grey_pars = (GreyOpacityParams *) p;
+                                
+  MyOpacity out = StimAbsOpacity(x[0], &grey_pars->opacity_pars, &grey_pars->eos_pars);
+
+  return x[0] * x[0] * out.ab_nue * TotalNuF(x[0], &grey_pars->distr_pars);
+}
+
+// NueAbsEnergyOpacityIntegrand function
+// integrand for the computation of the number opacity
+// coefficient for electron-type neutrino with
+// stimulated absorption formalism
+// (v**3 * kappa(nu) * g(nu), constants are added after the
+// integration)
+double NueAbsEnergyOpacityIntegrand(double *x, void *p) {
+  return x[0] * NueAbsNumberOpacityIntegrand(x, p); 
+}
+
+
+// ANueAbsNumberOpacityIntegrand function
+// integrand for the computation of the number opacity
+// coefficient for electron-type antineutrino with
+// stimulated absorption formalism
+// (v**2 * kappa(nu) * g(nu), constants are added after the
+// integration)
+double ANueAbsNumberOpacityIntegrand(double *x, void *p) {
+  GreyOpacityParams *grey_pars = (GreyOpacityParams *) p;
+                                  
+  MyOpacity out = StimAbsOpacity(x[0], &grey_pars->opacity_pars, &grey_pars->eos_pars);
+
+  return x[0] * x[0] * out.ab_anue * TotalNuF(x[0], &grey_pars->distr_pars);
+}
+
+// ANueAbsEnergyOpacityIntegrand function
+// integrand for the computation of the number opacity
+// coefficient for electron-type antineutrino with
+// stimulated absorption formalism
+// (v**3 * kappa(nu) * g(nu), constants are added after the
+// integration)
+double ANueAbsEnergyOpacityIntegrand(double *x, void *p) {
+  return x[0] * ANueAbsNumberOpacityIntegrand(x, p); 
+}
+
+
 SourceCoeffs NuclAbsEmissionCoeffs(MyEOSParams *eos_pars) {
   SourceCoeffs out;
 
@@ -259,12 +296,12 @@ SourceCoeffs NuclAbsEmissionCoeffs(MyEOSParams *eos_pars) {
   em_integrand.params = eos_pars;
 
   // @TODO: compute quadrature points once for all
-  const int n = 32;
+  const int np = 32;
 
   //static MyQuadrature quadrature_default = {.type=kGauleg, .dim=1, .nx=32, .ny=1, .nz=1, .alpha=0., .x1=0., .x2=1., .y1=-42., .y2=-42., .z1=-42., .z2=-42.};
   MyQuadrature quad = quadrature_default;
 
-  quad.nx = n;
+  quad.nx = np;
   quad.type = kGauleg;
   quad.dim = 1;
   quad.x1 = 0.;
@@ -290,6 +327,58 @@ SourceCoeffs NuclAbsEmissionCoeffs(MyEOSParams *eos_pars) {
 
   em_integrand.function = &ANueAbsEnergyEmissivityIntegrand;
   out.Q_anue = 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &em_integrand, s) / pow(kH * kClight, 3.);
+  
+  //out.Q_num  = ...
+  //out.Q_anum = ...
+ 
+  out.Q_nux = 0;
+  
+  return out;
+}
+
+SourceCoeffs NuclAbsOpacityCoeffs(GreyOpacityParams *grey_pars) {
+  SourceCoeffs out;
+
+  MyFunction ab_integrand;
+
+  ab_integrand.dim = 1;
+  ab_integrand.params = grey_pars;
+
+  // @TODO: compute quadrature points once for all
+  const int np = 32;
+
+  //static MyQuadrature quadrature_default = {.type=kGauleg, .dim=1, .nx=32, .ny=1, .nz=1, .alpha=0., .x1=0., .x2=1., .y1=-42., .y2=-42., .z1=-42., .z2=-42.};
+  MyQuadrature quad = quadrature_default;
+
+  quad.nx = np;
+  quad.type = kGauleg;
+  quad.dim = 1;
+  quad.x1 = 0.;
+  quad.x2 = 1.;
+
+  GaussLegendreMultiD(&quad);
+
+  double n = NuNumber(&grey_pars->distr_pars);
+  double J = NuEnergy(&grey_pars->distr_pars);
+
+  double s = grey_pars->eos_pars.mu_e - kQ;
+
+  ab_integrand.function = &NueAbsNumberOpacityIntegrand;
+  out.R_nue  = 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &ab_integrand, s) / n / pow(kH * kClight, 3.);
+
+  ab_integrand.function = &ANueAbsNumberOpacityIntegrand;
+  out.R_anue = 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &ab_integrand, s) / n / pow(kH * kClight, 3.);
+  
+  //out.R_num = ...
+  //out.R_anum = ...
+  
+  out.R_nux = 0.;
+
+  ab_integrand.function = &NueAbsEnergyOpacityIntegrand;
+  out.Q_nue  = 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &ab_integrand, s) / J / pow(kH * kClight, 3.);
+
+  ab_integrand.function = &ANueAbsEnergyOpacityIntegrand;
+  out.Q_anue = 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &ab_integrand, s) / J / pow(kH * kClight, 3.);
   
   //out.Q_num  = ...
   //out.Q_anum = ...
