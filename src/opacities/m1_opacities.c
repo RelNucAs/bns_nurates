@@ -12,13 +12,9 @@
 #include "../integration/integration.h"
 #include "../distribution/distribution.h"
 
-/* Computes the integrand for nubar integration in Eqn (50) of Leonardo's notes
+/* Computes the integrand for all double integrals from Leonardo's notes
  *
- * I1 = nubar^2 (R^P_{pair} + R^p_{brem})(1 - gbar)
- *
- * where gbar = w_t g_t + w_f g_f from Federico's notes
- *
- * Returns two doubles, one for electron neutrino and another for mu/tau neutrino
+ * A total of six integrands are computed
  *
  */
 void M1DoubleIntegrand(double nu, double nubar, GreyOpacityParams *my_grey_opacity_params) {
@@ -66,10 +62,29 @@ void M1DoubleIntegrand(double nu, double nubar, GreyOpacityParams *my_grey_opaci
 
 }
 
+/* Computes the integrand for all single integrals from Leonardo's notes
+ *
+ * A total of six integrands are computed
+ *
+ */
 void M1SingleIntegrand(double nu, GreyOpacityParams *my_grey_opacity_params) {
 
-}
+  // compute the neutrino distribution function
+  double g_t_nu = NuFThick(nu, &my_grey_opacity_params->distr_pars);
+  double g_f_nu = NuFThin(nu, &my_grey_opacity_params->distr_pars);
+  double g_nu = my_grey_opacity_params->distr_pars.w_t * g_t_nu + my_grey_opacity_params->distr_pars.w_f * g_f_nu;
 
+  const double four_pi_hc3 = (4. * kPi) / (kH * kH * kH * kClight * kClight * kClight);
+  const double four_pi_hc3_cJ_e = four_pi_hc3 / (kClight * 0.); // @TODO: Add J_e from M1
+  const double four_pi_hc3_cJ_x = four_pi_hc3 / (kClight * 0.); // @TODO: Add J_x from M1
+
+  double integrand_1_e = 0.;
+  double integrand_1_x = 0.;
+  double integrand_2_e = 0.;
+  double integrand_2_x = 0.;
+  double integrand_3_e = four_pi_hc3_cJ_e * 4. * kPi * nu * nu * nu * nu * nu * g_nu * (0.);
+  double integrand_3_x = 0.;
+}
 
 /* Integrand for the M1 opacities
  *
