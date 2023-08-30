@@ -79,3 +79,5 @@ MyOpacityQuantity GaussLegendreIntegrateZeroInfSpecial(MyQuadrature *quad, MyFun
   return result;
 
 }
+
+
