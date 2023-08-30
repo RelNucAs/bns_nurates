@@ -225,4 +225,15 @@ struct M1Quantities {
 };
 typedef struct M1Quantities M1Quantities;
 
+struct M1Opacities {
+  double eta_e;
+  double kappa_a_e;
+  double kappa_s_e;
+
+  double eta_x;
+  double kappa_a_x;
+  double kappa_s_x;
+};
+typedef struct M1Opacities M1Opacities;
+
 #endif //BNS_NURATES_SRC_BNS_NURATES_H_
