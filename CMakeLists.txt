@@ -40,7 +40,8 @@ add_executable(bns_nurates
         src/opacities/kernels/kernel_pair.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
-        src/integration/integration_quadrature_integrate_kernels.c)
+        src/integration/integration_quadrature_integrate_kernels.c
+        src/opacities/m1_opacities.c)
 
 target_link_libraries(bns_nurates GSL::gsl GSL::gslcblas)
 target_link_libraries(bns_nurates m)

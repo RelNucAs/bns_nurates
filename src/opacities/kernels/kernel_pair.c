@@ -303,6 +303,45 @@ MyOpacityQuantity PairKernels(MyEOSParams *eos_pars, PairKernelParams *kernel_pa
 
 }
 
+/* Calculates the production and absorption kernels for the pair process for M1 (l = 0)
+ *
+ * R^p_{TP}(omega,omega',cos theta) = (1/2) Phi_l(omega,omega')
+ * R^a_{TP}(omega,omega',cos theta) = e^{(omega+omega')/T} R^p_{TP}(omega,omega',cos theta)
+ *
+ */
+MyOpacityQuantity PairKernelsM1(MyEOSParams *eos_pars, PairKernelParams *kernel_pars) {
+
+  // kernel specific parameters
+  double omega = kernel_pars->omega;
+  double omega_prime = kernel_pars->omega_prime;
+
+  // EOS specific parameters
+  double eta = eos_pars->mu_e / eos_pars->temp;
+  double temp = eos_pars->temp;
+
+  double pair_kernel_production_e = 0.;
+  double pair_kernel_absorption_e = 0.;
+  double pair_kernel_production_x = 0.;
+  double pair_kernel_absorption_x = 0.;
+  double pair_phi_e = 0.;
+  double pair_phi_x = 0.;
+
+  pair_phi_e = PairPhi(0, omega, omega_prime, eta, temp, 0);
+  pair_phi_x = PairPhi(0, omega, omega_prime, eta, temp, 1);
+
+  pair_kernel_production_e = 0.5 * pair_phi_e;
+  pair_kernel_production_x = 0.5 * pair_phi_x;
+
+  pair_kernel_absorption_e = exp((omega + omega_prime) / temp) * pair_kernel_production_e;
+  pair_kernel_absorption_x = exp((omega + omega_prime) / temp) * pair_kernel_production_x;
+
+  MyOpacityQuantity pair_kernel = {.abs_e = pair_kernel_absorption_e, .em_e = pair_kernel_production_e,
+      .abs_x = pair_kernel_absorption_x, .em_x = pair_kernel_production_x};
+
+  return pair_kernel;
+
+}
+
 /* Calculates the production and absorption kernels for the pair process from Eqns. (2) and (3) of Pons et. al.
  * integrated over the phi variable
  *

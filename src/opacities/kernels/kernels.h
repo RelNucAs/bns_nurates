@@ -34,6 +34,7 @@ double PairG(int n, double a, double b, double eta, double y, double z);
 double PairPsi(int l, double y, double z, double eta);
 double PairPhi(int l, double omega, double omega_prime, double eta, double temp, int e_x);
 MyOpacityQuantity PairKernels(MyEOSParams *eos_pars, PairKernelParams *kernel_pars);
+MyOpacityQuantity PairKernelsM1(MyEOSParams *eos_pars, PairKernelParams *kernel_pars);
 MyOpacityQuantity PairKernelsPhiMuIntegrated( MyEOSParams *eos_pars, PairKernelParams *kernel_pars);
 // End of pair process kernel
 // ===============================================================================
