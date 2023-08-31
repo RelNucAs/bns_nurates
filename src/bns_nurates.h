@@ -10,6 +10,8 @@
 
 #include <stdbool.h>
 
+//#define kNSp 3 // number of neutrino species
+
 // -------------------------------------------------
 // Quadrature specific data structures
 
@@ -172,6 +174,8 @@ struct OpacityParams {
 };
 typedef struct OpacityParams OpacityParams;
 
+// @TODO: generalize the following structure to all neutrino species (e.g. double w_t -> double w_t[Nsp])
+
 // NuDistributionParams struct
 // structure needed for storing the parameters of the 
 // neutrino distribution function
@@ -187,13 +191,25 @@ struct NuDistributionParams {
 };
 typedef struct NuDistributionParams NuDistributionParams;
 
+// @TODO: generalize the following structure to all neutrino species (e.g. double n -> double n[Nsp])
+struct M1Quantities {
+  double n;    // radiation number density
+  double J;    // radiation energy density
+  double H[4]; // radiation flux components (only three are independent since
+               //                            H^alpha u_alpha = 0)
+  double chi;  // closure
+};
+typedef struct M1Quantities M1Quantities;
+
 // GreyOpacityParams struct
 // structure for storing the parameters needed for the 
 // computation of grey source coefficients
 struct GreyOpacityParams {
   OpacityParams opacity_pars;      // spectral opacity input parameters
+  MyKernelParams kernel_pars;      // kernel input parameters
   MyEOSParams eos_pars;            // eos parameters
   NuDistributionParams distr_pars; // neutrino distribution function parameters
+  M1Quantities m1_pars;            // M1 related quantities
 };
 typedef struct GreyOpacityParams GreyOpacityParams;
 
@@ -215,15 +231,6 @@ struct SourceCoeffs {
   double Q_nux;    // energy, heavy-type (anti)neutrino
 };
 typedef struct SourceCoeffs SourceCoeffs;
-
-struct M1Quantities {
-  double n;    // radiation number density
-  double J;    // radiation energy density
-  double H[4]; // radiation flux components (only three are independent since
-               //                            H^alpha u_alpha = 0)
-  double chi;  // closure
-};
-typedef struct M1Quantities M1Quantities;
 
 struct M1Opacities {
   double eta_e;

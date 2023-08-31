@@ -5,7 +5,10 @@
 //! \file distribution_total.c
 //  \brief functions for constructing the total neutrino distribution function by combining the optically thick and thin regimes
 
+#include <math.h>
+
 #include "distribution.h"
+#include "../constants.h"
 #include "../integration/integration.h"
 
 /* Total neutrino distribution combining optically thick and thin regimes
@@ -37,6 +40,9 @@ NuDistributionParams CalculateDistrParamsFromM1(M1Quantities *M1_pars, MyEOSPara
   return out_distr_pars;
 }
 
+
+// @TODO: generalize all the following functions with structures containing all nu species
+
 // Integrand for computation of neutrino number density
 double NuNumberIntegrand(double *x, void *p) {
   NuDistributionParams *distr_pars = (NuDistributionParams *) p;
@@ -51,23 +57,14 @@ double NuNumber(NuDistributionParams *distr_pars) {
   integrand.dim = 1;
   integrand.params = distr_pars;
 
-  // @TODO: compute quadrature points once for all
-  const int n = 32;
-
   MyQuadrature quad = quadrature_default;
-
-  quad.nx = n;
-  quad.type = kGauleg;
-  quad.dim = 1;
-  quad.x1 = 0.;
-  quad.x2 = 1.;
 
   GaussLegendreMultiD(&quad);
 
   double s = distr_pars->temp_t * distr_pars->eta_t;
 
   integrand.function = &NuNumberIntegrand;
-  return GaussLegendreIntegrateZeroInf(&quad, &integrand, s);
+  return 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &integrand, s) / pow(kH * kClight, 3.);
 }
 
 // Integrand for computation of neutrino energy density
@@ -82,21 +79,12 @@ double NuEnergy(NuDistributionParams *distr_pars) {
   integrand.dim = 1;
   integrand.params = distr_pars;
 
-  // @TODO: compute quadrature points once for all
-  const int n = 32;
-
   MyQuadrature quad = quadrature_default;
-
-  quad.nx = n;
-  quad.type = kGauleg;
-  quad.dim = 1;
-  quad.x1 = 0.;
-  quad.x2 = 1.;
 
   GaussLegendreMultiD(&quad);
 
   double s = distr_pars->temp_t * distr_pars->eta_t;
 
   integrand.function = &NuEnergyIntegrand;
-  return GaussLegendreIntegrateZeroInf(&quad, &integrand, s);
+  return 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &integrand, s) / pow(kH * kClight, 3.);
 }

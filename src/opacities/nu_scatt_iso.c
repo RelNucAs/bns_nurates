@@ -76,12 +76,12 @@ double IsoScattNucleon(double omega, OpacityParams *opacity_pars,
 
   if (reacflag == 1) {
     // Scattering on proton
-    leg_0 = h0_p * R0;
-    leg_1 = h1_p * R1; // [MeV cm^3 s-1]
+    leg_0 = c0_p * R0;
+    leg_1 = c1_p * R1; // [MeV cm^3 s-1]
   } else if (reacflag == 2) {
     // Scattering on neutron
-    leg_0 = h0_n * R0;
-    leg_1 = h1_n * R1; // [MeV cm^3 s-1]
+    leg_0 = c0_n * R0;
+    leg_1 = c1_n * R1; // [MeV cm^3 s-1]
   }
   
   return omega * omega * etaNN * (leg_1 / 3. - leg_0); // "Eq.(A41)" [MeV^3 cm^3 s-1]
@@ -110,29 +110,25 @@ double IsoScattTotal(double omega, OpacityParams *opacity_pars, MyEOSParams *eos
   return iso_nu_p + iso_nu_n;
 }
 
-// NuNumberScatteringIntegrand function
-// integrand for the computation of the number opacity
-// scattering coefficient
-// (constants are added after the integration)
-double NuNumberScatteringIntegrand(double *x, void *p) {
-  GreyOpacityParams *grey_pars = (GreyOpacityParams *) p;
-  
-  const double iso_scatt = IsoScattTotal(x[0], &grey_pars->opacity_pars, &grey_pars->eos_pars);
 
-  return x[0] * x[0] * iso_scatt * TotalNuF(x[0], &grey_pars->distr_pars);
-}
+// @TODO: generalize all the following functions with structures containing all nu species
 
 // NuEnergyScatteringIntegrand function
 // integrand for the computation of the energy opacity
 // scattering coefficient
 // (constants are added after the integration)
 double NuEnergyScatteringIntegrand(double *x, void *p) {
-  return x[0] * NuNumberScatteringIntegrand(x, p); 
+  GreyOpacityParams *grey_pars = (GreyOpacityParams *) p;
+  
+  const double iso_scatt = IsoScattTotal(x[0], &grey_pars->opacity_pars, &grey_pars->eos_pars);
+
+  return x[0] * x[0] * x[0] * iso_scatt * TotalNuF(x[0], &grey_pars->distr_pars);
 }
+
 
 // Computation of scattering coefficients
 SourceCoeffs IsoScattCoeffs(GreyOpacityParams *grey_pars) {
-  double iso_n, iso_j;
+  double iso;
   
   SourceCoeffs out;
 
@@ -141,46 +137,30 @@ SourceCoeffs IsoScattCoeffs(GreyOpacityParams *grey_pars) {
   integrand.dim = 1;
   integrand.params = grey_pars;
 
-  // @TODO: compute quadrature points once for all
-  const int np = 32;
-
-  //static MyQuadrature quadrature_default = {.type=kGauleg, .dim=1, .nx=32, .ny=1, .nz=1, .alpha=0., .x1=0., .x2=1., .y1=-42., .y2=-42., .z1=-42., .z2=-42.};
-  MyQuadrature quad = quadrature_default;
-
-  quad.nx = np;
-  quad.type = kGauleg;
-  quad.dim = 1;
-  quad.x1 = 0.;
-  quad.x2 = 1.;
+  MyQuadrature quad = quadrature_default; //{.type=kGauleg, .dim=1, .nx=32, .ny=1, .nz=1, .alpha=0., .x1=0., .x2=1., .y1=-42., .y2=-42., .z1=-42., .z2=-42.};
 
   GaussLegendreMultiD(&quad);
 
-  double n = NuNumber(&grey_pars->distr_pars);
-  double J = NuEnergy(&grey_pars->distr_pars);
-
   double s = 2. * grey_pars->distr_pars.eta_t * grey_pars->distr_pars.temp_t;
 
-  integrand.function = &NuNumberScatteringIntegrand;
-  iso_n = 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &integrand, s) / n / pow(kH * kClight, 3.);
+  out.R_nue  = 0.;
+  out.R_anue = 0.;
   
-  out.R_nue  = iso_n;
-  out.R_anue = iso_n;
+  //out.R_num  = 0.;
+  //out.R_anum = 0.;
   
-  //out.R_num  = iso_n;
-  //out.R_anum = iso_n;
-  
-  out.R_nux = iso_n;
+  out.R_nux = 0.;
 
   integrand.function = &NuEnergyScatteringIntegrand;
-  iso_j = 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &integrand, s) / J / pow(kH * kClight, 3.);
+  iso = 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &integrand, s) / grey_pars->m1_pars.J / kClight;
 
-  out.Q_nue  = iso_j;
-  out.Q_anue = iso_j;
+  out.Q_nue  = iso;
+  out.Q_anue = iso;
   
-  //out.Q_num  = iso_j;
-  //out.Q_anum = iso_j;
+  //out.Q_num  = iso;
+  //out.Q_anum = iso;
   
-  out.Q_nux = iso_j;
+  out.Q_nux = iso;
   
   return out;
 }

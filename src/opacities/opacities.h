@@ -21,10 +21,10 @@ MyOpacity AbsOpacity(double omega, OpacityParams *opacity_pars, MyEOSParams *eos
 MyOpacity StimAbsOpacity(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars);
 
 // Emission coefficients
-SourceCoeffs NuclAbsEmissionCoeffs(MyEOSParams *eos_pars);
+SourceCoeffs BetaEmissionCoeffs(GreyOpacityParams *grey_pars);
 
 // Absoprtion coefficients
-SourceCoeffs NuclAbsOpacityCoeffs(GreyOpacityParams *grey_pars);
+SourceCoeffs BetaOpacityCoeffs(GreyOpacityParams *grey_pars);
 
 /*===========================================================================*/
 
@@ -47,13 +47,13 @@ SourceCoeffs IsoScattCoeffs(GreyOpacityParams *grey_pars);
 // nu_grey_total.c
 
 // Total emission coefficients
-SourceCoeffs EmissionCoeffs(MyEOSParams *eos_pars);
+//SourceCoeffs EmissionCoeffs(GreyOpacityParams *grey_pars);
 
 // Total opacity coefficients
-SourceCoeffs OpacityCoeffs(GreyOpacityParams *grey_pars);
+//SourceCoeffs OpacityCoeffs(GreyOpacityParams *grey_pars);
 
 // Total scattering coefficients
-SourceCoeffs ScatteringCoeffs(GreyOpacityParams *grey_pars);
+//SourceCoeffs ScatteringCoeffs(GreyOpacityParams *grey_pars);
 
 /*===========================================================================*/
 

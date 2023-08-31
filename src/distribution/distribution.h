@@ -38,10 +38,10 @@ double TotalNuF(double omega, NuDistributionParams *distr_pars);
 // Recover parameters of thick and thin distribution function from M1 quantities
 NuDistributionParams CalculateDistrParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars);
 
-// Neutrino number density (besides 4*pi factor)
+// Neutrino number density
 double NuNumber(NuDistributionParams *distr_pars);
 
-// Neutrino energy density (besides 4*pi factor)
+// Neutrino energy density
 double NuEnergy(NuDistributionParams *distr_pars);
 
 /*===========================================================================*/
