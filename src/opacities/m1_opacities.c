@@ -11,6 +11,7 @@
 #include "../functions/functions.h"
 #include "../integration/integration.h"
 #include "../distribution/distribution.h"
+#include "opacities.h"
 
 /* Computes the integrands from all double integration terms in Leonardo's notes (See Eqn. (50) and (51))
  * Each computation is perfomed for the 'e' & 'x' type neutrinos, so a total of 6 integrands are computed
@@ -74,21 +75,21 @@ void M1DoubleIntegrand(double nu, double nubar, GreyOpacityParams *my_grey_opaci
  */
 void M1SingleIntegrand(double nu, GreyOpacityParams *my_grey_opacity_params) {
 
-  // compute the neutrino distribution function
-  double g_t_nu = NuFThick(nu, &my_grey_opacity_params->distr_pars);
-  double g_f_nu = NuFThin(nu, &my_grey_opacity_params->distr_pars);
-  double g_nu = my_grey_opacity_params->distr_pars.w_t * g_t_nu + my_grey_opacity_params->distr_pars.w_f * g_f_nu;
+  // compute the neutrino & anti-neutrino distribution function
+  double g_nu = TotalNuF(kH * nu, &my_grey_opacity_params->distr_pars);
 
   const double four_pi_hc3 = (4. * kPi) / (kH * kH * kH * kClight * kClight * kClight);
-  const double four_pi_hc3_cJ_e = four_pi_hc3 / (kClight * 0.); // @TODO: Add J_e from M1
+  const double four_pi_hc3_cJ_e = four_pi_hc3 / (kClight * my_grey_opacity_params->m1_pars.J); // @TODO: Add J_e from M1
   const double four_pi_hc3_cJ_x = four_pi_hc3 / (kClight * 0.); // @TODO: Add J_x from M1
+
+  const double iso_scatt = IsoScattTotal(nu, &my_grey_opacity_params->opacity_pars, &my_grey_opacity_params->eos_pars);
 
   double integrand_1_e = 0.;
   double integrand_1_x = 0.;
   double integrand_2_e = 0.;
   double integrand_2_x = 0.;
-  double integrand_3_e = four_pi_hc3_cJ_e * 4. * kPi * nu * nu * nu * nu * nu * g_nu * (0.);
-  double integrand_3_x = 0.;
+  double integrand_3_e = four_pi_hc3_cJ_e * 4 * kPi * nu * nu * nu * nu * nu * iso_scatt * g_nu;
+  double integrand_3_x = integrand_3_e;
 }
 
 /* Integrand for the M1 opacities
