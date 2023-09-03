@@ -103,8 +103,8 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
   double integrand_1_x = four_pi_hc3 * nu * nu * nu * 1;
   double integrand_2_e = (1. / (kClight * J_e)) * four_pi_hc3_sqr * nu * nu * nu * g_nu * (1);
   double integrand_2_x = (1. / (kClight * J_x)) * four_pi_hc3_sqr * nu * nu * nu * g_nu * (1);
-  double integrand_3_e = (1. / (kClight * J_e)) * 16. * kPi * kPi * nu * nu * nu * nu * nu * (1);
-  double integrand_3_x = (1. / (kClight * J_x)) * 16. * kPi * kPi * nu * nu * nu * nu * nu * (1);
+  double integrand_3_e = (1. / (kClight * J_e)) * 16. * kPi * kPi * nu * nu * nu * nu * nu * iso_scatt;
+  double integrand_3_x = (1. / (kClight * J_x)) * 16. * kPi * kPi * nu * nu * nu * nu * nu * iso_scatt;
 
   MyQuadratureIntegrand result = {.n = 6};
 
