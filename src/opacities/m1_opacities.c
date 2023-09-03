@@ -17,7 +17,8 @@
  * There are a total of two expressions for 'e' and 'x' neutrinos, so 4 integrands in total
  *
  * 1. Contribution to emissivity: (4 pi)^2/(hc)^6 nu^3 nubar^2 [R^prod(pair) + R^prod(brem)][1 - g_nubar]
- * 2. Contribution to absorption coefficient:
+ * 2. Contribution to absorption coefficient: (1/(c J)) *(4 pi)^2/(hc)^6 * (nu^3 nubar^2 [R_pro(Pair) + R_pro(Brem)][1 - g_nubar] g_nu
+ *                                                                        + nu^3 nubar^2 [R_abs(Pair) + R_abs(Brem)]g_nubar g_nu)
  *
  * Note that there are no double integrals for the computation of the scattering coefficient.
  */
@@ -59,8 +60,8 @@ MyQuadratureIntegrand M1DoubleIntegrand(double *var, void *p) {
   double J_e = my_grey_opacity_params->m1_pars.J;
   double J_x = my_grey_opacity_params->m1_pars.J; // @TODO: check what is to be done for 'e' and 'x' type neutrinos!
 
-  double integrand_2_e = (1./(kClight * J_e)) * (integrand_1_e * g_nu + nu * nu * nu * nubar * nubar * (pair_kernels_m1.abs_e + brem_kernels_m1.abs_e) * g_nu * g_nubar);
-  double integrand_2_x = (1./(kClight * J_x)) * (integrand_1_x * g_nu + nu * nu * nu * nubar * nubar * (pair_kernels_m1.abs_x + brem_kernels_m1.abs_x) * g_nu * g_nubar);
+  double integrand_2_e = (1. / (kClight * J_e)) * (integrand_1_e * g_nu + nu * nu * nu * nubar * nubar * (pair_kernels_m1.abs_e + brem_kernels_m1.abs_e) * g_nu * g_nubar);
+  double integrand_2_x = (1. / (kClight * J_x)) * (integrand_1_x * g_nu + nu * nu * nu * nubar * nubar * (pair_kernels_m1.abs_x + brem_kernels_m1.abs_x) * g_nu * g_nubar);
 
   MyQuadratureIntegrand result = {.n = 4};
 
@@ -74,32 +75,47 @@ MyQuadratureIntegrand M1DoubleIntegrand(double *var, void *p) {
 
 /* Computes the integrand for all single integrals from Leonardo's notes
  *
- * A total of six integrands are computed
+ * There are a total of 3 expressions for 'e' and 'x' neutrinos, so a total of 6 integrands are computed
  *
+ * 1. Contribution to emissivity: (4 pi /(h c)^3) nu^3 j_x
+ * 2. Contribution to absorption coefficient: (1/(c J)) (4 pi /(h c)^3) nu^3 g_nu (j_x + 1/lambda_x)
+ * 3. Contribution to scattering coefficient: (1/(c J)) (4 pi)^2 nu^5 g_nu (R_iso(1)/3 - R_iso(0))
  */
-void M1SingleIntegrand(double nu, GreyOpacityParams *my_grey_opacity_params) {
+MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
+
+  // energy and parameters
+  double nu = var[0];
+  GreyOpacityParams *my_grey_opacity_params = (GreyOpacityParams *) p;
 
   // compute the neutrino & anti-neutrino distribution function
   double g_nu = TotalNuF(kH * nu, &my_grey_opacity_params->distr_pars);
 
+  // compute some constants
   const double four_pi_hc3 = (4. * kPi) / (kH * kH * kH * kClight * kClight * kClight);
-  const double four_pi_hc3_cJ_e = four_pi_hc3 / (kClight * my_grey_opacity_params->m1_pars.J); // @TODO: Add J_e from M1
-  const double four_pi_hc3_cJ_x = four_pi_hc3 / (kClight * 0.); // @TODO: Add J_x from M1
+  const double four_pi_hc3_sqr = four_pi_hc3 * four_pi_hc3;
 
   const double iso_scatt = IsoScattTotal(nu, &my_grey_opacity_params->opacity_pars, &my_grey_opacity_params->eos_pars);
 
-  double integrand_1_e = 0.;
-  double integrand_1_x = 0.;
-  double integrand_2_e = 0.;
-  double integrand_2_x = 0.;
-  double integrand_3_e = four_pi_hc3_cJ_e * 4 * kPi * nu * nu * nu * nu * nu * iso_scatt * g_nu;
-  double integrand_3_x = integrand_3_e;
-}
+  double J_e = my_grey_opacity_params->m1_pars.J;
+  double J_x = my_grey_opacity_params->m1_pars.J; // @TODO: check what is to be done for 'e' and 'x' type neutrinos!
 
-/* Integrand for the M1 opacities
- *
- */
-M1Opacities M1OpacitiesIntegrand(var3d x, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params, GreyOpacityParams *my_grey_opacity_params) {
+  double integrand_1_e = four_pi_hc3 * nu * nu * nu * 1;
+  double integrand_1_x = four_pi_hc3 * nu * nu * nu * 1;
+  double integrand_2_e = (1. / (kClight * J_e)) * four_pi_hc3_sqr * nu * nu * nu * g_nu * (1);
+  double integrand_2_x = (1. / (kClight * J_x)) * four_pi_hc3_sqr * nu * nu * nu * g_nu * (1);
+  double integrand_3_e = (1. / (kClight * J_e)) * 16. * kPi * kPi * nu * nu * nu * nu * nu * (1);
+  double integrand_3_x = (1. / (kClight * J_x)) * 16. * kPi * kPi * nu * nu * nu * nu * nu * (1);
+
+  MyQuadratureIntegrand result = {.n = 6};
+
+  result.integrand[0] = integrand_1_e;
+  result.integrand[1] = integrand_1_x;
+  result.integrand[2] = integrand_2_e;
+  result.integrand[3] = integrand_2_x;
+  result.integrand[4] = integrand_3_e;
+  result.integrand[5] = integrand_3_x;
+
+  return result;
 
 }
 
