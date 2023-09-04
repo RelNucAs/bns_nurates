@@ -13,7 +13,7 @@
 #include "../distribution/distribution.h"
 #include "opacities.h"
 
-/* Compute the 2d integrands for all reactions from Leonardo's notes [Eqns. (50) & (51)]
+/* Compute the 2d integrands for all reactions from Leonardo's notes [Eqns. (51) & (52)]
  * There are a total of two expressions for 'e' and 'x' neutrinos, so 4 integrands in total
  *
  * 1. Contribution to emissivity: (4 pi)^2/(hc)^6 nu^3 nubar^2 [R^prod(pair) + R^prod(brem)][1 - g_nubar]
@@ -75,7 +75,12 @@ MyQuadratureIntegrand M1DoubleIntegrand(double *var, void *p) {
 
 /* Computes the integrand for all single integrals from Leonardo's notes
  *
- * There are a total of 3 expressions for 'e' and 'x' neutrinos, so a total of 6 integrands are computed
+ * There are a total of 3 expressions for electron-type neutrinos, electron-type antineutrinos
+ * and 'x' neutrinos, so a total of 9 integrands should be computed
+ * 
+ * However, two of them (those in Eq.(51) and Eq.(52) for 'x' neutrinos) are trivially equal  
+ * to zero), while the three for the scattering coefficient (Eq.(53)) are the same except for
+ * the J constant (which depends on the neutrino species)
  *
  * 1. Contribution to emissivity: (4 pi /(h c)^3) nu^3 j_x
  * 2. Contribution to absorption coefficient: (1/(c J)) (4 pi /(h c)^3) nu^3 g_nu (j_x + 1/lambda_x)
@@ -89,6 +94,7 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
 
   // compute the neutrino & anti-neutrino distribution function
   double g_nu = TotalNuF(kH * nu, &my_grey_opacity_params->distr_pars);
+  // @TODO: g_nu is not the same for all the neutrino species
 
   // compute some constants
   const double four_pi_hc3 = (4. * kPi) / (kH * kH * kH * kClight * kClight * kClight);
@@ -96,32 +102,38 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
 
   const double iso_scatt = IsoScattTotal(nu, &my_grey_opacity_params->opacity_pars, &my_grey_opacity_params->eos_pars);
 
-  double J_e = my_grey_opacity_params->m1_pars.J;
-  double J_x = my_grey_opacity_params->m1_pars.J; // @TODO: check what is to be done for 'e' and 'x' type neutrinos!
+  double J_nue = my_grey_opacity_params->m1_pars.J;
+  double J_anue = my_grey_opacity_params->m1_pars.J;
+  double J_nux = my_grey_opacity_params->m1_pars.J; // @TODO: check what is to be done for 'e' and 'x' type neutrinos!
+  // @TODO: M1Quantities structure must be generalized in order to account for different neutrino
+  //        species (e.g. double J -> double J[Nsp], where Nsp is the number of different neutrino species)
 
-  double integrand_1_e = four_pi_hc3 * nu * nu * nu * 1;
-  double integrand_1_x = four_pi_hc3 * nu * nu * nu * 1;
-  double integrand_2_e = (1. / (kClight * J_e)) * four_pi_hc3_sqr * nu * nu * nu * g_nu * (1);
-  double integrand_2_x = (1. / (kClight * J_x)) * four_pi_hc3_sqr * nu * nu * nu * g_nu * (1);
-  double integrand_3_e = (1. / (kClight * J_e)) * 16. * kPi * kPi * nu * nu * nu * nu * nu * iso_scatt;
-  double integrand_3_x = (1. / (kClight * J_x)) * 16. * kPi * kPi * nu * nu * nu * nu * nu * iso_scatt;
+  MyOpacity abs_em_beta = StimAbsOpacity(nu, &my_grey_opacity_params->opacity_pars, &my_grey_opacity_params->eos_pars);
+
+  double integrand_1_nue = four_pi_hc3 * nu * nu * nu * abs_em_beta.em_nue;
+  double integrand_1_anue = four_pi_hc3 * nu * nu * nu * abs_em_beta.em_anue;
+  double integrand_2_nue = (1. / (kClight * J_nue)) * four_pi_hc3 * nu * nu * nu * g_nu * abs_em_beta.ab_nue; // @TODO: use the correct g_nu
+  double integrand_2_anue = (1. / (kClight * J_anue)) * four_pi_hc3_sqr * nu * nu * nu * g_nu * abs_em_beta.ab_anue; // @TODO: use the correct g_nu
+  double integrand_3 = (1. / kClight) * 16. * kPi * kPi * nu * nu * nu * g_nu * iso_scatt; // factor nu^2 already in iso_scatt, @TODO: use the correct g_nu
+  double integrand_3_nue = integrand_3 / J_nue;
+  double integrand_3_anue = integrand_3 / J_anue;
+  double integrand_3_nux = integrand_3 / J_nux;
 
   MyQuadratureIntegrand result = {.n = 6};
 
-  result.integrand[0] = integrand_1_e;
-  result.integrand[1] = integrand_1_x;
-  result.integrand[2] = integrand_2_e;
-  result.integrand[3] = integrand_2_x;
-  result.integrand[4] = integrand_3_e;
-  result.integrand[5] = integrand_3_x;
+  result.integrand[0] = integrand_1_nue;
+  result.integrand[1] = integrand_1_anue;
+  result.integrand[2] = integrand_2_nue;
+  result.integrand[3] = integrand_2_anue;
+  result.integrand[4] = integrand_3_nue;
+  result.integrand[5] = integrand_3_anue;
+  //result.integrand... = integrand_3_nux;
 
   return result;
-
 }
 
 /* Computes the M1 opacities for the M1 code
  *
  */
 M1Opacities ComputeM1Opacities(MyQuadrature *quad, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params, GreyOpacityParams *my_grey_opacity_params) {
-
 }
