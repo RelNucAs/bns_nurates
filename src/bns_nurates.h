@@ -107,7 +107,6 @@ struct PairKernelParams {
 };
 typedef struct PairKernelParams PairKernelParams;
 
-
 // unified kernel params
 struct MyKernelParams {
   PairKernelParams pair_kernel_params;
@@ -146,7 +145,6 @@ struct MyFunctionSpecial {
   MyKernelParams *kernel_params;                                                           // all other parameters
 };
 typedef struct MyFunctionSpecial MyFunctionSpecial;
-
 
 // @FIXME: decide with Maitraya what to use for this
 // Temporary struct for storing output of emissivity/absorptivity opacity output
@@ -196,7 +194,7 @@ struct M1Quantities {
   double n;    // radiation number density
   double J;    // radiation energy density
   double H[4]; // radiation flux components (only three are independent since
-               //                            H^alpha u_alpha = 0)
+  //                            H^alpha u_alpha = 0)
   double chi;  // closure
 };
 typedef struct M1Quantities M1Quantities;
@@ -248,5 +246,13 @@ struct MyQuadratureIntegrand {
   double integrand[6];
 };
 typedef struct MyQuadratureIntegrand MyQuadratureIntegrand;
+
+struct MyFunctionMultiD {
+  int dim;                                                        // number of function variables (1/2)
+  MyQuadratureIntegrand (*function)(double *var3d, void *params); // the function
+  MyQuadratureIntegrand my_quadrature_integrand;
+  void *params;                                                   // all parameters of the function
+};
+typedef struct MyFunctionMultiD MyFunctionMultiD;
 
 #endif //BNS_NURATES_SRC_BNS_NURATES_H_

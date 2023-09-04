@@ -8,6 +8,7 @@
 
 #include <math.h>
 #include "integration.h"
+#include "../bns_nurates.h"
 
 /* Compute 4 different integration results at once (emission & absorption for e & points neutrinos)
  * Use this function for integrating over kernel quantities
@@ -75,6 +76,57 @@ MyOpacityQuantity GaussLegendreIntegrateZeroInfSpecial(MyQuadrature *quad, MyFun
 
   MyOpacityQuantity result = {.em_e = DoIntegration(quad->nz, f_em_e_z, w_z), .abs_e = DoIntegration(quad->nz, f_abs_e_z, w_z),
       .em_x = DoIntegration(quad->nz, f_em_x_z, w_z), .abs_x = DoIntegration(quad->nz, f_abs_x_z, w_z)};
+
+  return result;
+
+}
+
+/* Perform 2d integration of multiple functions using a Gauss-Legendre quadrature
+ *
+ * quad:    must be a properly populated quadrature (upto 2d)
+ * func:    the function(s) to be integrated
+ * t:       the value at which to break the integral into two
+ */
+MyQuadratureIntegrand GaussLegendreIntegrateMultiD(MyQuadrature *quad, MyFunctionMultiD *func, double t) {
+
+  int num_integrands = func->my_quadrature_integrand.n;
+
+  double f1_x[num_integrands][quad->nx], f2_x[num_integrands][quad->nx];
+  double f1_y[num_integrands][quad->ny], f2_y[num_integrands][quad->ny];
+
+  double w_y[quad->ny], w_z[quad->nz];
+  double var[2];
+
+  for (int j = 0; j < quad->ny; j++) {
+    for (int i = 0; i < quad->nx; i++) {
+      var[0] = t * quad->points[i];
+      var[1] = quad->points[quad->nx + j];
+
+      MyQuadratureIntegrand f1_vals = func->function(var, 0); //@TODO: fix!
+
+      for (int k = 0; k < num_integrands; ++k) {
+        f1_x[k][i] = f1_vals.integrand[i];
+      }
+
+      var[0] = t / quad->points[i];
+      MyQuadratureIntegrand f2_vals = func->function(var, 0); // @TODO: fix!
+      for (int k = 0; k < num_integrands; ++k) {
+        f2_x[k][i] = f2_vals.integrand[i] / (quad->points[i] * quad->points[i]);
+      }
+
+    }
+
+    for(int k = 0; k < num_integrands; k++) {
+      f1_y[k][j] = t * (DoIntegration(quad->nx, quad->w, f1_x[k]) + DoIntegration(quad->nx, quad->w, f2_x[k]));
+    }
+    w_y[j] = quad->w[quad->nx + j];
+  }
+
+  MyQuadratureIntegrand result;
+
+  for (int k = 0; k < num_integrands; k++) {
+    result.integrand[k] = f1_y[k][0];  //@TODO: fix!
+  }
 
   return result;
 
