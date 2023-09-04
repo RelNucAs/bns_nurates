@@ -79,8 +79,7 @@ MyQuadratureIntegrand M1DoubleIntegrand(double *var, void *p) {
  * and 'x' neutrinos, so a total of 9 integrands should be computed
  * 
  * However, two of them (those in Eq.(51) and Eq.(52) for 'x' neutrinos) are trivially equal  
- * to zero), while the three for the scattering coefficient (Eq.(53)) are the same except for
- * the J constant (which depends on the neutrino species)
+ * to zero)
  *
  * 1. Contribution to emissivity: (4 pi /(h c)^3) nu^3 j_x
  * 2. Contribution to absorption coefficient: (1/(c J)) (4 pi /(h c)^3) nu^3 g_nu (j_x + 1/lambda_x)
@@ -114,10 +113,9 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
   double integrand_1_anue = four_pi_hc3 * nu * nu * nu * abs_em_beta.em_anue;
   double integrand_2_nue = (1. / (kClight * J_nue)) * four_pi_hc3 * nu * nu * nu * g_nu * abs_em_beta.ab_nue; // @TODO: use the correct g_nu
   double integrand_2_anue = (1. / (kClight * J_anue)) * four_pi_hc3_sqr * nu * nu * nu * g_nu * abs_em_beta.ab_anue; // @TODO: use the correct g_nu
-  double integrand_3 = (1. / kClight) * 16. * kPi * kPi * nu * nu * nu * g_nu * iso_scatt; // factor nu^2 already in iso_scatt, @TODO: use the correct g_nu
-  double integrand_3_nue = integrand_3 / J_nue;
-  double integrand_3_anue = integrand_3 / J_anue;
-  double integrand_3_nux = integrand_3 / J_nux;
+  double integrand_3_nue = (1. / (kClight * J_nue)) * 16. * kPi * kPi * nu * nu * nu * g_nu * iso_scatt; // factor nu^2 already in iso_scatt, @TODO: use the correct g_nu
+  double integrand_3_anue = (1. / (kClight * J_anue)) * 16. * kPi * kPi * nu * nu * nu * g_nu * iso_scatt; // @TODO: use the correct g_nu
+  double integrand_3_nux  = (1. / (kClight * J_nux)) * 16. * kPi * kPi * nu * nu * nu * g_nu * iso_scatt; // @TODO: use the correct g_nu
 
   MyQuadratureIntegrand result = {.n = 6};
 
