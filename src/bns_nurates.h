@@ -242,7 +242,7 @@ struct M1Opacities {
 typedef struct M1Opacities M1Opacities;
 
 struct MyQuadratureIntegrand {
-  double n;    // number of integrands (maximum is 6)
+  int n;    // number of integrands (maximum is 6)
   double integrand[6];
 };
 typedef struct MyQuadratureIntegrand MyQuadratureIntegrand;

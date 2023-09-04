@@ -102,14 +102,13 @@ MyQuadratureIntegrand GaussLegendreIntegrateMultiD(MyQuadrature *quad, MyFunctio
       var[0] = t * quad->points[i];
       var[1] = quad->points[quad->nx + j];
 
-      MyQuadratureIntegrand f1_vals = func->function(var, 0); //@TODO: fix!
-
+      MyQuadratureIntegrand f1_vals = func->function(var, func->params);
       for (int k = 0; k < num_integrands; ++k) {
         f1_x[k][i] = f1_vals.integrand[i];
       }
 
       var[0] = t / quad->points[i];
-      MyQuadratureIntegrand f2_vals = func->function(var, 0); // @TODO: fix!
+      MyQuadratureIntegrand f2_vals = func->function(var, func->params);
       for (int k = 0; k < num_integrands; ++k) {
         f2_x[k][i] = f2_vals.integrand[i] / (quad->points[i] * quad->points[i]);
       }
