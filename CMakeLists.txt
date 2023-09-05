@@ -96,7 +96,7 @@ add_executable(test_pair_phi
         src/functions/safe_exp.c
         src/opacities/kernels/kernels.h
         src/opacities/kernels/kernel_pair.c
-        )
+)
 
 target_link_libraries(test_pair_phi GSL::gsl GSL::gslcblas)
 target_link_libraries(test_pair_phi m)
@@ -108,7 +108,7 @@ add_executable(test_pair_kernels
         src/functions/safe_exp.c
         src/opacities/kernels/kernels.h
         src/opacities/kernels/kernel_pair.c
-        )
+)
 
 target_link_libraries(test_pair_kernels GSL::gsl GSL::gslcblas)
 target_link_libraries(test_pair_kernels m)
@@ -120,7 +120,7 @@ add_executable(test_pair_kernels_phi_mu_integrated
         src/functions/safe_exp.c
         src/opacities/kernels/kernels.h
         src/opacities/kernels/kernel_pair.c
-        )
+)
 
 target_link_libraries(test_pair_kernels_phi_mu_integrated GSL::gsl GSL::gslcblas)
 target_link_libraries(test_pair_kernels_phi_mu_integrated m)
@@ -145,7 +145,7 @@ add_executable(test_pair_opacities
         src/opacities/kernels/kernel_pair.c
         src/opacities/nu_abs_em_pair.c
         src/integration/integration_quadrature_integrate_kernels.c
-        )
+)
 
 target_link_libraries(test_pair_opacities GSL::gsl GSL::gslcblas)
 target_link_libraries(test_pair_opacities m)
@@ -156,7 +156,7 @@ add_executable(test_m1_coeffs
         src/constants.h
         src/bns_nurates.h
         src/distribution/distribution.h
-        src/distribution/distribution_opt_thick.c 
+        src/distribution/distribution_opt_thick.c
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
         src/functions/functions.h
@@ -174,7 +174,7 @@ add_executable(test_m1_coeffs
         src/functions/fermi.c
         src/functions/gamma.c
         src/functions/safe_exp.c
-        ) 
+)
 
 target_link_libraries(test_m1_coeffs m)
 
@@ -193,7 +193,7 @@ add_executable(test_gauss_legendre_1d
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
-        )
+)
 
 target_link_libraries(test_gauss_legendre_1d GSL::gsl GSL::gslcblas)
 target_link_libraries(test_gauss_legendre_1d m)
@@ -213,7 +213,7 @@ add_executable(test_gauss_legendre_2d
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
-        )
+)
 
 target_link_libraries(test_gauss_legendre_2d GSL::gsl GSL::gslcblas)
 target_link_libraries(test_gauss_legendre_2d m)
@@ -233,7 +233,7 @@ add_executable(test_gauss_legendre_3d
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
-        )
+)
 
 target_link_libraries(test_gauss_legendre_3d GSL::gsl GSL::gslcblas)
 target_link_libraries(test_gauss_legendre_3d m)
@@ -253,7 +253,7 @@ add_executable(test_gauss_laguerre_1d
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
-        )
+)
 
 target_link_libraries(test_gauss_laguerre_1d GSL::gsl GSL::gslcblas)
 target_link_libraries(test_gauss_laguerre_1d m)
@@ -273,7 +273,7 @@ add_executable(test_quadrature_io
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
-        )
+)
 
 target_link_libraries(test_quadrature_io GSL::gsl GSL::gslcblas)
 target_link_libraries(test_quadrature_io m)
@@ -295,7 +295,7 @@ add_executable(test_integration_1d
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
-        )
+)
 
 target_link_libraries(test_integration_1d GSL::gsl GSL::gslcblas)
 target_link_libraries(test_integration_1d m)
@@ -317,7 +317,7 @@ add_executable(test_integration_2d
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
-        )
+)
 
 target_link_libraries(test_integration_2d GSL::gsl GSL::gslcblas)
 target_link_libraries(test_integration_2d m)
@@ -339,7 +339,7 @@ add_executable(test_integration_3d
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
-        )
+)
 
 target_link_libraries(test_integration_3d GSL::gsl GSL::gslcblas)
 target_link_libraries(test_integration_3d m)
@@ -362,10 +362,33 @@ add_executable(test_integration_special
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
         src/integration/integration_quadrature_integrate_kernels.c
-        )
+)
 
 target_link_libraries(test_integration_special GSL::gsl GSL::gslcblas)
 target_link_libraries(test_integration_special m)
+
+# test integration special
+add_executable(test_integration_multi_func
+        tests/tests_quadrature_integrate/test_integration_multi_func.c
+        tests/tests_quadrature_integrate/gsl_routines/integration_gsl.h
+        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
+        src/constants.h
+        src/bns_nurates.h
+        src/functions/functions.h
+        src/functions/digamma.c
+        src/functions/fermi.c
+        src/functions/gamma.c
+        src/functions/mnewt.c
+        src/functions/safe_exp.c
+        src/integration/integration.h
+        src/integration/integration_quadrature_schemes.c
+        src/integration/integration_quadrature_io.c
+        src/integration/integration_quadrature_integrate.c
+        src/integration/integration_quadrature_integrate_kernels.c
+)
+
+target_link_libraries(test_integration_multi_func GSL::gsl GSL::gslcblas)
+target_link_libraries(test_integration_multi_func m)
 
 enable_testing()
 
@@ -403,4 +426,6 @@ add_test(NAME test_integration_2d
 add_test(NAME test_integration_3d
         COMMAND $<TARGET_FILE:test_integration_3d>)
 add_test(NAME test_integration_special
+        COMMAND $<TARGET_FILE:test_integration_special>)
+add_test(NAME test_integration_multi_func
         COMMAND $<TARGET_FILE:test_integration_special>)

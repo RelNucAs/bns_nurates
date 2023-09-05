@@ -25,5 +25,5 @@ double GaussLegendreIntegrateZeroInf(MyQuadrature *quad, MyFunction *func, doubl
 MyOpacityQuantity GaussLegendreIntegrateZeroInfSpecial(MyQuadrature *quad, MyFunctionSpecial *func, double t);
 double GaussLaguerreIntegrateZeroInf(MyQuadrature *quad, MyFunction *func);
 MyQuadratureIntegrand GaussLegendreIntegrate2D(MyQuadrature *quad, MyFunctionMultiD *func, double t);
-
+MyQuadratureIntegrand GaussLegendreIntegrate1D(MyQuadrature *quad, MyFunctionMultiD *func, double t);
 #endif //BNS_NURATES_SRC_INTEGRATION_INTEGRATION_H_
