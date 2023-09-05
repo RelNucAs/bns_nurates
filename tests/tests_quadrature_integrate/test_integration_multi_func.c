@@ -49,9 +49,19 @@ int main() {
   double s = 1.;
   MyQuadratureIntegrand gauleg_inf = GaussLegendreIntegrate1D(&quad, &test_function, s);
 
+  double correct_answer[4] = {1., 0.5, 0.886226925452758013649083741670, 0.2};
+  double error = 42.;
   for (int i = 0; i < test_function.my_quadrature_integrand.n; i++) {
     printf("%d: \t %f\n", i, gauleg_inf.integrand[i]);
+    if(fabs(gauleg_inf.integrand[i]-correct_answer[i]) < fabs(error)) {
+      error = fabs(gauleg_inf.integrand[i]-correct_answer[i]);
+    }
   }
 
-  return 0;
+  if(error < 1e-7) {
+    return 0;
+  } else {
+    return 1;
+  }
+
 }
