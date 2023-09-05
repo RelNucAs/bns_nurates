@@ -87,7 +87,7 @@ MyOpacityQuantity GaussLegendreIntegrateZeroInfSpecial(MyQuadrature *quad, MyFun
  * func:    the function(s) to be integrated
  * t:       the value at which to break the integral into two
  */
-MyQuadratureIntegrand GaussLegendreIntegrateMultiD(MyQuadrature *quad, MyFunctionMultiD *func, double t) {
+MyQuadratureIntegrand GaussLegendreIntegrate2D(MyQuadrature *quad, MyFunctionMultiD *func, double t) {
 
   int num_integrands = func->my_quadrature_integrand.n;
 
@@ -100,7 +100,7 @@ MyQuadratureIntegrand GaussLegendreIntegrateMultiD(MyQuadrature *quad, MyFunctio
   for (int j = 0; j < quad->ny; j++) {
     for (int i = 0; i < quad->nx; i++) {
       var[0] = t * quad->points[i];
-      var[1] = quad->points[quad->nx + j];
+      var[1] = t * quad->points[quad->nx + j];
 
       MyQuadratureIntegrand f1_vals = func->function(var, func->params);
       for (int k = 0; k < num_integrands; ++k) {
@@ -118,13 +118,35 @@ MyQuadratureIntegrand GaussLegendreIntegrateMultiD(MyQuadrature *quad, MyFunctio
     for(int k = 0; k < num_integrands; k++) {
       f1_y[k][j] = t * (DoIntegration(quad->nx, quad->w, f1_x[k]) + DoIntegration(quad->nx, quad->w, f2_x[k]));
     }
+
+    for (int i = 0; i < quad->nx; i++) {
+      var[0] = t * quad->points[i];
+      var[1] = t / quad->points[quad->nx + j];
+
+      MyQuadratureIntegrand f1_vals = func->function(var, func->params);
+      for (int k = 0; k < num_integrands; ++k) {
+        f1_x[k][i] = f1_vals.integrand[i];
+      }
+
+      var[0] = t / quad->points[i];
+      MyQuadratureIntegrand f2_vals = func->function(var, func->params);
+      for (int k = 0; k < num_integrands; ++k) {
+        f2_x[k][i] = f2_vals.integrand[i] / (quad->points[i] * quad->points[i]);
+      }
+
+    }
+
+    for(int k = 0; k < num_integrands; k++) {
+      f2_y[k][j] = t * (DoIntegration(quad->nx, quad->w, f1_x[k]) + DoIntegration(quad->nx, quad->w, f2_x[k]));
+    }
+
     w_y[j] = quad->w[quad->nx + j];
   }
 
   MyQuadratureIntegrand result;
 
   for (int k = 0; k < num_integrands; k++) {
-    result.integrand[k] = f1_y[k][0];  //@TODO: fix!
+    result.integrand[k] = t * (DoIntegration(quad->ny, w_y, f1_y[k]) + DoIntegration(quad->ny, w_y, f2_y[k]));
   }
 
   return result;
