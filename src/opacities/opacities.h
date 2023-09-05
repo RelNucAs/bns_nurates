@@ -1,6 +1,9 @@
-//
-// Created by maitraya on 6/2/23.
-//
+// ================================================
+// bns-nurates neutrino opacities code
+// Copyright(C) XXX, licensed under the YYY License
+// ================================================
+//! \file opacities.h
+//  \brief header files for opacity functions
 
 #ifndef BNS_NURATES_SRC_OPACITIES_OPACITIES_H_
 #define BNS_NURATES_SRC_OPACITIES_OPACITIES_H_

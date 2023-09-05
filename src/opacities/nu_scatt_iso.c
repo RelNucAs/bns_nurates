@@ -122,7 +122,7 @@ double NuEnergyScatteringIntegrand(double *x, void *p) {
   
   const double iso_scatt = IsoScattTotal(x[0], &grey_pars->opacity_pars, &grey_pars->eos_pars);
 
-  return x[0] * x[0] * x[0] * iso_scatt * TotalNuF(x[0], &grey_pars->distr_pars);
+  return x[0] * x[0] * x[0] * iso_scatt * TotalNuF(x[0], &grey_pars->distr_pars, -42);  //@TODO: fix! This is just to get code to compile
 }
 
 
@@ -141,7 +141,7 @@ SourceCoeffs IsoScattCoeffs(GreyOpacityParams *grey_pars) {
 
   GaussLegendreMultiD(&quad);
 
-  double s = 2. * grey_pars->distr_pars.eta_t * grey_pars->distr_pars.temp_t;
+  double s = 2. * grey_pars->distr_pars.eta_t[-42] * grey_pars->distr_pars.temp_t[-42]; //@TODO: fix! This is just to get code to compile
 
   out.R_nue  = 0.;
   out.R_anue = 0.;
@@ -152,7 +152,7 @@ SourceCoeffs IsoScattCoeffs(GreyOpacityParams *grey_pars) {
   out.R_nux = 0.;
 
   integrand.function = &NuEnergyScatteringIntegrand;
-  iso = 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &integrand, s) / grey_pars->m1_pars.J / kClight;
+  iso = 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &integrand, s) / grey_pars->m1_pars.J[-42] / kClight; //@TODO: fix! This is just to get code to compile
 
   out.Q_nue  = iso;
   out.Q_anue = iso;

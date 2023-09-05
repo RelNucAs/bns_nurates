@@ -10,6 +10,8 @@
 
 #include <stdbool.h>
 
+#define total_num_species 3
+
 //#define kNSp 3 // number of neutrino species
 
 // -------------------------------------------------
@@ -172,29 +174,32 @@ struct OpacityParams {
 };
 typedef struct OpacityParams OpacityParams;
 
-// @TODO: generalize the following structure to all neutrino species (e.g. double w_t -> double w_t[Nsp])
-
-// NuDistributionParams struct
-// structure needed for storing the parameters of the 
-// neutrino distribution function
+/* NuDistributionParams struct
+ *
+ * Structure for storing the parameters of the distribution function for different species of (anti)neutrinos
+ * Supports [0]: electron neutrino, [1]: electron anti-neutrino, [2]: mu/tau (anti)neutrino
+ *
+ */
 struct NuDistributionParams {
-  int nutype;       // if nutype = 0 for electron neutrino, nutype = 1 for electron antineutrino and nutype = 2 for mu/tau neutrinos
-  // optically thick
-  double w_t;
-  double temp_t;
-  double eta_t;
-  // optically thin
-  double w_f;
-  double temp_f;
-  double c_f;
+
+  // parameters for optically thick distribution function
+  double w_t[total_num_species];         // contribution factor
+  double temp_t[total_num_species];      // temperature
+  double eta_t[total_num_species];       // degeneracy parameter
+
+  // parameters for optically thin distribution function
+  double w_f[total_num_species];         // contribution factor
+  double temp_f[total_num_species];      // temperature
+  double c_f[total_num_species];         // constant in power from Ferederico's notes
+
 };
 typedef struct NuDistributionParams NuDistributionParams;
 
 // @TODO: generalize the following structure to all neutrino species (e.g. double n -> double n[Nsp])
 struct M1Quantities {
-  double n;    // radiation number density
-  double J;    // radiation energy density
-  double H[4]; // radiation flux components (only three are independent since
+  double n[total_num_species];    // radiation number density
+  double J[total_num_species];    // radiation energy density
+  //double H[4]; // radiation flux components (only three are independent since
   //                            H^alpha u_alpha = 0)
   double chi;  // closure
 };

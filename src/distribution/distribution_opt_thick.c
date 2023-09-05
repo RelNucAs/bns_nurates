@@ -15,12 +15,13 @@
 
 /* Neutrino distribution function in optically thick regime: Fermi-Dirac distribution
  *
- * omega: neutrino energy
- * distr_pars: uses temp_t (fluid temperature) and eta_t (degeneracy parameter)
+ * omega:       neutrino energy
+ * distr_pars:  uses temp_t (fluid temperature) and eta_t (degeneracy parameter)
+ * species:     species of neutrino
  */
-double NuFThick(double omega, NuDistributionParams *distr_pars) {
-  double temp = distr_pars->temp_t;
-  double mu = temp * distr_pars->eta_t;
+double NuFThick(double omega, NuDistributionParams *distr_pars, int species) {
+  double temp = distr_pars->temp_t[species];
+  double mu = temp * distr_pars->eta_t[species];
   return FermiDistr(omega, temp, mu);
 }
 
@@ -31,22 +32,6 @@ double NuFThick(double omega, NuDistributionParams *distr_pars) {
  * out_distr_pars:  computes trapped neutrino temperature and degeneracy parameter
  */
 void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, NuDistributionParams *out_distr_pars) {
-  // calculate trapped distribution contribution from Eddington factor
-  out_distr_pars->w_t = 0.5 * (3. * M1_pars->chi - 1.);
-
-  // trapped neutrinos taken to be in equilibrium with fluid
-  out_distr_pars->temp_t = eos_pars->temp;
-  if (out_distr_pars->nutype == 0) { // for electron neutrinos
-    out_distr_pars->eta_t = (eos_pars->mu_p + eos_pars->mu_e - eos_pars->mu_n) / eos_pars->temp;
-  } else if (out_distr_pars->nutype == 1) { // for electron antineutrino
-    out_distr_pars->eta_t = -(eos_pars->mu_p + eos_pars->mu_e - eos_pars->mu_n) / eos_pars->temp;
-  } else if (out_distr_pars->nutype == 2) { // for heavy neutrino/anti-neutrino
-    out_distr_pars->eta_t = 0.;
-  }
-
-  // calculate degeneracy parameter
-  const double y = fmax(M1_pars->J / (M1_pars->n * eos_pars->temp), 3.05); // average neutrino energy over thermal energy
-  const double y_0 = 114.;
 
   // least square fit parameters from Federico's notes
   const double kA = 1.3300219438752203;
@@ -62,5 +47,22 @@ void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, Nu
   const double kM = -1871.7098365259042;
   const double kN = -2166.313342616665;
 
-  out_distr_pars->eta_t = y < y_0 ? (y * (y * (y * (y * (y * (kA * y + kB) + kC) + kD) + kE) + kF) + kG) / (y * (y * (y * (y * (y + kH) + kI) + kL) + kM) + kN) : kFourThirds * y;
+  // set degeneracy parameter for different neutrino species
+  out_distr_pars->eta_t[0] = (eos_pars->mu_p + eos_pars->mu_e - eos_pars->mu_n) / eos_pars->temp;
+  out_distr_pars->eta_t[1] = -(eos_pars->mu_p + eos_pars->mu_e - eos_pars->mu_n) / eos_pars->temp;
+  out_distr_pars->eta_t[2] = 0.;
+
+  for (int species = 0; species < total_num_species; species++) {
+
+    out_distr_pars->w_t[species] = 0.5 * (3. * M1_pars->chi - 1.);
+    out_distr_pars->temp_t[species] = eos_pars->temp;
+
+    // readjust degeneracy parameter
+    double y = fmax(M1_pars->J[species] / (M1_pars->n[species] * eos_pars->temp), 3.05); // average neutrino energy over thermal energy
+    double y_0 = 114.;
+
+    out_distr_pars->eta_t[species] =
+        y < y_0 ? (y * (y * (y * (y * (y * (kA * y + kB) + kC) + kD) + kE) + kF) + kG) / (y * (y * (y * (y * (y + kH) + kI) + kL) + kM) + kN) : kFourThirds * y;
+
+  }
 }

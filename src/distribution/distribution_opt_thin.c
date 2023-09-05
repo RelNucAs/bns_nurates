@@ -17,15 +17,16 @@
 # define DEBUG_PRINT(x) do {} while (0)
 #endif
 
-/* Neutrino distribution function for optically thin regime: Maxwell-Boltzmann distribtion
+/* Neutrino distribution function for optically thin regime: Maxwell-Boltzmann distribution
  *
  * omega:       neutrino energy
  * distr_pars:  optically thin parameters
+ * species:     species of neutrino
  */
-double NuFThin(double omega, NuDistributionParams *distr_pars) {
-  double temp_f = distr_pars->temp_f;
-  double c_f = distr_pars->c_f;
-  return pow(omega, c_f) * exp(- omega / temp_f);
+double NuFThin(double omega, NuDistributionParams *distr_pars, int species) {
+  double temp_f = distr_pars->temp_f[species];
+  double c_f = distr_pars->c_f[species];
+  return pow(omega, c_f) * exp(-omega / temp_f);
 }
 
 /* Recover distribution function parameters for optically thin regime from M1 quantities
@@ -34,32 +35,28 @@ double NuFThin(double omega, NuDistributionParams *distr_pars) {
  * out_distr_pars:  computes free neutrino temperature and c_f
  */
 void CalculateThinParamsFromM1(M1Quantities *M1_pars, NuDistributionParams *out_distr_pars) {
-  static const double exp3         = 20.085536923187668;
-  static const double e            = 2.718281828459045235360287471352;
-  static const double ie           = 1. / e;
+
+  static const double exp3 = 20.085536923187668;
+  static const double e = 2.718281828459045235360287471352;
+  static const double ie = 1. / e;
   static const double isqrt_32_pi3 = 0.031746817967120484;
-  
-  const double n = M1_pars->n;
-  const double j = M1_pars->J;
 
-  const double j_over_n = j / n;
-  const double A = j_over_n / e;
-  const double B = n * isqrt_32_pi3;
-  const double log_A = log(A);
+  for (int species = 0; species < total_num_species; species++) {
+    double n = M1_pars->n[species];
+    double j = M1_pars->J[species];
 
-  const double argW0 = -2. * log_A / (B * B);
-  double x;
-  x = argW0 > -ie ? -W0(argW0) / (2. * log_A) : 3.;
+    double j_over_n = j / n;
+    double A = j_over_n / e;
+    double B = n * isqrt_32_pi3;
+    double log_A = log(A);
 
-  //if (x < 0.) {
-    //DEBUG_PRINT(("WARNING -> opt_thin.c: negative value for Lambert function\n"));
-  //}
+    double argW0 = -2. * log_A / (B * B);
+    double x = argW0 > -ie ? -W0(argW0) / (2. * log_A) : 3.;
 
-  // calculate free streaming distribution contribution from Eddington factor
-  out_distr_pars->w_f = 1.5 * (1. - M1_pars->chi);
+    out_distr_pars->w_f[species] = 1.5 * (1. - M1_pars->chi);
 
-  out_distr_pars->c_f = fmax(x - 3., 0.);
-  out_distr_pars->temp_f = j_over_n / x;
+    out_distr_pars->c_f[species] = fmax(x - 3., 0.);
+    out_distr_pars->temp_f[species] = j_over_n / x;
 
-  return;
+  }
 }

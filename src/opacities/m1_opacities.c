@@ -35,8 +35,10 @@ MyQuadratureIntegrand M1DoubleIntegrand(double *var, void *p) {
   const double four_pi_hc3_sqr = four_pi_hc3 * four_pi_hc3;
 
   // compute the neutrino & anti-neutrino distribution function
-  double g_nu = TotalNuF(kH * nu, &my_grey_opacity_params->distr_pars);
-  double g_nubar = TotalNuF(kH * nubar, &my_grey_opacity_params->distr_pars);
+  double g_nue = TotalNuF(kH * nu, &my_grey_opacity_params->distr_pars, 0);
+  double g_anue = TotalNuF(kH * nubar, &my_grey_opacity_params->distr_pars, 1);
+  double g_nux = TotalNuF(kH * nubar, &my_grey_opacity_params->distr_pars, 2);
+  double g_anux = g_nux;
 
   // compute the pair kernels
   MyKernelParams my_kernel_params;
@@ -54,21 +56,21 @@ MyQuadratureIntegrand M1DoubleIntegrand(double *var, void *p) {
   my_kernel_params.brem_kernel_params.omega_prime = kH * nubar;
   MyOpacityQuantity brem_kernels_m1 = BremKernels(&my_kernel_params.brem_kernel_params, &my_eos_params);
 
-  double integrand_1_e = four_pi_hc3_sqr * nu * nu * nu * nubar * nubar * (1. - g_nubar) * (pair_kernels_m1.em_e + brem_kernels_m1.em_e);
-  double integrand_1_x = four_pi_hc3_sqr * nu * nu * nu * nubar * nubar * (1. - g_nubar) * (pair_kernels_m1.em_x + brem_kernels_m1.em_x);
+  double integrand_1_nue = four_pi_hc3_sqr * nu * nu * nu * nubar * nubar * (1. - g_anue) * (pair_kernels_m1.em_e + brem_kernels_m1.em_e);
+  double integrand_1_nux = four_pi_hc3_sqr * nu * nu * nu * nubar * nubar * (1. - g_nux) * (pair_kernels_m1.em_x + brem_kernels_m1.em_x);
 
-  double J_e = my_grey_opacity_params->m1_pars.J;
-  double J_x = my_grey_opacity_params->m1_pars.J; // @TODO: check what is to be done for 'e' and 'x' type neutrinos!
+  double J_nue = my_grey_opacity_params->m1_pars.J[0];
+  double J_nux = my_grey_opacity_params->m1_pars.J[2];
 
-  double integrand_2_e = (1. / (kClight * J_e)) * (integrand_1_e * g_nu + nu * nu * nu * nubar * nubar * (pair_kernels_m1.abs_e + brem_kernels_m1.abs_e) * g_nu * g_nubar);
-  double integrand_2_x = (1. / (kClight * J_x)) * (integrand_1_x * g_nu + nu * nu * nu * nubar * nubar * (pair_kernels_m1.abs_x + brem_kernels_m1.abs_x) * g_nu * g_nubar);
+  double integrand_2_nue = (1. / (kClight * J_nue)) * (integrand_1_nue * g_nue + nu * nu * nu * nubar * nubar * (pair_kernels_m1.abs_e + brem_kernels_m1.abs_e) * g_nue * g_anue);
+  double integrand_2_nux = (1. / (kClight * J_nux)) * (integrand_1_nux * g_nux + nu * nu * nu * nubar * nubar * (pair_kernels_m1.abs_x + brem_kernels_m1.abs_x) * g_nux * g_anux);
 
   MyQuadratureIntegrand result = {.n = 4};
 
-  result.integrand[0] = integrand_1_e;
-  result.integrand[1] = integrand_1_x;
-  result.integrand[2] = integrand_2_e;
-  result.integrand[3] = integrand_2_x;
+  result.integrand[0] = integrand_1_nue;
+  result.integrand[1] = integrand_1_nux;
+  result.integrand[2] = integrand_2_nue;
+  result.integrand[3] = integrand_2_nux;
 
   return result;
 }
@@ -92,8 +94,10 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
   GreyOpacityParams *my_grey_opacity_params = (GreyOpacityParams *) p;
 
   // compute the neutrino & anti-neutrino distribution function
-  double g_nu = TotalNuF(kH * nu, &my_grey_opacity_params->distr_pars);
-  // @TODO: g_nu is not the same for all the neutrino species
+  double g_nue = TotalNuF(kH * nu, &my_grey_opacity_params->distr_pars, 0);
+  double g_anue = TotalNuF(kH * nu, &my_grey_opacity_params->distr_pars, 1);
+  double g_nux = TotalNuF(kH * nu, &my_grey_opacity_params->distr_pars, 2);
+  double g_anux = g_nux;
 
   // compute some constants
   const double four_pi_hc3 = (4. * kPi) / (kH * kH * kH * kClight * kClight * kClight);
@@ -101,21 +105,19 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
 
   const double iso_scatt = IsoScattTotal(nu, &my_grey_opacity_params->opacity_pars, &my_grey_opacity_params->eos_pars);
 
-  double J_nue = my_grey_opacity_params->m1_pars.J;
-  double J_anue = my_grey_opacity_params->m1_pars.J;
-  double J_nux = my_grey_opacity_params->m1_pars.J; // @TODO: check what is to be done for 'e' and 'x' type neutrinos!
-  // @TODO: M1Quantities structure must be generalized in order to account for different neutrino
-  //        species (e.g. double J -> double J[Nsp], where Nsp is the number of different neutrino species)
+  double J_nue = my_grey_opacity_params->m1_pars.J[0];
+  double J_anue = my_grey_opacity_params->m1_pars.J[1];
+  double J_nux = my_grey_opacity_params->m1_pars.J[2];
 
   MyOpacity abs_em_beta = StimAbsOpacity(nu, &my_grey_opacity_params->opacity_pars, &my_grey_opacity_params->eos_pars);
 
   double integrand_1_nue = four_pi_hc3 * nu * nu * nu * abs_em_beta.em_nue;
   double integrand_1_anue = four_pi_hc3 * nu * nu * nu * abs_em_beta.em_anue;
-  double integrand_2_nue = (1. / (kClight * J_nue)) * four_pi_hc3 * nu * nu * nu * g_nu * abs_em_beta.ab_nue; // @TODO: use the correct g_nu
-  double integrand_2_anue = (1. / (kClight * J_anue)) * four_pi_hc3_sqr * nu * nu * nu * g_nu * abs_em_beta.ab_anue; // @TODO: use the correct g_nu
-  double integrand_3_nue = (1. / (kClight * J_nue)) * 16. * kPi * kPi * nu * nu * nu * g_nu * iso_scatt; // factor nu^2 already in iso_scatt, @TODO: use the correct g_nu
-  double integrand_3_anue = (1. / (kClight * J_anue)) * 16. * kPi * kPi * nu * nu * nu * g_nu * iso_scatt; // @TODO: use the correct g_nu
-  double integrand_3_nux  = (1. / (kClight * J_nux)) * 16. * kPi * kPi * nu * nu * nu * g_nu * iso_scatt; // @TODO: use the correct g_nu
+  double integrand_2_nue = (1. / (kClight * J_nue)) * four_pi_hc3 * nu * nu * nu * g_nue * abs_em_beta.ab_nue;
+  double integrand_2_anue = (1. / (kClight * J_anue)) * four_pi_hc3_sqr * nu * nu * nu * g_anue * abs_em_beta.ab_anue;
+  double integrand_3_nue = (1. / (kClight * J_nue)) * 16. * kPi * kPi * nu * nu * nu * g_nue * iso_scatt; // factor nu^2 already in iso_scatt
+  double integrand_3_anue = (1. / (kClight * J_anue)) * 16. * kPi * kPi * nu * nu * nu * g_anue * iso_scatt;
+  double integrand_3_nux  = (1. / (kClight * J_nux)) * 16. * kPi * kPi * nu * nu * nu * g_nux * iso_scatt;
 
   MyQuadratureIntegrand result = {.n = 6};
 

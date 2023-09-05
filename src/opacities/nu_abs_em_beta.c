@@ -244,7 +244,7 @@ double NueBetaNumberOpacityIntegrand(double *x, void *p) {
                                 
   MyOpacity out = StimAbsOpacity(x[0], &grey_pars->opacity_pars, &grey_pars->eos_pars);
 
-  return x[0] * x[0] * out.ab_nue * TotalNuF(x[0], &grey_pars->distr_pars);
+  return x[0] * x[0] * out.ab_nue * TotalNuF(x[0], &grey_pars->distr_pars, -42); //@TODO: fix! This is just to get code to compile
 }
 
 // NueBetaEnergyOpacityIntegrand function
@@ -269,7 +269,7 @@ double ANueBetaNumberOpacityIntegrand(double *x, void *p) {
                                   
   MyOpacity out = StimAbsOpacity(x[0], &grey_pars->opacity_pars, &grey_pars->eos_pars);
 
-  return x[0] * x[0] * out.ab_anue * TotalNuF(x[0], &grey_pars->distr_pars);
+  return x[0] * x[0] * out.ab_anue * TotalNuF(x[0], &grey_pars->distr_pars, -42); //@TODO: fix! This is just to get code to compile
 }
 
 // ANueBetaEnergyOpacityIntegrand function
@@ -337,10 +337,10 @@ SourceCoeffs BetaOpacityCoeffs(GreyOpacityParams *grey_pars) {
   double s = grey_pars->eos_pars.mu_e - kQ;
 
   ab_integrand.function = &NueBetaNumberOpacityIntegrand;
-  out.R_nue  = 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &ab_integrand, s) / grey_pars->m1_pars.n / pow(kH * kClight, 3.) / kClight;
+  out.R_nue  = 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &ab_integrand, s) / grey_pars->m1_pars.n[0] / pow(kH * kClight, 3.) / kClight;
 
   ab_integrand.function = &ANueBetaNumberOpacityIntegrand;
-  out.R_anue = 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &ab_integrand, s) / grey_pars->m1_pars.J / pow(kH * kClight, 3.) / kClight;
+  out.R_anue = 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &ab_integrand, s) / grey_pars->m1_pars.J[1] / pow(kH * kClight, 3.) / kClight;
   
   //out.R_num = ...
   //out.R_anum = ...
@@ -348,10 +348,10 @@ SourceCoeffs BetaOpacityCoeffs(GreyOpacityParams *grey_pars) {
   out.R_nux = 0.;
 
   ab_integrand.function = &NueBetaEnergyOpacityIntegrand;
-  out.Q_nue  = 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &ab_integrand, s) / grey_pars->m1_pars.n / pow(kH * kClight, 3.) / kClight;
+  out.Q_nue  = 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &ab_integrand, s) / grey_pars->m1_pars.n[0] / pow(kH * kClight, 3.) / kClight;
 
   ab_integrand.function = &ANueBetaEnergyOpacityIntegrand;
-  out.Q_anue = 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &ab_integrand, s) / grey_pars->m1_pars.n / pow(kH * kClight, 3.) / kClight;
+  out.Q_anue = 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &ab_integrand, s) / grey_pars->m1_pars.n[1] / pow(kH * kClight, 3.) / kClight;
   
   //out.Q_num  = ...
   //out.Q_anum = ...

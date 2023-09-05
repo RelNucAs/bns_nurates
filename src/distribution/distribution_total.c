@@ -15,13 +15,14 @@
  *
  * omega:       neutrino energy
  * distr_pars:  neutrino distribution parameters for thick and thin regimes
+ * species:     species of neutrino
  */
-double TotalNuF(double omega, NuDistributionParams *distr_pars) {
-  double w_t = distr_pars->w_t;
-  double w_f = distr_pars->w_f;
+double TotalNuF(double omega, NuDistributionParams *distr_pars, int species) {
+  double w_t = distr_pars->w_t[species];
+  double w_f = distr_pars->w_f[species];
 
-  double f_thick = NuFThick(omega, distr_pars);
-  double f_thin = NuFThin(omega, distr_pars);
+  double f_thick = NuFThick(omega, distr_pars, species);
+  double f_thin = NuFThin(omega, distr_pars, species);
 
   return w_t * f_thick + w_f * f_thin;
 }
@@ -40,17 +41,15 @@ NuDistributionParams CalculateDistrParamsFromM1(M1Quantities *M1_pars, MyEOSPara
   return out_distr_pars;
 }
 
-
-// @TODO: generalize all the following functions with structures containing all nu species
-
 // Integrand for computation of neutrino number density
-double NuNumberIntegrand(double *x, void *p) {
+double NuNumberIntegrand(double *x, void *p, int species) {
   NuDistributionParams *distr_pars = (NuDistributionParams *) p;
 
-  return x[0] * x[0] * TotalNuF(x[0], distr_pars);
+  return x[0] * x[0] * TotalNuF(x[0], distr_pars, species);
 }
 
 // Neutrino number density (besides 4*pi factor)
+/*
 double NuNumber(NuDistributionParams *distr_pars) {
   MyFunction integrand;
 
@@ -68,8 +67,8 @@ double NuNumber(NuDistributionParams *distr_pars) {
 }
 
 // Integrand for computation of neutrino energy density
-double NuEnergyIntegrand(double *x, void *p) {
-  return x[0] * NuNumberIntegrand(x, p);
+double NuEnergyIntegrand(double *x, void *p, int species) {
+  return x[0] * NuNumberIntegrand(x, p, species);
 }
 
 // Neutrino energy density (besides 4*pi factor)
@@ -88,3 +87,4 @@ double NuEnergy(NuDistributionParams *distr_pars) {
   integrand.function = &NuEnergyIntegrand;
   return 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &integrand, s) / pow(kH * kClight, 3.);
 }
+*/
