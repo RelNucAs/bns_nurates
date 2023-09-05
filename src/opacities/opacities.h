@@ -65,7 +65,8 @@ MyOpacityQuantity BremEmissivityAbsorptivityIntegrandFermi(double omega_prime, M
 MyOpacityQuantity BremOpacitiesFermi(MyQuadrature *quad, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);
 
 // M1 opacities
-M1Opacities M1OpacitiesIntegrand(var3d x, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params, GreyOpacityParams *my_grey_opacity_params);
-M1Opacities ComputeM1Opacities(MyQuadrature *quad, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params, GreyOpacityParams *my_grey_opacity_params);
+MyQuadratureIntegrand M1DoubleIntegrand(double *var, void *p);
+MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p);
+M1Opacities ComputeM1Opacities(MyQuadrature *quad_1d, MyQuadrature *quad_2d, GreyOpacityParams *my_grey_opacity_params);
 
 #endif //BNS_NURATES_SRC_OPACITIES_OPACITIES_H_

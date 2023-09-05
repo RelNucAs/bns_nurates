@@ -12,7 +12,7 @@
 #include "../functions/functions.h"
 
 #define kFourThirds 1.333333333333333333333333
- 
+
 /* Neutrino distribution function in optically thick regime: Fermi-Dirac distribution
  *
  * omega: neutrino energy
@@ -36,8 +36,8 @@ void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, Nu
 
   // trapped neutrinos taken to be in equilibrium with fluid
   out_distr_pars->temp_t = eos_pars->temp;
-  if(out_distr_pars->nutype == 0) { // for electron neutrinos
-  out_distr_pars->eta_t = (eos_pars->mu_p + eos_pars->mu_e - eos_pars->mu_n) / eos_pars->temp;
+  if (out_distr_pars->nutype == 0) { // for electron neutrinos
+    out_distr_pars->eta_t = (eos_pars->mu_p + eos_pars->mu_e - eos_pars->mu_n) / eos_pars->temp;
   } else if (out_distr_pars->nutype == 1) { // for electron antineutrino
     out_distr_pars->eta_t = -(eos_pars->mu_p + eos_pars->mu_e - eos_pars->mu_n) / eos_pars->temp;
   } else if (out_distr_pars->nutype == 2) { // for heavy neutrino/anti-neutrino
@@ -62,17 +62,5 @@ void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, Nu
   const double kM = -1871.7098365259042;
   const double kN = -2166.313342616665;
 
-  out_distr_pars->eta_t =
-        y < y_0 ?
-            (y * (y * (y * (y * (y * (kA * y + kB) +
-                                 kC) +
-                            kD) +
-                       kE) +
-                  kF) +
-             kG) /
-                (y * (y * (y * (y * (y + kH) + kI) +
-                           kL) +
-                      kM) +
-                 kN) :
-            kFourThirds * y;
+  out_distr_pars->eta_t = y < y_0 ? (y * (y * (y * (y * (y * (kA * y + kB) + kC) + kD) + kE) + kF) + kG) / (y * (y * (y * (y * (y + kH) + kI) + kL) + kM) + kN) : kFourThirds * y;
 }

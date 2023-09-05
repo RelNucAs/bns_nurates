@@ -130,8 +130,38 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
   return result;
 }
 
-/* Computes the M1 opacities for the M1 code
+/* Computes the opacities for the M1 code
  *
  */
-M1Opacities ComputeM1Opacities(MyQuadrature *quad, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params, GreyOpacityParams *my_grey_opacity_params) {
+M1Opacities ComputeM1Opacities(MyQuadrature *quad_1d, MyQuadrature *quad_2d, GreyOpacityParams *my_grey_opacity_params) {
+
+  // set up 1d integration
+  MyFunctionMultiD integrand_m1_1d;
+  MyQuadratureIntegrand integrand_m1_1d_info = {.n = 6};
+  integrand_m1_1d.function = &M1SingleIntegrand;
+  integrand_m1_1d.params = my_grey_opacity_params;
+  integrand_m1_1d.my_quadrature_integrand = integrand_m1_1d_info;
+
+  // set up 2d integration
+  MyFunctionMultiD integrand_m1_2d;
+  MyQuadratureIntegrand integrand_m1_2d_info = {.n = 4};
+  integrand_m1_2d.function = &M1DoubleIntegrand;
+  integrand_m1_2d.params = my_grey_opacity_params;
+  integrand_m1_2d.my_quadrature_integrand = integrand_m1_2d_info;
+
+  double s = 1. * my_grey_opacity_params->eos_pars.temp; // @TODO: choose this appropriately
+
+  MyQuadratureIntegrand integrals_1d = GaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s);
+  MyQuadratureIntegrand integrals_2d = GaussLegendreIntegrate2D(quad_2d, &integrand_m1_2d, s);
+
+  M1Opacities m1_opacities;
+
+  m1_opacities.eta_e = integrals_2d.integrand[0] + integrals_1d.integrand[0];
+  m1_opacities.eta_x = integrals_2d.integrand[1];
+  m1_opacities.kappa_a_e = integrals_2d.integrand[2];
+  m1_opacities.kappa_a_x = integrals_2d.integrand[3];
+  m1_opacities.kappa_s_e = 0;
+  m1_opacities.kappa_s_x = 0;
+
+  return m1_opacities;
 }
