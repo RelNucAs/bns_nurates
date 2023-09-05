@@ -367,9 +367,9 @@ add_executable(test_integration_special
 target_link_libraries(test_integration_special GSL::gsl GSL::gslcblas)
 target_link_libraries(test_integration_special m)
 
-# test integration special
-add_executable(test_integration_multi_func
-        tests/tests_quadrature_integrate/test_integration_multi_func.c
+# test integration special 1d
+add_executable(test_integration_multi_func_1d
+        tests/tests_quadrature_integrate/test_integration_multi_func_1d.c
         tests/tests_quadrature_integrate/gsl_routines/integration_gsl.h
         tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
         src/constants.h
@@ -387,8 +387,31 @@ add_executable(test_integration_multi_func
         src/integration/integration_quadrature_integrate_kernels.c
 )
 
-target_link_libraries(test_integration_multi_func GSL::gsl GSL::gslcblas)
-target_link_libraries(test_integration_multi_func m)
+target_link_libraries(test_integration_multi_func_1d GSL::gsl GSL::gslcblas)
+target_link_libraries(test_integration_multi_func_1d m)
+
+# test integration special 2d
+add_executable(test_integration_multi_func_2d
+        tests/tests_quadrature_integrate/test_integration_multi_func_2d.c
+        tests/tests_quadrature_integrate/gsl_routines/integration_gsl.h
+        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
+        src/constants.h
+        src/bns_nurates.h
+        src/functions/functions.h
+        src/functions/digamma.c
+        src/functions/fermi.c
+        src/functions/gamma.c
+        src/functions/mnewt.c
+        src/functions/safe_exp.c
+        src/integration/integration.h
+        src/integration/integration_quadrature_schemes.c
+        src/integration/integration_quadrature_io.c
+        src/integration/integration_quadrature_integrate.c
+        src/integration/integration_quadrature_integrate_kernels.c
+)
+
+target_link_libraries(test_integration_multi_func_2d GSL::gsl GSL::gslcblas)
+target_link_libraries(test_integration_multi_func_2d m)
 
 enable_testing()
 
@@ -427,5 +450,7 @@ add_test(NAME test_integration_3d
         COMMAND $<TARGET_FILE:test_integration_3d>)
 add_test(NAME test_integration_special
         COMMAND $<TARGET_FILE:test_integration_special>)
-add_test(NAME test_integration_multi_func
-        COMMAND $<TARGET_FILE:test_integration_special>)
+add_test(NAME test_integration_multi_func_1d
+        COMMAND $<TARGET_FILE:test_integration_multi_func_1d>)
+add_test(NAME test_integration_multi_func_2d
+        COMMAND $<TARGET_FILE:test_integration_multi_func_2d>)

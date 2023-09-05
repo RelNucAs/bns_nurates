@@ -104,13 +104,13 @@ MyQuadratureIntegrand GaussLegendreIntegrate2D(MyQuadrature *quad, MyFunctionMul
 
       MyQuadratureIntegrand f1_vals = func->function(var, func->params);
       for (int k = 0; k < num_integrands; ++k) {
-        f1_x[k][i] = f1_vals.integrand[i];
+        f1_x[k][i] = f1_vals.integrand[k];
       }
 
       var[0] = t / quad->points[i];
       MyQuadratureIntegrand f2_vals = func->function(var, func->params);
       for (int k = 0; k < num_integrands; ++k) {
-        f2_x[k][i] = f2_vals.integrand[i] / (quad->points[i] * quad->points[i]);
+        f2_x[k][i] = f2_vals.integrand[k] / (quad->points[i] * quad->points[i]);
       }
 
     }
@@ -125,13 +125,13 @@ MyQuadratureIntegrand GaussLegendreIntegrate2D(MyQuadrature *quad, MyFunctionMul
 
       MyQuadratureIntegrand f1_vals = func->function(var, func->params);
       for (int k = 0; k < num_integrands; ++k) {
-        f1_x[k][i] = f1_vals.integrand[i];
+        f1_x[k][i] = f1_vals.integrand[k];
       }
 
       var[0] = t / quad->points[i];
       MyQuadratureIntegrand f2_vals = func->function(var, func->params);
       for (int k = 0; k < num_integrands; ++k) {
-        f2_x[k][i] = f2_vals.integrand[i] / (quad->points[i] * quad->points[i]);
+        f2_x[k][i] = f2_vals.integrand[k] / (quad->points[i] * quad->points[i]);
       }
 
     }

@@ -2,7 +2,7 @@
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
-//! \file  test_integration_multi_func.c
+//! \file  test_integration_multi_func_1d.c
 //  \brief test integration routines for multiple functions
 
 #include <stdio.h>
@@ -51,8 +51,9 @@ int main() {
 
   double correct_answer[4] = {1., 0.5, 0.886226925452758013649083741670, 0.2};
   double error = 42.;
+  printf("Num \t Result \t Error\n");
   for (int i = 0; i < test_function.my_quadrature_integrand.n; i++) {
-    printf("%d: \t %f\n", i, gauleg_inf.integrand[i]);
+    printf("%d: \t %f \t %f\n", i, gauleg_inf.integrand[i],fabs(gauleg_inf.integrand[i]-correct_answer[i]));
     if(fabs(gauleg_inf.integrand[i]-correct_answer[i]) < fabs(error)) {
       error = fabs(gauleg_inf.integrand[i]-correct_answer[i]);
     }
