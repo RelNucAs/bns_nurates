@@ -178,6 +178,7 @@ typedef struct OpacityParams OpacityParams;
 // structure needed for storing the parameters of the 
 // neutrino distribution function
 struct NuDistributionParams {
+  int nutype;       // if nutype = 0 for electron neutrino, nutype = 1 for electron antineutrino and nutype = 2 for mu/tau neutrinos
   // optically thick
   double w_t;
   double temp_t;

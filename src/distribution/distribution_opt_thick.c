@@ -35,7 +35,14 @@ void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, Nu
   out_distr_pars->w_t = 0.5 * (3. * M1_pars->chi - 1.);
 
   // trapped neutrinos taken to be in equilibrium with fluid
-  out_distr_pars->eta_t = eos_pars->temp;
+  out_distr_pars->temp_t = eos_pars->temp;
+  if(out_distr_pars->nutype == 0) { // for electron neutrinos
+  out_distr_pars->eta_t = (eos_pars->mu_p + eos_pars->mu_e - eos_pars->mu_n) / eos_pars->temp;
+  } else if (out_distr_pars->nutype == 1) { // for electron antineutrino
+    out_distr_pars->eta_t = -(eos_pars->mu_p + eos_pars->mu_e - eos_pars->mu_n) / eos_pars->temp;
+  } else if (out_distr_pars->nutype == 2) { // for heavy neutrino/anti-neutrino
+    out_distr_pars->eta_t = 0.;
+  }
 
   // calculate degeneracy parameter
   const double y = fmax(M1_pars->J / (M1_pars->n * eos_pars->temp), 3.05); // average neutrino energy over thermal energy
@@ -68,6 +75,4 @@ void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, Nu
                       kM) +
                  kN) :
             kFourThirds * y;
- 
-  return;
 }
