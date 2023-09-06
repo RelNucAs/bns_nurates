@@ -117,31 +117,38 @@ double IsoScattTotal(double omega, OpacityParams *opacity_pars, MyEOSParams *eos
 // integrand for the computation of the energy opacity
 // scattering coefficient
 // (constants are added after the integration)
-double NuEnergyScatteringIntegrand(double *x, void *p) {
+MyQuadratureIntegrand NuEnergyScatteringIntegrand(double *x, void *p) {
   GreyOpacityParams *grey_pars = (GreyOpacityParams *) p;
   
   const double iso_scatt = IsoScattTotal(x[0], &grey_pars->opacity_pars, &grey_pars->eos_pars);
 
-  return x[0] * x[0] * x[0] * iso_scatt * TotalNuF(x[0], &grey_pars->distr_pars, -42);  //@TODO: fix! This is just to get code to compile
+  MyQuadratureIntegrand result;
+
+  result.integrand[0] = x[0] * x[0] * x[0] * iso_scatt * TotalNuF(x[0], &grey_pars->distr_pars, 0);
+  result.integrand[1] = x[0] * x[0] * x[0] * iso_scatt * TotalNuF(x[0], &grey_pars->distr_pars, 1);
+  result.integrand[2] = x[0] * x[0] * x[0] * iso_scatt * TotalNuF(x[0], &grey_pars->distr_pars, 2);
+
+  return result;
 }
 
 
 // Computation of scattering coefficients
 SourceCoeffs IsoScattCoeffs(GreyOpacityParams *grey_pars) {
-  double iso;
+  MyQuadratureIntegrand iso;
   
   SourceCoeffs out;
 
-  MyFunction integrand;
+  MyFunctionMultiD integrand;
 
   integrand.dim = 1;
   integrand.params = grey_pars;
+  integrand.my_quadrature_integrand.n = 3;
 
   MyQuadrature quad = quadrature_default; //{.type=kGauleg, .dim=1, .nx=32, .ny=1, .nz=1, .alpha=0., .x1=0., .x2=1., .y1=-42., .y2=-42., .z1=-42., .z2=-42.};
 
   GaussLegendreMultiD(&quad);
 
-  double s = 2. * grey_pars->distr_pars.eta_t[-42] * grey_pars->distr_pars.temp_t[-42]; //@TODO: fix! This is just to get code to compile
+  double s = 2. * grey_pars->distr_pars.eta_t[0] * grey_pars->distr_pars.temp_t[0]; //@TODO: we are choose the same s for all species
 
   out.R_nue  = 0.;
   out.R_anue = 0.;
@@ -152,15 +159,16 @@ SourceCoeffs IsoScattCoeffs(GreyOpacityParams *grey_pars) {
   out.R_nux = 0.;
 
   integrand.function = &NuEnergyScatteringIntegrand;
-  iso = 4. * kPi * GaussLegendreIntegrateZeroInf(&quad, &integrand, s) / grey_pars->m1_pars.J[-42] / kClight; //@TODO: fix! This is just to get code to compile
+  iso =  GaussLegendreIntegrate1D(&quad, &integrand, s);
 
-  out.Q_nue  = iso;
-  out.Q_anue = iso;
+
+  out.Q_nue  = 4. * kPi * iso.integrand[0] / grey_pars->m1_pars.J[0] / kClight;
+  out.Q_anue = 4. * kPi * iso.integrand[1] / grey_pars->m1_pars.J[1] / kClight;
   
   //out.Q_num  = iso;
   //out.Q_anum = iso;
   
-  out.Q_nux = iso;
+  out.Q_nux = 4. * kPi * iso.integrand[2] / grey_pars->m1_pars.J[2] / kClight;
   
   return out;
 }
