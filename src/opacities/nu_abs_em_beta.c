@@ -244,7 +244,7 @@ double NueBetaNumberOpacityIntegrand(double *x, void *p) {
                                 
   MyOpacity out = StimAbsOpacity(x[0], &grey_pars->opacity_pars, &grey_pars->eos_pars);
 
-  return x[0] * x[0] * out.ab_nue * TotalNuF(x[0], &grey_pars->distr_pars, -42); //@TODO: fix! This is just to get code to compile
+  return x[0] * x[0] * out.ab_nue * TotalNuF(x[0], &grey_pars->distr_pars, 0);
 }
 
 // NueBetaEnergyOpacityIntegrand function
@@ -269,7 +269,7 @@ double ANueBetaNumberOpacityIntegrand(double *x, void *p) {
                                   
   MyOpacity out = StimAbsOpacity(x[0], &grey_pars->opacity_pars, &grey_pars->eos_pars);
 
-  return x[0] * x[0] * out.ab_anue * TotalNuF(x[0], &grey_pars->distr_pars, -42); //@TODO: fix! This is just to get code to compile
+  return x[0] * x[0] * out.ab_anue * TotalNuF(x[0], &grey_pars->distr_pars, 1);
 }
 
 // ANueBetaEnergyOpacityIntegrand function
