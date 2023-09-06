@@ -38,7 +38,6 @@ MyQuadratureIntegrand M1DoubleIntegrand(double *var, void *p) {
   double g_nue = TotalNuF(kH * nu, &my_grey_opacity_params->distr_pars, 0);
   double g_anue = TotalNuF(kH * nubar, &my_grey_opacity_params->distr_pars, 1);
   double g_nux = TotalNuF(kH * nubar, &my_grey_opacity_params->distr_pars, 2);
-  double g_anux = g_nux;
 
   // compute the pair kernels
   MyKernelParams my_kernel_params;
@@ -63,7 +62,7 @@ MyQuadratureIntegrand M1DoubleIntegrand(double *var, void *p) {
   double J_nux = my_grey_opacity_params->m1_pars.J[2];
 
   double integrand_2_nue = (1. / (kClight * J_nue)) * (integrand_1_nue * g_nue + nu * nu * nu * nubar * nubar * (pair_kernels_m1.abs_e + brem_kernels_m1.abs_e) * g_nue * g_anue);
-  double integrand_2_nux = (1. / (kClight * J_nux)) * (integrand_1_nux * g_nux + nu * nu * nu * nubar * nubar * (pair_kernels_m1.abs_x + brem_kernels_m1.abs_x) * g_nux * g_anux);
+  double integrand_2_nux = (1. / (kClight * J_nux)) * (integrand_1_nux * g_nux + nu * nu * nu * nubar * nubar * (pair_kernels_m1.abs_x + brem_kernels_m1.abs_x) * g_nux * g_nux);
 
   MyQuadratureIntegrand result = {.n = 4};
 
@@ -97,7 +96,6 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
   double g_nue = TotalNuF(kH * nu, &my_grey_opacity_params->distr_pars, 0);
   double g_anue = TotalNuF(kH * nu, &my_grey_opacity_params->distr_pars, 1);
   double g_nux = TotalNuF(kH * nu, &my_grey_opacity_params->distr_pars, 2);
-  double g_anux = g_nux;
 
   // compute some constants
   const double four_pi_hc3 = (4. * kPi) / (kH * kH * kH * kClight * kClight * kClight);
@@ -119,7 +117,7 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
   double integrand_3_anue = (1. / (kClight * J_anue)) * 16. * kPi * kPi * nu * nu * nu * g_anue * iso_scatt;
   double integrand_3_nux  = (1. / (kClight * J_nux)) * 16. * kPi * kPi * nu * nu * nu * g_nux * iso_scatt;
 
-  MyQuadratureIntegrand result = {.n = 6};
+  MyQuadratureIntegrand result = {.n = 7};
 
   result.integrand[0] = integrand_1_nue;
   result.integrand[1] = integrand_1_anue;
@@ -127,7 +125,7 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
   result.integrand[3] = integrand_2_anue;
   result.integrand[4] = integrand_3_nue;
   result.integrand[5] = integrand_3_anue;
-  //result.integrand... = integrand_3_nux;
+  result.integrand[7] = integrand_3_nux;
 
   return result;
 }
@@ -158,12 +156,15 @@ M1Opacities ComputeM1Opacities(MyQuadrature *quad_1d, MyQuadrature *quad_2d, Gre
 
   M1Opacities m1_opacities;
 
-  m1_opacities.eta_e = integrals_2d.integrand[0] + integrals_1d.integrand[0];
-  m1_opacities.eta_x = integrals_2d.integrand[1];
-  m1_opacities.kappa_a_e = integrals_2d.integrand[2];
-  m1_opacities.kappa_a_x = integrals_2d.integrand[3];
-  m1_opacities.kappa_s_e = 0;
-  m1_opacities.kappa_s_x = 0;
+  m1_opacities.eta_nue = integrals_2d.integrand[0] + integrals_1d.integrand[0];
+  m1_opacities.eta_anue = integrals_2d.integrand[0] + integrals_1d.integrand[1];
+  m1_opacities.eta_nux = integrals_2d.integrand[1];
+  m1_opacities.kappa_a_nue = integrals_2d.integrand[2] + integrals_1d.integrand[2];
+  m1_opacities.kappa_a_anue = integrals_2d.integrand[2] + integrals_1d.integrand[3];
+  m1_opacities.kappa_a_nux = integrals_2d.integrand[3];
+  m1_opacities.kappa_s_nue = integrals_1d.integrand[4];
+  m1_opacities.kappa_s_anue = integrals_1d.integrand[5];
+  m1_opacities.kappa_s_nux = integrals_1d.integrand[6];
 
   return m1_opacities;
 }

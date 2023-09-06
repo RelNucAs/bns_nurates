@@ -237,19 +237,23 @@ struct SourceCoeffs {
 typedef struct SourceCoeffs SourceCoeffs;
 
 struct M1Opacities {
-  double eta_e;
-  double kappa_a_e;
-  double kappa_s_e;
+  double eta_nue;
+  double kappa_a_nue;
+  double kappa_s_nue;
 
-  double eta_x;
-  double kappa_a_x;
-  double kappa_s_x;
+  double eta_anue;
+  double kappa_a_anue;
+  double kappa_s_anue;
+
+  double eta_nux;
+  double kappa_a_nux;
+  double kappa_s_nux;
 };
 typedef struct M1Opacities M1Opacities;
 
 struct MyQuadratureIntegrand {
-  int n;    // number of integrands (maximum is 6)
-  double integrand[6];
+  int n;
+  double integrand[10];
 };
 typedef struct MyQuadratureIntegrand MyQuadratureIntegrand;
 
