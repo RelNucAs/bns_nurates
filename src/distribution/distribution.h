@@ -13,7 +13,8 @@
 
 /* ===========================================================================
  * Functions for the optically thick distribution function
- * =========================================================================== */
+ * ===========================================================================
+ */
 
 // Neutrino distribution function for the optically thick regime
 double NuFThick(double omega, NuDistributionParams *distr_pars, int species);
@@ -23,7 +24,8 @@ void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, Nu
 
 /* ===========================================================================
  * Functions for the optically thin distribution function
- * =========================================================================== */
+ * ===========================================================================
+ */
 
 // Neutrino distribution function in optically thin regime
 double NuFThin(double omega, NuDistributionParams *distr_pars, int species);
@@ -33,7 +35,8 @@ void CalculateThinParamsFromM1(M1Quantities *M1_pars, NuDistributionParams *out_
 
 /* ===========================================================================
  * Functions for constructing the total distribution function
- * =========================================================================== */
+ * ===========================================================================
+ */
 
 // Total neutrino distribution combining optically thick and thin regimes
 double TotalNuF(double omega, NuDistributionParams *distr_pars, int species);
@@ -41,10 +44,15 @@ double TotalNuF(double omega, NuDistributionParams *distr_pars, int species);
 // Recover parameters of thick and thin distribution function from M1 quantities
 NuDistributionParams CalculateDistrParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars);
 
+/* ===========================================================================
+ * Functions for computing neutrino number and energy density
+ * ===========================================================================
+ */
+
 // Neutrino number density
-double NuNumber(NuDistributionParams *distr_pars);
+MyQuadratureIntegrand NuNumber(NuDistributionParams *distr_pars);
 
 // Neutrino energy density
-double NuEnergy(NuDistributionParams *distr_pars);
+MyQuadratureIntegrand NuEnergy(NuDistributionParams *distr_pars);
 
 #endif //BNS_NURATES_SRC_DISTRIBUTION_DISTRIBUTION_H_

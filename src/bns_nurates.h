@@ -256,7 +256,7 @@ struct M1Quantities {
   double n[total_num_species];      // radiation number density
   double J[total_num_species];      // radiation energy density
   double H[total_num_species][4];   // radiation flux
-  double chi;                       // Eddington factor
+  double chi[total_num_species];    // Eddington factor
 };
 typedef struct M1Quantities M1Quantities;
 

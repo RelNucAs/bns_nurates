@@ -3,7 +3,7 @@
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
 //! \file distribution_opt_thick.h
-//  \brief compute neutrino distribution function for optically thick regime
+//  \brief compute neutrino distribution function & M1 parameters for optically thick regime
 
 #include <math.h>
 
@@ -12,6 +12,18 @@
 #include "../functions/functions.h"
 
 #define kFourThirds 1.333333333333333333333333
+#define kFitA  1.3300219438752203
+#define kFitB  368.1278987362366
+#define kFitC (-2701.5865312193273)
+#define kFitD 3930.881704339285
+#define kFitE 11356.551670239718
+#define kFitF (-33734.77092570755)
+#define kFitG 21233.158792661736
+#define kFitH 275.93123409700814
+#define kFitI (-2015.9177416521718)
+#define kFitL 4403.086279325216
+#define kFitM (-1871.7098365259042)
+#define kFitN (-2166.313342616665)
 
 /* Neutrino distribution function in optically thick regime: Fermi-Dirac distribution
  *
@@ -33,20 +45,6 @@ double NuFThick(double omega, NuDistributionParams *distr_pars, int species) {
  */
 void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, NuDistributionParams *out_distr_pars) {
 
-  // least square fit parameters from Federico's notes
-  const double kA = 1.3300219438752203;
-  const double kB = 368.1278987362366;
-  const double kC = -2701.5865312193273;
-  const double kD = 3930.881704339285;
-  const double kE = 11356.551670239718;
-  const double kF = -33734.77092570755;
-  const double kG = 21233.158792661736;
-  const double kH = 275.93123409700814;
-  const double kI = -2015.9177416521718;
-  const double kL = 4403.086279325216;
-  const double kM = -1871.7098365259042;
-  const double kN = -2166.313342616665;
-
   // set degeneracy parameter for different neutrino species
   out_distr_pars->eta_t[0] = (eos_pars->mu_p + eos_pars->mu_e - eos_pars->mu_n) / eos_pars->temp;
   out_distr_pars->eta_t[1] = -(eos_pars->mu_p + eos_pars->mu_e - eos_pars->mu_n) / eos_pars->temp;
@@ -54,15 +52,15 @@ void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, Nu
 
   for (int species = 0; species < total_num_species; species++) {
 
-    out_distr_pars->w_t[species] = 0.5 * (3. * M1_pars->chi - 1.);
+    out_distr_pars->w_t[species] = 0.5 * (3. * M1_pars->chi[species] - 1.);
     out_distr_pars->temp_t[species] = eos_pars->temp;
 
-    // readjust degeneracy parameter
-    double y = fmax(M1_pars->J[species] / (M1_pars->n[species] * eos_pars->temp), 3.05); // average neutrino energy over thermal energy
-    double y_0 = 114.;
+    // @TODO: Currently disabling alternative. What do we do with this ?
+    //double y = fmax(M1_pars->J[species] / (M1_pars->n[species] * eos_pars->temp), 3.05); // average neutrino energy over thermal energy
+    //double y_0 = 114.;
 
-    out_distr_pars->eta_t[species] =
-        y < y_0 ? (y * (y * (y * (y * (y * (kA * y + kB) + kC) + kD) + kE) + kF) + kG) / (y * (y * (y * (y * (y + kH) + kI) + kL) + kM) + kN) : kFourThirds * y;
+    //out_distr_pars->eta_t[species] =
+    //    y < y_0 ? (y * (y * (y * (y * (y * (kFitA * y + kFitB) + kFitC) + kFitD) + kFitE) + kFitF) + kFitG) / (y * (y * (y * (y * (y + kFitH) + kFitI) + kFitL) + kFitM) + kFitN) : kFourThirds * y;
 
   }
 }
