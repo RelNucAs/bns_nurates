@@ -44,15 +44,15 @@ int main() {
                                      .w_f = 0., .temp_f = 10., .c_f = 0.};
 
 
-  double n = NuNumber(&distr_pars);
-  double J = NuEnergy(&distr_pars);
+  //double n = NuNumber(&distr_pars);
+  //double J = NuEnergy(&distr_pars);
 
-  M1Quantities m1_pars = {.n = n, .J = J, .chi = 1./3.};
+  //M1Quantities m1_pars = {.n = n, .J = J, .chi = 1./3.};
 
-  GreyOpacityParams grey_pars = {.opacity_pars = opacity_pars,
-                                 .eos_pars = EOS_pars,
-                                 .distr_pars = distr_pars,
-                                 .m1_pars = m1_pars};
+  //GreyOpacityParams grey_pars = {.opacity_pars = opacity_pars,
+  //                               .eos_pars = EOS_pars,
+  //                               .distr_pars = distr_pars,
+  //                               .m1_pars = m1_pars};
 
   /* Compute emission coefficients */
 

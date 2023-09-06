@@ -167,9 +167,11 @@ add_executable(test_m1_coeffs
         src/opacities/weak_magnetism/weak_magnetism.h
         src/opacities/weak_magnetism/nucfrmfac.c
         src/opacities/weak_magnetism/weak_magnetism.c
+        src/integration/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
+        src/integration/integration_quadrature_integrate_kernels.c
         src/functions/functions.h
         src/functions/fermi.c
         src/functions/gamma.c
