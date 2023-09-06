@@ -12,13 +12,16 @@
 
 #define total_num_species 3
 
-//#define kNSp 3 // number of neutrino species
+/* ==================================================================================
+ * Integration structures
+ * ==================================================================================
+ */
 
-// -------------------------------------------------
-// Quadrature specific data structures
-
-// Quadrature enum
-// Holds the type of quadrature
+/* Quadrature specific data structures
+ *
+ * Quadrature enum
+ * Holds the type of quadrature: Gauss-Legendre, Gauss-Laguerre
+ */
 enum Quadrature { kGauleg, kGaulag };
 typedef enum Quadrature Quadrature;
 
@@ -57,9 +60,109 @@ struct MyQuadrature {
 typedef struct MyQuadrature MyQuadrature;
 static MyQuadrature quadrature_default = {.type=kGauleg, .dim=1, .nx=32, .ny=1, .nz=1, .alpha=0., .x1=0., .x2=1., .y1=-42., .y2=-42., .z1=-42., .z2=-42.};
 
-// MyEOSParams struct
-// Parameters which come from the EOS
-// @TODO: decide if using standard or non-rel chemical potentials
+/* MyFunction struct
+ *
+ * A struct for holding one function and its parameters.
+ * Use this when considering only one integrand.
+ */
+struct MyFunction {
+  int dim;                                          // number of function variables (1/2)
+  double (*function)(double *var, void *params);    // function
+  void *params;                                     // function parameters
+};
+typedef struct MyFunction MyFunction;
+
+/* MyQuadratureIntegrand struct
+ *
+ * Holds metadata and integrand/integral data when multiple functions
+ * are integrated in one go.
+ *
+ * This is used by the MyFunctionMultiD structure.
+ */
+struct MyQuadratureIntegrand {
+  int n;                  // number of integrands/integrals
+  double integrand[10];   // values of integrands/integrals (max: 10)
+};
+typedef struct MyQuadratureIntegrand MyQuadratureIntegrand;
+
+/* MyFunctionMultiD struct
+ *
+ * A struct for holding multiple function and its parameters.
+ * Use this when considering only multiple integrands.
+ */
+struct MyFunctionMultiD {
+  int dim;                                                        // number of function variables (1/2)
+  MyQuadratureIntegrand (*function)(double *var3d, void *params); // the function
+  MyQuadratureIntegrand my_quadrature_integrand;                  // integrand information and values
+  void *params;                                                   // function parameters
+};
+typedef struct MyFunctionMultiD MyFunctionMultiD;
+
+/* ==================================================================================
+ * Kernel structures
+ * ==================================================================================
+ */
+
+/* BremKernelParams struct
+ *
+ * Parameters for Bremsstrahlung kernel
+ */
+struct BremKernelParams {
+  double omega;         // neutrino energy before interaction
+  double omega_prime;   // neutrino energy after interaction
+};
+typedef struct BremKernelParams BremKernelParams;
+
+/* PairKernelParams struct
+ *
+ * Parameters for the pair kernel
+ */
+struct PairKernelParams {
+  double omega;         // neutrino energy
+  double omega_prime;   // anti-neutrino energy
+  double cos_theta;     // cosine of angle between nu and a-nu
+  double mu;            // cosine of neutrino polar angle
+  double mu_prime;      // cosine of anti-neutrino polar angle
+  double lmax;          // maximum value of l for Legendre expansion
+  double filter;        // filter parameter for pair kernel positivity
+};
+typedef struct PairKernelParams PairKernelParams;
+
+/* MyKernelParams struct
+ *
+ * Unified structure for holding parameters for multiple kernels
+ */
+struct MyKernelParams {
+  PairKernelParams pair_kernel_params;    // pair kernel parameters
+  BremKernelParams brem_kernel_params;    // Bremsstrahlung kernel parameters
+};
+typedef struct MyKernelParams MyKernelParams;
+
+// MyKernelQuantity struct
+//
+/* MyKernelQuantity struct
+ *
+ * holds emission/absorption related quantities for the pair and Bremsstrahlung process
+ * for electron 'e' neutrinos and mu/tau 'x' neutrinos.
+ */
+struct MyKernelQuantity {
+  double em_e;    // quantity related to emission/production for electron neutrinos
+  double abs_e;   // quantity related to absorption for electron neutrinos
+  double em_x;    // quantity related to emission/production for mu/tau neutrinos
+  double abs_x;   // quantity related to absorption for mu/tau neutrinos
+};
+typedef struct MyKernelQuantity MyKernelQuantity;
+
+/* ==================================================================================
+ * EOS structures
+ * ==================================================================================
+ */
+
+/* MyEOSParams struct
+ *
+ * Holds EOS parameters
+ * @TODO: decide if using standard or non-rel chemical potentials
+ */
 struct MyEOSParams {
   double nb;      // baryon number density
   double temp;    // temperature
@@ -73,100 +176,41 @@ struct MyEOSParams {
 };
 typedef struct MyEOSParams MyEOSParams;
 
-struct var3d {
-  double x;
-  double y;
-  double z;
-};
-typedef struct var3d var3d;
-static var3d var3d_default = {.x = 0., .y = 0., .z = 0.};
+/* ==================================================================================
+ * Opacity structures
+ * ==================================================================================
+ */
 
-// MyFunction struct
-// A struct holding a function and its parameters
-struct MyFunction {
-  int dim;                                      // number of function variables (1/2)
-  double (*function)(double *var3d, void *params); // the function
-  void *params;                                 // all parameters of the function
-};
-typedef struct MyFunction MyFunction;
-
-// bremsstrahlung kernel specific parameters
-struct BremKernelParams {
-  double omega;
-  double omega_prime;
-};
-typedef struct BremKernelParams BremKernelParams;
-
-// pair kernel specific parameters
-struct PairKernelParams {
-  double omega;
-  double omega_prime;
-  double cos_theta;
-  double mu;
-  double mu_prime;
-  double lmax;
-  double filter;
-};
-typedef struct PairKernelParams PairKernelParams;
-
-// unified kernel params
-struct MyKernelParams {
-  PairKernelParams pair_kernel_params;
-  BremKernelParams brem_kernel_params;
-};
-typedef struct MyKernelParams MyKernelParams;
-
-// MyKernel struct
-// Returns the absorption and production kernels for electron (e) and mu/tau (points) neutrinos
-struct MyKernel {
-  double production_e;
-  double absorption_e;
-  double production_x;
-  double absorption_x;
-  double production;
-  double absorption;
-};
-typedef struct MyKernel MyKernel;
-
-// MyOpacityQuantity struct
-// holds emission/absorption quantities for two neutrino species
-struct MyOpacityQuantity {
-  double em_e;    // quantity related to emission/production for e neutrinos
-  double abs_e;   // quantity related to absorption for e neutrinos
-  double em_x;    // quantity related to emission/production for points neutrinos
-  double abs_x;   // quantity related to absorption for points neutrinos
-};
-typedef struct MyOpacityQuantity MyOpacityQuantity;
-
-// special function struct
-// function returns 4 values
-struct MyFunctionSpecial {
-  int dim;                                                                                // number of function variables (1/2)
-  MyOpacityQuantity (*function)(double *var, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);  // the function
-  MyEOSParams *eos_params;                                                                // all eos parameters of the function
-  MyKernelParams *kernel_params;                                                           // all other parameters
-};
-typedef struct MyFunctionSpecial MyFunctionSpecial;
-
-// @FIXME: decide with Maitraya what to use for this
-// Temporary struct for storing output of emissivity/absorptivity opacity output
-// For the moment let's consider muonic (anti)neutrinos as nux
-// Add in ab_(a)num, em_(a)num when we also muons will be considered
+/* MyOpacity struct
+ *
+ * Structure for storing emissivity and absorptivity output for
+ * [0] electron neutrino (nue) [1] anti-electron neutrino (anue) [2] mu/tau neutrino (nux)
+ *
+ * Can be used in the general case or the energy integrated case.
+ *
+ * Note: For the moment let's consider muonic (anti)neutrinos as nux
+ *       Add in ab_(a)num, em_(a)num when we also muons will be considered
+ *
+ * @TODO: Add in ab_(a)num, em_(a)num when muons are considered
+ */
 struct MyOpacity {
   double ab_nue;    // electron neutrino absorptivity
   double em_nue;    // electron neutrino emissivity
   double ab_anue;   // electron antineutrino absorptivity
   double em_anue;   // electron antineutrino emissivity
+  double ab_nux;    // heavy (anti)neutrino absorptivity
+  double em_nux;    // heavy (anti)neutrino emissivity
   //double ab_num;    // muon neutrino absorptivity
   //double em_num;    // muon neutrino emissivity
   //double ab_anum;   // muon antineutrino absorptivity
   //double em_anum;   // muon antineutrino emissivity
-  double ab_nux;    // heavy (anti)neutrino absorptivity
-  double em_nux;    // heavy (anti)neutrino emissivity
 };
 typedef struct MyOpacity MyOpacity;
 
-// Opacity parameters
+/* OpacityParams struct
+ *
+ * Store additional flags when computing opacities
+ */
 struct OpacityParams {
   bool use_dU;     // flag for dU correction
   bool use_WM_ab;  // flag for WM correction (and related) on absorption rates
@@ -174,11 +218,19 @@ struct OpacityParams {
 };
 typedef struct OpacityParams OpacityParams;
 
+/* ==================================================================================
+ * M1 structures
+ * ==================================================================================
+ */
+
 /* NuDistributionParams struct
  *
- * Structure for storing the parameters of the distribution function for different species of (anti)neutrinos
+ * Structure for storing the parameters of the distribution function for different species of neutrinos
+ * in the optically thin and thick regime.
+ *
  * Supports [0]: electron neutrino, [1]: electron anti-neutrino, [2]: mu/tau (anti)neutrino
  *
+ * Follows the definition in Federico's notes
  */
 struct NuDistributionParams {
 
@@ -195,19 +247,23 @@ struct NuDistributionParams {
 };
 typedef struct NuDistributionParams NuDistributionParams;
 
-// @TODO: generalize the following structure to all neutrino species (e.g. double n -> double n[Nsp])
+/* M1Quantities struct
+ *
+ * Stores the radiation number density, energy density and radiation flux for all neutrino species from M1
+ * Also stores the Eddington factor from the closure
+ */
 struct M1Quantities {
-  double n[total_num_species];    // radiation number density
-  double J[total_num_species];    // radiation energy density
-  //double H[4]; // radiation flux components (only three are independent since
-  //                            H^alpha u_alpha = 0)
-  double chi;  // closure
+  double n[total_num_species];      // radiation number density
+  double J[total_num_species];      // radiation energy density
+  double H[total_num_species][4];   // radiation flux
+  double chi;                       // Eddington factor
 };
 typedef struct M1Quantities M1Quantities;
 
-// GreyOpacityParams struct
-// structure for storing the parameters needed for the 
-// computation of grey source coefficients
+/* GreyOpacityParams struct
+ *
+ * Stores all parameters needed for computing grey source coefficients for M1
+ */
 struct GreyOpacityParams {
   OpacityParams opacity_pars;      // spectral opacity input parameters
   MyKernelParams kernel_pars;      // kernel input parameters
@@ -217,8 +273,33 @@ struct GreyOpacityParams {
 };
 typedef struct GreyOpacityParams GreyOpacityParams;
 
+/* M1Opacities struct
+ *
+ * Stores the emissivity, absorption and scattering coefficients
+ * for electron neutrino (nue), electron anti-neutrino (anue) and mu/tau neutrinos (nux)
+ */
+struct M1Opacities {
+  double eta_nue;       // energy integrated emissivity for nue
+  double kappa_a_nue;   // absorption coefficient for nue
+  double kappa_s_nue;   // scattering coefficient for nue
+
+  double eta_anue;      // energy integrated emissivity for anue
+  double kappa_a_anue;  // absorption coefficient for anue
+  double kappa_s_anue;  // scattering coefficient for anue
+
+  double eta_nux;       // energy integrated emissivity for nux
+  double kappa_a_nux;   // absorption coefficient for nux
+  double kappa_s_nux;   // scattering coefficient for nux
+};
+typedef struct M1Opacities M1Opacities;
+
+/* ==================================================================================
+ * Legacy and unused structures @TODO: repurpose or remove safely
+ * ==================================================================================
+ */
+
 // SourceCoeffs struct
-// structure needed for storing the values of the 
+// structure needed for storing the values of the
 // emissivity and absoprtion/scattering coefficients
 // for the different neutrino species as in Radice
 // et al. (2022)
@@ -236,33 +317,14 @@ struct SourceCoeffs {
 };
 typedef struct SourceCoeffs SourceCoeffs;
 
-struct M1Opacities {
-  double eta_nue;
-  double kappa_a_nue;
-  double kappa_s_nue;
-
-  double eta_anue;
-  double kappa_a_anue;
-  double kappa_s_anue;
-
-  double eta_nux;
-  double kappa_a_nux;
-  double kappa_s_nux;
+// special function struct
+// function returns 4 values
+struct MyFunctionSpecial {
+  int dim;                                                                                // number of function variables (1/2)
+  MyKernelQuantity (*function)(double *var, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);  // the function
+  MyEOSParams *eos_params;                                                                // all eos parameters of the function
+  MyKernelParams *kernel_params;                                                           // all other parameters
 };
-typedef struct M1Opacities M1Opacities;
-
-struct MyQuadratureIntegrand {
-  int n;
-  double integrand[10];
-};
-typedef struct MyQuadratureIntegrand MyQuadratureIntegrand;
-
-struct MyFunctionMultiD {
-  int dim;                                                        // number of function variables (1/2)
-  MyQuadratureIntegrand (*function)(double *var3d, void *params); // the function
-  MyQuadratureIntegrand my_quadrature_integrand;
-  void *params;                                                   // all parameters of the function
-};
-typedef struct MyFunctionMultiD MyFunctionMultiD;
+typedef struct MyFunctionSpecial MyFunctionSpecial;
 
 #endif //BNS_NURATES_SRC_BNS_NURATES_H_

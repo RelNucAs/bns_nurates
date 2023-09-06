@@ -16,15 +16,15 @@
 // var[3]: [omega' mu' phi'] can in generally have 3 variables but the kernel we are considering has already
 // been integrated over mu' and phi' and therefore only depends on the anti-neutrino energy (nu') and EOS/Kernel
 // parameters.
-MyOpacityQuantity PairEmissivityAbsorptivityIntegrandFermi(double *var, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params) {
+MyKernelQuantity PairEmissivityAbsorptivityIntegrandFermi(double *var, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params) {
 
   my_kernel_params->pair_kernel_params.omega_prime = var[0];
-  MyOpacityQuantity pair_kernel = PairKernelsPhiMuIntegrated(my_eos_params, &my_kernel_params->pair_kernel_params);
+  MyKernelQuantity pair_kernel = PairKernelsPhiMuIntegrated(my_eos_params, &my_kernel_params->pair_kernel_params);
 
   double fermi_e = FermiDistr(var[0], my_eos_params->temp, my_eos_params->mu_e / my_eos_params->temp);
   double fermi_x = FermiDistr(var[0], my_eos_params->temp, 0.);
 
-  MyOpacityQuantity result;
+  MyKernelQuantity result;
 
   result.em_e = var[0] * var[0] * (1. - fermi_e) * pair_kernel.em_e;
   result.em_x = var[0] * var[0] * (1. - fermi_x) * pair_kernel.em_x;
@@ -36,7 +36,7 @@ MyOpacityQuantity PairEmissivityAbsorptivityIntegrandFermi(double *var, MyEOSPar
 
 }
 
-MyOpacityQuantity PairOpacitiesFermi(MyQuadrature *quad, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params) {
+MyKernelQuantity PairOpacitiesFermi(MyQuadrature *quad, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params) {
 
   double t = 1.5 * my_eos_params->temp;
   MyFunctionSpecial func;
@@ -45,7 +45,7 @@ MyOpacityQuantity PairOpacitiesFermi(MyQuadrature *quad, MyEOSParams *my_eos_par
   func.eos_params = my_eos_params;
   func.kernel_params = my_kernel_params;
 
-  MyOpacityQuantity opacities = GaussLegendreIntegrateZeroInfSpecial(quad, &func, t);
+  MyKernelQuantity opacities = GaussLegendreIntegrateZeroInfSpecial(quad, &func, t);
 
   return opacities;
 }

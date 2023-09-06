@@ -195,7 +195,7 @@ double BremSingleChannelAbsKernel(double n_nuc, double m_nuc, BremKernelParams *
 
 /* Compute the production and absorption kernels for the Bremsstrahlung reactions by summing
  the contributions of all NN channels */
-MyOpacityQuantity BremKernels(BremKernelParams *kernel_params, MyEOSParams *eos_params) {
+MyKernelQuantity BremKernels(BremKernelParams *kernel_params, MyEOSParams *eos_params) {
   // @TODO: compute the following constant only once
   const double kBremConst = kClight * pow(kHbar * kClight, 5.) * kCa * kCa * kGfBrem * kGfBrem;
 
@@ -225,7 +225,7 @@ MyOpacityQuantity BremKernels(BremKernelParams *kernel_params, MyEOSParams *eos_
   double s_abs_tot = kBremConst * nb * (xn * s_abs_nn + xp * s_abs_pp + 28. / 3. * x_mean * s_abs_np);
   // total production kernel (from detailed balance)
   double s_em_tot = s_abs_tot * SafeExp(-x);
-  MyOpacityQuantity brem_kernel = {.abs_e = s_abs_tot, .em_e = s_em_tot, .abs_x = s_abs_tot, .em_x = s_em_tot};
+  MyKernelQuantity brem_kernel = {.abs_e = s_abs_tot, .em_e = s_em_tot, .abs_x = s_abs_tot, .em_x = s_em_tot};
 
   return brem_kernel;
 }

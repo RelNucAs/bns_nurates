@@ -262,7 +262,7 @@ double PairPhi(int l, double omega, double omega_prime, double eta, double temp,
  *
  * l is an integer.
  */
-MyOpacityQuantity PairKernels(MyEOSParams *eos_pars, PairKernelParams *kernel_pars) {
+MyKernelQuantity PairKernels(MyEOSParams *eos_pars, PairKernelParams *kernel_pars) {
 
   // kernel specific parameters
   double omega = kernel_pars->omega;
@@ -296,7 +296,7 @@ MyOpacityQuantity PairKernels(MyEOSParams *eos_pars, PairKernelParams *kernel_pa
   pair_kernel_absorption_e = exp((omega + omega_prime) / temp) * pair_kernel_production_e;
   pair_kernel_absorption_x = exp((omega + omega_prime) / temp) * pair_kernel_production_x;
 
-  MyOpacityQuantity pair_kernel =
+  MyKernelQuantity pair_kernel =
       {.abs_e = pair_kernel_absorption_e, .em_e = pair_kernel_production_e, .abs_x = pair_kernel_absorption_x, .em_x = pair_kernel_production_x};
 
   return pair_kernel;
@@ -309,7 +309,7 @@ MyOpacityQuantity PairKernels(MyEOSParams *eos_pars, PairKernelParams *kernel_pa
  * R^a_{TP}(omega,omega',cos theta) = e^{(omega+omega')/T} R^p_{TP}(omega,omega',cos theta)
  *
  */
-MyOpacityQuantity PairKernelsM1(MyEOSParams *eos_pars, PairKernelParams *kernel_pars) {
+MyKernelQuantity PairKernelsM1(MyEOSParams *eos_pars, PairKernelParams *kernel_pars) {
 
   // kernel specific parameters
   double omega = kernel_pars->omega;
@@ -335,7 +335,7 @@ MyOpacityQuantity PairKernelsM1(MyEOSParams *eos_pars, PairKernelParams *kernel_
   pair_kernel_absorption_e = exp((omega + omega_prime) / temp) * pair_kernel_production_e;
   pair_kernel_absorption_x = exp((omega + omega_prime) / temp) * pair_kernel_production_x;
 
-  MyOpacityQuantity pair_kernel = {.abs_e = pair_kernel_absorption_e, .em_e = pair_kernel_production_e,
+  MyKernelQuantity pair_kernel = {.abs_e = pair_kernel_absorption_e, .em_e = pair_kernel_production_e,
       .abs_x = pair_kernel_absorption_x, .em_x = pair_kernel_production_x};
 
   return pair_kernel;
@@ -350,7 +350,7 @@ MyOpacityQuantity PairKernelsM1(MyEOSParams *eos_pars, PairKernelParams *kernel_
  *
  * l is an integer.
  */
-MyKernel PairKernelsPhiIntegrated(MyEOSParams *eos_pars, PairKernelParams *kernel_pars) {
+MyKernelQuantity PairKernelsPhiIntegrated(MyEOSParams *eos_pars, PairKernelParams *kernel_pars) {
 
   // kernel specific parameters
   double omega = kernel_pars->omega;
@@ -386,14 +386,14 @@ MyKernel PairKernelsPhiIntegrated(MyEOSParams *eos_pars, PairKernelParams *kerne
   pair_kernel_absorption_e = exp((omega + omega_prime) / temp) * pair_kernel_production_e;
   pair_kernel_absorption_x = exp((omega + omega_prime) / temp) * pair_kernel_production_x;
 
-  MyKernel pair_kernel =
-      {.absorption_e = pair_kernel_absorption_e, .production = pair_kernel_production_e, .absorption_x = pair_kernel_absorption_x, .production_x = pair_kernel_production_x};
+  MyKernelQuantity pair_kernel =
+      {.abs_e = pair_kernel_absorption_e, .em_e = pair_kernel_production_e, .abs_x = pair_kernel_absorption_x, .em_x = pair_kernel_production_x};
 
   return pair_kernel;
 
 }
 
-MyOpacityQuantity PairKernelsPhiMuIntegrated(MyEOSParams *eos_pars, PairKernelParams *kernel_pars) {
+MyKernelQuantity PairKernelsPhiMuIntegrated(MyEOSParams *eos_pars, PairKernelParams *kernel_pars) {
 
   // kernel specific parameters
   double omega = kernel_pars->omega;
@@ -417,7 +417,7 @@ MyOpacityQuantity PairKernelsPhiMuIntegrated(MyEOSParams *eos_pars, PairKernelPa
   const double kPrefactor = 1. / (kClight * pow(kH * kClight, 3.));
   //const double kPrefactor = 1.;
 
-  MyOpacityQuantity pair_kernel = {.abs_e = kPrefactor * pair_kernel_absorption_e, .em_e = kPrefactor * pair_kernel_production_e,
+  MyKernelQuantity pair_kernel = {.abs_e = kPrefactor * pair_kernel_absorption_e, .em_e = kPrefactor * pair_kernel_production_e,
       .abs_x = kPrefactor * pair_kernel_absorption_x, .em_x = kPrefactor * pair_kernel_production_x};
 
   return pair_kernel;

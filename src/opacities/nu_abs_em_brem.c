@@ -12,13 +12,13 @@
 #include "../functions/functions.h"
 #include "../integration/integration.h"
 
-MyOpacityQuantity BremEmissivityAbsorptivityIntegrandFermi(double *omega_prime, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params) {
+MyKernelQuantity BremEmissivityAbsorptivityIntegrandFermi(double *omega_prime, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params) {
 
-  MyOpacityQuantity result = {.em_e = 0., .abs_e = 0., .em_x = 0., .abs_x = 0.};
+  MyKernelQuantity result = {.em_e = 0., .abs_e = 0., .em_x = 0., .abs_x = 0.};
   return result;
 }
 
-MyOpacityQuantity BremOpacitiesFermi(MyQuadrature *quad, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params) {
+MyKernelQuantity BremOpacitiesFermi(MyQuadrature *quad, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params) {
 
   double t = 1.5 * my_eos_params->temp;
   MyFunctionSpecial func;
@@ -27,7 +27,7 @@ MyOpacityQuantity BremOpacitiesFermi(MyQuadrature *quad, MyEOSParams *my_eos_par
   func.eos_params = my_eos_params;
   func.kernel_params = my_kernel_params;
 
-  MyOpacityQuantity opacities = GaussLegendreIntegrateZeroInfSpecial(quad, &func, t);
+  MyKernelQuantity opacities = GaussLegendreIntegrateZeroInfSpecial(quad, &func, t);
 
   return opacities;
 }

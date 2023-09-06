@@ -48,12 +48,12 @@ MyQuadratureIntegrand M1DoubleIntegrand(double *var, void *p) {
   my_kernel_params.pair_kernel_params.lmax = 0;
   my_kernel_params.pair_kernel_params.mu = 1.;
   my_kernel_params.pair_kernel_params.mu_prime = 1.;
-  MyOpacityQuantity pair_kernels_m1 = PairKernelsM1(&my_eos_params, &my_kernel_params.pair_kernel_params);
+  MyKernelQuantity pair_kernels_m1 = PairKernelsM1(&my_eos_params, &my_kernel_params.pair_kernel_params);
 
   // compute the bremsstrahlung kernels (TODO: Leonardo, check this!)
   my_kernel_params.brem_kernel_params.omega = kH * nu;
   my_kernel_params.brem_kernel_params.omega_prime = kH * nubar;
-  MyOpacityQuantity brem_kernels_m1 = BremKernels(&my_kernel_params.brem_kernel_params, &my_eos_params);
+  MyKernelQuantity brem_kernels_m1 = BremKernels(&my_kernel_params.brem_kernel_params, &my_eos_params);
 
   double integrand_1_nue = four_pi_hc3_sqr * nu * nu * nu * nubar * nubar * (1. - g_anue) * (pair_kernels_m1.em_e + brem_kernels_m1.em_e);
   double integrand_1_nux = four_pi_hc3_sqr * nu * nu * nu * nubar * nubar * (1. - g_nux) * (pair_kernels_m1.em_x + brem_kernels_m1.em_x);

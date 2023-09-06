@@ -22,7 +22,7 @@ void LoadQuadrature(char *filedir, MyQuadrature *quad);
 // routines for integrating functions
 double DoIntegration(const int n, const double *wtarray, const double *fnarray);
 double GaussLegendreIntegrateZeroInf(MyQuadrature *quad, MyFunction *func, double t);
-MyOpacityQuantity GaussLegendreIntegrateZeroInfSpecial(MyQuadrature *quad, MyFunctionSpecial *func, double t);
+MyKernelQuantity GaussLegendreIntegrateZeroInfSpecial(MyQuadrature *quad, MyFunctionSpecial *func, double t);
 double GaussLaguerreIntegrateZeroInf(MyQuadrature *quad, MyFunction *func);
 MyQuadratureIntegrand GaussLegendreIntegrate2D(MyQuadrature *quad, MyFunctionMultiD *func, double t);
 MyQuadratureIntegrand GaussLegendreIntegrate1D(MyQuadrature *quad, MyFunctionMultiD *func, double t);

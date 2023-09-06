@@ -21,7 +21,7 @@
  * Outputs:
  *      the emissivities and absoptivities for e and points neutrinos (take care of constant multiplications separately outside)
  */
-MyOpacityQuantity GaussLegendreIntegrateZeroInfSpecial(MyQuadrature *quad, MyFunctionSpecial *func, double t) {
+MyKernelQuantity GaussLegendreIntegrateZeroInfSpecial(MyQuadrature *quad, MyFunctionSpecial *func, double t) {
 
   double f1_em_e[quad->nx], f2_em_e[quad->nx];    // emissivity e neutrino
   double f1_abs_e[quad->nx], f2_abs_e[quad->nx];  // absoptivity e neutrino
@@ -48,14 +48,14 @@ MyOpacityQuantity GaussLegendreIntegrateZeroInfSpecial(MyQuadrature *quad, MyFun
         var[1] = quad->points[quad->nx + j];
         var[2] = quad->points[quad->nx + quad->ny + k];
 
-        MyOpacityQuantity f1_vals = func->function(var, func->eos_params, func->kernel_params);
+        MyKernelQuantity f1_vals = func->function(var, func->eos_params, func->kernel_params);
         f1_em_e[i] = f1_vals.em_e;
         f1_abs_e[i] = f1_vals.abs_e;
         f1_em_x[i] = f1_vals.em_x;
         f1_abs_x[i] = f1_vals.abs_x;
 
         var[0] = t / quad->points[i];
-        MyOpacityQuantity f2_vals = func->function(var, func->eos_params, func->kernel_params);
+        MyKernelQuantity f2_vals = func->function(var, func->eos_params, func->kernel_params);
         f2_em_e[i] = f2_vals.em_e / (quad->points[i] * quad->points[i]);
         f2_abs_e[i] = f2_vals.abs_e / (quad->points[i] * quad->points[i]);
         f2_em_x[i] = f2_vals.em_x / (quad->points[i] * quad->points[i]);
@@ -74,7 +74,7 @@ MyOpacityQuantity GaussLegendreIntegrateZeroInfSpecial(MyQuadrature *quad, MyFun
     w_z[k] = quad->w[quad->nx + quad->ny + k];
   }
 
-  MyOpacityQuantity result = {.em_e = DoIntegration(quad->nz, f_em_e_z, w_z), .abs_e = DoIntegration(quad->nz, f_abs_e_z, w_z),
+  MyKernelQuantity result = {.em_e = DoIntegration(quad->nz, f_em_e_z, w_z), .abs_e = DoIntegration(quad->nz, f_abs_e_z, w_z),
       .em_x = DoIntegration(quad->nz, f_em_x_z, w_z), .abs_x = DoIntegration(quad->nz, f_abs_x_z, w_z)};
 
   return result;

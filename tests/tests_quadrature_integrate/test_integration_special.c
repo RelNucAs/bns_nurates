@@ -32,12 +32,12 @@ double ModifiedFermiDiracLegendre(double *x, void *p) {
   return exp(-x[2] * x[2]) * exp(-x[1]) * pow(x[0], k) / (exp(x[0] - eta) + 1.);
 }
 
-MyOpacityQuantity ModifiedFermiDiracLegendreSpecial(double *x, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params) {
+MyKernelQuantity ModifiedFermiDiracLegendreSpecial(double *x, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params) {
   struct MyEOSParams *params = (struct MyEOSParams *) my_eos_params;
   int k = (params->nb);
   double eta = (params->mu_e);
   double result = exp(-x[2] * x[2]) * exp(-x[1]) * pow(x[0], k) / (exp(x[0] - eta) + 1.);
-  MyOpacityQuantity result_special = {.em_x = result, .em_e = result, .abs_x = result, .abs_e = result};
+  MyKernelQuantity result_special = {.em_x = result, .em_e = result, .abs_x = result, .abs_e = result};
 
   return result_special;
 }
@@ -85,7 +85,7 @@ int main() {
   // Gauss-Legendre integration from 0 to inf (integral split at s)
   double s = 10.;
   double gauleg_inf_gsl = GslLegInfSplit(35, &f, s);
-  MyOpacityQuantity gauleg_inf = GaussLegendreIntegrateZeroInfSpecial(&quad, &fermi, s);
+  MyKernelQuantity gauleg_inf = GaussLegendreIntegrateZeroInfSpecial(&quad, &fermi, s);
 
   printf("Integrate ModifiedFermiSpecial(x) dx dy from x = 0 to inf, y = -1 to 1, z = 0 to 5 pi!\n");
   printf("Result (GSL):   %.5e\n", 2.08298988126271493703118623899952578251399250678958515806232097 * gauleg_inf_gsl);
