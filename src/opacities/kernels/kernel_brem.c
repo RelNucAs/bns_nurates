@@ -103,8 +103,8 @@ double BremKernelS(double x, double y, double eta_star) {
   double p_brem = 0.67 + 0.18 * pow(y, 0.4);
 
   // @TODO: decide what to do here in case of errors
-  if (s_nd < 0.) printf("\ns_ND = %.5e\n", s_nd);
-  if (s_d < 0.) printf("s_D  = %.5e\n", s_d);
+  //if (s_nd < 0.) printf("\ns_ND = %.5e\n", s_nd);
+  //if (s_d < 0.) printf("s_D  = %.5e\n", s_d);
 
   // interpolated formula for s in Eqn. (49)
   double s_brem = pow(pow(s_nd, -p_brem) + pow(s_d, -p_brem), -1. / p_brem) * f_brem * (1. + c_brem * g_brem);

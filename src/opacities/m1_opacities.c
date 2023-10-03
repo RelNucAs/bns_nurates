@@ -41,33 +41,34 @@ MyQuadratureIntegrand M1DoubleIntegrand(double *var, void *p) {
   double g_nux = TotalNuF(kH * nubar, &my_grey_opacity_params->distr_pars, 2);
 
   // compute the pair kernels
+  MyKernelQuantity pair_kernels_m1 = {.em_e = 0., .abs_e = 0., .em_x = 0., .abs_x = 0.};
   MyKernelParams my_kernel_params;
-  my_kernel_params.pair_kernel_params.omega = kH * nu;
-  my_kernel_params.pair_kernel_params.omega_prime = kH * nubar;
-  my_kernel_params.pair_kernel_params.cos_theta = 1.;
-  my_kernel_params.pair_kernel_params.filter = 0.;
-  my_kernel_params.pair_kernel_params.lmax = 0;
-  my_kernel_params.pair_kernel_params.mu = 1.;
-  my_kernel_params.pair_kernel_params.mu_prime = 1.;
-  MyKernelQuantity pair_kernels_m1 = PairKernelsM1(&my_eos_params, &my_kernel_params.pair_kernel_params);
+  if (opacity_flags.use_pair) {
+    my_kernel_params.pair_kernel_params.omega = kH * nu;
+    my_kernel_params.pair_kernel_params.omega_prime = kH * nubar;
+    my_kernel_params.pair_kernel_params.cos_theta = 1.;
+    my_kernel_params.pair_kernel_params.filter = 0.;
+    my_kernel_params.pair_kernel_params.lmax = 0;
+    my_kernel_params.pair_kernel_params.mu = 1.;
+    my_kernel_params.pair_kernel_params.mu_prime = 1.;
+    pair_kernels_m1 = PairKernelsM1(&my_eos_params, &my_kernel_params.pair_kernel_params);
+  }
 
   // compute the bremsstrahlung kernels (TODO: Leonardo, check this!)
-  my_kernel_params.brem_kernel_params.omega = kH * nu;
-  my_kernel_params.brem_kernel_params.omega_prime = kH * nubar;
-  MyKernelQuantity brem_kernels_m1 = BremKernels(&my_kernel_params.brem_kernel_params, &my_eos_params);
-
-  double integrand_1_nue =
-      four_pi_hc3_sqr * nu * nu * nu * nubar * nubar * (1. - g_anue) * (opacity_flags.use_pair * pair_kernels_m1.em_e + opacity_flags.use_brem * brem_kernels_m1.em_e);
-  double integrand_1_nux =
-      four_pi_hc3_sqr * nu * nu * nu * nubar * nubar * (1. - g_nux) * (opacity_flags.use_pair * pair_kernels_m1.em_x + opacity_flags.use_brem * brem_kernels_m1.em_x);
+  MyKernelQuantity brem_kernels_m1 = {.em_e = 0., .abs_e = 0., .em_x = 0., .abs_x = 0.};
+  if (opacity_flags.use_brem) {
+    my_kernel_params.brem_kernel_params.omega = kH * nu;
+    my_kernel_params.brem_kernel_params.omega_prime = kH * nubar;
+    brem_kernels_m1 = BremKernels(&my_kernel_params.brem_kernel_params, &my_eos_params);
+  }
+  double integrand_1_nue = four_pi_hc3_sqr * nu * nu * nu * nubar * nubar * (1. - g_anue) * (pair_kernels_m1.em_e + brem_kernels_m1.em_e);
+  double integrand_1_nux = four_pi_hc3_sqr * nu * nu * nu * nubar * nubar * (1. - g_nux) * (pair_kernels_m1.em_x + brem_kernels_m1.em_x);
 
   double J_nue = my_grey_opacity_params->m1_pars.J[0];
   double J_nux = my_grey_opacity_params->m1_pars.J[2];
 
-  double integrand_2_nue = (1. / (kClight * J_nue)) * (integrand_1_nue * g_nue
-      + nu * nu * nu * nubar * nubar * (opacity_flags.use_pair * pair_kernels_m1.abs_e + opacity_flags.use_brem * brem_kernels_m1.abs_e) * g_nue * g_anue);
-  double integrand_2_nux = (1. / (kClight * J_nux)) * (integrand_1_nux * g_nux
-      + nu * nu * nu * nubar * nubar * (opacity_flags.use_pair * pair_kernels_m1.abs_x + opacity_flags.use_brem * brem_kernels_m1.abs_x) * g_nux * g_nux);
+  double integrand_2_nue = (1. / (kClight * J_nue)) * (integrand_1_nue * g_nue + nu * nu * nu * nubar * nubar * (pair_kernels_m1.abs_e + brem_kernels_m1.abs_e) * g_nue * g_anue);
+  double integrand_2_nux = (1. / (kClight * J_nux)) * (integrand_1_nux * g_nux + nu * nu * nu * nubar * nubar * (pair_kernels_m1.abs_x + brem_kernels_m1.abs_x) * g_nux * g_nux);
 
   MyQuadratureIntegrand result = {.n = 4};
 
@@ -115,13 +116,25 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
 
   MyOpacity abs_em_beta = StimAbsOpacity(nu, &my_grey_opacity_params->opacity_pars, &my_grey_opacity_params->eos_pars);
 
-  double integrand_1_nue = opacity_flags.use_abs_em * four_pi_hc3 * nu * nu * nu * abs_em_beta.em_nue;
-  double integrand_1_anue = opacity_flags.use_abs_em * four_pi_hc3 * nu * nu * nu * abs_em_beta.em_anue;
-  double integrand_2_nue = opacity_flags.use_abs_em * (1. / (kClight * J_nue)) * four_pi_hc3 * nu * nu * nu * g_nue * abs_em_beta.ab_nue;
-  double integrand_2_anue = opacity_flags.use_abs_em * (1. / (kClight * J_anue)) * four_pi_hc3_sqr * nu * nu * nu * g_anue * abs_em_beta.ab_anue;
-  double integrand_3_nue = opacity_flags.use_iso * (1. / (kClight * J_nue)) * 16. * kPi * kPi * nu * nu * nu * g_nue * iso_scatt; // factor nu^2 already in iso_scatt
-  double integrand_3_anue = opacity_flags.use_iso * (1. / (kClight * J_anue)) * 16. * kPi * kPi * nu * nu * nu * g_anue * iso_scatt;
-  double integrand_3_nux = opacity_flags.use_iso * (1. / (kClight * J_nux)) * 16. * kPi * kPi * nu * nu * nu * g_nux * iso_scatt;
+  double integrand_1_nue = 0.;
+  double integrand_1_anue = 0.;
+  double integrand_2_nue = 0.;
+  double integrand_2_anue = 0.;
+  if (opacity_flags.use_abs_em == 1) {
+    integrand_1_nue = four_pi_hc3 * nu * nu * nu * abs_em_beta.em_nue;
+    integrand_1_anue = four_pi_hc3 * nu * nu * nu * abs_em_beta.em_anue;
+    integrand_2_nue = (1. / (kClight * J_nue)) * four_pi_hc3 * nu * nu * nu * g_nue * abs_em_beta.ab_nue;
+    integrand_2_anue = (1. / (kClight * J_anue)) * four_pi_hc3_sqr * nu * nu * nu * g_anue * abs_em_beta.ab_anue;
+  }
+
+  double integrand_3_nue = 0.;
+  double integrand_3_anue = 0.;
+  double integrand_3_nux = 0.;
+  if (opacity_flags.use_iso == 1) {
+    integrand_3_nue = (1. / (kClight * J_nue)) * 16. * kPi * kPi * nu * nu * nu * g_nue * iso_scatt; // factor nu^2 already in iso_scatt
+    integrand_3_anue = (1. / (kClight * J_anue)) * 16. * kPi * kPi * nu * nu * nu * g_anue * iso_scatt;
+    integrand_3_nux = (1. / (kClight * J_nux)) * 16. * kPi * kPi * nu * nu * nu * g_nux * iso_scatt;
+  }
 
   MyQuadratureIntegrand result = {.n = 7};
 

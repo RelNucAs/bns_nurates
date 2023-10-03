@@ -75,22 +75,25 @@ int main() {
 
   printf("E_nu: %lf\n", e_nu);
   for (int i = 0; i < num_data; i++) {
-      printf("%d %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e\n",
-             zone[i], r[i], rho[i], T[i], Ye[i], mu_e[i], mu_hat[i], Yh[i], Ya[i], Yp[i], Yn[i], em_nue[i], l_nue_inv[i], em_anue[i], l_anue_inv[i]);
+      //printf("%d %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e\n",
+      //       zone[i], r[i], rho[i], T[i], Ye[i], mu_e[i], mu_hat[i], Yh[i], Ya[i], Yp[i], Yn[i], em_nue[i], l_nue_inv[i], em_anue[i], l_anue_inv[i]);
     }
 
   printf("\n");
   printf("Generating quadratures ...\n");
   MyQuadrature my_quadrature_1d = {.nx = 60, .dim = 1, .type = kGauleg, .x1 = 0., .x2 = 1.};
-  GaussLegendre(&my_quadrature_1d);
+  GaussLegendreMultiD(&my_quadrature_1d);
   MyQuadrature my_quadrature_2d = {.nx = 60, .ny = 60, .dim = 2, .type = kGauleg, .x1 = 0., .x2 = 1., .y1 = 0., .y2 = 1.};
-  GaussLegendre(&my_quadrature_2d);
+  GaussLegendreMultiD(&my_quadrature_2d);
 
+  // activate only abs_em
   GreyOpacityParams my_grey_opacity_params;
+  my_grey_opacity_params.opacity_flags = opacity_flags_default_none;
+  my_grey_opacity_params.opacity_flags.use_abs_em = 1;
 
   for (int i = 0; i < num_data; i++) {
 
-    // set EOS params from table
+    // populate EOS parameters from table
     my_grey_opacity_params.eos_pars.mu_e = mu_e[i];
     my_grey_opacity_params.eos_pars.temp = T[i];
     my_grey_opacity_params.eos_pars.yp = Yp[i];
@@ -122,9 +125,9 @@ int main() {
     my_grey_opacity_params.distr_pars.temp_f[1] = T[i];
     my_grey_opacity_params.distr_pars.temp_f[2] = T[i];
 
-    my_grey_opacity_params.opacity_flags = opacity_flags_default_none;
-    my_grey_opacity_params.opacity_flags.use_abs_em = 1;
+    M1Opacities abs_em_opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
 
+    printf("%lf %lf %lf %lf %lf %lf\n", abs_em_opacities.eta_nue, abs_em_opacities.kappa_a_nue, abs_em_opacities.kappa_s_nue);
   }
   return 0;
 }
