@@ -35,7 +35,7 @@ int main() {
   LoadQuadrature(filedir, &load_quad);
   printf("\n");
 
-  printf("nx = %d \t x1 = %0.16e \t x2 = %0.16e\nx", quad.nx, quad.x1, quad.x2);
+  printf("nx = %d \t x1 = %0.16e \t x2 = %0.16e\n", quad.nx, quad.x1, quad.x2);
   for (int i = 0; i < quad.nx; i++) {
     printf("%0.16e \t %0.16e \t %0.16e \t %0.16e\n", quad.points[i], load_quad.points[i], quad.w[i], load_quad.w[i]);
     if(fabs(quad.points[i]-load_quad.points[i]) > max_error) {

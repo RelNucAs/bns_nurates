@@ -102,16 +102,19 @@ void LoadQuadrature(char *filedir, MyQuadrature *quad) {
     quad->points = (double *) realloc(quad->points, quad->nx * sizeof(double));
     quad->w = (double *) realloc(quad->w, quad->nx * sizeof(double));
 
-    fscanf(fptr, fileHeader);
-
-    // @TODO: currently works only for 1d quadratures, generalize for 2d later
-    for (int i = 0; i < quad->nx; i++) {
-      fscanf(fptr, "%.16e %.16e\n", quad->points[i], quad->w[i]);
+    int i = 0;
+    char line[1000];
+    while (fgets(line, sizeof(line), fptr) != NULL) {
+      if (line[0] == '#') {
+        continue;
+      }
+        sscanf(line, "%lf %lf\n", &quad->points[i], &quad->w[i]);
+        i++;
+      }
     }
-  }
 
-  if (fptr != NULL) {
-    fclose(fptr);
-  }
+    if (fptr != NULL) {
+      fclose(fptr);
+    }
 
-}
+  }
