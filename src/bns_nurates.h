@@ -260,6 +260,15 @@ struct M1Quantities {
 };
 typedef struct M1Quantities M1Quantities;
 
+struct OpacityFlags {
+  double use_abs_em;
+  double use_pair;
+  double use_brem;
+  double use_iso;
+};
+typedef struct OpacityFlags OpacityFlags;
+static OpacityFlags opacity_flags_default = {.use_abs_em = 1., .use_pair = 1., .use_brem = 1., .use_iso = 1.};
+
 /* GreyOpacityParams struct
  *
  * Stores all parameters needed for computing grey source coefficients for M1
@@ -270,6 +279,7 @@ struct GreyOpacityParams {
   MyEOSParams eos_pars;            // eos parameters
   NuDistributionParams distr_pars; // neutrino distribution function parameters
   M1Quantities m1_pars;            // M1 related quantities
+  OpacityFlags my_opacity_flags;   // flags to turn on and off reactions
 };
 typedef struct GreyOpacityParams GreyOpacityParams;
 
