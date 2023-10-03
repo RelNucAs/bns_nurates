@@ -267,7 +267,8 @@ struct OpacityFlags {
   double use_iso;
 };
 typedef struct OpacityFlags OpacityFlags;
-static OpacityFlags opacity_flags_default = {.use_abs_em = 1., .use_pair = 1., .use_brem = 1., .use_iso = 1.};
+static OpacityFlags opacity_flags_default_all = {.use_abs_em = 1., .use_pair = 1., .use_brem = 1., .use_iso = 1.};
+static OpacityFlags opacity_flags_default_none = {.use_abs_em = 0., .use_pair = 0., .use_brem = 0., .use_iso = 0.};
 
 /* GreyOpacityParams struct
  *
@@ -279,7 +280,7 @@ struct GreyOpacityParams {
   MyEOSParams eos_pars;            // eos parameters
   NuDistributionParams distr_pars; // neutrino distribution function parameters
   M1Quantities m1_pars;            // M1 related quantities
-  OpacityFlags my_opacity_flags;   // flags to turn on and off reactions
+  OpacityFlags opacity_flags;   // flags to turn on and off reactions
 };
 typedef struct GreyOpacityParams GreyOpacityParams;
 

@@ -122,6 +122,8 @@ int main() {
     my_grey_opacity_params.distr_pars.temp_f[1] = T[i];
     my_grey_opacity_params.distr_pars.temp_f[2] = T[i];
 
+    my_grey_opacity_params.opacity_flags = opacity_flags_default_none;
+    my_grey_opacity_params.opacity_flags.use_abs_em = 1;
 
   }
   return 0;

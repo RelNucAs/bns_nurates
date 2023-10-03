@@ -29,7 +29,7 @@ MyQuadratureIntegrand M1DoubleIntegrand(double *var, void *p) {
   double nubar = var[1];
   GreyOpacityParams *my_grey_opacity_params = (GreyOpacityParams *) p;
   MyEOSParams my_eos_params = my_grey_opacity_params->eos_pars;
-  OpacityFlags opacity_flags = my_grey_opacity_params->my_opacity_flags;
+  OpacityFlags opacity_flags = my_grey_opacity_params->opacity_flags;
 
   // compute some constants
   const double four_pi_hc3 = (4. * kPi) / (kH * kH * kH * kClight * kClight * kClight);
@@ -96,7 +96,7 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
   // energy and parameters
   double nu = var[0];
   GreyOpacityParams *my_grey_opacity_params = (GreyOpacityParams *) p;
-  OpacityFlags opacity_flags = my_grey_opacity_params->my_opacity_flags;
+  OpacityFlags opacity_flags = my_grey_opacity_params->opacity_flags;
 
   // compute the neutrino & anti-neutrino distribution function
   double g_nue = TotalNuF(kH * nu, &my_grey_opacity_params->distr_pars, 0);
