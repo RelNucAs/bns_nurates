@@ -19,8 +19,8 @@ int main() {
   printf("=================================================== \n");
 
   char filepath[300] = {'\0'};
-  char filedir[300] = "/var/home/maitraya/Documents/bns_nurates/tests/tests_opacities/nurates_CCSN/";
-  char outname[50] = "nurates_1.008E+01.txt";
+  char filedir[300] = SOURCE_DIR;
+  char outname[200] = "/tests/tests_opacities/nurates_CCSN/nurates_1.008E+01.txt";
 
   strcat(filepath, filedir);
   strcat(filepath, outname);

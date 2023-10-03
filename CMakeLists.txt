@@ -4,6 +4,8 @@ project(bns_nurates C)
 set(CMAKE_C_STANDARD 11)
 find_package(GSL)
 
+add_definitions(-DSOURCE_DIR="${CMAKE_SOURCE_DIR}")
+
 add_executable(bns_nurates
         main.c
         src/constants.h
