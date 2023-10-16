@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include "../../src/opacities/opacities.h"
 #include "../../src/integration/integration.h"
+#include "../../src/distribution/distribution.h"
 
 int main() {
 
@@ -65,7 +66,7 @@ int main() {
     }
 
     sscanf(line, "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
-             &zone[i], &r[i], &rho[i], &T[i], &Ye[i], &mu_e[i], &mu_hat[i], &Yh[i], &Ya[i], &Yp[i], &Yn[i], &em_nue[i], &l_nue_inv[i], &em_anue[i], &l_anue_inv[i]);
+           &zone[i], &r[i], &rho[i], &T[i], &Ye[i], &mu_e[i], &mu_hat[i], &Yh[i], &Ya[i], &Yp[i], &Yn[i], &em_nue[i], &l_nue_inv[i], &em_anue[i], &l_anue_inv[i]);
     i++;
   }
 
@@ -75,9 +76,9 @@ int main() {
 
   printf("E_nu: %lf\n", e_nu);
   for (int i = 0; i < num_data; i++) {
-      printf("%d %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e\n",
-             zone[i], r[i], rho[i], T[i], Ye[i], mu_e[i], mu_hat[i], Yh[i], Ya[i], Yp[i], Yn[i], em_nue[i], l_nue_inv[i], em_anue[i], l_anue_inv[i]);
-    }
+    printf("%d %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e\n",
+           zone[i], r[i], rho[i], T[i], Ye[i], mu_e[i], mu_hat[i], Yh[i], Ya[i], Yp[i], Yn[i], em_nue[i], l_nue_inv[i], em_anue[i], l_anue_inv[i]);
+  }
 
   printf("\n");
   printf("End of input table.\n");
@@ -116,8 +117,21 @@ int main() {
     my_grey_opacity_params.distr_pars.w_t[1] = 1.;
     my_grey_opacity_params.distr_pars.w_t[2] = 1.;
     my_grey_opacity_params.distr_pars.eta_t[0] = mu_e[i] / T[i];
-    my_grey_opacity_params.distr_pars.eta_t[1] = - mu_e[i] / T[i];
+    my_grey_opacity_params.distr_pars.eta_t[1] = -mu_e[i] / T[i];
     my_grey_opacity_params.distr_pars.eta_t[2] = 0.;
+
+    // M1 parameters
+    MyQuadratureIntegrand Jvals = NuEnergy(&my_grey_opacity_params.distr_pars);
+    MyQuadratureIntegrand nvals = NuNumber(&my_grey_opacity_params.distr_pars);
+    my_grey_opacity_params.m1_pars.J[0] = Jvals.integrand[0];
+    my_grey_opacity_params.m1_pars.J[1] = Jvals.integrand[1];
+    my_grey_opacity_params.m1_pars.J[2] = Jvals.integrand[2];
+    my_grey_opacity_params.m1_pars.n[0] = nvals.integrand[0];
+    my_grey_opacity_params.m1_pars.n[1] = nvals.integrand[1];
+    my_grey_opacity_params.m1_pars.n[2] = nvals.integrand[2];
+    my_grey_opacity_params.m1_pars.chi[0] = 1;
+    my_grey_opacity_params.m1_pars.chi[1] = 1;
+    my_grey_opacity_params.m1_pars.chi[2] = 1;
 
     // disable thin distribution function for the time being
     my_grey_opacity_params.distr_pars.w_f[0] = 0.;
@@ -132,7 +146,7 @@ int main() {
 
     M1Opacities abs_em_opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
 
-    printf("%e %e %e\n", abs_em_opacities.eta_nue, abs_em_opacities.kappa_a_nue, abs_em_opacities.kappa_s_nue);
+    printf("j-nue: %e j_anue: %e\n", abs_em_opacities.eta_nue, abs_em_opacities.eta_anue);
   }
   return 0;
 }
