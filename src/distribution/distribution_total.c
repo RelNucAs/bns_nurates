@@ -50,6 +50,7 @@ MyQuadratureIntegrand NuNumberIntegrand(double *x, void *p) {
 
   MyQuadratureIntegrand result;
 
+  result.n = 3;
   result.integrand[0] = x[0] * x[0] * TotalNuF(x[0], distr_pars, 0);
   result.integrand[1] = x[0] * x[0] * TotalNuF(x[0], distr_pars, 1);
   result.integrand[2] = x[0] * x[0] * TotalNuF(x[0], distr_pars, 2);

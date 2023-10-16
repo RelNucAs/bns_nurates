@@ -13,6 +13,7 @@
 #include "../../src/opacities/opacities.h"
 #include "../../src/integration/integration.h"
 #include "../../src/distribution/distribution.h"
+#include "../../src/constants.h"
 
 int main() {
 
@@ -101,9 +102,12 @@ int main() {
 
     // populate EOS parameters from table
     my_grey_opacity_params.eos_pars.mu_e = mu_e[i];
+    my_grey_opacity_params.eos_pars.mu_p = 0.;
+    my_grey_opacity_params.eos_pars.mu_n = mu_hat[i] + kQ;
     my_grey_opacity_params.eos_pars.temp = T[i];
     my_grey_opacity_params.eos_pars.yp = Yp[i];
     my_grey_opacity_params.eos_pars.yn = Yn[i];
+    my_grey_opacity_params.eos_pars.nb = 1.;
 
     my_grey_opacity_params.opacity_pars.use_WM_ab = false;
     my_grey_opacity_params.opacity_pars.use_WM_sc = false;
@@ -146,7 +150,9 @@ int main() {
 
     M1Opacities abs_em_opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
 
-    printf("j-nue: %e j_anue: %e\n", abs_em_opacities.eta_nue, abs_em_opacities.eta_anue);
+    printf("j-nue: %e, kappa-a-nue: %e, kappa-s-nue: %e, j_anue: %e, kappa-a-anue: %e, kappa-s-anue: %e\n", abs_em_opacities.eta_nue, abs_em_opacities.kappa_a_nue,
+           abs_em_opacities.kappa_s_nue, abs_em_opacities.eta_anue, abs_em_opacities.eta_nue, abs_em_opacities.kappa_a_nue, abs_em_opacities.kappa_s_nue,
+           abs_em_opacities.eta_anue, abs_em_opacities.kappa_a_anue, abs_em_opacities.kappa_s_anue);
   }
   return 0;
 }

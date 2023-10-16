@@ -1,13 +1,19 @@
+//=================================================
+// bns-nurates neutrino opacities code
+// Copyright(C) XXX, licensed under the YYY License
+// ================================================
 // \file nu_abs_em_beta.c
-// \brief Computation of emissivity and absorptivity for neutrino absorption on neutron
-//        (and inverse reaction) and for antineutrino absorption on proton (and inverse reaction)
-//        Ref: Bruenn, 1985 (https://articles.adsabs.harvard.edu/pdf/1985ApJS...58..771B)
-//        
-// Possible inclusion of phase space, recoil, weak magnetism correction as in
-// Horowitz, 2002 (https://journals.aps.org/prd/abstract/10.1103/PhysRevD.65.043001) 
+// \brief Computes emissivity and absorptivity for neutrino absorption on neutron
+//        and for antineutrino absorption on proton and their inverse reactions
 //
-// Possible inclusion of nucleon interation correction as in 
-// Hempel, 2015 (https://journals.aps.org/prc/abstract/10.1103/PhysRevC.91.055807)
+// Reference: Bruenn, 1985 (https://articles.adsabs.harvard.edu/pdf/1985ApJS...58..771B)
+//
+// Also include:
+//           Possible inclusion of phase space, recoil, weak magnetism correction as in
+//           Horowitz, 2002 (https://journals.aps.org/prd/abstract/10.1103/PhysRevD.65.043001)
+//
+//           Possible inclusion of nucleon interation correction as in
+//           Hempel, 2015 (https://journals.aps.org/prc/abstract/10.1103/PhysRevC.91.055807)
 
 #include <math.h>
 
@@ -18,6 +24,8 @@
 #include "../functions/functions.h"
 #include "../integration/integration.h"
 
+// ----------------------------------------------------------------------------------
+// @TODO: move this later
 // @TODO: align with constant definitions for opacities coming from kernel integration
 // Definition of constants
 const double g0 = 0.5 * kH * kClight / kPi;
@@ -27,6 +35,7 @@ const double g1 = (kGf * kGf / kPi) / (g0 * g0 * g0 * g0); // (GF*GF/pi) / pow(h
 const double g2 = kGv * kGv + 3. * kGa * kGa; // constant in Eq.(C13,C15,C19,C20)
 const double g3 = g1 * g2;
 const double mu_thres = 1.E-02;   // mu_hat threshold value in EtaNNAbs evaluation
+// ----------------------------------------------------------------------------------
 
 /* Inputs:
  * 	omega    [MeV] : (anti)neutrino energy
@@ -40,15 +49,21 @@ const double mu_thres = 1.E-02;   // mu_hat threshold value in EtaNNAbs evaluati
  * 	dU       [MeV] : nuclear interaction correction on mu_hat
 */
 
-// Generic function for nucleon phase space integration
-double EtaNNAbs(const double n_in, const double n_out,
-                const double mu_hat,
-                const double temp) {
-  if (n_in == 0.) return 0.; // enforce zero rates if no nucleons 
-  // available in the initial state
+/* Generic function for necleon phase space integration
+ * Computes absorptivity from Eqn. (C14) of Bruenn
+ *
+ * Inputs:
+ *
+ * Output:
+ *
+ */
+double EtaNNAbs(const double n_in, const double n_out, const double mu_hat, const double temp) {
 
-  if (fabs(mu_hat) < mu_thres) return n_in; // backup solution if mu_hat
-  // too small
+  // if no nucleons, enforce zero rates
+  if (n_in == 0.) return 0.;
+
+  // if mu_hat too small, return backup reaction
+  if (fabs(mu_hat) < mu_thres) return n_in;
 
   const double etanp = (n_out - n_in) / (exp(-mu_hat / temp) - 1.); // Eq.(C14), [cm-3]
 
@@ -58,9 +73,7 @@ double EtaNNAbs(const double n_in, const double n_out,
 }
 
 // Nucleon phase space integration for X + n -> X + p 
-double EtaNP(const double nn, const double np,
-             const double mu_hat,
-             const double temp) {
+double EtaNP(const double nn, const double np, const double mu_hat, const double temp) {
   return EtaNNAbs(nn, np, mu_hat, temp);
 }
 
