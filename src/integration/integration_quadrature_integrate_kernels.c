@@ -166,7 +166,6 @@ MyQuadratureIntegrand GaussLegendreIntegrate1D(MyQuadrature *quad, MyFunctionMul
 
   double var[2];
 
-  for (int j = 0; j < quad->ny; j++) {
     for (int i = 0; i < quad->nx; i++) {
 
       var[0] = t * quad->points[i];
@@ -183,9 +182,9 @@ MyQuadratureIntegrand GaussLegendreIntegrate1D(MyQuadrature *quad, MyFunctionMul
 
     }
 
-  }
 
   MyQuadratureIntegrand result;
+  result.n = num_integrands;
 
   for (int k = 0; k < num_integrands; k++) {
     result.integrand[k] = t * (DoIntegration(quad->nx, quad->w, f1_x[k]) + DoIntegration(quad->nx, quad->w, f2_x[k]));

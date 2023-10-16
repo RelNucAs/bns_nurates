@@ -158,6 +158,7 @@ M1Opacities ComputeM1Opacities(MyQuadrature *quad_1d, MyQuadrature *quad_2d, Gre
   MyFunctionMultiD integrand_m1_1d;
   MyQuadratureIntegrand integrand_m1_1d_info = {.n = 6};
   integrand_m1_1d.function = &M1SingleIntegrand;
+  integrand_m1_1d.dim = 1;
   integrand_m1_1d.params = my_grey_opacity_params;
   integrand_m1_1d.my_quadrature_integrand = integrand_m1_1d_info;
 
@@ -165,6 +166,7 @@ M1Opacities ComputeM1Opacities(MyQuadrature *quad_1d, MyQuadrature *quad_2d, Gre
   MyFunctionMultiD integrand_m1_2d;
   MyQuadratureIntegrand integrand_m1_2d_info = {.n = 4};
   integrand_m1_2d.function = &M1DoubleIntegrand;
+  integrand_m1_2d.dim = 2;
   integrand_m1_2d.params = my_grey_opacity_params;
   integrand_m1_2d.my_quadrature_integrand = integrand_m1_2d_info;
 

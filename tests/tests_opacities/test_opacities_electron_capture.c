@@ -70,14 +70,18 @@ int main() {
   }
 
   printf("\n");
-  printf("Printing out %s\n", outname);
+  printf("Printing out input table ... %s\n", outname);
   printf("\n");
 
   printf("E_nu: %lf\n", e_nu);
   for (int i = 0; i < num_data; i++) {
-      //printf("%d %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e\n",
-      //       zone[i], r[i], rho[i], T[i], Ye[i], mu_e[i], mu_hat[i], Yh[i], Ya[i], Yp[i], Yn[i], em_nue[i], l_nue_inv[i], em_anue[i], l_anue_inv[i]);
+      printf("%d %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e\n",
+             zone[i], r[i], rho[i], T[i], Ye[i], mu_e[i], mu_hat[i], Yh[i], Ya[i], Yp[i], Yn[i], em_nue[i], l_nue_inv[i], em_anue[i], l_anue_inv[i]);
     }
+
+  printf("\n");
+  printf("End of input table.\n");
+  printf("\n");
 
   printf("\n");
   printf("Generating quadratures ...\n");
@@ -85,6 +89,7 @@ int main() {
   GaussLegendreMultiD(&my_quadrature_1d);
   MyQuadrature my_quadrature_2d = {.nx = 60, .ny = 60, .dim = 2, .type = kGauleg, .x1 = 0., .x2 = 1., .y1 = 0., .y2 = 1.};
   GaussLegendreMultiD(&my_quadrature_2d);
+  printf("Quadratures generated.\n");
 
   // activate only abs_em
   GreyOpacityParams my_grey_opacity_params;
@@ -127,7 +132,7 @@ int main() {
 
     M1Opacities abs_em_opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
 
-    printf("%lf %lf %lf %lf %lf %lf\n", abs_em_opacities.eta_nue, abs_em_opacities.kappa_a_nue, abs_em_opacities.kappa_s_nue);
+    printf("%e %e %e\n", abs_em_opacities.eta_nue, abs_em_opacities.kappa_a_nue, abs_em_opacities.kappa_s_nue);
   }
   return 0;
 }
