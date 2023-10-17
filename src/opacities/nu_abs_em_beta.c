@@ -49,13 +49,15 @@ const double mu_thres = 1.E-02;   // mu_hat threshold value in EtaNNAbs evaluati
  * 	dU       [MeV] : nuclear interaction correction on mu_hat
 */
 
-/* Generic function for necleon phase space integration
+/* Generic function for nucleon phase space integration
  * Computes absorptivity from Eqn. (C14) of Bruenn
  *
- * Inputs:
+ * Note:
  *
- * Output:
+ * mu_hat [MeV] is neutron-proton chemical potential difference, rest mass NOT included
+ * This function is never called directly.
  *
+ *  Output: j [cm^-3]
  */
 double EtaNNAbs(const double n_in, const double n_out, const double mu_hat, const double temp) {
 
@@ -65,32 +67,46 @@ double EtaNNAbs(const double n_in, const double n_out, const double mu_hat, cons
   // if mu_hat too small, return backup reaction
   if (fabs(mu_hat) < mu_thres) return n_in;
 
-  const double etanp = (n_out - n_in) / (exp(-mu_hat / temp) - 1.); // Eq.(C14), [cm-3]
+  // Eq.(C14), [cm-3]
+  const double etanp = (n_out - n_in) / (exp(-mu_hat / temp) - 1.);
 
-  if (etanp < 0.) return n_in; //backup if etanp is negative
+  //backup if etanp is negative
+  if (etanp < 0.) return n_in;
 
   return etanp;
 }
 
-// Nucleon phase space integration for X + n -> X + p 
+/* Perform phase space integration for:
+ *    X + n -> X + p
+ * Inputs:
+ *      nn [MeV], np [MeV], mu_hat [MeV], temp [MeV]
+ * Output:
+ *      Eta_np from Bruenn (C14) [cm^-3]
+ */
 double EtaNP(const double nn, const double np, const double mu_hat, const double temp) {
   return EtaNNAbs(nn, np, mu_hat, temp);
 }
 
-// Nucleon phase space integration for X + p -> X + n 
-double EtaPN(const double nn, const double np,
-             const double mu_hat,
-             const double temp) {
+/* Perform phase space integration for:
+ *    X + p -> X + n
+ * Inputs:
+ *      nn [MeV], np [MeV], mu_hat [MeV], temp [MeV]
+ * Output:
+ *      Eta_pn [cm^-3]
+ */
+double EtaPN(const double nn, const double np, const double mu_hat, const double temp) {
   return EtaNNAbs(np, nn, -mu_hat, temp);
 }
 
-/* Calculate the opacities for:
+/* Compute opacities for:
  *
- * 1. Neutrino absorption on neutron (nul + n -> l- + p)
+ * 1. Neutrino absorption on neutron (nu + n -> l- + p)
  * 2. Antineutrino absorption on neutron (anul + p -> l+ + n)
  *
+ * Inputs:
+ *    omega [MeV], mLep [MeV], muLep [MeV]
  * Outputs: j_x and 1/lambda_x for electron neutrino and electron antineutrino
- *          out[0] --> nu_abs, out[1] --> nu_em, out[2] --> anu_abs, out[3] --> anu_em
+ *    out[0]: j_nue [s^-1], out[1]: 1/lamda_nue [s^-1], out[2]: j_anue [s^-1], out[3]: 1/lamda_anue [s^-1]
  */
 void AbsOpacitySingleLep(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars, const double mLep, const double muLep, double *out) {
 
@@ -136,7 +152,7 @@ void AbsOpacitySingleLep(double omega, OpacityParams *opacity_pars, MyEOSParams 
     fd_e = FermiDistr(E_e, temp, muLep);
     // @TODO: eventually think about a specifically designed function for (1-FermiDistr)
     out[1] = etapn * tmp * fd_e;       // Neutrino emissivity   [s-1], Eq.(C15)
-    out[0] = out[1] * SafeExp((omega - (mu_p + muLep - mu_n))/eos_pars->temp);
+    out[0] = out[1] * SafeExp((omega - (mu_p + muLep - mu_n)) / eos_pars->temp);
 
     // without detailed balance
     //out[0] = etanp * tmp * (1 - fd_e); // Neutrino absopritvity [s-1], Eq.(C13)
@@ -148,14 +164,22 @@ void AbsOpacitySingleLep(double omega, OpacityParams *opacity_pars, MyEOSParams 
     fd_p = FermiDistr(E_p, temp, -muLep);
     // @TODO: eventually think about a specifically designed function for (1-FermiDistr)
     out[3] = etanp * tmp * fd_p;        // Antineutrino emissivity   [s-1], Eq.(C20)
-    out[2] = out[3] * SafeExp((omega - (mu_n - mu_p - muLep))/eos_pars->temp);
+    out[2] = out[3] * SafeExp((omega - (mu_n - mu_p - muLep)) / eos_pars->temp);
     // without detailed balance
     //out[2] = etapn * tmp * (1. - fd_p); // Antineutrino absopritvity [s-1], Eq.(C19)
   }
-
-  return;
 }
 
+/* Compute the absortivity and inverse mean free path
+ *
+ * Outputs:
+ *      em_nue = j_nu [s^-1] for nue
+ *      ab_nue = 1/lambda_nu [s^-1] for nue
+ *      em_anue = j_nu [s^-1] for anue
+ *      ab_anue = 1/lambda_nu [s^-1] for anue
+ *
+ * @TODO: add support for muons
+ */
 MyOpacity AbsOpacity(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
   MyOpacity MyOut = {0.0}; // initialize to zero
 
@@ -181,17 +205,21 @@ MyOpacity AbsOpacity(double omega, OpacityParams *opacity_pars, MyEOSParams *eos
   return MyOut;
 }
 
-// Stimulated absorption versions
+/* Compute the stimulated absorption opacities
+ *
+ * For all species:
+ *      em_nu = j_nu [s^-1]
+ *      ab_nu = j_nu + 1/lambda_nu [s^-1]
+ *
+ * Both opacities are energy dependent
+ * @TODO: add support for muons
+ */
 MyOpacity StimAbsOpacity(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
   MyOpacity abs_opacity = AbsOpacity(omega, opacity_pars, eos_pars);
-  MyOpacity stim_abs_opacity = {.ab_nue  = abs_opacity.ab_nue + abs_opacity.em_nue,
-      .em_nue  = abs_opacity.em_nue,
-      .ab_anue = abs_opacity.ab_anue + abs_opacity.em_anue,
+  MyOpacity stim_abs_opacity = {.em_nue  = abs_opacity.em_nue,
+      .ab_nue  = abs_opacity.ab_nue + abs_opacity.em_nue,
       .em_anue = abs_opacity.em_anue,
-      //.ab_num  = abs_opacity.ab_num  + abs_opacity.em_num,
-      //.em_num  = abs_opacity.em_num,
-      //.ab_anum = abs_opacity.ab_anum + abs_opacity.em_anum,
-      //.em_anum = abs_opacity.em_anum,
+      .ab_anue = abs_opacity.ab_anue + abs_opacity.em_anue,
       .ab_nux  = 0.,
       .em_nux  = 0.};
 

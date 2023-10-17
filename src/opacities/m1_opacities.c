@@ -120,6 +120,10 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
   double integrand_1_anue = 0.;
   double integrand_2_nue = 0.;
   double integrand_2_anue = 0.;
+  double integrand_3_nue = 0.;
+  double integrand_3_anue = 0.;
+  double integrand_3_nux = 0.;
+
   if (opacity_flags.use_abs_em == 1) {
     integrand_1_nue = four_pi_hc3 * nu * nu * nu * abs_em_beta.em_nue;
     integrand_1_anue = four_pi_hc3 * nu * nu * nu * abs_em_beta.em_anue;
@@ -127,9 +131,6 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
     integrand_2_anue = (1. / (kClight * J_anue)) * four_pi_hc3_sqr * nu * nu * nu * g_anue * abs_em_beta.ab_anue;
   }
 
-  double integrand_3_nue = 0.;
-  double integrand_3_anue = 0.;
-  double integrand_3_nux = 0.;
   if (opacity_flags.use_iso == 1) {
     integrand_3_nue = (1. / (kClight * J_nue)) * 16. * kPi * kPi * nu * nu * nu * g_nue * iso_scatt; // factor nu^2 already in iso_scatt
     integrand_3_anue = (1. / (kClight * J_anue)) * 16. * kPi * kPi * nu * nu * nu * g_anue * iso_scatt;

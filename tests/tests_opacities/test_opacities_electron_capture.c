@@ -57,6 +57,7 @@ int main() {
   double em_anue[num_data];
   double l_anue_inv[num_data];
 
+  // read in the data file
   int i = 0;
   char line[1000];
   while (fgets(line, sizeof(line), fptr) != NULL) {
@@ -72,20 +73,23 @@ int main() {
     i++;
   }
 
-  printf("\n");
-  printf("Printing out input table ... %s\n", outname);
-  printf("\n");
+  // print input data
+  if (false) {
+    printf("\n");
+    printf("Printing out input table ... %s\n", outname);
+    printf("\n");
 
-  printf("Input data:\n");
-  printf("E_nu: %lf\n", e_nu);
-  for (int i = 0; i < num_data; i++) {
-    printf("%d %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e\n",
-           zone[i], r[i], rho[i], T[i], Ye[i], mu_e[i], mu_hat[i], Yh[i], Ya[i], Yp[i], Yn[i], em_nue[i], l_nue_inv[i], em_anue[i], l_anue_inv[i]);
+    printf("Input data:\n");
+    printf("E_nu: %lf\n", e_nu);
+    for (int i = 0; i < num_data; i++) {
+      printf("%d %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e\n",
+             zone[i], r[i], rho[i], T[i], Ye[i], mu_e[i], mu_hat[i], Yh[i], Ya[i], Yp[i], Yn[i], em_nue[i], l_nue_inv[i], em_anue[i], l_anue_inv[i]);
+    }
+
+    printf("\n");
+    printf("End of input table.\n");
+    printf("\n");
   }
-
-  printf("\n");
-  printf("End of input table.\n");
-  printf("\n");
 
   printf("Test for distribution function implementation:\n");
 
@@ -101,6 +105,10 @@ int main() {
   my_grey_opacity_params.opacity_flags = opacity_flags_default_none;
   my_grey_opacity_params.opacity_flags.use_abs_em = 1;
 
+  printf("\n");
+  printf("Generated tables:\n");
+  printf("r: [cm], diff_distr [should be zero, checks Fermi Dirac with NuFTotal], j-nue[], ");
+  printf("r diff_distr j-nue kappa-a-nue kappa-s-nue j_anue kappa-a-anue kappa-s-anue\n");
   for (int i = 0; i < 102; i++) {
 
     // populate EOS parameters from table
@@ -156,12 +164,11 @@ int main() {
     double distr_nuftot = TotalNuF(123.4, &my_grey_opacity_params.distr_pars, 0);
     double diff_distr = fabs(distr_fermi - distr_nuftot);
 
-    printf("\n");
     M1Opacities abs_em_opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
 
-    printf("j-nue: %e, kappa-a-nue: %e, kappa-s-nue: %e, j_anue: %e, kappa-a-anue: %e, kappa-s-anue: %e\n", abs_em_opacities.eta_nue, abs_em_opacities.kappa_a_nue,
-           abs_em_opacities.kappa_s_nue, abs_em_opacities.eta_anue, abs_em_opacities.eta_nue, abs_em_opacities.kappa_a_nue, abs_em_opacities.kappa_s_nue,
-           abs_em_opacities.eta_anue, abs_em_opacities.kappa_a_anue, abs_em_opacities.kappa_s_anue);
+    printf("%e %e %e %e %e %e %e %e\n",
+           r[i], diff_distr, abs_em_opacities.eta_nue, abs_em_opacities.kappa_a_nue, abs_em_opacities.kappa_s_nue, abs_em_opacities.eta_anue,
+           abs_em_opacities.kappa_a_anue, abs_em_opacities.kappa_s_anue);
   }
   return 0;
 }
