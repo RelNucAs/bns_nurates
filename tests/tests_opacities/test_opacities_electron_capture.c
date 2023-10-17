@@ -107,7 +107,7 @@ int main() {
     my_grey_opacity_params.eos_pars.temp = T[i];
     my_grey_opacity_params.eos_pars.yp = Yp[i];
     my_grey_opacity_params.eos_pars.yn = Yn[i];
-    my_grey_opacity_params.eos_pars.nb = 1.;
+    my_grey_opacity_params.eos_pars.nb = 1.008E+01;
 
     my_grey_opacity_params.opacity_pars.use_WM_ab = false;
     my_grey_opacity_params.opacity_pars.use_WM_sc = false;
