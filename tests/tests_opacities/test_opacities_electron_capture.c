@@ -14,6 +14,7 @@
 #include "../../src/integration/integration.h"
 #include "../../src/distribution/distribution.h"
 #include "../../src/constants.h"
+#include "../../src/functions/functions.h"
 
 int main() {
 
@@ -75,6 +76,7 @@ int main() {
   printf("Printing out input table ... %s\n", outname);
   printf("\n");
 
+  printf("Input data:\n");
   printf("E_nu: %lf\n", e_nu);
   for (int i = 0; i < num_data; i++) {
     printf("%d %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e\n",
@@ -85,7 +87,8 @@ int main() {
   printf("End of input table.\n");
   printf("\n");
 
-  printf("\n");
+  printf("Test for distribution function implementation:\n");
+
   printf("Generating quadratures ...\n");
   MyQuadrature my_quadrature_1d = {.nx = 60, .dim = 1, .type = kGauleg, .x1 = 0., .x2 = 1.};
   GaussLegendreMultiD(&my_quadrature_1d);
@@ -98,7 +101,7 @@ int main() {
   my_grey_opacity_params.opacity_flags = opacity_flags_default_none;
   my_grey_opacity_params.opacity_flags.use_abs_em = 1;
 
-  for (int i = 50; i < 51; i++) {
+  for (int i = 0; i < 102; i++) {
 
     // populate EOS parameters from table
     my_grey_opacity_params.eos_pars.mu_e = mu_e[i];
@@ -107,7 +110,7 @@ int main() {
     my_grey_opacity_params.eos_pars.temp = T[i];
     my_grey_opacity_params.eos_pars.yp = Yp[i];
     my_grey_opacity_params.eos_pars.yn = Yn[i];
-    my_grey_opacity_params.eos_pars.nb = rho[i]/kMu; // @TODO: fix!
+    my_grey_opacity_params.eos_pars.nb = rho[i] / kMu;
 
     my_grey_opacity_params.opacity_pars.use_WM_ab = false;
     my_grey_opacity_params.opacity_pars.use_WM_sc = false;
@@ -120,8 +123,8 @@ int main() {
     my_grey_opacity_params.distr_pars.w_t[0] = 1.;
     my_grey_opacity_params.distr_pars.w_t[1] = 1.;
     my_grey_opacity_params.distr_pars.w_t[2] = 1.;
-    my_grey_opacity_params.distr_pars.eta_t[0] = mu_e[i] / T[i];
-    my_grey_opacity_params.distr_pars.eta_t[1] = -mu_e[i] / T[i];
+    my_grey_opacity_params.distr_pars.eta_t[0] = (my_grey_opacity_params.eos_pars.mu_e - my_grey_opacity_params.eos_pars.mu_n + my_grey_opacity_params.eos_pars.mu_p) / T[i];
+    my_grey_opacity_params.distr_pars.eta_t[1] = -(my_grey_opacity_params.eos_pars.mu_e - my_grey_opacity_params.eos_pars.mu_n + my_grey_opacity_params.eos_pars.mu_p) / T[i];
     my_grey_opacity_params.distr_pars.eta_t[2] = 0.;
 
     // M1 parameters
@@ -148,6 +151,12 @@ int main() {
     my_grey_opacity_params.distr_pars.temp_f[1] = T[i];
     my_grey_opacity_params.distr_pars.temp_f[2] = T[i];
 
+    double distr_fermi =
+        FermiDistr(123.4, my_grey_opacity_params.eos_pars.temp, my_grey_opacity_params.eos_pars.mu_e - my_grey_opacity_params.eos_pars.mu_n + my_grey_opacity_params.eos_pars.mu_p);
+    double distr_nuftot = TotalNuF(123.4, &my_grey_opacity_params.distr_pars, 0);
+    double diff_distr = fabs(distr_fermi - distr_nuftot);
+
+    printf("\n");
     M1Opacities abs_em_opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
 
     printf("j-nue: %e, kappa-a-nue: %e, kappa-s-nue: %e, j_anue: %e, kappa-a-anue: %e, kappa-s-anue: %e\n", abs_em_opacities.eta_nue, abs_em_opacities.kappa_a_nue,

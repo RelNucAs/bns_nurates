@@ -33,7 +33,7 @@
  */
 double NuFThick(double omega, NuDistributionParams *distr_pars, int species) {
   double temp = distr_pars->temp_t[species];
-  double mu = temp * distr_pars->eta_t[species];
+  double mu = distr_pars->temp_t[species] * distr_pars->eta_t[species]; // @TODO: simplify if needed
   return FermiDistr(omega, temp, mu);
 }
 
