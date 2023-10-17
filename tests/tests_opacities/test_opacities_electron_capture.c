@@ -98,7 +98,7 @@ int main() {
   my_grey_opacity_params.opacity_flags = opacity_flags_default_none;
   my_grey_opacity_params.opacity_flags.use_abs_em = 1;
 
-  for (int i = 0; i < num_data; i++) {
+  for (int i = 50; i < 51; i++) {
 
     // populate EOS parameters from table
     my_grey_opacity_params.eos_pars.mu_e = mu_e[i];
@@ -107,7 +107,7 @@ int main() {
     my_grey_opacity_params.eos_pars.temp = T[i];
     my_grey_opacity_params.eos_pars.yp = Yp[i];
     my_grey_opacity_params.eos_pars.yn = Yn[i];
-    my_grey_opacity_params.eos_pars.nb = 1.008E+01;
+    my_grey_opacity_params.eos_pars.nb = rho[i]/kMu; // @TODO: fix!
 
     my_grey_opacity_params.opacity_pars.use_WM_ab = false;
     my_grey_opacity_params.opacity_pars.use_WM_sc = false;

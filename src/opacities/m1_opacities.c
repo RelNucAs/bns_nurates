@@ -100,10 +100,10 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
   OpacityFlags opacity_flags = my_grey_opacity_params->opacity_flags;
 
   // compute the neutrino & anti-neutrino distribution function
-  double g_nue = TotalNuF(kH * nu, &my_grey_opacity_params->distr_pars, 0);
-  double g_anue = TotalNuF(kH * nu, &my_grey_opacity_params->distr_pars, 1);
-  double g_nux = TotalNuF(kH * nu, &my_grey_opacity_params->distr_pars, 2);
-
+  //double g_nue = TotalNuF(nu, &my_grey_opacity_params->distr_pars, 0);
+  double g_anue = TotalNuF(nu, &my_grey_opacity_params->distr_pars, 1);
+  double g_nux = TotalNuF(nu, &my_grey_opacity_params->distr_pars, 2);
+  double g_nue = FermiDistr(nu, my_grey_opacity_params->eos_pars.temp, my_grey_opacity_params->eos_pars.mu_e - my_grey_opacity_params->eos_pars.mu_n + my_grey_opacity_params->eos_pars.mu_p);
   // compute some constants
   const double four_pi_hc3 = (4. * kPi) / (kH * kH * kH * kClight * kClight * kClight);
   const double four_pi_hc3_sqr = four_pi_hc3 * four_pi_hc3;

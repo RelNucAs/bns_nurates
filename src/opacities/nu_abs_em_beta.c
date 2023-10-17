@@ -136,7 +136,7 @@ void AbsOpacitySingleLep(double omega, OpacityParams *opacity_pars, MyEOSParams 
     fd_e = FermiDistr(E_e, temp, muLep);
     // @TODO: eventually think about a specifically designed function for (1-FermiDistr)
     out[1] = etapn * tmp * fd_e;       // Neutrino emissivity   [s-1], Eq.(C15)
-    out[0] = out[1] * exp(omega - (mu_p + muLep - mu_n));
+    out[0] = out[1] * SafeExp((omega - (mu_p + muLep - mu_n))/eos_pars->temp);
 
     // without detailed balance
     //out[0] = etanp * tmp * (1 - fd_e); // Neutrino absopritvity [s-1], Eq.(C13)
@@ -148,7 +148,7 @@ void AbsOpacitySingleLep(double omega, OpacityParams *opacity_pars, MyEOSParams 
     fd_p = FermiDistr(E_p, temp, -muLep);
     // @TODO: eventually think about a specifically designed function for (1-FermiDistr)
     out[3] = etanp * tmp * fd_p;        // Antineutrino emissivity   [s-1], Eq.(C20)
-    out[2] = out[3] * exp(omega - (mu_n - mu_p - muLep));
+    out[2] = out[3] * SafeExp((omega - (mu_n - mu_p - muLep))/eos_pars->temp);
     // without detailed balance
     //out[2] = etapn * tmp * (1. - fd_p); // Antineutrino absopritvity [s-1], Eq.(C19)
   }
