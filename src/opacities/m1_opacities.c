@@ -95,7 +95,7 @@ MyQuadratureIntegrand M1DoubleIntegrand(double *var, void *p) {
 MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
 
   // energy and parameters
-  double nu = var[0];
+  double nu = var[0]; // [MeV]
   GreyOpacityParams *my_grey_opacity_params = (GreyOpacityParams *) p;
   OpacityFlags opacity_flags = my_grey_opacity_params->opacity_flags;
 
@@ -105,8 +105,8 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
   double g_nux = TotalNuF(nu, &my_grey_opacity_params->distr_pars, 2);
 
   // compute some constants
-  const double four_pi_hc3 = (4. * kPi) / (kH * kH * kH * kClight * kClight * kClight);
-  const double four_pi_hc3_sqr = four_pi_hc3 * four_pi_hc3;
+  const double four_pi_hc3 = (4. * kPi) / (kH * kH * kH * kClight * kClight * kClight); // [MeV^-3 cm^-3]
+  const double four_pi_hc3_sqr = four_pi_hc3 * four_pi_hc3; // [MeV^-6 cm^-6]
 
   const double iso_scatt = IsoScattTotal(nu, &my_grey_opacity_params->opacity_pars, &my_grey_opacity_params->eos_pars);
 
@@ -114,7 +114,7 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
   double J_anue = my_grey_opacity_params->m1_pars.J[1];
   double J_nux = my_grey_opacity_params->m1_pars.J[2];
 
-  MyOpacity abs_em_beta = StimAbsOpacity(nu, &my_grey_opacity_params->opacity_pars, &my_grey_opacity_params->eos_pars);
+  MyOpacity abs_em_beta = StimAbsOpacity(nu, &my_grey_opacity_params->opacity_pars, &my_grey_opacity_params->eos_pars); // [s^-1]
 
   double integrand_1_nue = 0.;
   double integrand_1_anue = 0.;
@@ -125,10 +125,10 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
   double integrand_3_nux = 0.;
 
   if (opacity_flags.use_abs_em == 1) {
-    integrand_1_nue = four_pi_hc3 * nu * nu * nu * abs_em_beta.em_nue;
-    integrand_1_anue = four_pi_hc3 * nu * nu * nu * abs_em_beta.em_anue;
+    integrand_1_nue = four_pi_hc3 * nu * nu * nu * abs_em_beta.em_nue; // [cm^-3 s^-1]
+    integrand_1_anue = four_pi_hc3 * nu * nu * nu * abs_em_beta.em_anue; // [cm^-3 s^-1]
     integrand_2_nue = (1. / (kClight * J_nue)) * four_pi_hc3 * nu * nu * nu * g_nue * abs_em_beta.ab_nue;
-    integrand_2_anue = (1. / (kClight * J_anue)) * four_pi_hc3_sqr * nu * nu * nu * g_anue * abs_em_beta.ab_anue;
+    integrand_2_anue = (1. / (kClight * J_anue)) * four_pi_hc3 * nu * nu * nu * g_anue * abs_em_beta.ab_anue;
   }
 
   if (opacity_flags.use_iso == 1) {
