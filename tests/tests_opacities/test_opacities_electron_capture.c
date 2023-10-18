@@ -105,6 +105,9 @@ int main() {
   my_grey_opacity_params.opacity_flags = opacity_flags_default_none;
   my_grey_opacity_params.opacity_flags.use_abs_em = 1;
 
+  FILE *file;
+  file = fopen("/var/home/maitraya/Documents/opacities/tests/abs_em_auto.txt","w+");
+
   printf("\n");
   printf("Generated tables:\n");
   printf("r: [cm], diff_distr [should be zero, checks Fermi Dirac with NuFTotal], j-nue[], ");
@@ -135,15 +138,6 @@ int main() {
     my_grey_opacity_params.distr_pars.eta_t[1] = -(my_grey_opacity_params.eos_pars.mu_e - my_grey_opacity_params.eos_pars.mu_n + my_grey_opacity_params.eos_pars.mu_p) / T[i];
     my_grey_opacity_params.distr_pars.eta_t[2] = 0.;
 
-    // M1 parameters
-    MyQuadratureIntegrand Jvals = NuEnergy(&my_grey_opacity_params.distr_pars);
-    MyQuadratureIntegrand nvals = NuNumber(&my_grey_opacity_params.distr_pars);
-    my_grey_opacity_params.m1_pars.J[0] = Jvals.integrand[0];
-    my_grey_opacity_params.m1_pars.J[1] = Jvals.integrand[1];
-    my_grey_opacity_params.m1_pars.J[2] = Jvals.integrand[2];
-    my_grey_opacity_params.m1_pars.n[0] = nvals.integrand[0];
-    my_grey_opacity_params.m1_pars.n[1] = nvals.integrand[1];
-    my_grey_opacity_params.m1_pars.n[2] = nvals.integrand[2];
     my_grey_opacity_params.m1_pars.chi[0] = 1;
     my_grey_opacity_params.m1_pars.chi[1] = 1;
     my_grey_opacity_params.m1_pars.chi[2] = 1;
@@ -159,6 +153,16 @@ int main() {
     my_grey_opacity_params.distr_pars.temp_f[1] = T[i];
     my_grey_opacity_params.distr_pars.temp_f[2] = T[i];
 
+    // M1 parameters
+    MyQuadratureIntegrand Jvals = NuEnergy(&my_grey_opacity_params.distr_pars);
+    MyQuadratureIntegrand nvals = NuNumber(&my_grey_opacity_params.distr_pars);
+    my_grey_opacity_params.m1_pars.J[0] = Jvals.integrand[0];
+    my_grey_opacity_params.m1_pars.J[1] = Jvals.integrand[1];
+    my_grey_opacity_params.m1_pars.J[2] = Jvals.integrand[2];
+    my_grey_opacity_params.m1_pars.n[0] = nvals.integrand[0];
+    my_grey_opacity_params.m1_pars.n[1] = nvals.integrand[1];
+    my_grey_opacity_params.m1_pars.n[2] = nvals.integrand[2];
+
     double distr_fermi =
         FermiDistr(123.4, my_grey_opacity_params.eos_pars.temp, my_grey_opacity_params.eos_pars.mu_e - my_grey_opacity_params.eos_pars.mu_n + my_grey_opacity_params.eos_pars.mu_p);
     double distr_nuftot = TotalNuF(123.4, &my_grey_opacity_params.distr_pars, 0);
@@ -169,7 +173,11 @@ int main() {
     printf("%e %e %e %e %e %e %e %e\n",
            r[i], diff_distr, abs_em_opacities.eta_nue, abs_em_opacities.kappa_a_nue, abs_em_opacities.kappa_s_nue, abs_em_opacities.eta_anue,
            abs_em_opacities.kappa_a_anue, abs_em_opacities.kappa_s_anue);
+    fprintf(file, "%e %e %e %e %e %e %e %e\n",
+           r[i], diff_distr, abs_em_opacities.eta_nue, abs_em_opacities.kappa_a_nue, abs_em_opacities.kappa_s_nue, abs_em_opacities.eta_anue,
+           abs_em_opacities.kappa_a_anue, abs_em_opacities.kappa_s_anue);
   }
+  fclose(file);
   return 0;
 }
 

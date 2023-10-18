@@ -73,7 +73,7 @@ MyQuadratureIntegrand NuNumber(NuDistributionParams *distr_pars) {
 
   GaussLegendreMultiD(&quad);
 
-  double s = distr_pars->temp_t[0] * distr_pars->eta_t[0]; // @TODO: currently breaking the integral at the same point for all species
+  double s = fabs(distr_pars->temp_t[0] * distr_pars->eta_t[0]); // @TODO: currently breaking the integral at the same point for all species
 
   integrand.function = &NuNumberIntegrand;
   MyQuadratureIntegrand result = GaussLegendreIntegrate1D(&quad, &integrand, s);
@@ -116,7 +116,7 @@ MyQuadratureIntegrand NuEnergy(NuDistributionParams *distr_pars) {
 
   GaussLegendreMultiD(&quad);
 
-  double s = distr_pars->temp_t[0] * distr_pars->eta_t[0]; // @TODO: currently breaking the integral at the same point for all species
+  double s = fabs(distr_pars->temp_t[0] * distr_pars->eta_t[0]); // @TODO: currently breaking the integral at the same point for all species
 
   integrand.function = &NuEnergyIntegrand;
   MyQuadratureIntegrand result = GaussLegendreIntegrate1D(&quad, &integrand, s);
