@@ -32,8 +32,8 @@ MyQuadratureIntegrand M1DoubleIntegrand(double *var, void *p) {
   OpacityFlags opacity_flags = my_grey_opacity_params->opacity_flags;
 
   // compute some constants
-  const double four_pi_hc3 = (4. * kPi) / (kH * kH * kH * kClight * kClight * kClight);
-  const double four_pi_hc3_sqr = four_pi_hc3 * four_pi_hc3;
+  const double four_pi_hc3 = (4. * kPi) / (kH * kH * kH * kClight * kClight * kClight); // [MeV^-3 cm^-3]
+  const double four_pi_hc3_sqr = four_pi_hc3 * four_pi_hc3; // [MeV^-6 cm^-6]
 
   // compute the neutrino & anti-neutrino distribution function
   double g_nue = TotalNuF(nu, &my_grey_opacity_params->distr_pars, 0);
@@ -174,7 +174,7 @@ M1Opacities ComputeM1Opacities(MyQuadrature *quad_1d, MyQuadrature *quad_2d, Gre
   integrand_m1_2d.my_quadrature_integrand = integrand_m1_2d_info;
 
   double s = 1.5 * my_grey_opacity_params->eos_pars.temp; // @TODO: choose this appropriately
-  //double s = 0.01;
+  //double s = 1;
 
   MyQuadratureIntegrand integrals_1d = GaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s);
   MyQuadratureIntegrand integrals_2d = GaussLegendreIntegrate2D(quad_2d, &integrand_m1_2d, s);

@@ -332,8 +332,8 @@ MyKernelQuantity PairKernelsM1(MyEOSParams *eos_pars, PairKernelParams *kernel_p
   pair_kernel_production_e = 0.5 * pair_phi_e;
   pair_kernel_production_x = 0.5 * pair_phi_x;
 
-  pair_kernel_absorption_e = exp((omega + omega_prime) / temp) * pair_kernel_production_e;
-  pair_kernel_absorption_x = exp((omega + omega_prime) / temp) * pair_kernel_production_x;
+  pair_kernel_absorption_e = SafeExp((omega + omega_prime) / temp) * pair_kernel_production_e;
+  pair_kernel_absorption_x = SafeExp((omega + omega_prime) / temp) * pair_kernel_production_x;
 
   MyKernelQuantity pair_kernel = {.abs_e = pair_kernel_absorption_e, .em_e = pair_kernel_production_e,
       .abs_x = pair_kernel_absorption_x, .em_x = pair_kernel_production_x};

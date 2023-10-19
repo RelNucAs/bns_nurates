@@ -106,7 +106,7 @@ int main() {
   my_grey_opacity_params.opacity_flags.use_pair = 1;
 
   FILE *file;
-  file = fopen("/var/home/maitraya/Documents/opacities/tests/pair_auto.txt","w+");
+  file = fopen("/var/home/maitraya/Documents/opacities/tests/pair_auto.txt", "w+");
 
   printf("\n");
   printf("Generated tables:\n");
@@ -168,14 +168,16 @@ int main() {
     double distr_nuftot = TotalNuF(123.4, &my_grey_opacity_params.distr_pars, 0);
     double diff_distr = fabs(distr_fermi - distr_nuftot);
 
-    M1Opacities abs_em_opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
+    M1Opacities pair_opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
 
-    printf(file, "%e %e %e %e %e %e %e %e %e %e %e\n",
-           r[i], diff_distr, abs_em_opacities.eta_nue, abs_em_opacities.kappa_a_nue, abs_em_opacities.kappa_s_nue, abs_em_opacities.eta_anue,
-           abs_em_opacities.kappa_a_anue, abs_em_opacities.kappa_s_anue, abs_em_opacities.eta_nux, abs_em_opacities.kappa_a_nux, abs_em_opacities.kappa_s_nux);
+    printf("%e %e %e %e %e %e %e %e %e %e %e\n",
+           r[i], diff_distr, pair_opacities.eta_nue, pair_opacities.kappa_a_nue, pair_opacities.kappa_s_nue, pair_opacities.eta_anue,
+           pair_opacities.kappa_a_anue, pair_opacities.kappa_s_anue, pair_opacities.eta_nux,
+           pair_opacities.kappa_a_nux, pair_opacities.kappa_s_nux);
     fprintf(file, "%e %e %e %e %e %e %e %e %e %e %e\n",
-           r[i], diff_distr, abs_em_opacities.eta_nue, abs_em_opacities.kappa_a_nue, abs_em_opacities.kappa_s_nue, abs_em_opacities.eta_anue,
-           abs_em_opacities.kappa_a_anue, abs_em_opacities.kappa_s_anue, abs_em_opacities.eta_nux, abs_em_opacities.kappa_a_nux, abs_em_opacities.kappa_s_nux);
+            r[i], diff_distr, pair_opacities.eta_nue, pair_opacities.kappa_a_nue, pair_opacities.kappa_s_nue, pair_opacities.eta_anue,
+            pair_opacities.kappa_a_anue, pair_opacities.kappa_s_anue, pair_opacities.eta_nux,
+            pair_opacities.kappa_a_nux, pair_opacities.kappa_s_nux);
   }
   fclose(file);
   return 0;
