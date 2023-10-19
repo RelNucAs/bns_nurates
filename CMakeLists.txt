@@ -417,7 +417,7 @@ add_executable(test_integration_multi_func_2d
 target_link_libraries(test_integration_multi_func_2d GSL::gsl GSL::gslcblas)
 target_link_libraries(test_integration_multi_func_2d m)
 
-# test integration special 2d
+# test opacities electron capture
 add_executable(test_opacities_electron_capture
         src/constants.h
         src/bns_nurates.h
@@ -459,6 +459,50 @@ add_executable(test_opacities_electron_capture
 
 target_link_libraries(test_opacities_electron_capture GSL::gsl GSL::gslcblas)
 target_link_libraries(test_opacities_electron_capture m)
+
+# test opacities electron capture
+add_executable(test_opacities_pair
+        src/constants.h
+        src/bns_nurates.h
+        src/distribution/distribution.h
+        src/distribution/distribution_opt_thick.c
+        src/distribution/distribution_opt_thin.c
+        src/distribution/distribution_total.c
+        src/functions/functions.h
+        src/functions/digamma.c
+        src/functions/fermi.c
+        src/functions/gamma.c
+        src/functions/lambert.c
+        src/functions/mnewt.c
+        src/functions/safe_exp.c
+        src/integration/integration.h
+        src/opacities/kernels/kernels.h
+        src/opacities/weak_magnetism/weak_magnetism.h
+        src/opacities/weak_magnetism/weak_magnetism.c
+        src/opacities/weak_magnetism/nucfrmfac.c
+        src/opacities/opacities.h
+        src/opacities/nu_abs_em_beta.c
+        src/opacities/nu_scatt_iso.c
+        src/output/outputs.h
+        src/eos/eos.h
+        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
+        tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.c
+        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
+        src/integration/integration_quadrature_schemes.c
+        src/integration/integration_quadrature_io.c
+        src/integration/integration_quadrature_integrate.c
+        src/opacities/kernels/kernel_brem.c
+        src/opacities/kernels/kernel_pair.c
+        src/opacities/nu_abs_em_pair.c
+        src/opacities/nu_abs_em_brem.c
+        src/integration/integration_quadrature_integrate_kernels.c
+        src/opacities/m1_opacities.c
+        tests/tests_opacities/test_opacities_pair.c
+        tests/tests_opacities/test_opacities_pair.c
+)
+
+target_link_libraries(test_opacities_pair GSL::gsl GSL::gslcblas)
+target_link_libraries(test_opacities_pair m)
 
 enable_testing()
 
@@ -503,3 +547,5 @@ add_test(NAME test_integration_multi_func_2d
         COMMAND $<TARGET_FILE:test_integration_multi_func_2d>)
 add_test(NAME test_opacities_electron_capture
         COMMAND $<TARGET_FILE:test_opacities_electron_capture>)
+add_test(NAME test_opacities_pair
+        COMMAND $<TARGET_FILE:test_opacities_pair>)

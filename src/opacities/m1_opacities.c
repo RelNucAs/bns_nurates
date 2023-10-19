@@ -25,8 +25,8 @@
 MyQuadratureIntegrand M1DoubleIntegrand(double *var, void *p) {
 
   // energies and parameters
-  double nu = var[0];
-  double nubar = var[1];
+  double nu = var[0];     // [MeV]
+  double nubar = var[1];  // [MeV]
   GreyOpacityParams *my_grey_opacity_params = (GreyOpacityParams *) p;
   MyEOSParams my_eos_params = my_grey_opacity_params->eos_pars;
   OpacityFlags opacity_flags = my_grey_opacity_params->opacity_flags;
@@ -36,16 +36,16 @@ MyQuadratureIntegrand M1DoubleIntegrand(double *var, void *p) {
   const double four_pi_hc3_sqr = four_pi_hc3 * four_pi_hc3;
 
   // compute the neutrino & anti-neutrino distribution function
-  double g_nue = TotalNuF(kH * nu, &my_grey_opacity_params->distr_pars, 0);
-  double g_anue = TotalNuF(kH * nubar, &my_grey_opacity_params->distr_pars, 1);
-  double g_nux = TotalNuF(kH * nubar, &my_grey_opacity_params->distr_pars, 2);
+  double g_nue = TotalNuF(nu, &my_grey_opacity_params->distr_pars, 0);
+  double g_anue = TotalNuF(nubar, &my_grey_opacity_params->distr_pars, 1);
+  double g_nux = TotalNuF(nubar, &my_grey_opacity_params->distr_pars, 2);
 
   // compute the pair kernels
   MyKernelQuantity pair_kernels_m1 = {.em_e = 0., .abs_e = 0., .em_x = 0., .abs_x = 0.};
   MyKernelParams my_kernel_params;
   if (opacity_flags.use_pair) {
-    my_kernel_params.pair_kernel_params.omega = kH * nu;
-    my_kernel_params.pair_kernel_params.omega_prime = kH * nubar;
+    my_kernel_params.pair_kernel_params.omega = nu;
+    my_kernel_params.pair_kernel_params.omega_prime = nubar;
     my_kernel_params.pair_kernel_params.cos_theta = 1.;
     my_kernel_params.pair_kernel_params.filter = 0.;
     my_kernel_params.pair_kernel_params.lmax = 0;
@@ -57,8 +57,8 @@ MyQuadratureIntegrand M1DoubleIntegrand(double *var, void *p) {
   // compute the bremsstrahlung kernels (TODO: Leonardo, check this!)
   MyKernelQuantity brem_kernels_m1 = {.em_e = 0., .abs_e = 0., .em_x = 0., .abs_x = 0.};
   if (opacity_flags.use_brem) {
-    my_kernel_params.brem_kernel_params.omega = kH * nu;
-    my_kernel_params.brem_kernel_params.omega_prime = kH * nubar;
+    my_kernel_params.brem_kernel_params.omega = nu;
+    my_kernel_params.brem_kernel_params.omega_prime = nubar;
     brem_kernels_m1 = BremKernels(&my_kernel_params.brem_kernel_params, &my_eos_params);
   }
   double integrand_1_nue = four_pi_hc3_sqr * nu * nu * nu * nubar * nubar * (1. - g_anue) * (pair_kernels_m1.em_e + brem_kernels_m1.em_e);
