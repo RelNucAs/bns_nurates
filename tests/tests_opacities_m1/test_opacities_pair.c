@@ -2,8 +2,8 @@
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
-//! \file  tests_opacities_electron_capture.c
-//  \brief Generate a table for electron positron capture
+//! \file  tests_opacities_pair.c
+//  \brief Generate a table for pair opacities
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,12 +19,12 @@
 int main() {
 
   printf("=================================================== \n");
-  printf("Testing opacities for electron/positron capture ... \n");
+  printf("Testing opacities for pair ... \n");
   printf("=================================================== \n");
 
   char filepath[300] = {'\0'};
   char filedir[300] = SOURCE_DIR;
-  char outname[200] = "/tests/tests_opacities/nurates_CCSN/nurates_1.008E+01.txt";
+  char outname[200] = "/tests/tests_opacities_m1/nurates_CCSN/nurates_1.008E+01.txt";
 
   strcat(filepath, filedir);
   strcat(filepath, outname);
@@ -103,14 +103,14 @@ int main() {
   // activate only abs_em
   GreyOpacityParams my_grey_opacity_params;
   my_grey_opacity_params.opacity_flags = opacity_flags_default_none;
-  my_grey_opacity_params.opacity_flags.use_abs_em = 1;
+  my_grey_opacity_params.opacity_flags.use_pair = 1;
 
   FILE *file;
-  file = fopen("/var/home/maitraya/Documents/opacities/tests/abs_em_auto.txt","w+");
+  file = fopen("/var/home/maitraya/Documents/opacities/tests/pair_auto.txt", "w+");
 
   printf("\n");
   printf("Generated tables:\n");
-  printf("r: [cm], diff_distr [should be zero, checks Fermi Dirac with NuFTotal], j-nue[], ");
+  printf("r: [cm], diff_distr [should be zero, checks Fermi Dirac with NuFTotal], j-nue, ");
   printf("r diff_distr j-nue kappa-a-nue kappa-s-nue j_anue kappa-a-anue kappa-s-anue\n");
   for (int i = 0; i < 102; i++) {
 
@@ -168,14 +168,16 @@ int main() {
     double distr_nuftot = TotalNuF(123.4, &my_grey_opacity_params.distr_pars, 0);
     double diff_distr = fabs(distr_fermi - distr_nuftot);
 
-    M1Opacities abs_em_opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
+    M1Opacities pair_opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
 
-    printf("%e %e %e %e %e %e %e %e\n",
-           r[i], diff_distr, abs_em_opacities.eta_nue, abs_em_opacities.kappa_a_nue, abs_em_opacities.kappa_s_nue, abs_em_opacities.eta_anue,
-           abs_em_opacities.kappa_a_anue, abs_em_opacities.kappa_s_anue);
-    fprintf(file, "%e %e %e %e %e %e %e %e\n",
-           r[i], diff_distr, abs_em_opacities.eta_nue, abs_em_opacities.kappa_a_nue, abs_em_opacities.kappa_s_nue, abs_em_opacities.eta_anue,
-           abs_em_opacities.kappa_a_anue, abs_em_opacities.kappa_s_anue);
+    printf("%e %e %e %e %e %e %e %e %e %e %e\n",
+           r[i], diff_distr, pair_opacities.eta_nue, pair_opacities.kappa_a_nue, pair_opacities.kappa_s_nue, pair_opacities.eta_anue,
+           pair_opacities.kappa_a_anue, pair_opacities.kappa_s_anue, pair_opacities.eta_nux,
+           pair_opacities.kappa_a_nux, pair_opacities.kappa_s_nux);
+    fprintf(file, "%e %e %e %e %e %e %e %e %e %e %e\n",
+            r[i], diff_distr, pair_opacities.eta_nue, pair_opacities.kappa_a_nue, pair_opacities.kappa_s_nue, pair_opacities.eta_anue,
+            pair_opacities.kappa_a_anue, pair_opacities.kappa_s_anue, pair_opacities.eta_nux,
+            pair_opacities.kappa_a_nux, pair_opacities.kappa_s_nux);
   }
   fclose(file);
   return 0;

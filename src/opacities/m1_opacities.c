@@ -129,8 +129,6 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
     integrand_1_anue = four_pi_hc3 * nu * nu * nu * abs_em_beta.em_anue; // [cm^-3 s^-1]
     integrand_2_nue = (1. / (kClight * J_nue)) * four_pi_hc3 * nu * nu * nu * g_nue * abs_em_beta.ab_nue;
     integrand_2_anue = (1. / (kClight * J_anue)) * four_pi_hc3 * nu * nu * nu * g_anue * abs_em_beta.ab_anue;
-    //integrand_2_nue = my_grey_opacity_params->m1_pars.n[0];
-    //integrand_2_anue = my_grey_opacity_params->m1_pars.n[1];
   }
 
   if (opacity_flags.use_iso == 1) {

@@ -425,3 +425,8 @@ TSWLatexianTemp*
 
 # xwatermark package
 *.xwm
+
+# doxygen gitignore
+./doc/*
+!./doc/Doxyfile
+!./doc/theme/*
