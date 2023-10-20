@@ -1,5 +1,9 @@
-// \file nu_scatt_iso.c
-// \brief Implementation of isoenergetic neutrino scattering on nucleons
+// ================================================
+// bns-nurates neutrino opacities code
+// Copyright(C) XXX, licensed under the YYY License
+// ================================================
+//! \file nu_scatt_iso.c
+//  \brief Implementation of isoenergetic neutrino scattering on nucleons
 //        Ref: Bruenn, 1985 (https://articles.adsabs.harvard.edu/pdf/1985ApJS...58..771B)
 
 // Possible inclusion of phase space, recoil, weak magnetism correction as in
@@ -11,10 +15,7 @@
 
 #include "opacities.h"
 #include "weak_magnetism/weak_magnetism.h"
-//#include "../constants.h"
-#include "../bns_nurates.h"
 #include "../distribution/distribution.h"
-//#include "../functions/functions.h"
 #include "../integration/integration.h"
 
 // Definition of constants

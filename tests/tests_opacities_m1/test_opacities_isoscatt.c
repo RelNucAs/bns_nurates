@@ -196,6 +196,8 @@ int main() {
   fclose(file);
 
   if (diff_distr > 1e-12) {
+    printf("\n");
+    printf("Error in distribution function: %lf", diff_distr);
     return 1;
   }
 

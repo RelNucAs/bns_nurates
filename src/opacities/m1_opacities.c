@@ -106,7 +106,6 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
 
   // compute some constants
   const double four_pi_hc3 = (4. * kPi) / (kH * kH * kH * kClight * kClight * kClight); // [MeV^-3 cm^-3]
-  const double four_pi_hc3_sqr = four_pi_hc3 * four_pi_hc3; // [MeV^-6 cm^-6]
 
   const double iso_scatt = IsoScattTotal(nu, &my_grey_opacity_params->opacity_pars, &my_grey_opacity_params->eos_pars);
 
