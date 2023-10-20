@@ -498,7 +498,6 @@ add_executable(test_opacities_pair
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
         tests/tests_opacities_m1/test_opacities_pair.c
-        tests/tests_opacities_m1/test_opacities_pair.c
 )
 
 target_link_libraries(test_opacities_pair GSL::gsl GSL::gslcblas)
@@ -541,8 +540,7 @@ add_executable(test_opacities_brem
         src/opacities/nu_abs_em_brem.c
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
-        tests/tests_opacities_m1/test_opacities_pair.c
-        tests/tests_opacities_m1/test_opacities_pair.c
+        tests/tests_opacities_m1/test_opacities_brem.c
 )
 
 target_link_libraries(test_opacities_brem GSL::gsl GSL::gslcblas)

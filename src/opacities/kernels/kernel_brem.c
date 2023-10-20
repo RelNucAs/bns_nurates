@@ -72,20 +72,26 @@ double BremKernelS(double x, double y, double eta_star) {
   double u = sqrt(y / (2. * eta_star)) + 1.e-10;
   double u2 = u * u;
   double u_arg = u2 / (2. * sqrt(2. * u2 + 4.));
-  double f_u = 1. - kFiveSixths * u * atan(2. / u) + u2 / (3. * (u2 + 4.)) + atan(1. / u_arg) * u_arg / 3.;
+  double f_u = (1. - kFiveSixths * u * atan(2. / u) + u2 / (3. * (u2 + 4.)) + atan(1. / u_arg) * u_arg / 3.);
+
+  // @TODO: Leonardo check this! Doing this to prevent s_d from being a large negative number
+  if(fabs(f_u) < 1.e-14) {
+    f_u = 1.e-14;
+  }
 
   // @TODO: compute pow(0.5 * kPi, 2.5) constant only once
   double s_d = 3. * pow(0.5 * kPi, 2.5) * pow(eta_star, -2.5) * (x * x + 4. * kPiSquared) * x * f_u / (4. * kPiSquared * (1. - SafeExp(-x)));
 
-  //if (s_d < 0.) {
-  //  printf("s_D = %.5e\n"              , s_d);
-  //  printf("one minus exp(-x) = %.5e\n", 1.-SafeExp(-x));
-  //  printf("x = %.5e\n"                , x);
-  //  printf("y = %.5e\n"                , y);
-  //  printf("u = %.5e\n"                , u);
-  //  printf("eta_star = %.5e\n"         , eta_star);
-  //  printf("f_u = %.5e\n"              , f_u);
-  //}
+  /*
+  if (s_d < 0.) {
+    printf("s_D = %.5e\n"              , s_d);
+    printf("one minus exp(-x) = %.5e\n", 1.-SafeExp(-x));
+    printf("x = %.5e\n"                , x);
+    printf("y = %.5e\n"                , y);
+    printf("u = %.5e\n"                , u);
+    printf("eta_star = %.5e\n"         , eta_star);
+    printf("f_u = %.5e\n"              , f_u);
+  } */
 
   // F, Eqn. (50)
   double f_denominator = (3. + pow(x - 1.2, 2.) + pow(x, -4.)) * (1. + eta_star * eta_star) * (1. + pow(y, 4.));
