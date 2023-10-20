@@ -2,8 +2,8 @@
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
-//! \file  tests_opacities_bremsstrahlung.c
-//  \brief Generate a table for bremsstrahlung
+//! \file  tests_opacities_isoscatt.c
+//  \brief Generate a table for iso-energetic neutrino scattering on nucleons
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,18 +17,24 @@
 
 int main() {
 
-  printf("=================================================== \n");
-  printf("Testing opacities for bremsstrahlung ... \n");
-  printf("=================================================== \n");
-
   char filepath[300] = {'\0'};
   char filedir[300] = SOURCE_DIR;
   char outname[200] = "/tests/tests_opacities_m1/nurates_CCSN/nurates_1.008E+01.txt";
 
+  char data_fileout[200] = "/tests/tests_opacities_m1/output/m1_opacities_isoscatt.txt";
+  char data_filepath[300] = {'\0'};
+
   strcat(filepath, filedir);
   strcat(filepath, outname);
+  strcat(data_filepath, filedir);
+  strcat(data_filepath, data_fileout);
 
-  printf("Data_directory: %s\n", filepath);
+  printf("=================================================== \n");
+  printf("Testing opacities for iso-energetic scattering ...  \n");
+  printf("=================================================== \n");
+
+  printf("Data load directory: %s\n", filepath);
+  printf("Data save directory: %s\n", data_filepath);
 
   FILE *fptr;
   fptr = fopen(filepath, "r");
@@ -36,6 +42,9 @@ int main() {
     printf("%s: The file %s does not exist!\n", __FILE_NAME__, filepath);
     exit(1);
   }
+
+  // -------------------------------------------------------------
+  // Load data table
 
   // store columns here
   int num_data = 102;
@@ -72,7 +81,7 @@ int main() {
     i++;
   }
 
-  // print input data
+  // print input data table
   if (false) {
     printf("\n");
     printf("Printing out input table ... %s\n", outname);
@@ -90,8 +99,9 @@ int main() {
     printf("\n");
   }
 
-  printf("Test for distribution function implementation:\n");
+  // -------------------------------------------------------------
 
+  printf("Test started:\n");
   printf("Generating quadratures ...\n");
   MyQuadrature my_quadrature_1d = {.nx = 60, .dim = 1, .type = kGauleg, .x1 = 0., .x2 = 1.};
   GaussLegendreMultiD(&my_quadrature_1d);
@@ -99,18 +109,20 @@ int main() {
   GaussLegendreMultiD(&my_quadrature_2d);
   printf("Quadratures generated.\n");
 
-  // activate only abs_em
+  // activate only iso-energetic scattering
   GreyOpacityParams my_grey_opacity_params;
   my_grey_opacity_params.opacity_flags = opacity_flags_default_none;
-  my_grey_opacity_params.opacity_flags.use_brem = 1;
+  my_grey_opacity_params.opacity_flags.use_iso = 1;
 
   FILE *file;
-  file = fopen("/var/home/maitraya/Documents/opacities/tests/brem_auto.txt", "w+");
+  file = fopen(data_filepath, "w+");
 
   printf("\n");
   printf("Generated tables:\n");
-  printf("r: [cm], diff_distr [should be zero, checks Fermi Dirac with NuFTotal], j-nue, ");
-  printf("r diff_distr j-nue kappa-a-nue kappa-s-nue j_anue kappa-a-anue kappa-s-anue\n");
+  printf("r j-nue kappa-a-nue kappa-s-nue j_anue kappa-a-anue kappa-s-anue\n");
+  fprintf(file, "# r j-nue kappa-a-nue kappa-s-nue j_anue kappa-a-anue kappa-s-anue\n");
+
+  double diff_distr = -42.;
   for (int i = 0; i < 102; i++) {
 
     // populate EOS parameters from table
@@ -165,20 +177,27 @@ int main() {
     double distr_fermi =
         FermiDistr(123.4, my_grey_opacity_params.eos_pars.temp, my_grey_opacity_params.eos_pars.mu_e - my_grey_opacity_params.eos_pars.mu_n + my_grey_opacity_params.eos_pars.mu_p);
     double distr_nuftot = TotalNuF(123.4, &my_grey_opacity_params.distr_pars, 0);
-    double diff_distr = fabs(distr_fermi - distr_nuftot);
 
-    M1Opacities brem_opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
+    if (fabs(distr_fermi - distr_nuftot) > diff_distr) {
+      diff_distr = fabs(distr_fermi - distr_nuftot);
+    }
 
-    printf("%e %e %e %e %e %e %e %e %e %e %e\n",
-           r[i], diff_distr, brem_opacities.eta_nue, brem_opacities.kappa_a_nue, brem_opacities.kappa_s_nue, brem_opacities.eta_anue,
-           brem_opacities.kappa_a_anue, brem_opacities.kappa_s_anue, brem_opacities.eta_nux,
-           brem_opacities.kappa_a_nux, brem_opacities.kappa_s_nux);
-    fprintf(file, "%e %e %e %e %e %e %e %e %e %e %e\n",
-            r[i], diff_distr, brem_opacities.eta_nue, brem_opacities.kappa_a_nue, brem_opacities.kappa_s_nue, brem_opacities.eta_anue,
-            brem_opacities.kappa_a_anue, brem_opacities.kappa_s_anue, brem_opacities.eta_nux,
-            brem_opacities.kappa_a_nux, brem_opacities.kappa_s_nux);
+    M1Opacities isoscatt_opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
+
+    printf("%e %e %e %e %e %e %e %e %e %e\n",
+           r[i], isoscatt_opacities.eta_nue, isoscatt_opacities.kappa_a_nue, isoscatt_opacities.kappa_s_nue, isoscatt_opacities.eta_anue,
+           isoscatt_opacities.kappa_a_anue, isoscatt_opacities.kappa_s_anue, isoscatt_opacities.eta_nux,
+           isoscatt_opacities.kappa_a_nux, isoscatt_opacities.kappa_s_nux);
+    fprintf(file, "%e %e %e %e %e %e %e %e %e %e\n",
+            r[i], isoscatt_opacities.eta_nue, isoscatt_opacities.kappa_a_nue, isoscatt_opacities.kappa_s_nue, isoscatt_opacities.eta_anue,
+            isoscatt_opacities.kappa_a_anue, isoscatt_opacities.kappa_s_anue, isoscatt_opacities.eta_nux,
+            isoscatt_opacities.kappa_a_nux, isoscatt_opacities.kappa_s_nux);
   }
   fclose(file);
+
+  if (diff_distr > 1e-12) {
+    return 1;
+  }
+
   return 0;
 }
-

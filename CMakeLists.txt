@@ -546,6 +546,49 @@ add_executable(test_opacities_brem
 target_link_libraries(test_opacities_brem GSL::gsl GSL::gslcblas)
 target_link_libraries(test_opacities_brem m)
 
+# test opacities isoscatt
+add_executable(test_opacities_isoscatt
+        src/constants.h
+        src/bns_nurates.h
+        src/distribution/distribution.h
+        src/distribution/distribution_opt_thick.c
+        src/distribution/distribution_opt_thin.c
+        src/distribution/distribution_total.c
+        src/functions/functions.h
+        src/functions/digamma.c
+        src/functions/fermi.c
+        src/functions/gamma.c
+        src/functions/lambert.c
+        src/functions/mnewt.c
+        src/functions/safe_exp.c
+        src/integration/integration.h
+        src/opacities/kernels/kernels.h
+        src/opacities/weak_magnetism/weak_magnetism.h
+        src/opacities/weak_magnetism/weak_magnetism.c
+        src/opacities/weak_magnetism/nucfrmfac.c
+        src/opacities/opacities.h
+        src/opacities/nu_abs_em_beta.c
+        src/opacities/nu_scatt_iso.c
+        src/output/outputs.h
+        src/eos/eos.h
+        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
+        tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.c
+        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
+        src/integration/integration_quadrature_schemes.c
+        src/integration/integration_quadrature_io.c
+        src/integration/integration_quadrature_integrate.c
+        src/opacities/kernels/kernel_brem.c
+        src/opacities/kernels/kernel_pair.c
+        src/opacities/nu_abs_em_pair.c
+        src/opacities/nu_abs_em_brem.c
+        src/integration/integration_quadrature_integrate_kernels.c
+        src/opacities/m1_opacities.c
+        tests/tests_opacities_m1/test_opacities_isoscatt.c
+)
+
+target_link_libraries(test_opacities_isoscatt GSL::gsl GSL::gslcblas)
+target_link_libraries(test_opacities_isoscatt m)
+
 enable_testing()
 
 # unit tests
@@ -593,3 +636,5 @@ add_test(NAME test_opacities_pair
         COMMAND $<TARGET_FILE:test_opacities_pair>)
 add_test(NAME test_opacities_brem
         COMMAND $<TARGET_FILE:test_opacities_brem>)
+add_test(NAME test_opacities_isoscatt
+        COMMAND $<TARGET_FILE:test_opacities_isoscatt>)
