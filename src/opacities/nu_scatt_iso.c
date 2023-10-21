@@ -41,6 +41,14 @@
 
 
 /* Computation of degeneracy parameter eta_NN */
+/**
+ * @brief Computation of degeneracy parameter eta_NN
+ *
+ * @param nb
+ * @param temp
+ * @param yN
+ * @return
+ */
 double EtaNNsc(const double nb, const double temp, const double yN) {
   static const double three_pi_sqr = 3. * kPi * kPi;
   static const double eF_const = 0.5 * kHbar * kHbar / kMb * kMeV; // constant in Fermi energy calculation
