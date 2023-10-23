@@ -130,10 +130,10 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
     integrand_2_anue = (1. / (kClight * J_anue)) * four_pi_hc3 * nu * nu * nu * g_anue * abs_em_beta.ab_anue;
   }
 
-  if (opacity_flags.use_iso == 1) { // @TODO: fix
-    integrand_3_nue = (1. / (kClight * J_nue)) * 4. * kPi * 4. * kPi * nu * g_nue * iso_scatt; // factor nu^2 already in iso_scatt
-    integrand_3_anue = (1. / (kClight * J_anue)) * 4. * kPi * 4. * kPi * nu * g_anue * iso_scatt;
-    integrand_3_nux = (1. / (kClight * J_nux)) * 4. * kPi * 4. * kPi * nu * g_nux * iso_scatt;
+  if (opacity_flags.use_iso == 1) {
+    integrand_3_nue = (4. * kPi / (kClight * J_nue)) * nu * nu * nu * g_nue * iso_scatt; // factor nu^2 already in iso_scatt
+    integrand_3_anue = (4. * kPi / (kClight * J_nue)) * nu * nu * nu * g_anue * iso_scatt;
+    integrand_3_nux = (4. * kPi / (kClight * J_nue)) * nu * nu * nu * g_nux * iso_scatt;
   }
 
   MyQuadratureIntegrand result = {.n = 7};

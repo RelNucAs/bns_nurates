@@ -2,14 +2,15 @@
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
-//! \file nu_scatt_iso.c
-//  \brief Implementation of isoenergetic neutrino scattering on nucleons
-//        Ref: Bruenn, 1985 (https://articles.adsabs.harvard.edu/pdf/1985ApJS...58..771B)
-
-// Possible inclusion of phase space, recoil, weak magnetism correction as in
-// Horowitz, 2002 (https://journals.aps.org/prd/abstract/10.1103/PhysRevD.65.043001)
-
-// The isoenergetic scattering kernel is equal for production and absorption and is the same for all neutrino types
+/**
+ * @file nu_scatt_iso.c
+ * @brief Implementation of iso-energetic scattering of neutrinos with nucleons.
+ *
+ * This file implements iso-energetic scattering on nucleons from [Bruenn 1985](https://articles.adsabs.harvard.edu/pdf/1985ApJS...58..771B)
+ * with optional inclusion of phase space, recoil and weak magnetism corrections from [Horowitz 2002](https://journals.aps.org/prd/abstract/10.1103/PhysRevD.65.043001)
+ *
+ * @note The iso-energetic scattering kernel is same for production and absorption and for all neutrino species.
+ */
 
 #include <math.h>
 
@@ -18,70 +19,67 @@
 #include "../distribution/distribution.h"
 #include "../integration/integration.h"
 
-// Definition of constants
-#define kIsoKer (2. * kPi *  kGf * kGf) / kHbar // constant in (C36) [MeV cm^6 s-1], 
-                                                  // Gf^2/hbar = 1.2E-65 MeV cm^6 s^-1 from (C40)
-#define h0_p  kHpv*kHpv + 3.*kHpa*kHpa  // 0th Leg coeff, protons
-#define h1_p  kHpv*kHpv -    kHpa*kHpa  // 1st Leg coeff, protons
-#define h0_n  kHnv*kHnv + 3.*kHna*kHna  // 0th Leg coeff, neutrons
-#define h1_n  kHnv*kHnv -    kHna*kHna  // 1st Leg coeff, neutrons
+// Definition of local constants
+#define kIsoKer (2. * kPi *  kGf * kGf) / kHbar // 2 pi Gf^2 / hbar [MeV cm^6 s^-1] from Eqn. (C36) of Bruenn
 
-#define c0_p  kIsoKer * h0_p  // 0th Leg coeff, protons
-#define c1_p  kIsoKer * h1_p  // 1st Leg coeff, protons
-#define c0_n  kIsoKer * h0_n  // 0th Leg coeff, neutrons
-#define c1_n  kIsoKer * h1_n  // 1st Leg coeff, neutrons
+#define h0_p  kHpv*kHpv + 3.*kHpa*kHpa          // 0th Legendre coefficient (protons)
+#define h1_p  kHpv*kHpv -    kHpa*kHpa          // 1st Legedndre coefficient (protons)
+#define h0_n  kHnv*kHnv + 3.*kHna*kHna          // 0th Legendre coefficient (neutrons)
+#define h1_n  kHnv*kHnv -    kHna*kHna          // 1st Legendre coefficient (neutrons)
 
-/* Inputs:
- *      omega    [MeV] : (anti)neutrino energy (elastic process)
- *      nb      [cm-3] : baryon number density
- *      temp     [MeV] : temperature
- *      yp             : proton fraction
- *      yn             : neutron fraction
-*/
+#define c0_p  kIsoKer * h0_p                    // 0th Legendre coefficient (protons)
+#define c1_p  kIsoKer * h1_p                    // 1st Legendre coefficient (protons)
+#define c0_n  kIsoKer * h0_n                    // 0th Legendre coefficient (neutrons)
+#define c1_n  kIsoKer * h1_n                    // 1st Legendre coefficient (neutrons)
 
-
-/* Computation of degeneracy parameter eta_NN */
 /**
- * @brief Computation of degeneracy parameter eta_NN
+ * @fn double EtaNNsc(const double nb, const double temp, const double yN)
+ * @brief Computes degeneracy parameter \f$\eta_{NN}\f$ from Eqn. (C37) of Bruenn.
  *
- * @param nb
- * @param temp
- * @param yN
- * @return
+ * @param nb    baryon number density \f$[cm^{-3}]\f$
+ * @param temp  temperature \f$[MeV]\f$
+ * @param yN    proton/neutron fraction
+ * @return      The degeneracy parameter \f$\eta_{NN} [cm^-3]\f$
  */
 double EtaNNsc(const double nb, const double temp, const double yN) {
+
   static const double three_pi_sqr = 3. * kPi * kPi;
   static const double eF_const = 0.5 * kHbar * kHbar / kMb * kMeV; // constant in Fermi energy calculation
 
-  const double nN = yN*nb;
+  const double nN = yN * nb;
 
   if (nN <= 0.) return 0.;  // Enforce zero rates if no nucleons are present
-  
+
   // Linear interpolation between degenerate and nondegnerate limit in Eq.(C37)
-  const double eFN = eF_const * pow(three_pi_sqr * nN, 2./3.); // Fermi energy computation [MeV]
+  const double eFN = eF_const * pow(three_pi_sqr * nN, 2. / 3.); // Fermi energy computation [MeV]
   const double tmp = 1.5 * temp / eFN;
-  return nN * tmp / sqrt(1. + tmp*tmp); // [cm-3]
-  
-  /* Alternative computation: evaluate via numerical derivative (some quick tests showed it's unstable) */
-  //dmudrho = ....; //[MeV*cm^3/g]
-  //etann = yn / (T*mu*dmudrho); //[1/cm^3]
+  return nN * tmp / sqrt(1. + tmp * tmp); // [cm-3]
+
 }
 
-// Spectral scattering opacity for isoenergetic scattering on nucleons
-double IsoScattNucleon(double omega, OpacityParams *opacity_pars,
-                       MyEOSParams *eos_pars,
-                       const double yN, const int reacflag) {
+/**
+ * @fn double IsoScattNucleon(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars, const double yN, const int reacflag)
+ * @brief Computes Spectral scattering opacity for iso-energetic scattering on nucleons (protons/neutrons)
+ * @param omega         neutrino energy \f$[MeV]\f$
+ * @param opacity_pars  structure containing opacity parameters
+ * @param eos_pars      structure containing equation of state parameters (needs baryon number density \f$[cm^{-3}]\f$ and temperature \f$[MeV]\f$)
+ * @param yN            proton/neutron fraction
+ * @param reacflag      choice of nucleon (1: proton scattering 2: neutron scattering)
+ * @return              "Eq.(A41)" \f$[MeV^{3} cm{^3} s^{-1}]\f$
+ */
+double IsoScattNucleon(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars, const double yN, const int reacflag) {
+
   double R0 = 1., R1 = 1.;
   double leg_0, leg_1;
-	   
-  const double nb   = eos_pars->nb;   // Number baryon density [cm-3]
+
+  const double nb = eos_pars->nb;   // Number baryon density [cm-3]
   const double temp = eos_pars->temp; // Temperature [MeV]
 
-  const double etaNN = EtaNNsc(nb, temp, yN); // degeneracy parameter eta_NN, Eq.(C37)
+  const double etaNN = EtaNNsc(nb, temp, yN); // degeneracy parameter eta_NN [cm^-3] from Eqn. (C37) of Bruenn
 
   // Phase space, recoil and weak magnetism corrections
   // R0 (R1) is the correction to the zeroth (first) Legendre coefficient
-  if (opacity_pars->use_WM_sc)  WMScatt(omega, &R0, &R1, reacflag);
+  if (opacity_pars->use_WM_sc) { WMScatt(omega, &R0, &R1, reacflag); }
 
   if (reacflag == 1) {
     // Scattering on proton
@@ -92,29 +90,45 @@ double IsoScattNucleon(double omega, OpacityParams *opacity_pars,
     leg_0 = c0_n * R0;
     leg_1 = c1_n * R1; // [MeV cm^3 s-1]
   }
-  
+
   return omega * omega * etaNN * (leg_1 / 3. - leg_0); // "Eq.(A41)" [MeV^3 cm^3 s-1]
 }
 
-// Neutrino-proton contribution
+/**
+ * @fn double IsoScattProton(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars)
+ * @brief Computes the spectral scattering opacity for scattering of neutrinos on protons
+ * @param omega         neutrino energy \f$[MeV]\f$
+ * @param opacity_pars  structure for opacity parameters
+ * @param eos_pars      structure for equation of state parameters
+ * @return              "Eq.(A41)" \f$[MeV^{3} cm{^3} s^{-1}]\f$
+ */
 double IsoScattProton(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
   return IsoScattNucleon(omega, opacity_pars, eos_pars, eos_pars->yp, 1);
 }
 
-// Neutrino-neutron contribution
+/**
+ * @fn double IsoScattNeutron(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars)
+ * @brief Computes the spectral scattering opacity for scattering of neutrinos on neutrons
+ * @param omega         neutrino energy \f$[MeV]\f$
+ * @param opacity_pars  structure for opacity parameters
+ * @param eos_pars      structure for equation of state parameters
+ * @return              "Eq.(A41)" \f$[MeV^{3} cm{^3} s^{-1}]\f$
+ */
 double IsoScattNeutron(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
   return IsoScattNucleon(omega, opacity_pars, eos_pars, eos_pars->yn, 2);
 }
 
-// Sum of the two contributions for neutrino-nucleon scattering (protons + neutrons)
+/**
+ * @fn double IsoScattTotal(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars)
+ * @brief Computes the total spectral scattering opacity for scattering of neutrinos on protons and neutrons
+ * @param omega         neutrino energy \f$[MeV]\f$
+ * @param opacity_pars  structure for opacity parameters
+ * @param eos_pars      structure for equation of state parameters
+ * @return              "Eq.(A41)" \f$[MeV^{3} cm{^3} s^{-1}]\f$
+ */
 double IsoScattTotal(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
-  const double iso_nu_p = IsoScattProton(omega , opacity_pars, eos_pars); // proton contribution
+  const double iso_nu_p = IsoScattProton(omega, opacity_pars, eos_pars); // proton contribution
   const double iso_nu_n = IsoScattNeutron(omega, opacity_pars, eos_pars); // neutron contribution
-
-  //MyKernel elastic_kernel = {.absorption_e = nu_p_ker.absorption_e + nu_n_ker.absorption_e,
-  //                           .production_e = nu_p_ker.production_e + nu_n_ker.production_e,
-  //                           .absorption_x = nu_p_ker.absorption_x + nu_n_ker.absorption_x,
-  //                           .production_x = nu_p_ker.production_x + nu_n_ker.production_x};
 
   return iso_nu_p + iso_nu_n;
 }
@@ -128,7 +142,7 @@ double IsoScattTotal(double omega, OpacityParams *opacity_pars, MyEOSParams *eos
 // (constants are added after the integration)
 MyQuadratureIntegrand NuEnergyScatteringIntegrand(double *x, void *p) {
   GreyOpacityParams *grey_pars = (GreyOpacityParams *) p;
-  
+
   const double iso_scatt = IsoScattTotal(x[0], &grey_pars->opacity_pars, &grey_pars->eos_pars);
 
   MyQuadratureIntegrand result;
@@ -140,11 +154,10 @@ MyQuadratureIntegrand NuEnergyScatteringIntegrand(double *x, void *p) {
   return result;
 }
 
-
 // Computation of scattering coefficients
 SourceCoeffs IsoScattCoeffs(GreyOpacityParams *grey_pars) {
   MyQuadratureIntegrand iso;
-  
+
   SourceCoeffs out;
 
   MyFunctionMultiD integrand;
@@ -159,26 +172,25 @@ SourceCoeffs IsoScattCoeffs(GreyOpacityParams *grey_pars) {
 
   double s = 2. * grey_pars->distr_pars.eta_t[0] * grey_pars->distr_pars.temp_t[0]; //@TODO: we are choose the same s for all species
 
-  out.R_nue  = 0.;
+  out.R_nue = 0.;
   out.R_anue = 0.;
-  
+
   //out.R_num  = 0.;
   //out.R_anum = 0.;
-  
+
   out.R_nux = 0.;
 
   integrand.function = &NuEnergyScatteringIntegrand;
-  iso =  GaussLegendreIntegrate1D(&quad, &integrand, s);
+  iso = GaussLegendreIntegrate1D(&quad, &integrand, s);
 
-
-  out.Q_nue  = 4. * kPi * iso.integrand[0] / grey_pars->m1_pars.J[0] / kClight;
+  out.Q_nue = 4. * kPi * iso.integrand[0] / grey_pars->m1_pars.J[0] / kClight;
   out.Q_anue = 4. * kPi * iso.integrand[1] / grey_pars->m1_pars.J[1] / kClight;
-  
+
   //out.Q_num  = iso;
   //out.Q_anum = iso;
-  
+
   out.Q_nux = 4. * kPi * iso.integrand[2] / grey_pars->m1_pars.J[2] / kClight;
-  
+
   return out;
 }
 
