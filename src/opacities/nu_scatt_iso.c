@@ -15,6 +15,7 @@
 #include <math.h>
 
 #include "opacities.h"
+#include "../constants.h"
 #include "weak_magnetism/weak_magnetism.h"
 #include "../distribution/distribution.h"
 #include "../integration/integration.h"
@@ -50,7 +51,7 @@ double EtaNNsc(const double nb, const double temp, const double yN) {
 
   if (nN <= 0.) return 0.;  // Enforce zero rates if no nucleons are present
 
-  // Linear interpolation between degenerate and nondegnerate limit in Eq.(C37)
+  // Linear interpolation between degenerate and non-degnerate limit in Eq.(C37)
   const double eFN = eF_const * pow(three_pi_sqr * nN, 2. / 3.); // Fermi energy computation [MeV]
   const double tmp = 1.5 * temp / eFN;
   return nN * tmp / sqrt(1. + tmp * tmp); // [cm-3]
@@ -65,7 +66,7 @@ double EtaNNsc(const double nb, const double temp, const double yN) {
  * @param eos_pars      structure containing equation of state parameters (needs baryon number density \f$[cm^{-3}]\f$ and temperature \f$[MeV]\f$)
  * @param yN            proton/neutron fraction
  * @param reacflag      choice of nucleon (1: proton scattering 2: neutron scattering)
- * @return              "Eq.(A41)" \f$[MeV^{3} cm{^3} s^{-1}]\f$
+ * @return              "Eq.(A41)" \f$[MeV cm{^3} s^{-1}]\f$
  */
 double IsoScattNucleon(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars, const double yN, const int reacflag) {
 
@@ -91,7 +92,7 @@ double IsoScattNucleon(double omega, OpacityParams *opacity_pars, MyEOSParams *e
     leg_1 = c1_n * R1; // [MeV cm^3 s-1]
   }
 
-  return omega * omega * etaNN * (leg_1 / 3. - leg_0); // "Eq.(A41)" [MeV^3 cm^3 s-1]
+  return etaNN * (leg_1 / 3. - leg_0); // "Eq.(A41)" [MeV cm^3 s-1]
 }
 
 /**
@@ -100,7 +101,7 @@ double IsoScattNucleon(double omega, OpacityParams *opacity_pars, MyEOSParams *e
  * @param omega         neutrino energy \f$[MeV]\f$
  * @param opacity_pars  structure for opacity parameters
  * @param eos_pars      structure for equation of state parameters
- * @return              "Eq.(A41)" \f$[MeV^{3} cm{^3} s^{-1}]\f$
+ * @return              "Eq.(A41)" \f$[MeV cm{^3} s^{-1}]\f$
  */
 double IsoScattProton(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
   return IsoScattNucleon(omega, opacity_pars, eos_pars, eos_pars->yp, 1);
@@ -112,7 +113,7 @@ double IsoScattProton(double omega, OpacityParams *opacity_pars, MyEOSParams *eo
  * @param omega         neutrino energy \f$[MeV]\f$
  * @param opacity_pars  structure for opacity parameters
  * @param eos_pars      structure for equation of state parameters
- * @return              "Eq.(A41)" \f$[MeV^{3} cm{^3} s^{-1}]\f$
+ * @return              "Eq.(A41)" \f$[MeV cm{^3} s^{-1}]\f$
  */
 double IsoScattNeutron(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
   return IsoScattNucleon(omega, opacity_pars, eos_pars, eos_pars->yn, 2);
@@ -124,7 +125,7 @@ double IsoScattNeutron(double omega, OpacityParams *opacity_pars, MyEOSParams *e
  * @param omega         neutrino energy \f$[MeV]\f$
  * @param opacity_pars  structure for opacity parameters
  * @param eos_pars      structure for equation of state parameters
- * @return              "Eq.(A41)" \f$[MeV^{3} cm{^3} s^{-1}]\f$
+ * @return              "Eq.(A41)" \f$[MeV cm{^3} s^{-1}]\f$
  */
 double IsoScattTotal(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
   const double iso_nu_p = IsoScattProton(omega, opacity_pars, eos_pars); // proton contribution

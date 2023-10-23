@@ -131,9 +131,9 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
   }
 
   if (opacity_flags.use_iso == 1) {
-    integrand_3_nue = (4. * kPi / (kClight * J_nue)) * nu * nu * nu * g_nue * iso_scatt; // factor nu^2 already in iso_scatt
-    integrand_3_anue = (4. * kPi / (kClight * J_nue)) * nu * nu * nu * g_anue * iso_scatt;
-    integrand_3_nux = (4. * kPi / (kClight * J_nue)) * nu * nu * nu * g_nux * iso_scatt;
+    integrand_3_nue = (4. * kPi / (kClight * J_nue)) * nu * nu * nu * nu * nu * g_nue * iso_scatt;
+    integrand_3_anue = (4. * kPi / (kClight * J_nue)) * nu * nu * nu * nu * nu * g_anue * iso_scatt;
+    integrand_3_nux = (4. * kPi / (kClight * J_nue)) * nu * nu * nu * nu * nu * g_nux * iso_scatt;
   }
 
   MyQuadratureIntegrand result = {.n = 7};
@@ -144,7 +144,7 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
   result.integrand[3] = integrand_2_anue;
   result.integrand[4] = integrand_3_nue;
   result.integrand[5] = integrand_3_anue;
-  result.integrand[7] = integrand_3_nux;
+  result.integrand[6] = integrand_3_nux;
 
   return result;
 }
@@ -156,7 +156,7 @@ M1Opacities ComputeM1Opacities(MyQuadrature *quad_1d, MyQuadrature *quad_2d, Gre
 
   // set up 1d integration
   MyFunctionMultiD integrand_m1_1d;
-  MyQuadratureIntegrand integrand_m1_1d_info = {.n = 6};
+  MyQuadratureIntegrand integrand_m1_1d_info = {.n = 7};
   integrand_m1_1d.function = &M1SingleIntegrand;
   integrand_m1_1d.dim = 1;
   integrand_m1_1d.params = my_grey_opacity_params;
