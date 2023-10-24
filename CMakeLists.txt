@@ -47,6 +47,65 @@ add_executable(bns_nurates
 target_link_libraries(bns_nurates GSL::gsl GSL::gslcblas)
 target_link_libraries(bns_nurates m)
 
+# add target for THC
+file(GLOB SOURCES
+        src/distribution/distribution_opt_thick.c
+        src/distribution/distribution_opt_thin.c
+        src/distribution/distribution_total.c
+        src/functions/digamma.c
+        src/functions/fermi.c
+        src/functions/gamma.c
+        src/functions/lambert.c
+        src/functions/mnewt.c
+        src/functions/safe_exp.c
+        src/opacities/weak_magnetism/weak_magnetism.c
+        src/opacities/weak_magnetism/nucfrmfac.c
+        src/opacities/nu_abs_em_beta.c
+        src/opacities/nu_scatt_iso.c
+        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
+        tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.c
+        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
+        src/integration/integration_quadrature_schemes.c
+        src/integration/integration_quadrature_io.c
+        src/integration/integration_quadrature_integrate.c
+        src/opacities/kernels/kernel_brem.c
+        src/opacities/kernels/kernel_pair.c
+        src/opacities/nu_abs_em_pair.c
+        src/opacities/nu_abs_em_brem.c
+        src/integration/integration_quadrature_integrate_kernels.c
+        src/opacities/m1_opacities.c)
+
+# include headers
+set(HEADERS_TO_INCLUDE src/constants.h
+        src/bns_nurates.h
+        src/distribution/distribution.h
+        src/functions/functions.h
+        src/integration/integration.h
+        src/opacities/kernels/kernels.h
+        src/opacities/weak_magnetism/weak_magnetism.h
+        src/opacities/opacities.h
+        src/output/outputs.h
+        src/eos/eos.h
+        src/libnurates.h)
+
+include_directories(src
+        src/distribution
+        src/eos src/functions
+        src/integration
+        src/opacities/kernels
+        src/opacities/weak_magnetism
+        src/output src/quadratures)
+
+add_library(nurates ${SOURCES})
+target_sources(nurates PUBLIC ${HEADERS_TO_INCLUDE})
+
+target_link_libraries(nurates GSL::gsl GSL::gslcblas)
+target_link_libraries(nurates m)
+
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/install)
+install(TARGETS nurates DESTINATION ${CMAKE_BINARY_DIR}/install)
+install(FILES ${HEADERS_TO_INCLUDE} DESTINATION ${CMAKE_BINARY_DIR}/install)
+
 # test pair kernel T
 add_executable(test_pair_t
         tests/tests_pair/test_pair_t.c
