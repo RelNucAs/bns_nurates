@@ -21,17 +21,8 @@
 #include "../integration/integration.h"
 
 // Definition of local constants
-#define kIsoKer (2. * kPi *  kGf * kGf) / kHbar // 2 pi Gf^2 / hbar [MeV cm^6 s^-1] from Eqn. (C36) of Bruenn
+//#define kIsoKer (2. * kPi *  kGf *  kGf) / kHbar / (kHbarClight * kHbarClight * kHbarClight * kHbarClight * kHbarClight * kHbarClight) // 2 pi Gf^2 / hbar [MeV cm^6 s^-1] from Eqn. (C36) of Bruenn
 
-#define h0_p  kHpv*kHpv + 3.*kHpa*kHpa          // 0th Legendre coefficient (protons)
-#define h1_p  kHpv*kHpv -    kHpa*kHpa          // 1st Legedndre coefficient (protons)
-#define h0_n  kHnv*kHnv + 3.*kHna*kHna          // 0th Legendre coefficient (neutrons)
-#define h1_n  kHnv*kHnv -    kHna*kHna          // 1st Legendre coefficient (neutrons)
-
-#define c0_p  kIsoKer * h0_p                    // 0th Legendre coefficient (protons)
-#define c1_p  kIsoKer * h1_p                    // 1st Legendre coefficient (protons)
-#define c0_n  kIsoKer * h0_n                    // 0th Legendre coefficient (neutrons)
-#define c1_n  kIsoKer * h1_n                    // 1st Legendre coefficient (neutrons)
 
 /**
  * @fn double EtaNNsc(const double nb, const double temp, const double yN)
@@ -66,9 +57,19 @@ double EtaNNsc(const double nb, const double temp, const double yN) {
  * @param eos_pars      structure containing equation of state parameters (needs baryon number density \f$[cm^{-3}]\f$ and temperature \f$[MeV]\f$)
  * @param yN            proton/neutron fraction
  * @param reacflag      choice of nucleon (1: proton scattering 2: neutron scattering)
- * @return              "Eq.(A41)" \f$[MeV cm{^3} s^{-1}]\f$
+ * @return              "Eq.(A41)" \f$[MeV cm^{3} s^{-1}]\f$
  */
 double IsoScattNucleon(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars, const double yN, const int reacflag) {
+  const static double kIsoKer = (2. * kPi *  kGf *  kGf) / (kHbarClight * kHbarClight * kHbarClight * kHbarClight * kHbarClight * kHbarClight);
+  const static const double h0_p = kHpv * kHpv + 3. * kHpa * kHpa;          // 0th Legendre coefficient (protons)
+  const static double h1_p = kHpv * kHpv - kHpa * kHpa;          // 1st Legedndre coefficient (protons)
+  const static double h0_n = kHnv * kHnv + 3. * kHna * kHna;          // 0th Legendre coefficient (neutrons)
+  const static double h1_n = kHnv * kHnv - kHna * kHna;          // 1st Legendre coefficient (neutrons)
+
+  static double c0_p = kIsoKer * h0_p;                    // 0th Legendre coefficient (protons)
+  static double c1_p = kIsoKer * h1_p;              // 1st Legendre coefficient (protons)
+  static double c0_n = kIsoKer * h0_n;                    // 0th Legendre coefficient (neutrons)
+  static double c1_n = kIsoKer * h1_n;                    // 1st Legendre coefficient (neutrons)
 
   double R0 = 1., R1 = 1.;
   double leg_0, leg_1;
@@ -85,11 +86,11 @@ double IsoScattNucleon(double omega, OpacityParams *opacity_pars, MyEOSParams *e
   if (reacflag == 1) {
     // Scattering on proton
     leg_0 = c0_p * R0;
-    leg_1 = c1_p * R1; // [MeV cm^3 s-1]
+    leg_1 = c1_p * R1; // [MeV cm^6 s^-1]
   } else if (reacflag == 2) {
     // Scattering on neutron
     leg_0 = c0_n * R0;
-    leg_1 = c1_n * R1; // [MeV cm^3 s-1]
+    leg_1 = c1_n * R1; // [MeV cm^6 s^-1]
   }
 
   return etaNN * (leg_1 / 3. - leg_0); // "Eq.(A41)" [MeV cm^3 s-1]

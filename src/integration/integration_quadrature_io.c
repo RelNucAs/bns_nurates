@@ -47,16 +47,16 @@ void SaveQuadrature(char *filedir, MyQuadrature *quad) {
 
   fptr = fopen(filepath, "w");
   if (fptr == NULL) {
-    printf("%s: The file %s does not exist!\n", __FILE_NAME__, filepath);
+    printf("%s: The file %s does not exist!\n", __FILE__, filepath);
     exit(1);
   }
 
-  fprintf(fptr, fileHeader);
+  fputs(fileHeader, fptr);
 
   // @TODO: only works for the 1d case, generalize for 2d case later
   for (int i = 0; i < quad->nx; i++) {
     sprintf(fileline, "%0.16e \t %0.16e\n", quad->points[i], quad->w[i]);
-    fprintf(fptr, fileline);
+    fputs(fileline, fptr);
   }
 
   fclose(fptr);
