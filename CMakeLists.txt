@@ -85,8 +85,7 @@ set(HEADERS_TO_INCLUDE src/constants.h
         src/opacities/weak_magnetism/weak_magnetism.h
         src/opacities/opacities.h
         src/output/outputs.h
-        src/eos/eos.h
-        src/libnurates.h)
+        src/eos/eos.h)
 
 include_directories(src
         src/distribution
@@ -97,14 +96,22 @@ include_directories(src
         src/output src/quadratures)
 
 add_library(nurates ${SOURCES})
-target_sources(nurates PUBLIC ${HEADERS_TO_INCLUDE})
+#target_sources(nurates PUBLIC ${HEADERS_TO_INCLUDE})
+
+configure_file(
+    ${CMAKE_SOURCE_DIR}/src/libnurates.h.in
+    ${CMAKE_BINARY_DIR}/libnurates.h
+)
 
 target_link_libraries(nurates GSL::gsl GSL::gslcblas)
 target_link_libraries(nurates m)
 
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/install)
-install(TARGETS nurates DESTINATION ${CMAKE_BINARY_DIR}/install)
-install(FILES ${HEADERS_TO_INCLUDE} DESTINATION ${CMAKE_BINARY_DIR}/install)
+install(TARGETS nurates DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install(FILES ${CMAKE_BINARY_DIR}/libnurates.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+
+#file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/install)
+#install(TARGETS nurates DESTINATION ${CMAKE_BINARY_DIR}/install)
+#install(FILES ${HEADERS_TO_INCLUDE} DESTINATION ${CMAKE_BINARY_DIR}/install)
 
 # test pair kernel T
 add_executable(test_pair_t
