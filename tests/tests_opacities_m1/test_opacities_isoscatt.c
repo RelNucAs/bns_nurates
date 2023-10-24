@@ -39,7 +39,7 @@ int main() {
   FILE *fptr;
   fptr = fopen(filepath, "r");
   if (fptr == NULL) {
-    printf("%s: The file %s does not exist!\n", __FILE_NAME__, filepath);
+    printf("%s: The file %s does not exist!\n", __FILE__, filepath);
     exit(1);
   }
 
