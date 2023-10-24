@@ -111,7 +111,7 @@ int main() {
   my_grey_opacity_params.opacity_flags.use_abs_em = 1;
 
   FILE *file;
-  file = fopen(data_fileout, "w+");
+  file = fopen(data_filepath, "w+");
 
   printf("\n");
   printf("Generated tables:\n");

@@ -184,7 +184,9 @@ int main() {
             pair_opacities.kappa_a_anue, pair_opacities.kappa_s_anue, pair_opacities.eta_nux,
             pair_opacities.kappa_a_nux, pair_opacities.kappa_s_nux);
   }
+
   fclose(file);
+
   return 0;
 }
 
