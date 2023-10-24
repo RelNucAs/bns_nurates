@@ -26,8 +26,13 @@ int main() {
   char filedir[300] = SOURCE_DIR;
   char outname[200] = "/tests/tests_opacities_m1/nurates_CCSN/nurates_1.008E+01.txt";
 
+  char data_fileout[200] = "/tests/tests_opacities_m1/output/m1_opacities_abs_em.txt";
+  char data_filepath[300] = {'\0'};
+
   strcat(filepath, filedir);
   strcat(filepath, outname);
+  strcat(data_filepath, filedir);
+  strcat(data_filepath, data_fileout);
 
   printf("Data_directory: %s\n", filepath);
 
@@ -106,7 +111,7 @@ int main() {
   my_grey_opacity_params.opacity_flags.use_abs_em = 1;
 
   FILE *file;
-  file = fopen("/var/home/maitraya/Documents/opacities/tests/abs_em_auto.txt","w+");
+  file = fopen(data_fileout, "w+");
 
   printf("\n");
   printf("Generated tables:\n");
@@ -174,8 +179,8 @@ int main() {
            r[i], diff_distr, abs_em_opacities.eta_nue, abs_em_opacities.kappa_a_nue, abs_em_opacities.kappa_s_nue, abs_em_opacities.eta_anue,
            abs_em_opacities.kappa_a_anue, abs_em_opacities.kappa_s_anue);
     fprintf(file, "%e %e %e %e %e %e %e %e\n",
-           r[i], diff_distr, abs_em_opacities.eta_nue, abs_em_opacities.kappa_a_nue, abs_em_opacities.kappa_s_nue, abs_em_opacities.eta_anue,
-           abs_em_opacities.kappa_a_anue, abs_em_opacities.kappa_s_anue);
+            r[i], diff_distr, abs_em_opacities.eta_nue, abs_em_opacities.kappa_a_nue, abs_em_opacities.kappa_s_nue, abs_em_opacities.eta_anue,
+            abs_em_opacities.kappa_a_anue, abs_em_opacities.kappa_s_anue);
   }
   fclose(file);
   return 0;

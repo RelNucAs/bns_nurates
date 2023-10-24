@@ -26,8 +26,13 @@ int main() {
   char filedir[300] = SOURCE_DIR;
   char outname[200] = "/tests/tests_opacities_m1/nurates_CCSN/nurates_1.008E+01.txt";
 
+  char data_fileout[200] = "/tests/tests_opacities_m1/output/m1_opacities_pair.txt";
+  char data_filepath[300] = {'\0'};
+
   strcat(filepath, filedir);
   strcat(filepath, outname);
+  strcat(data_filepath, filedir);
+  strcat(data_filepath, data_fileout);
 
   printf("Data_directory: %s\n", filepath);
 
@@ -106,7 +111,7 @@ int main() {
   my_grey_opacity_params.opacity_flags.use_pair = 1;
 
   FILE *file;
-  file = fopen("/var/home/maitraya/Documents/opacities/tests/pair_auto.txt", "w+");
+  file = fopen(data_filepath, "w+");
 
   printf("\n");
   printf("Generated tables:\n");

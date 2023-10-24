@@ -25,6 +25,12 @@ int main() {
   char filedir[300] = SOURCE_DIR;
   char outname[200] = "/tests/tests_opacities_m1/nurates_CCSN/nurates_1.008E+01.txt";
 
+  char data_fileout[200] = "/tests/tests_opacities_m1/output/m1_opacities_brem.txt";
+  char data_filepath[300] = {'\0'};
+
+  strcat(data_filepath, filedir);
+  strcat(data_filepath, data_fileout);
+
   strcat(filepath, filedir);
   strcat(filepath, outname);
 
@@ -105,7 +111,7 @@ int main() {
   my_grey_opacity_params.opacity_flags.use_brem = 1;
 
   FILE *file;
-  file = fopen("/var/home/maitraya/Documents/opacities/tests/brem_auto.txt", "w+");
+  file = fopen(data_filepath, "w+");
 
   printf("\n");
   printf("Generated tables:\n");
