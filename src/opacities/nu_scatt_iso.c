@@ -23,7 +23,6 @@
 // Definition of local constants
 //#define kIsoKer (2. * kPi *  kGf *  kGf) / kHbar / (kHbarClight * kHbarClight * kHbarClight * kHbarClight * kHbarClight * kHbarClight) // 2 pi Gf^2 / hbar [MeV cm^6 s^-1] from Eqn. (C36) of Bruenn
 
-
 /**
  * @fn double EtaNNsc(const double nb, const double temp, const double yN)
  * @brief Computes degeneracy parameter \f$\eta_{NN}\f$ from Eqn. (C37) of Bruenn.
@@ -93,7 +92,7 @@ double IsoScattNucleon(double omega, OpacityParams *opacity_pars, MyEOSParams *e
     leg_1 = c1_n * R1; // [MeV cm^6 s^-1]
   }
 
-  return etaNN * (leg_1 / 3. - leg_0); // "Eq.(A41)" [MeV cm^3 s-1]
+  return etaNN * (leg_0 - leg_1 / 3.); // "Eq.(A41)" [MeV cm^3 s-1]
 }
 
 /**

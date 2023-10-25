@@ -69,9 +69,9 @@ void NucFrmFac(const double E, double* cv, double* ca, double* F2, const int rea
     exit(EXIT_FAILURE);
   }
 
-  cv = &frm1;
-  ca = &frm2;
-  F2 = &frm3;
+  *cv = frm1;
+  *ca = frm2;
+  *F2 = frm3;
 
   return;
 }	

@@ -2,6 +2,7 @@
 
 #include "../../constants.h"
 #include "weak_magnetism.h"
+#include <stdio.h>
 
 // !\file weak_magnetism.c
 // \brief Evaluation of phase space/recoil/weak magnetism correction for (anti)neutrino
@@ -25,12 +26,9 @@ void WMAbsEm(const double omega, double* R, double* Rbar) {
   //const double tmp3 = (cv*cv+3.0*ca*ca)*pow(1.+2.*ehor,3.);
   const double tmp3 = (kGv*kGv+3.0*kGa*kGa)*pow(1.+2.*ehor,3.);
   
-  R_nu  = (tmp1+tmp2)/tmp3; // Eq.(22) 
-  R_anu = (tmp1-tmp2)/tmp3; // Eq.(22)
+  *R    = (tmp1+tmp2)/tmp3; // Eq.(22) 
+  *Rbar = (tmp1-tmp2)/tmp3; // Eq.(22)
 
-  R     = &R_nu;
-  Rbar = &R_anu;
-  
   return;
 }
 
