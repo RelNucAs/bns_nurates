@@ -8,6 +8,8 @@
 //! \file constants.h
 //  \brief constants used throughout the code
 
+// @TODO: increase precision in definition of constants when possible
+
 // Units conversion
 static const double kMeV = 1.602176634e-6;       // [erg]
 static const double kCm = 10e13;                 // [fm]
@@ -30,13 +32,15 @@ static const double kMb = 1.674e-24;             // [g]
 static const double kMu = 1.66054e-24;           // [g]
 
 // Physical constants
-static const double kHbar = 6.582119569e-22;     // [MeV s]
-static const double kH = 4.1356943e-21;          // [MeV s]
-static const double kClight = 2.997924562e+10;   // [cm s^-1]
-static const double kHbarClight = kHbar * kClight; // [Mev cm]
-static const double kGf = 8.957e-44;             // [MeV cm^3]
-static const double kPi = 3.1415926535898;       //  acos(static_cast<double>(-1.));
-static const double kKB = 8.617333262e-11;       // [MeV K^-1]
+static const double kHbar = 6.582119569e-22;       // [MeV s]
+static const double kH = 4.1356943e-21;            // [MeV s]
+static const double kClight = 2.997924562e+10;     // [cm s^-1]
+static const double kHClight = kH * kClight;       // [MeV cm]
+static const double kHbarClight = kHbar * kClight; // [MeV cm]
+static const double kGf  = 8.957e-44;              // [MeV cm^3]
+static const double kGf0 = 1.1664E-11;             // [MeV^-2]
+static const double kPi = 3.1415926535898;         //  acos(static_cast<double>(-1.));
+static const double kKB = 8.617333262e-11;         // [MeV K^-1]
 
 // Coupling constants
 static const double kGa = 1.23;

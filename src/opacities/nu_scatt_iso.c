@@ -59,8 +59,9 @@ double EtaNNsc(const double nb, const double temp, const double yN) {
  * @return              "Eq.(A41)" \f$[MeV cm^{3} s^{-1}]\f$
  */
 double IsoScattNucleon(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars, const double yN, const int reacflag) {
-  const static double kIsoKer = (2. * kPi *  kGf *  kGf) / (kHbarClight * kHbarClight * kHbarClight * kHbarClight * kHbarClight * kHbarClight);
-  const static const double h0_p = kHpv * kHpv + 3. * kHpa * kHpa;          // 0th Legendre coefficient (protons)
+  const static double kIsoKer = (2. * kPi *  kGf *  kGf) / kHbar / (kHClight * kHClight * kHClight * kHClight * kHClight * kHClight);
+    
+  const static double h0_p = kHpv * kHpv + 3. * kHpa * kHpa;          // 0th Legendre coefficient (protons)
   const static double h1_p = kHpv * kHpv - kHpa * kHpa;          // 1st Legedndre coefficient (protons)
   const static double h0_n = kHnv * kHnv + 3. * kHna * kHna;          // 0th Legendre coefficient (neutrons)
   const static double h1_n = kHnv * kHnv - kHna * kHna;          // 1st Legendre coefficient (neutrons)
