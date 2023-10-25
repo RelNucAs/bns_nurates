@@ -12,19 +12,18 @@
 #include "../../src/constants.h"
 #include "../../src/opacities/opacities.h"
 
-int main() {
-  printf("============================================================== \n");
-  printf("Testing opacities for beta processes without dU correction ... \n");
-  printf("============================================================== \n");
-  printf("\n");
-  
-  printf("Spectral rates are compared with the results of a tested Fortran code\n");
-  printf("\n");
+void generate_comparison_data(const bool use_dU) {
 
   // Define path of input file
   char filepath[300] = {'\0'};
   char filedir[300] = SOURCE_DIR;
-  char outname[200] = "/inputs/nurates_CCSN/nurates_1.008E+01.txt";
+  char outname[200] = {'\0'};
+  
+  if (use_dU == false) {
+    strcpy(outname, "/inputs/nurates_CCSN/nurates_1.008E+01.txt");
+  } else {
+    strcpy(outname, "/inputs/nurates_CCSN/nurates_1.008E+01_dU.txt");
+  }
 
   strcat(filepath, filedir);
   strcat(filepath, outname);
@@ -86,7 +85,11 @@ int main() {
 
   // Define path of output file
   filepath[0] = '\0';
-  sprintf(outname, "/tests/tests_beta/test_beta_%.3e.txt", omega);
+  if (use_dU == false) {
+    sprintf(outname, "/tests/tests_beta/test_beta_%.3e.txt", omega);
+  } else {
+    sprintf(outname, "/tests/tests_beta/test_beta_%.3e_dU.txt", omega);
+  }
 
   strcat(filepath, filedir);
   strcat(filepath, outname);
@@ -139,8 +142,9 @@ int main() {
     eos_pars.yp   = yp[i];          
     eos_pars.yn   = yn[i];          
     eos_pars.mu_p = 0.;            
-    eos_pars.mu_n = mu_hat[i] + kQ; // N.B.: correct for the nucleon mass difference
+    eos_pars.mu_n = mu_hat[i] + kQ; // N.B.: corrected for the nucleon mass difference
     eos_pars.mu_e = mu_e[i];        
+    eos_pars.dU   = du[i];
 
     // Compute emissivity and inverse mean free path for electron-type (anti)neutrinos
     opacity_pars.use_WM_ab = false; // WM correction turned off
@@ -169,6 +173,35 @@ int main() {
     printf("Warning: n_data (%d) different for number of lines in the input file (%d)",
            n_data, zone[i-1]);
   }
+
+  return;
+}
+
+
+
+
+
+int main() {
+      printf("Spectral rates are compared with the results of a tested Fortran code\n");
+  printf("\n");
+
+  bool use_dU = false;
+  
+  printf("============================================================== \n");
+  printf("Testing opacities for beta processes without dU correction ... \n");
+  printf("============================================================== \n");
+  printf("\n");
+
+  generate_comparison_data(use_dU); // dU correction is off
+
+  use_dU = true;
+  
+  printf("=========================================================== \n");
+  printf("Testing opacities for beta processes with dU correction ... \n");
+  printf("=========================================================== \n");
+  printf("\n");
+
+  generate_comparison_data(use_dU); // dU correction is on
 
   return 0;
 }

@@ -98,6 +98,9 @@ double EtaPN(const double nn, const double np, const double mu_hat, const double
   return EtaNNAbs(np, nn, -mu_hat, temp);
 }
 
+
+// @TODO: add effective mass correction to the rates
+
 /* Compute opacities for:
  *
  * 1. Neutrino absorption on neutron (nu + n -> l- + p)
