@@ -5,7 +5,7 @@
 #ifndef BNS_NURATES_SRC_OPACITIES_WEAK_MAGNETISM_WEAK_MAGNETISM_H_
 #define BNS_NURATES_SRC_OPACITIES_WEAK_MAGNETISM_WEAK_MAGNETISM_H_
 
-#include "../../constants.h"
+#include "constants.h"
 
 /*===========================================================================*/
 

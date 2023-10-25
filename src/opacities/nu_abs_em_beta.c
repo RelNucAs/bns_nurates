@@ -18,11 +18,11 @@
 #include <math.h>
 
 #include "opacities.h"
-#include "weak_magnetism/weak_magnetism.h"
-#include "../constants.h"
-#include "../distribution/distribution.h"
-#include "../functions/functions.h"
-#include "../integration/integration.h"
+#include "weak_magnetism.h"
+#include "constants.h"
+#include "distribution.h"
+#include "functions.h"
+#include "integration.h"
 
 // ----------------------------------------------------------------------------------
 // @TODO: move this later

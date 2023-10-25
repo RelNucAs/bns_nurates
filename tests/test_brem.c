@@ -10,9 +10,9 @@
 #include <math.h>
 #include <string.h>
 //#include "tests.h"
-#include "../src/bns_nurates.h"
-#include "../src/opacities/kernels/kernels.h"
-#include "../src/integration/integration.h"
+#include "bns_nurates.h"
+#include "kernels.h"
+#include "integration.h"
 #include "../src/opacities/opacities.h"
 
 // Write data for plotting Fig. 3 of Hannestadt and Raffelt

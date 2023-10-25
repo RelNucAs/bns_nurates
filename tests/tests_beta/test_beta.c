@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../src/constants.h"
+#include "../../include/constants.h"
 #include "../../src/opacities/opacities.h"
 
 void generate_comparison_data(const bool use_dU) {

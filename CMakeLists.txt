@@ -8,29 +8,29 @@ add_definitions(-DSOURCE_DIR="${CMAKE_SOURCE_DIR}")
 
 add_executable(bns_nurates
         main.c
-        src/constants.h
-        src/bns_nurates.h
-        src/distribution/distribution.h
+        include/constants.h
+        include/bns_nurates.h
+        include/distribution.h
         src/distribution/distribution_opt_thick.c
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
-        src/functions/functions.h
+        include/functions.h
         src/functions/digamma.c
         src/functions/fermi.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
-        src/integration/integration.h
-        src/opacities/kernels/kernels.h
-        src/opacities/weak_magnetism/weak_magnetism.h
+        include/integration.h
+        include/kernels.h
+        include/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
         src/opacities/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
         src/output/outputs.h
-        src/eos/eos.h
+        include/eos.h
         tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
         tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.c
         tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
@@ -44,12 +44,14 @@ add_executable(bns_nurates
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c)
 
+target_include_directories(bns_nurates PRIVATE include)
+target_include_directories(bns_nurates PRIVATE src)
+
 target_link_libraries(bns_nurates GSL::gsl GSL::gslcblas)
 target_link_libraries(bns_nurates m)
 
-# add target for THC
-# source files
-file(GLOB SOURCES
+# create shared library for THC
+add_library(nurates SHARED
         src/distribution/distribution_opt_thick.c
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
@@ -76,38 +78,28 @@ file(GLOB SOURCES
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c)
 
-# create shared library
-add_library(nurates SHARED ${SOURCES})
-
-# include header file directories
+#set_target_properties(nurates PROPERTIES PUBLIC_HEADER include/*.h)
+include_directories(include)
 include_directories(src)
-include_directories(src/distribution)
-include_directories(src/eos src/functions)
-include_directories(src/integration)
-include_directories(src/opacities/kernels)
-include_directories(src/opacities/weak_magnetism)
-include_directories(src/output src/quadratures)
 
-#target_sources(nurates PUBLIC ${HEADERS_TO_INCLUDE})
+file(GLOB HEADERS_ALL "include/*.h")
+set_target_properties(nurates PROPERTIES PUBLIC_HEADER "${HEADERS_ALL}")
 
-configure_file(
-        ${CMAKE_SOURCE_DIR}/src/libnurates.h.in
-        ${CMAKE_BINARY_DIR}/src/libnurates.h
-)
-
+target_include_directories(nurates PRIVATE include)
+target_include_directories(nurates PRIVATE include)
+target_include_directories(nurates PRIVATE src)
 target_link_libraries(nurates GSL::gsl GSL::gslcblas)
 target_link_libraries(nurates m)
 
-install(TARGETS nurates DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-install(FILES ${CMAKE_BINARY_DIR}/src/libnurates.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
-
+include(GNUInstallDirs)
+install(TARGETS nurates LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # test pair kernel T
 add_executable(test_pair_t
         tests/tests_pair/test_pair_t.c
-        src/constants.h
+        include/constants.h
         src/functions/safe_exp.c
-        src/opacities/kernels/kernels.h
+        include/kernels.h
         src/opacities/kernels/kernel_pair.c)
 
 target_link_libraries(test_pair_t GSL::gsl GSL::gslcblas)
@@ -116,9 +108,9 @@ target_link_libraries(test_pair_t m)
 # test pair kernel F
 add_executable(test_pair_f
         tests/tests_pair/test_pair_f.c
-        src/constants.h
+        include/constants.h
         src/functions/safe_exp.c
-        src/opacities/kernels/kernels.h
+        include/kernels.h
         src/opacities/kernels/kernel_pair.c)
 
 target_link_libraries(test_pair_f GSL::gsl GSL::gslcblas)
@@ -127,9 +119,9 @@ target_link_libraries(test_pair_f m)
 # test pair kernel F
 add_executable(test_pair_g
         tests/tests_pair/test_pair_g.c
-        src/constants.h
+        include/constants.h
         src/functions/safe_exp.c
-        src/opacities/kernels/kernels.h
+        include/kernels.h
         src/opacities/kernels/kernel_pair.c)
 
 target_link_libraries(test_pair_g GSL::gsl GSL::gslcblas)
@@ -138,9 +130,9 @@ target_link_libraries(test_pair_g m)
 # test pair kernel Psi
 add_executable(test_pair_psi
         tests/tests_pair/test_pair_psi.c
-        src/constants.h
+        include/constants.h
         src/functions/safe_exp.c
-        src/opacities/kernels/kernels.h
+        include/kernels.h
         src/opacities/kernels/kernel_pair.c)
 
 target_link_libraries(test_pair_psi GSL::gsl GSL::gslcblas)
@@ -149,9 +141,9 @@ target_link_libraries(test_pair_psi m)
 # test pair kernel Phi
 add_executable(test_pair_phi
         tests/tests_pair/test_pair_phi.c
-        src/constants.h
+        include/constants.h
         src/functions/safe_exp.c
-        src/opacities/kernels/kernels.h
+        include/kernels.h
         src/opacities/kernels/kernel_pair.c
 )
 
@@ -161,9 +153,9 @@ target_link_libraries(test_pair_phi m)
 # test pair kernel Kernels
 add_executable(test_pair_kernels
         tests/tests_pair/test_pair_kernels.c
-        src/constants.h
+        include/constants.h
         src/functions/safe_exp.c
-        src/opacities/kernels/kernels.h
+        include/kernels.h
         src/opacities/kernels/kernel_pair.c
 )
 
@@ -173,9 +165,9 @@ target_link_libraries(test_pair_kernels m)
 # test pair kernel Kernels phi integrated
 add_executable(test_pair_kernels_phi_mu_integrated
         tests/tests_pair/test_pair_kernels_phi_mu_integrated.c
-        src/constants.h
+        include/constants.h
         src/functions/safe_exp.c
-        src/opacities/kernels/kernels.h
+        include/kernels.h
         src/opacities/kernels/kernel_pair.c
 )
 
@@ -185,16 +177,16 @@ target_link_libraries(test_pair_kernels_phi_mu_integrated m)
 # test pair kernel opacities
 add_executable(test_pair_opacities
         tests/tests_pair/test_pair_opacities.c
-        src/constants.h
-        src/bns_nurates.h
-        src/functions/functions.h
+        include/constants.h
+        include/bns_nurates.h
+        include/functions.h
         src/functions/digamma.c
         src/functions/fermi.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
-        src/integration/integration.h
-        src/opacities/kernels/kernels.h
+        include/integration.h
+        include/kernels.h
         src/opacities/opacities.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
@@ -210,13 +202,13 @@ target_link_libraries(test_pair_opacities m)
 # test beta processes spectral rates
 add_executable(test_beta
         tests/tests_beta/test_beta.c
-        src/constants.h
+        include/constants.h
         #src/bns_nurates.h
         #src/distribution/distribution.h
         src/distribution/distribution_total.c
         src/distribution/distribution_opt_thick.c
         src/distribution/distribution_opt_thin.c
-        src/functions/functions.h
+        include/functions.h
         src/functions/digamma.c
         src/functions/fermi.c
         src/functions/gamma.c
@@ -225,7 +217,7 @@ add_executable(test_beta
         src/functions/safe_exp.c
         #src/integration/integration.h
         #src/opacities/kernels/kernels.h
-        src/opacities/weak_magnetism/weak_magnetism.h
+        include/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
         src/opacities/opacities.h
@@ -243,26 +235,26 @@ target_link_libraries(test_beta m)
 # test gray coefficients
 add_executable(test_m1_coeffs
         tests/test_m1_coeffs.c
-        src/constants.h
-        src/bns_nurates.h
-        src/distribution/distribution.h
+        include/constants.h
+        include/bns_nurates.h
+        include/distribution.h
         src/distribution/distribution_opt_thick.c
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
-        src/functions/functions.h
+        include/functions.h
         src/functions/lambert.c
         src/opacities/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
-        src/opacities/weak_magnetism/weak_magnetism.h
+        include/weak_magnetism.h
         src/opacities/weak_magnetism/nucfrmfac.c
         src/opacities/weak_magnetism/weak_magnetism.c
-        src/integration/integration.h
+        include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
         src/integration/integration_quadrature_integrate_kernels.c
-        src/functions/functions.h
+        include/functions.h
         src/functions/fermi.c
         src/functions/gamma.c
         src/functions/safe_exp.c
@@ -273,15 +265,15 @@ target_link_libraries(test_m1_coeffs m)
 # test gauss legendre quadrature 1d
 add_executable(test_gauss_legendre_1d
         tests/tests_quadrature_integrate/test_gauss_legendre_1d.c
-        src/constants.h
-        src/bns_nurates.h
-        src/functions/functions.h
+        include/constants.h
+        include/bns_nurates.h
+        include/functions.h
         src/functions/digamma.c
         src/functions/fermi.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
-        src/integration/integration.h
+        include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
@@ -293,15 +285,15 @@ target_link_libraries(test_gauss_legendre_1d m)
 # test gauss legendre quadrature 2d
 add_executable(test_gauss_legendre_2d
         tests/tests_quadrature_integrate/test_gauss_legendre_2d.c
-        src/constants.h
-        src/bns_nurates.h
-        src/functions/functions.h
+        include/constants.h
+        include/bns_nurates.h
+        include/functions.h
         src/functions/digamma.c
         src/functions/fermi.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
-        src/integration/integration.h
+        include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
@@ -313,15 +305,15 @@ target_link_libraries(test_gauss_legendre_2d m)
 # test gauss legendre quadrature 3d
 add_executable(test_gauss_legendre_3d
         tests/tests_quadrature_integrate/test_gauss_legendre_3d.c
-        src/constants.h
-        src/bns_nurates.h
-        src/functions/functions.h
+        include/constants.h
+        include/bns_nurates.h
+        include/functions.h
         src/functions/digamma.c
         src/functions/fermi.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
-        src/integration/integration.h
+        include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
@@ -333,15 +325,15 @@ target_link_libraries(test_gauss_legendre_3d m)
 # test gauss laguerre quadrature 1d
 add_executable(test_gauss_laguerre_1d
         tests/tests_quadrature_integrate/test_gauss_laguerre_1d.c
-        src/constants.h
-        src/bns_nurates.h
-        src/functions/functions.h
+        include/constants.h
+        include/bns_nurates.h
+        include/functions.h
         src/functions/digamma.c
         src/functions/fermi.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
-        src/integration/integration.h
+        include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
@@ -353,15 +345,15 @@ target_link_libraries(test_gauss_laguerre_1d m)
 # test quadrature I/O
 add_executable(test_quadrature_io
         tests/tests_quadrature_integrate/test_quadrature_io.c
-        src/constants.h
-        src/bns_nurates.h
-        src/functions/functions.h
+        include/constants.h
+        include/bns_nurates.h
+        include/functions.h
         src/functions/digamma.c
         src/functions/fermi.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
-        src/integration/integration.h
+        include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
@@ -375,15 +367,15 @@ add_executable(test_integration_1d
         tests/tests_quadrature_integrate/test_integration_1d.c
         tests/tests_quadrature_integrate/gsl_routines/integration_gsl.h
         tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        src/constants.h
-        src/bns_nurates.h
-        src/functions/functions.h
+        include/constants.h
+        include/bns_nurates.h
+        include/functions.h
         src/functions/digamma.c
         src/functions/fermi.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
-        src/integration/integration.h
+        include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
@@ -397,15 +389,15 @@ add_executable(test_integration_2d
         tests/tests_quadrature_integrate/test_integration_2d.c
         tests/tests_quadrature_integrate/gsl_routines/integration_gsl.h
         tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        src/constants.h
-        src/bns_nurates.h
-        src/functions/functions.h
+        include/constants.h
+        include/bns_nurates.h
+        include/functions.h
         src/functions/digamma.c
         src/functions/fermi.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
-        src/integration/integration.h
+        include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
@@ -419,15 +411,15 @@ add_executable(test_integration_3d
         tests/tests_quadrature_integrate/test_integration_3d.c
         tests/tests_quadrature_integrate/gsl_routines/integration_gsl.h
         tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        src/constants.h
-        src/bns_nurates.h
-        src/functions/functions.h
+        include/constants.h
+        include/bns_nurates.h
+        include/functions.h
         src/functions/digamma.c
         src/functions/fermi.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
-        src/integration/integration.h
+        include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
@@ -441,15 +433,15 @@ add_executable(test_integration_special
         tests/tests_quadrature_integrate/test_integration_special.c
         tests/tests_quadrature_integrate/gsl_routines/integration_gsl.h
         tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        src/constants.h
-        src/bns_nurates.h
-        src/functions/functions.h
+        include/constants.h
+        include/bns_nurates.h
+        include/functions.h
         src/functions/digamma.c
         src/functions/fermi.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
-        src/integration/integration.h
+        include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
@@ -464,15 +456,15 @@ add_executable(test_integration_multi_func_1d
         tests/tests_quadrature_integrate/test_integration_multi_func_1d.c
         tests/tests_quadrature_integrate/gsl_routines/integration_gsl.h
         tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        src/constants.h
-        src/bns_nurates.h
-        src/functions/functions.h
+        include/constants.h
+        include/bns_nurates.h
+        include/functions.h
         src/functions/digamma.c
         src/functions/fermi.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
-        src/integration/integration.h
+        include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
@@ -487,15 +479,15 @@ add_executable(test_integration_multi_func_2d
         tests/tests_quadrature_integrate/test_integration_multi_func_2d.c
         tests/tests_quadrature_integrate/gsl_routines/integration_gsl.h
         tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        src/constants.h
-        src/bns_nurates.h
-        src/functions/functions.h
+        include/constants.h
+        include/bns_nurates.h
+        include/functions.h
         src/functions/digamma.c
         src/functions/fermi.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
-        src/integration/integration.h
+        include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
@@ -507,29 +499,29 @@ target_link_libraries(test_integration_multi_func_2d m)
 
 # test opacities electron capture
 add_executable(test_opacities_electron_capture
-        src/constants.h
-        src/bns_nurates.h
-        src/distribution/distribution.h
+        include/constants.h
+        include/bns_nurates.h
+        include/distribution.h
         src/distribution/distribution_opt_thick.c
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
-        src/functions/functions.h
+        include/functions.h
         src/functions/digamma.c
         src/functions/fermi.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
-        src/integration/integration.h
-        src/opacities/kernels/kernels.h
-        src/opacities/weak_magnetism/weak_magnetism.h
+        include/integration.h
+        include/kernels.h
+        include/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
         src/opacities/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
         src/output/outputs.h
-        src/eos/eos.h
+        include/eos.h
         tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
         tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.c
         tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
@@ -550,29 +542,29 @@ target_link_libraries(test_opacities_electron_capture m)
 
 # test opacities pair
 add_executable(test_opacities_pair
-        src/constants.h
-        src/bns_nurates.h
-        src/distribution/distribution.h
+        include/constants.h
+        include/bns_nurates.h
+        include/distribution.h
         src/distribution/distribution_opt_thick.c
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
-        src/functions/functions.h
+        include/functions.h
         src/functions/digamma.c
         src/functions/fermi.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
-        src/integration/integration.h
-        src/opacities/kernels/kernels.h
-        src/opacities/weak_magnetism/weak_magnetism.h
+        include/integration.h
+        include/kernels.h
+        include/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
         src/opacities/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
         src/output/outputs.h
-        src/eos/eos.h
+        include/eos.h
         tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
         tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.c
         tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
@@ -593,29 +585,29 @@ target_link_libraries(test_opacities_pair m)
 
 # test opacities bremsstrahlung
 add_executable(test_opacities_brem
-        src/constants.h
-        src/bns_nurates.h
-        src/distribution/distribution.h
+        include/constants.h
+        include/bns_nurates.h
+        include/distribution.h
         src/distribution/distribution_opt_thick.c
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
-        src/functions/functions.h
+        include/functions.h
         src/functions/digamma.c
         src/functions/fermi.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
-        src/integration/integration.h
-        src/opacities/kernels/kernels.h
-        src/opacities/weak_magnetism/weak_magnetism.h
+        include/integration.h
+        include/kernels.h
+        include/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
         src/opacities/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
         src/output/outputs.h
-        src/eos/eos.h
+        include/eos.h
         tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
         tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.c
         tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
@@ -636,29 +628,29 @@ target_link_libraries(test_opacities_brem m)
 
 # test opacities isoscatt
 add_executable(test_opacities_isoscatt
-        src/constants.h
-        src/bns_nurates.h
-        src/distribution/distribution.h
+        include/constants.h
+        include/bns_nurates.h
+        include/distribution.h
         src/distribution/distribution_opt_thick.c
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
-        src/functions/functions.h
+        include/functions.h
         src/functions/digamma.c
         src/functions/fermi.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
-        src/integration/integration.h
-        src/opacities/kernels/kernels.h
-        src/opacities/weak_magnetism/weak_magnetism.h
+        include/integration.h
+        include/kernels.h
+        include/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
         src/opacities/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
         src/output/outputs.h
-        src/eos/eos.h
+        include/eos.h
         tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
         tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.c
         tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c

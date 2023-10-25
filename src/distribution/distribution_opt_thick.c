@@ -8,8 +8,8 @@
 #include <math.h>
 
 #include "distribution.h"
-#include "../bns_nurates.h"
-#include "../functions/functions.h"
+#include "bns_nurates.h"
+#include "functions.h"
 
 #define kFourThirds 1.333333333333333333333333
 #define kFitA  1.3300219438752203

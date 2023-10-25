@@ -15,10 +15,10 @@
 #include <math.h>
 
 #include "opacities.h"
-#include "../constants.h"
-#include "weak_magnetism/weak_magnetism.h"
-#include "../distribution/distribution.h"
-#include "../integration/integration.h"
+#include "constants.h"
+#include "weak_magnetism.h"
+#include "distribution.h"
+#include "integration.h"
 
 // Definition of local constants
 //#define kIsoKer (2. * kPi *  kGf *  kGf) / kHbar / (kHbarClight * kHbarClight * kHbarClight * kHbarClight * kHbarClight * kHbarClight) // 2 pi Gf^2 / hbar [MeV cm^6 s^-1] from Eqn. (C36) of Bruenn

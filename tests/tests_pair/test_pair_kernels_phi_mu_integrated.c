@@ -7,11 +7,11 @@
 
 #include <stdio.h>
 #include <math.h>
-#include "../../src/bns_nurates.h"
-#include "../../src/constants.h"
-#include "../../src/integration/integration.h"
+#include "../../include/bns_nurates.h"
+#include "../../include/constants.h"
+#include "../../include/integration.h"
 #include "../../src/opacities/opacities.h"
-#include "../../src/opacities/kernels/kernels.h"
+#include "../../include/kernels.h"
 
 int main() {
   double max_percentage_error = -42.;

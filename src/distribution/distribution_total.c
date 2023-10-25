@@ -8,8 +8,8 @@
 #include <math.h>
 
 #include "distribution.h"
-#include "../constants.h"
-#include "../integration/integration.h"
+#include "constants.h"
+#include "integration.h"
 
 /* Total neutrino distribution combining optically thick and thin regimes
  *

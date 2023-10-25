@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 #include <math.h>
-#include "../../src/opacities/kernels/kernels.h"
+#include "../../include/kernels.h"
 
 int main() {
   double pair_t[5];

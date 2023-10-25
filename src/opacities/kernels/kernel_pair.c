@@ -11,8 +11,8 @@
 #include <gsl/gsl_sf_legendre.h>
 #include <gsl/gsl_sf_zeta.h>
 #include "kernels.h"
-#include "../../functions/functions.h"
-#include "../../constants.h"
+#include "functions.h"
+#include "constants.h"
 
 /* Compute T_l(alpha) as defined in Appendix B of Pons et. al. (1998)
  * upto a given accuracy

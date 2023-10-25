@@ -8,7 +8,7 @@
 //! \file  integration.h
 //  \brief header file for all integration routines
 
-#include "../bns_nurates.h"
+#include "bns_nurates.h"
 
 // routines for generating quadratures
 void GaussLegendre(MyQuadrature *quad);

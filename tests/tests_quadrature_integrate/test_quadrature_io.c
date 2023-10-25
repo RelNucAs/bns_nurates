@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <unistd.h>
-#include "../../src/bns_nurates.h"
-#include "../../src/integration/integration.h"
+#include "../../include/bns_nurates.h"
+#include "../../include/integration.h"
 
 int main() {
 

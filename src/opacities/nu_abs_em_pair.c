@@ -6,11 +6,11 @@
 //  \brief calculate emissivity and inverse mean free path for the pair process
 
 #include <math.h>
-#include "../bns_nurates.h"
-#include "../constants.h"
-#include "kernels/kernels.h"
-#include "../functions/functions.h"
-#include "../integration/integration.h"
+#include "bns_nurates.h"
+#include "constants.h"
+#include "kernels.h"
+#include "functions.h"
+#include "integration.h"
 
 // Calculate the 4 integrands needed for computing pair opacities (assuming no dependence on mu' and phi')
 // var[3]: [omega' mu' phi'] can in generally have 3 variables but the kernel we are considering has already

@@ -8,8 +8,8 @@
 #include <math.h>
 
 #include "distribution.h"
-#include "../constants.h"
-#include "../functions/functions.h"
+#include "constants.h"
+#include "functions.h"
 
 /* Neutrino distribution function for optically thin regime: Maxwell-Boltzmann distribution
  *

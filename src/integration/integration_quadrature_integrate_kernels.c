@@ -8,7 +8,7 @@
 
 #include <math.h>
 #include "integration.h"
-#include "../bns_nurates.h"
+#include "bns_nurates.h"
 
 /* Compute 4 different integration results at once (emission & absorption for e & points neutrinos)
  * Use this function for integrating over kernel quantities

@@ -10,7 +10,7 @@
 
 #include <stdbool.h>
 
-#include "../bns_nurates.h"
+#include "bns_nurates.h"
 
 
 /*===========================================================================*/

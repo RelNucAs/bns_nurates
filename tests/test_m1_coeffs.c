@@ -8,10 +8,10 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "../src/constants.h"
-#include "../src/bns_nurates.h"
+#include "../include/constants.h"
+#include "../include/bns_nurates.h"
 #include "../src/opacities/opacities.h"
-#include "../src/distribution/distribution.h"
+#include "../include/distribution.h"
 
 int main() {
 

@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../bns_nurates.h"
+#include "bns_nurates.h"
 
 
 // Exception handling from Numerical Recipes

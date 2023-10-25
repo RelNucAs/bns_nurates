@@ -7,9 +7,9 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "../bns_nurates.h"
+#include "bns_nurates.h"
 #include "integration.h"
-#include "../functions/functions.h"
+#include "functions.h"
 
 /* Generate and save quadratures for integration. Saves files to the
  * filedir and loads the quadrature data to a quad struct provided that

@@ -12,9 +12,9 @@
 
 #include <math.h>
 #include "kernels.h"
-#include "../../constants.h"
-#include "../../bns_nurates.h"
-#include "../../functions/functions.h"
+#include "constants.h"
+#include "bns_nurates.h"
+#include "functions.h"
 
 // Constants for the bremsstrahlung reaction
 static const double kBremXmin = 1.e-10;

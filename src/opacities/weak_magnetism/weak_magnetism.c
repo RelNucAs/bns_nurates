@@ -1,6 +1,6 @@
 #include <math.h>
 
-#include "../../constants.h"
+#include "constants.h"
 #include "weak_magnetism.h"
 #include <stdio.h>
 

@@ -10,8 +10,8 @@
 #include <math.h>
 #include <gsl/gsl_math.h>
 #include "gsl_routines/integration_gsl.h"
-#include "../../src/bns_nurates.h"
-#include "../../src/integration/integration.h"
+#include "../../include/bns_nurates.h"
+#include "../../include/integration.h"
 
 // parameters for test functions
 struct FermiDiracParams {

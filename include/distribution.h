@@ -9,7 +9,7 @@
 #ifndef BNS_NURATES_SRC_DISTRIBUTION_DISTRIBUTION_H_
 #define BNS_NURATES_SRC_DISTRIBUTION_DISTRIBUTION_H_
 
-#include "../bns_nurates.h"
+#include "bns_nurates.h"
 
 /* ===========================================================================
  * Functions for the optically thick distribution function

@@ -8,9 +8,9 @@
 #include <math.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "../bns_nurates.h"
+#include "bns_nurates.h"
 #include "integration.h"
-#include "../functions/functions.h"
+#include "functions.h"
 
 /* Generate Gauss-Legendre quadratures in [x1,x2].
  *

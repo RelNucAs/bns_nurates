@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "../../src/opacities/kernels/kernels.h"
+#include "../../include/kernels.h"
 
 int main() {
   double pair_phi_e[3];

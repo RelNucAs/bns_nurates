@@ -6,11 +6,11 @@
 //  \brief computes opacities for the bremsstrahlung reaction
 
 #include <math.h>
-#include "../bns_nurates.h"
-#include "../constants.h"
-#include "kernels/kernels.h"
-#include "../functions/functions.h"
-#include "../integration/integration.h"
+#include "bns_nurates.h"
+#include "constants.h"
+#include "kernels.h"
+#include "functions.h"
+#include "integration.h"
 
 MyKernelQuantity BremEmissivityAbsorptivityIntegrandFermi(double *omega_prime, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params) {
 

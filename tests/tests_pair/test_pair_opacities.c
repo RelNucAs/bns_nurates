@@ -6,8 +6,8 @@
 //  \brief Generate emissivity and absorptivity tables considering thermal equilibrium and compare with Albino's result
 
 #include <stdio.h>
-#include "../../src/bns_nurates.h"
-#include "../../src/integration/integration.h"
+#include "../../include/bns_nurates.h"
+#include "../../include/integration.h"
 #include "../../src/opacities/opacities.h"
 
 int main() {

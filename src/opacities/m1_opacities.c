@@ -5,12 +5,12 @@
 //! \file m1_opacities.h
 //  \brief compute opacities for all processes in the M1 code
 
-#include "../bns_nurates.h"
-#include "../constants.h"
-#include "kernels/kernels.h"
-#include "../functions/functions.h"
-#include "../integration/integration.h"
-#include "../distribution/distribution.h"
+#include "bns_nurates.h"
+#include "constants.h"
+#include "kernels.h"
+#include "functions.h"
+#include "integration.h"
+#include "distribution.h"
 #include "opacities.h"
 
 /* Compute the 2d integrands for all reactions from Leonardo's notes [Eqns. (51) & (52)]
