@@ -48,6 +48,7 @@ target_link_libraries(bns_nurates GSL::gsl GSL::gslcblas)
 target_link_libraries(bns_nurates m)
 
 # add target for THC
+# source files
 file(GLOB SOURCES
         src/distribution/distribution_opt_thick.c
         src/distribution/distribution_opt_thin.c
@@ -75,43 +76,31 @@ file(GLOB SOURCES
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c)
 
-# include headers
-set(HEADERS_TO_INCLUDE src/constants.h
-        src/bns_nurates.h
-        src/distribution/distribution.h
-        src/functions/functions.h
-        src/integration/integration.h
-        src/opacities/kernels/kernels.h
-        src/opacities/weak_magnetism/weak_magnetism.h
-        src/opacities/opacities.h
-        src/output/outputs.h
-        src/eos/eos.h)
+# create shared library
+add_library(nurates SHARED ${SOURCES})
 
-include_directories(src
-        src/distribution
-        src/eos src/functions
-        src/integration
-        src/opacities/kernels
-        src/opacities/weak_magnetism
-        src/output src/quadratures)
+# include header file directories
+include_directories(src)
+include_directories(src/distribution)
+include_directories(src/eos src/functions)
+include_directories(src/integration)
+include_directories(src/opacities/kernels)
+include_directories(src/opacities/weak_magnetism)
+include_directories(src/output src/quadratures)
 
-add_library(nurates ${SOURCES})
 #target_sources(nurates PUBLIC ${HEADERS_TO_INCLUDE})
 
 configure_file(
-    ${CMAKE_SOURCE_DIR}/src/libnurates.h.in
-    ${CMAKE_BINARY_DIR}/libnurates.h
+        ${CMAKE_SOURCE_DIR}/src/libnurates.h.in
+        ${CMAKE_BINARY_DIR}/src/libnurates.h
 )
 
 target_link_libraries(nurates GSL::gsl GSL::gslcblas)
 target_link_libraries(nurates m)
 
 install(TARGETS nurates DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-install(FILES ${CMAKE_BINARY_DIR}/libnurates.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+install(FILES ${CMAKE_BINARY_DIR}/src/libnurates.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 
-#file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/install)
-#install(TARGETS nurates DESTINATION ${CMAKE_BINARY_DIR}/install)
-#install(FILES ${HEADERS_TO_INCLUDE} DESTINATION ${CMAKE_BINARY_DIR}/install)
 
 # test pair kernel T
 add_executable(test_pair_t

@@ -1,14 +1,11 @@
-#ifndef BNS_NURATES_SRC_LIBNURATES_H_
-#define BNS_NURATES_SRC_LIBNURATES_H_
+// composite header for libnurates
 
-#include "bns_nurates.h"
-#include "constants.h"
-#include "distribution/distribution.h"
-#include "eos/eos.h"
-#include "functions/functions.h"
-#include "integration/integration.h"
-#include "opacities/kernels/kernels.h"
-#include "opacities/weak_magnetism/weak_magnetism.h"
-#include "output/outputs.h"
-
-#endif //BNS_NURATES_SRC_LIBNURATES_H_
+#include "src/bns_nurates.h"
+#include "src/constants.h"
+#include "src/distribution/distribution.h"
+#include "src/eos/eos.h"
+#include "src/functions/functions.h"
+#include "src/integration/integration.h"
+#include "src/opacities/kernels/kernels.h"
+#include "src/opacities/weak_magnetism/weak_magnetism.h"
+#include "src/output/outputs.h"
