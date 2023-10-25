@@ -118,18 +118,14 @@ int main() {
   file = fopen(data_filepath, "w+");
 
   printf("\n");
-  printf("Ciao -3!");
 
   printf("Generated tables:\n");
   printf("r j-nue kappa-a-nue kappa-s-nue j_anue kappa-a-anue kappa-s-anue\n");
-  printf("Ciao -2!");
 
   fprintf(file, "# r j-nue kappa-a-nue kappa-s-nue j_anue kappa-a-anue kappa-s-anue\n");
 
-  printf("Ciao -1!");
   double diff_distr = -42.;
   for (int i = 0; i < 102; i++) {
-    printf("Ciao 0!");
 
     // populate EOS parameters from table
     my_grey_opacity_params.eos_pars.mu_e = mu_e[i];
@@ -140,13 +136,11 @@ int main() {
     my_grey_opacity_params.eos_pars.yn = Yn[i];
     my_grey_opacity_params.eos_pars.nb = rho[i] / kMu;
 
-    printf("Ciao 1!");
 
     my_grey_opacity_params.opacity_pars.use_WM_ab = false;
     my_grey_opacity_params.opacity_pars.use_WM_sc = false;
     my_grey_opacity_params.opacity_pars.use_dU = false;
 
-    printf("Ciao 2!");
 
     // only enable Fermi distribution function for the three neutrino species
     my_grey_opacity_params.distr_pars.temp_t[0] = T[i];
@@ -159,13 +153,11 @@ int main() {
     my_grey_opacity_params.distr_pars.eta_t[1] = -(my_grey_opacity_params.eos_pars.mu_e - my_grey_opacity_params.eos_pars.mu_n + my_grey_opacity_params.eos_pars.mu_p) / T[i];
     my_grey_opacity_params.distr_pars.eta_t[2] = 0.;
 
-    printf("Ciao 3!");
 
     my_grey_opacity_params.m1_pars.chi[0] = 1;
     my_grey_opacity_params.m1_pars.chi[1] = 1;
     my_grey_opacity_params.m1_pars.chi[2] = 1;
 
-    printf("Ciao 4!");
 
     // disable thin distribution function for the time being
     my_grey_opacity_params.distr_pars.w_f[0] = 0.;
@@ -178,7 +170,6 @@ int main() {
     my_grey_opacity_params.distr_pars.temp_f[1] = T[i];
     my_grey_opacity_params.distr_pars.temp_f[2] = T[i];
 
-    printf("Ciao 5!");
 
     // M1 parameters
     MyQuadratureIntegrand Jvals = NuEnergy(&my_grey_opacity_params.distr_pars);
@@ -190,23 +181,19 @@ int main() {
     my_grey_opacity_params.m1_pars.n[1] = nvals.integrand[1];
     my_grey_opacity_params.m1_pars.n[2] = nvals.integrand[2];
 
-    printf("Ciao 6!");
 
     double distr_fermi =
         FermiDistr(123.4, my_grey_opacity_params.eos_pars.temp, my_grey_opacity_params.eos_pars.mu_e - my_grey_opacity_params.eos_pars.mu_n + my_grey_opacity_params.eos_pars.mu_p);
     double distr_nuftot = TotalNuF(123.4, &my_grey_opacity_params.distr_pars, 0);
 
-    printf("Ciao 7!");
 
     if (fabs(distr_fermi - distr_nuftot) > diff_distr) {
       diff_distr = fabs(distr_fermi - distr_nuftot);
     }
 
-    printf("Ciao 8!");
 
     M1Opacities isoscatt_opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
 
-    printf("Ciao 9!");
 
     printf("%e %e %e %e %e %e %e %e %e %e\n",
            r[i], isoscatt_opacities.eta_nue, isoscatt_opacities.kappa_a_nue, isoscatt_opacities.kappa_s_nue, isoscatt_opacities.eta_anue,
@@ -219,7 +206,6 @@ int main() {
   }
   fclose(file);
 
-  printf("Ciao 10!");
 
   if (diff_distr > 1e-12) {
     printf("\n");
