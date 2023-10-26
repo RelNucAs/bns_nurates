@@ -132,8 +132,8 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
 
   if (opacity_flags.use_iso == 1) {
     integrand_3_nue = (4. * kPi / (kClight * J_nue)) * 4. * kPi * nu * nu * nu * nu * nu * g_nue * iso_scatt;
-    integrand_3_anue = (4. * kPi / (kClight * J_nue)) * 4. * kPi * nu * nu * nu * nu * nu * g_anue * iso_scatt;
-    integrand_3_nux = (4. * kPi / (kClight * J_nue)) * 4. * kPi * nu * nu * nu * nu * nu * g_nux * iso_scatt;
+    integrand_3_anue = (4. * kPi / (kClight * J_anue)) * 4. * kPi * nu * nu * nu * nu * nu * g_anue * iso_scatt;
+    integrand_3_nux = (4. * kPi / (kClight * J_nux)) * 4. * kPi * nu * nu * nu * nu * nu * g_nux * iso_scatt;
   }
 
   MyQuadratureIntegrand result = {.n = 7};
