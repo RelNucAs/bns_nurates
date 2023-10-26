@@ -2,8 +2,8 @@
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
-//! \file  test_beta.c
-//  \brief test routines for beta processes
+//! \file  test_iso.c
+//  \brief test routines for isoenergetic scattering kernel
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,18 +13,22 @@
 #include "../../include/weak_magnetism.h"
 #include "../../src/opacities/opacities.h"
 
-void generate_comparison_data(const bool use_dU) {
+int main () {
+  printf("Kernel is compared with the result of a tested Fortran code\n");
+  printf("\n");
+
+  bool use_dU = false;
+  
+  printf("========================================================== \n");
+  printf("Testing kernel for isoenergetic scattering on nucleons ... \n");
+  printf("========================================================== \n");
+  printf("\n");
 
   // Define path of input file
   char filepath[300] = {'\0'};
   char filedir[300] = SOURCE_DIR;
-  char outname[200] = {'\0'};
-  
-  if (use_dU == false) {
-    strcpy(outname, "/inputs/nurates_CCSN/nurates_1.008E+01.txt");
-  } else {
-    strcpy(outname, "/inputs/nurates_CCSN/nurates_1.008E+01_dU.txt");
-  }
+  char outname[300];
+  strcpy(outname, "/inputs/nurates_CCSN/nurates_1.008E+01.txt");
 
   strcat(filepath, filedir);
   strcat(filepath, outname);
@@ -39,7 +43,7 @@ void generate_comparison_data(const bool use_dU) {
   double omega; // [MeV]
 
   // Weak magnetism correction (code output)
-  double w, wbar; 
+  double w0_n_out, w1_n_out, w0_p_out, w1_p_out; 
 
   // Data arrays (rates are not corrected for the weak magnetism, WM corrections are provided separately)
   int zone[n_data];        // zone (counter)
@@ -64,7 +68,7 @@ void generate_comparison_data(const bool use_dU) {
   double w1_n[n_data], w1_p[n_data];  // weak magnetism correction to first Legendre term of scattering kernel (on neutrons and protons, respectively)
 
   // Opacity parameters (correction to rates)
-  OpacityParams opacity_pars = {.use_dU = use_dU, .use_WM_ab = false}; // WM correction turned off
+  OpacityParams opacity_pars = {.use_WM_sc = false}; // WM correction turned off
   
   // EOS parameters
   MyEOSParams eos_pars;
@@ -89,12 +93,8 @@ void generate_comparison_data(const bool use_dU) {
 
   // Define path of output file
   filepath[0] = '\0';
-  if (use_dU == false) {
-    sprintf(outname, "/tests/tests_beta/test_beta_%.3e.txt", omega);
-  } else {
-    sprintf(outname, "/tests/tests_beta/test_beta_%.3e_dU.txt", omega);
-  }
-
+  sprintf(outname, "/tests/tests_iso/test_iso_%.3e.txt", omega);
+ 
   strcat(filepath, filedir);
   strcat(filepath, outname);
 
@@ -125,9 +125,8 @@ void generate_comparison_data(const bool use_dU) {
   fprintf(fptr_out, "#  9: Ya\n");
   fprintf(fptr_out, "# 10: Yp\n");
   fprintf(fptr_out, "# 11: Yn\n");
-  fprintf(fptr_out, "# 12: dU [MeV]\n");
-  fprintf(fptr_out, "# 13-16: Fortran rates w/o WM (em_nue [s-1], ab_nue [cm-1], em_anue [s-1], ab_anue [cm-1])\n");
-  fprintf(fptr_out, "# 17-20: C rates w/o WM (em_nue [s-1], ab_nue [cm-1], em_anue [s-1], ab_anue [cm-1])\n");
+  fprintf(fptr_out, "# 12: Fortran R_iso w/o WM [cm-1]\n");
+  fprintf(fptr_out, "# 13: C R_iso w/o WM [cm-1]\n");
   fprintf(fptr_out, "\n");
   
   // Read in data from profile, compute rates and store results in output file
@@ -140,19 +139,24 @@ void generate_comparison_data(const bool use_dU) {
            &zone[i], &r[i], &rho[i], &temp[i], &ye[i], &mu_e[i], &mu_hat[i],
            &yh[i], &ya[i], &yp[i], &yn[i], &du[i],
            &em_nue[i], &ab_nue[i], &em_anue[i], &ab_anue[i], &w_nue[i], &w_anue[i],
-           &r_is[i], &w0_n[i], &w0_p[i], &w1_n[i], &w1_p[i]
+           &r_is[i], &w0_n[i], &w1_n[i], &w0_p[i], &w1_p[i]
            );
 
     if (i == 0) {
-      WMAbsEm(omega, &w, &wbar);
+      WMScatt(omega, &w0_p_out, &w1_p_out, 1);
+      WMScatt(omega, &w0_n_out, &w1_n_out, 2);
 
       // Print weak magnetism correction in output file
       fprintf(fptr_out, "# Weak magnetism correction (Fortran):\n");
-      fprintf(fptr_out, "# W_nue  = %lf\n", w_nue[i]);
-      fprintf(fptr_out, "# W_anue = %lf\n", w_anue[i]);
+      fprintf(fptr_out, "# W0_n = %lf\n", w0_n[i]);
+      fprintf(fptr_out, "# W1_n = %lf\n", w1_n[i]);
+      fprintf(fptr_out, "# W0_p = %lf\n", w0_p[i]);
+      fprintf(fptr_out, "# W1_p = %lf\n", w1_p[i]);
       fprintf(fptr_out, "# Weak magnetism correction (C):\n");
-      fprintf(fptr_out, "# W_nue  = %lf \n", w);
-      fprintf(fptr_out, "# W_anue = %lf\n", wbar); 
+      fprintf(fptr_out, "# W0_n = %lf\n", w0_n_out);
+      fprintf(fptr_out, "# W1_n = %lf\n", w1_n_out);
+      fprintf(fptr_out, "# W0_p = %lf\n", w0_p_out);
+      fprintf(fptr_out, "# W1_p = %lf\n", w1_p_out);
       fprintf(fptr_out, "\n");
     }
 
@@ -161,19 +165,14 @@ void generate_comparison_data(const bool use_dU) {
     eos_pars.temp = temp[i];        
     eos_pars.yp   = yp[i];          
     eos_pars.yn   = yn[i];          
-    eos_pars.mu_p = 0.;            
-    eos_pars.mu_n = mu_hat[i] + kQ; // N.B.: corrected for the nucleon mass difference
-    eos_pars.mu_e = mu_e[i];        
-    eos_pars.dU   = du[i];
 
-    // Compute emissivity and inverse mean free path for electron-type (anti)neutrinos
-    MyOpacity out    = AbsOpacity(omega, &opacity_pars, &eos_pars); 
+    // Compute isoenergetic scatterig kernel
+    double out = IsoScattTotal(omega, &opacity_pars, &eos_pars); 
 
-    fprintf(fptr_out, "%d %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e\n",
+    fprintf(fptr_out, "%d %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e\n",
              zone[i], r[i], rho[i], temp[i], ye[i], mu_e[i], mu_hat[i],
-             yh[i], ya[i], yp[i], yn[i], du[i],
-             em_nue[i], ab_nue[i], em_anue[i], ab_anue[i],
-             out.em_nue, out.ab_nue / kClight, out.em_anue, out.ab_anue / kClight);
+             yh[i], ya[i], yp[i], yn[i],
+             r_is[i], out);
    
     i++;
   }
@@ -187,35 +186,6 @@ void generate_comparison_data(const bool use_dU) {
     printf("Warning: n_data (%d) different for number of lines in the input file (%d)",
            n_data, zone[i-1]);
   }
-
-  return;
-}
-
-
-
-
-
-int main() {
-      printf("Spectral rates are compared with the results of a tested Fortran code\n");
-  printf("\n");
-
-  bool use_dU = false;
-  
-  printf("============================================================== \n");
-  printf("Testing opacities for beta processes without dU correction ... \n");
-  printf("============================================================== \n");
-  printf("\n");
-
-  generate_comparison_data(use_dU); // dU correction is off
-
-  use_dU = true;
-  
-  printf("=========================================================== \n");
-  printf("Testing opacities for beta processes with dU correction ... \n");
-  printf("=========================================================== \n");
-  printf("\n");
-
-  generate_comparison_data(use_dU); // dU correction is on
 
   return 0;
 }

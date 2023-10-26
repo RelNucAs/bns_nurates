@@ -232,6 +232,39 @@ add_executable(test_beta
 target_link_libraries(test_beta GSL::gsl GSL::gslcblas)
 target_link_libraries(test_beta m)
 
+# test isoenergetic scattering kernel
+add_executable(test_iso
+        tests/tests_iso/test_iso.c
+        include/constants.h
+        #src/bns_nurates.h
+        #src/distribution/distribution.h
+        src/distribution/distribution_total.c
+        src/distribution/distribution_opt_thick.c
+        src/distribution/distribution_opt_thin.c
+        include/functions.h
+        src/functions/digamma.c
+        src/functions/fermi.c
+        src/functions/gamma.c
+        src/functions/lambert.c
+        #src/functions/mnewt.c
+        src/functions/safe_exp.c
+        #src/integration/integration.h
+        #src/opacities/kernels/kernels.h
+        include/weak_magnetism.h
+        src/opacities/weak_magnetism/weak_magnetism.c
+        src/opacities/weak_magnetism/nucfrmfac.c
+        src/opacities/opacities.h
+        src/integration/integration_quadrature_schemes.c
+        src/integration/integration_quadrature_io.c
+        src/integration/integration_quadrature_integrate.c
+        src/opacities/kernels/kernel_pair.c
+        src/opacities/nu_scatt_iso.c
+        src/integration/integration_quadrature_integrate_kernels.c
+)
+
+target_link_libraries(test_iso GSL::gsl GSL::gslcblas)
+target_link_libraries(test_iso m)
+
 # test gray coefficients
 add_executable(test_m1_coeffs
         tests/test_m1_coeffs.c
