@@ -92,7 +92,7 @@ target_link_libraries(nurates GSL::gsl GSL::gslcblas)
 target_link_libraries(nurates m)
 
 include(GNUInstallDirs)
-install(TARGETS nurates LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(TARGETS nurates LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nurates)
 
 # test pair kernel T
 add_executable(test_pair_t
