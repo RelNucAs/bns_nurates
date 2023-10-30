@@ -114,9 +114,13 @@ int main() {
   file = fopen(data_filepath, "w+");
 
   printf("\n");
+
   printf("Generated tables:\n");
-  printf("r: [cm], diff_distr [should be zero, checks Fermi Dirac with NuFTotal], j-nue, ");
-  printf("r diff_distr j-nue kappa-a-nue kappa-s-nue j_anue kappa-a-anue kappa-s-anue\n");
+  printf("r diff_distr j0-nue j0-anue j0-nux j-nue j-anue j-nux kappa0-a-nue kappa0-a-anue kappa0-a-nux kappa-a-nue kappa-a-anue kappa-a-nux kappa-s-nue kappa-s-anue kappa-s-nux\n");
+
+  fprintf(file, "# r diff_distr j0-nue j0-anue j0-nux j-nue j-anue j-nux kappa0-a-nue kappa0-a-anue kappa0-a-nux kappa-a-nue kappa-a-anue kappa-a-nux kappa-s-nue kappa-s-anue kappa-s-nux\n");
+  // printf("r: [cm], diff_distr [should be zero, checks Fermi Dirac with NuFTotal], j-nue, ");
+
   for (int i = 0; i < 102; i++) {
 
     // populate EOS parameters from table
@@ -175,15 +179,22 @@ int main() {
 
     M1Opacities brem_opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
 
-    printf("%e %e %e %e %e %e %e %e %e %e %e\n",
-           r[i], diff_distr, brem_opacities.eta_nue, brem_opacities.kappa_a_nue, brem_opacities.kappa_s_nue, brem_opacities.eta_anue,
-           brem_opacities.kappa_a_anue, brem_opacities.kappa_s_anue, brem_opacities.eta_nux,
-           brem_opacities.kappa_a_nux, brem_opacities.kappa_s_nux);
-    fprintf(file, "%e %e %e %e %e %e %e %e %e %e %e\n",
-            r[i], diff_distr, brem_opacities.eta_nue, brem_opacities.kappa_a_nue, brem_opacities.kappa_s_nue, brem_opacities.eta_anue,
-            brem_opacities.kappa_a_anue, brem_opacities.kappa_s_anue, brem_opacities.eta_nux,
-            brem_opacities.kappa_a_nux, brem_opacities.kappa_s_nux);
-  }
+    printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
+            r[i], diff_distr,
+            brem_opacities.eta_0_nue, brem_opacities.eta_0_anue, brem_opacities.eta_0_nux,
+            brem_opacities.eta_nue, brem_opacities.eta_anue, brem_opacities.eta_nux,
+            brem_opacities.kappa_0_a_nue, brem_opacities.kappa_0_a_anue, brem_opacities.kappa_0_a_nux,
+            brem_opacities.kappa_a_nue, brem_opacities.kappa_a_anue, brem_opacities.kappa_a_nux,
+            brem_opacities.kappa_s_nue, brem_opacities.kappa_s_anue, brem_opacities.kappa_s_nux);
+    fprintf(file, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
+            r[i], diff_distr,
+            brem_opacities.eta_0_nue, brem_opacities.eta_0_anue, brem_opacities.eta_0_nux,
+            brem_opacities.eta_nue, brem_opacities.eta_anue, brem_opacities.eta_nux,
+            brem_opacities.kappa_0_a_nue, brem_opacities.kappa_0_a_anue, brem_opacities.kappa_0_a_nux,
+            brem_opacities.kappa_a_nue, brem_opacities.kappa_a_anue, brem_opacities.kappa_a_nux,
+            brem_opacities.kappa_s_nue, brem_opacities.kappa_s_anue, brem_opacities.kappa_s_nux);
+    }
+    
   fclose(file);
   return 0;
 }

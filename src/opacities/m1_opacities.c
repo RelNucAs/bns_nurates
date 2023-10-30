@@ -74,26 +74,44 @@ MyQuadratureIntegrand M1DoubleIntegrand(double *var, void *p) {
   const double ann_term_anue = (pair_kernels_m1.abs_e + brem_kernels_m1.abs_e) * g_nue_bar;
   const double ann_term_nux = (pair_kernels_m1.abs_x + brem_kernels_m1.abs_x) * g_nux_bar;
 
-  double integrand_1_nue = four_pi_hc3_sqr * nu * nu * nu * nubar * nubar * pro_term_nue;
-  double integrand_1_anue = four_pi_hc3_sqr * nu * nu * nu * nubar * nubar * pro_term_anue;
-  double integrand_1_nux = four_pi_hc3_sqr * nu * nu * nu * nubar * nubar * pro_term_nux;
+  double n_integrand_1_nue = four_pi_hc3_sqr * nu * nu * nubar * nubar * pro_term_nue;
+  double n_integrand_1_anue = four_pi_hc3_sqr * nu * nu * nubar * nubar * pro_term_anue;
+  double n_integrand_1_nux = four_pi_hc3_sqr * nu * nu * nubar * nubar * pro_term_nux;
+
+  double e_integrand_1_nue = nu * n_integrand_1_nue;
+  double e_integrand_1_anue = nu * n_integrand_1_anue;
+  double e_integrand_1_nux = nu * n_integrand_1_nux;
+  
+  double n_nue = my_grey_opacity_params->m1_pars.n[0];
+  double n_anue = my_grey_opacity_params->m1_pars.n[1];  
+  double n_nux = my_grey_opacity_params->m1_pars.n[2];
 
   double J_nue = my_grey_opacity_params->m1_pars.J[0];
   double J_anue = my_grey_opacity_params->m1_pars.J[1];  
   double J_nux = my_grey_opacity_params->m1_pars.J[2];
 
-  double integrand_2_nue = (1. / (kClight * J_nue)) * four_pi_hc3_sqr * g_nue * nu * nu * nu * nubar * nubar * (pro_term_nue + ann_term_nue);
-  double integrand_2_anue = (1. / (kClight * J_anue)) * four_pi_hc3_sqr * g_anue * nu * nu * nu * nubar * nubar * (pro_term_anue + ann_term_anue);
-  double integrand_2_nux = (1. / (kClight * J_nux)) * four_pi_hc3_sqr * g_nux * nu * nu * nu * nubar * nubar * (pro_term_nux + ann_term_nux);
+  double n_integrand_2_nue = four_pi_hc3_sqr * g_nue * nu * nu * nubar * nubar * (pro_term_nue + ann_term_nue);
+  double n_integrand_2_anue = four_pi_hc3_sqr * g_anue * nu * nu * nubar * nubar * (pro_term_anue + ann_term_anue);
+  double n_integrand_2_nux = four_pi_hc3_sqr * g_nux * nu * nu * nubar * nubar * (pro_term_nux + ann_term_nux);
 
-  MyQuadratureIntegrand result = {.n = 6};
+  double e_integrand_2_nue = nu * n_integrand_2_nue;
+  double e_integrand_2_anue = nu * n_integrand_2_anue;
+  double e_integrand_2_nux = nu * n_integrand_2_nux;
 
-  result.integrand[0] = integrand_1_nue;
-  result.integrand[1] = integrand_1_anue;
-  result.integrand[2] = integrand_1_nux;
-  result.integrand[3] = integrand_2_nue;
-  result.integrand[4] = integrand_2_anue;
-  result.integrand[5] = integrand_2_nux;
+  MyQuadratureIntegrand result = {.n = 12};
+
+  result.integrand[0] = n_integrand_1_nue;
+  result.integrand[1] = n_integrand_1_anue;
+  result.integrand[2] = n_integrand_1_nux;
+  result.integrand[3] = (1. / (kClight * n_nue)) * n_integrand_2_nue;
+  result.integrand[4] = (1. / (kClight * n_anue)) * n_integrand_2_anue;
+  result.integrand[5] = (1. / (kClight * n_nux)) * n_integrand_2_nux;
+  result.integrand[6] = e_integrand_1_nue;
+  result.integrand[7] = e_integrand_1_anue;
+  result.integrand[8] = e_integrand_1_nux;
+  result.integrand[9] = (1. / (kClight * J_nue)) * e_integrand_2_nue;
+  result.integrand[10] = (1. / (kClight * J_anue)) * e_integrand_2_anue;
+  result.integrand[11] = (1. / (kClight * J_nux)) * e_integrand_2_nux;
 
   return result;
 }
@@ -127,42 +145,60 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
 
   const double iso_scatt = IsoScattTotal(nu, &my_grey_opacity_params->opacity_pars, &my_grey_opacity_params->eos_pars);
 
+  const double n_nue = my_grey_opacity_params->m1_pars.n[0];
+  const double n_anue = my_grey_opacity_params->m1_pars.n[1];
+  const double n_nux = my_grey_opacity_params->m1_pars.n[2];
+
   double J_nue = my_grey_opacity_params->m1_pars.J[0];
   double J_anue = my_grey_opacity_params->m1_pars.J[1];
   double J_nux = my_grey_opacity_params->m1_pars.J[2];
 
   MyOpacity abs_em_beta = StimAbsOpacity(nu, &my_grey_opacity_params->opacity_pars, &my_grey_opacity_params->eos_pars); // [s^-1]
 
-  double integrand_1_nue = 0.;
-  double integrand_1_anue = 0.;
-  double integrand_2_nue = 0.;
-  double integrand_2_anue = 0.;
-  double integrand_3_nue = 0.;
-  double integrand_3_anue = 0.;
-  double integrand_3_nux = 0.;
+  double n_integrand_1_nue = 0.;
+  double n_integrand_1_anue = 0.;
+  double n_integrand_2_nue = 0.;
+  double n_integrand_2_anue = 0.;
+
+  double e_integrand_1_nue = 0.;
+  double e_integrand_1_anue = 0.;
+  double e_integrand_2_nue = 0.;
+  double e_integrand_2_anue = 0.;
+  double e_integrand_3_nue = 0.;
+  double e_integrand_3_anue = 0.;
+  double e_integrand_3_nux = 0.;
 
   if (opacity_flags.use_abs_em == 1) {
-    integrand_1_nue = four_pi_hc3 * nu * nu * nu * abs_em_beta.em_nue; // [cm^-3 s^-1]
-    integrand_1_anue = four_pi_hc3 * nu * nu * nu * abs_em_beta.em_anue; // [cm^-3 s^-1]
-    integrand_2_nue = (1. / (kClight * J_nue)) * four_pi_hc3 * nu * nu * nu * g_nue * abs_em_beta.ab_nue;
-    integrand_2_anue = (1. / (kClight * J_anue)) * four_pi_hc3 * nu * nu * nu * g_anue * abs_em_beta.ab_anue;
+    n_integrand_1_nue = four_pi_hc3 * nu * nu * abs_em_beta.em_nue; // [MeV^-1 cm^-3 s^-1]
+    n_integrand_1_anue = four_pi_hc3 * nu * nu * abs_em_beta.em_anue; // [MeV^-1 cm^-3 s^-1]
+    n_integrand_2_nue = four_pi_hc3 * nu * nu * g_nue * abs_em_beta.ab_nue; // ab = em + ab (stimulated absorption)
+    n_integrand_2_anue = four_pi_hc3 * nu * nu * g_anue * abs_em_beta.ab_anue;
+
+    e_integrand_1_nue = nu * n_integrand_1_nue; // [cm^-3 s^-1]
+    e_integrand_1_anue = nu * n_integrand_1_anue; // [cm^-3 s^-1]
+    e_integrand_2_nue = nu * n_integrand_2_nue;
+    e_integrand_2_anue = nu * n_integrand_2_anue;
   }
 
   if (opacity_flags.use_iso == 1) {
-    integrand_3_nue = (4. * kPi / (kClight * J_nue)) * 4. * kPi * nu * nu * nu * nu * nu * g_nue * iso_scatt;
-    integrand_3_anue = (4. * kPi / (kClight * J_anue)) * 4. * kPi * nu * nu * nu * nu * nu * g_anue * iso_scatt;
-    integrand_3_nux = (4. * kPi / (kClight * J_nux)) * 4. * kPi * nu * nu * nu * nu * nu * g_nux * iso_scatt;
+    e_integrand_3_nue = (4. * kPi / (kClight * J_nue)) * 4. * kPi * nu * nu * nu * nu * nu * g_nue * iso_scatt;
+    e_integrand_3_anue = (4. * kPi / (kClight * J_anue)) * 4. * kPi * nu * nu * nu * nu * nu * g_anue * iso_scatt;
+    e_integrand_3_nux = (4. * kPi / (kClight * J_nux)) * 4. * kPi * nu * nu * nu * nu * nu * g_nux * iso_scatt;
   }
 
-  MyQuadratureIntegrand result = {.n = 7};
+  MyQuadratureIntegrand result = {.n = 11};
 
-  result.integrand[0] = integrand_1_nue;
-  result.integrand[1] = integrand_1_anue;
-  result.integrand[2] = integrand_2_nue;
-  result.integrand[3] = integrand_2_anue;
-  result.integrand[4] = integrand_3_nue;
-  result.integrand[5] = integrand_3_anue;
-  result.integrand[6] = integrand_3_nux;
+  result.integrand[0] = n_integrand_1_nue;
+  result.integrand[1] = n_integrand_1_anue;
+  result.integrand[2] = (1. / (kClight * n_nue)) * n_integrand_2_nue;
+  result.integrand[3] = (1. / (kClight * n_anue)) * n_integrand_2_anue;
+  result.integrand[4] = e_integrand_1_nue;
+  result.integrand[5] = e_integrand_1_anue;
+  result.integrand[6] = (1. / (kClight * J_nue)) * e_integrand_2_nue;
+  result.integrand[7] = (1. / (kClight * J_anue)) * e_integrand_2_anue;
+  result.integrand[8] = e_integrand_3_nue;
+  result.integrand[9] = e_integrand_3_anue;
+  result.integrand[10] = e_integrand_3_nux;
 
   return result;
 }
@@ -182,7 +218,7 @@ M1Opacities ComputeM1Opacities(MyQuadrature *quad_1d, MyQuadrature *quad_2d, Gre
 
   // set up 2d integration
   MyFunctionMultiD integrand_m1_2d;
-  MyQuadratureIntegrand integrand_m1_2d_info = {.n = 4};
+  MyQuadratureIntegrand integrand_m1_2d_info = {.n = 6};
   integrand_m1_2d.function = &M1DoubleIntegrand;
   integrand_m1_2d.dim = 2;
   integrand_m1_2d.params = my_grey_opacity_params;
@@ -196,15 +232,22 @@ M1Opacities ComputeM1Opacities(MyQuadrature *quad_1d, MyQuadrature *quad_2d, Gre
 
   M1Opacities m1_opacities;
 
-  m1_opacities.eta_nue = integrals_2d.integrand[0] + integrals_1d.integrand[0];
-  m1_opacities.eta_anue = integrals_2d.integrand[1] + integrals_1d.integrand[1];
-  m1_opacities.eta_nux = integrals_2d.integrand[2];
-  m1_opacities.kappa_a_nue = integrals_2d.integrand[3] + integrals_1d.integrand[2];
-  m1_opacities.kappa_a_anue = integrals_2d.integrand[4] + integrals_1d.integrand[3];
-  m1_opacities.kappa_a_nux = integrals_2d.integrand[5];
-  m1_opacities.kappa_s_nue = integrals_1d.integrand[4];
-  m1_opacities.kappa_s_anue = integrals_1d.integrand[5];
-  m1_opacities.kappa_s_nux = integrals_1d.integrand[6];
+  m1_opacities.eta_0_nue = integrals_2d.integrand[0] + integrals_1d.integrand[0];
+  m1_opacities.eta_0_anue = integrals_2d.integrand[1] + integrals_1d.integrand[1];
+  m1_opacities.eta_0_nux = integrals_2d.integrand[2];
+  m1_opacities.kappa_0_a_nue = integrals_2d.integrand[3] + integrals_1d.integrand[2];
+  m1_opacities.kappa_0_a_anue = integrals_2d.integrand[4] + integrals_1d.integrand[3];
+  m1_opacities.kappa_0_a_nux = integrals_2d.integrand[5];
+
+  m1_opacities.eta_nue = integrals_2d.integrand[6] + integrals_1d.integrand[4];
+  m1_opacities.eta_anue = integrals_2d.integrand[7] + integrals_1d.integrand[5];
+  m1_opacities.eta_nux = integrals_2d.integrand[8];
+  m1_opacities.kappa_a_nue = integrals_2d.integrand[9] + integrals_1d.integrand[6];
+  m1_opacities.kappa_a_anue = integrals_2d.integrand[10] + integrals_1d.integrand[7];
+  m1_opacities.kappa_a_nux = integrals_2d.integrand[11];
+  m1_opacities.kappa_s_nue = integrals_1d.integrand[8];
+  m1_opacities.kappa_s_anue = integrals_1d.integrand[9];
+  m1_opacities.kappa_s_nux = integrals_1d.integrand[10];
 
   return m1_opacities;
 }

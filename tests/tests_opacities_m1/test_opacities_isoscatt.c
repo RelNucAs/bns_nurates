@@ -120,9 +120,9 @@ int main() {
   printf("\n");
 
   printf("Generated tables:\n");
-  printf("r j-nue kappa-a-nue kappa-s-nue j_anue kappa-a-anue kappa-s-anue\n");
+  printf("r j0-nue j0-anue j0-nux j-nue j-anue j-nux kappa0-a-nue kappa0-a-anue kappa0-a-nux kappa-a-nue kappa-a-anue kappa-a-nux kappa-s-nue kappa-s-anue kappa-s-nux\n");
 
-  fprintf(file, "# r j-nue kappa-a-nue kappa-s-nue j_anue kappa-a-anue kappa-s-anue\n");
+  fprintf(file, "# r j0-nue j0-anue j0-nux j-nue j-anue j-nux kappa0-a-nue kappa0-a-anue kappa0-a-nux kappa-a-nue kappa-a-anue kappa-a-nux kappa-s-nue kappa-s-anue kappa-s-nux\n");
 
   double diff_distr = -42.;
   for (int i = 0; i < 102; i++) {
@@ -194,16 +194,22 @@ int main() {
 
     M1Opacities isoscatt_opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
 
+    printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
+            r[i],
+            isoscatt_opacities.eta_0_nue, isoscatt_opacities.eta_0_anue, isoscatt_opacities.eta_0_nux,
+            isoscatt_opacities.eta_nue, isoscatt_opacities.eta_anue, isoscatt_opacities.eta_nux,
+            isoscatt_opacities.kappa_0_a_nue, isoscatt_opacities.kappa_0_a_anue, isoscatt_opacities.kappa_0_a_nux,
+            isoscatt_opacities.kappa_a_nue, isoscatt_opacities.kappa_a_anue, isoscatt_opacities.kappa_a_nux,
+            isoscatt_opacities.kappa_s_nue, isoscatt_opacities.kappa_s_anue, isoscatt_opacities.kappa_s_nux);
+    fprintf(file, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
+            r[i],
+            isoscatt_opacities.eta_0_nue, isoscatt_opacities.eta_0_anue, isoscatt_opacities.eta_0_nux,
+            isoscatt_opacities.eta_nue, isoscatt_opacities.eta_anue, isoscatt_opacities.eta_nux,
+            isoscatt_opacities.kappa_0_a_nue, isoscatt_opacities.kappa_0_a_anue, isoscatt_opacities.kappa_0_a_nux,
+            isoscatt_opacities.kappa_a_nue, isoscatt_opacities.kappa_a_anue, isoscatt_opacities.kappa_a_nux,
+            isoscatt_opacities.kappa_s_nue, isoscatt_opacities.kappa_s_anue, isoscatt_opacities.kappa_s_nux);
+    }
 
-    printf("%e %e %e %e %e %e %e %e %e %e\n",
-           r[i], isoscatt_opacities.eta_nue, isoscatt_opacities.kappa_a_nue, isoscatt_opacities.kappa_s_nue, isoscatt_opacities.eta_anue,
-           isoscatt_opacities.kappa_a_anue, isoscatt_opacities.kappa_s_anue, isoscatt_opacities.eta_nux,
-           isoscatt_opacities.kappa_a_nux, isoscatt_opacities.kappa_s_nux);
-    fprintf(file, "%e %e %e %e %e %e %e %e %e %e\n",
-            r[i], isoscatt_opacities.eta_nue, isoscatt_opacities.kappa_a_nue, isoscatt_opacities.kappa_s_nue, isoscatt_opacities.eta_anue,
-            isoscatt_opacities.kappa_a_anue, isoscatt_opacities.kappa_s_anue, isoscatt_opacities.eta_nux,
-            isoscatt_opacities.kappa_a_nux, isoscatt_opacities.kappa_s_nux);
-  }
   fclose(file);
 
 

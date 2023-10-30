@@ -5,6 +5,7 @@
 //! \file  test_iso.c
 //  \brief test routines for isoenergetic scattering kernel
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

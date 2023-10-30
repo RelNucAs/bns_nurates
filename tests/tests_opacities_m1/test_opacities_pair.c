@@ -114,9 +114,13 @@ int main() {
   file = fopen(data_filepath, "w+");
 
   printf("\n");
+
   printf("Generated tables:\n");
-  printf("r: [cm], diff_distr [should be zero, checks Fermi Dirac with NuFTotal], j-nue, ");
-  printf("r diff_distr j-nue kappa-a-nue kappa-s-nue j_anue kappa-a-anue kappa-s-anue\n");
+  printf("r diff_distr j0-nue j0-anue j0-nux j-nue j-anue j-nux kappa0-a-nue kappa0-a-anue kappa0-a-nux kappa-a-nue kappa-a-anue kappa-a-nux kappa-s-nue kappa-s-anue kappa-s-nux\n");
+
+  fprintf(file, "# r diff_distr j0-nue j0-anue j0-nux j-nue j-anue j-nux kappa0-a-nue kappa0-a-anue kappa0-a-nux kappa-a-nue kappa-a-anue kappa-a-nux kappa-s-nue kappa-s-anue kappa-s-nux\n");
+  // printf("r: [cm], diff_distr [should be zero, checks Fermi Dirac with NuFTotal], j-nue, ");
+
   for (int i = 0; i < 102; i++) {
 
     // populate EOS parameters from table
@@ -143,9 +147,9 @@ int main() {
     my_grey_opacity_params.distr_pars.eta_t[1] = -(my_grey_opacity_params.eos_pars.mu_e - my_grey_opacity_params.eos_pars.mu_n + my_grey_opacity_params.eos_pars.mu_p) / T[i];
     my_grey_opacity_params.distr_pars.eta_t[2] = 0.;
 
-    my_grey_opacity_params.m1_pars.chi[0] = 1;
-    my_grey_opacity_params.m1_pars.chi[1] = 1;
-    my_grey_opacity_params.m1_pars.chi[2] = 1;
+    my_grey_opacity_params.m1_pars.chi[0] = 1.;
+    my_grey_opacity_params.m1_pars.chi[1] = 1.;
+    my_grey_opacity_params.m1_pars.chi[2] = 1.;
 
     // disable thin distribution function for the time being
     my_grey_opacity_params.distr_pars.w_f[0] = 0.;
@@ -175,15 +179,21 @@ int main() {
 
     M1Opacities pair_opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
 
-    printf("%e %e %e %e %e %e %e %e %e %e %e\n",
-           r[i], diff_distr, pair_opacities.eta_nue, pair_opacities.kappa_a_nue, pair_opacities.kappa_s_nue, pair_opacities.eta_anue,
-           pair_opacities.kappa_a_anue, pair_opacities.kappa_s_anue, pair_opacities.eta_nux,
-           pair_opacities.kappa_a_nux, pair_opacities.kappa_s_nux);
-    fprintf(file, "%e %e %e %e %e %e %e %e %e %e %e\n",
-            r[i], diff_distr, pair_opacities.eta_nue, pair_opacities.kappa_a_nue, pair_opacities.kappa_s_nue, pair_opacities.eta_anue,
-            pair_opacities.kappa_a_anue, pair_opacities.kappa_s_anue, pair_opacities.eta_nux,
-            pair_opacities.kappa_a_nux, pair_opacities.kappa_s_nux);
-  }
+    printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
+            r[i], diff_distr,
+            pair_opacities.eta_0_nue, pair_opacities.eta_0_anue, pair_opacities.eta_0_nux,
+            pair_opacities.eta_nue, pair_opacities.eta_anue, pair_opacities.eta_nux,
+            pair_opacities.kappa_0_a_nue, pair_opacities.kappa_0_a_anue, pair_opacities.kappa_0_a_nux,
+            pair_opacities.kappa_a_nue, pair_opacities.kappa_a_anue, pair_opacities.kappa_a_nux,
+            pair_opacities.kappa_s_nue, pair_opacities.kappa_s_anue, pair_opacities.kappa_s_nux);
+    fprintf(file, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
+            r[i], diff_distr,
+            pair_opacities.eta_0_nue, pair_opacities.eta_0_anue, pair_opacities.eta_0_nux,
+            pair_opacities.eta_nue, pair_opacities.eta_anue, pair_opacities.eta_nux,
+            pair_opacities.kappa_0_a_nue, pair_opacities.kappa_0_a_anue, pair_opacities.kappa_0_a_nux,
+            pair_opacities.kappa_a_nue, pair_opacities.kappa_a_anue, pair_opacities.kappa_a_nux,
+            pair_opacities.kappa_s_nue, pair_opacities.kappa_s_anue, pair_opacities.kappa_s_nux);
+    }
 
   fclose(file);
 

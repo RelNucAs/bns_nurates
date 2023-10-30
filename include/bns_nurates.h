@@ -81,7 +81,7 @@ typedef struct MyFunction MyFunction;
  */
 struct MyQuadratureIntegrand {
   int n;                  // number of integrands/integrals
-  double integrand[10];   // values of integrands/integrals (max: 10)
+  double integrand[12];   // values of integrands/integrals (max: 12)
 };
 typedef struct MyQuadratureIntegrand MyQuadratureIntegrand;
 
@@ -290,17 +290,29 @@ typedef struct GreyOpacityParams GreyOpacityParams;
  * for electron neutrino (nue), electron anti-neutrino (anue) and mu/tau neutrinos (nux)
  */
 struct M1Opacities {
-  double eta_nue;       // energy integrated emissivity for nue
-  double kappa_a_nue;   // absorption coefficient for nue
+  /* Number coefficients */
+  double eta_0_nue;       // number emissivity coefficient for nue
+  double eta_0_anue;      // number emissivity coefficient for anue
+  double eta_0_nux;       // number emissivity coefficient for nux
+
+  double kappa_0_a_nue;   // number absorption coefficient for nue
+  double kappa_0_a_anue;  // number absorption coefficient for anue
+  double kappa_0_a_nux;   // number absorption coefficient for nux
+
+  /* Energy coefficients */
+  double eta_nue;       // energy emissivity coefficient for nue
+  double eta_anue;      // energy emissivity coefficient for anue
+  double eta_nux;       // energy emissivity coefficient for nux
+
+  double kappa_a_nue;   // energy absorption coefficient for nue
+  double kappa_a_anue;  // energy absorption coefficient for anue
+  double kappa_a_nux;   // energy absorption coefficient for nux
+
   double kappa_s_nue;   // scattering coefficient for nue
-
-  double eta_anue;      // energy integrated emissivity for anue
-  double kappa_a_anue;  // absorption coefficient for anue
   double kappa_s_anue;  // scattering coefficient for anue
-
-  double eta_nux;       // energy integrated emissivity for nux
-  double kappa_a_nux;   // absorption coefficient for nux
   double kappa_s_nux;   // scattering coefficient for nux
+
+
 };
 typedef struct M1Opacities M1Opacities;
 
