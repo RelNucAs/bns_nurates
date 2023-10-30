@@ -9,9 +9,10 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include "constants.h"
 //#include "tests.h"
 #include "bns_nurates.h"
-#include "kernels.h"
+#include "../../include/kernels.h"
 #include "integration.h"
 #include "../src/opacities/opacities.h"
 
@@ -41,7 +42,7 @@ void TestBremKernelS(char *filedir) {
 
   fptr = fopen(filepath, "w");
   if (fptr == NULL) {
-    printf("%s: The file %s does not exist!\n", filepath);
+    printf("The file %s does not exist!\n", filepath);
     exit(1);
   }
 
@@ -83,7 +84,7 @@ void TestBremKernelG(char *filedir) {
 
   fptr = fopen(filepath, "w");
   if (fptr == NULL) {
-    printf("%s: The file %s does not exist!\n", filepath);
+    printf("The file %s does not exist!\n", filepath);
     exit(1);
   }
 
@@ -96,4 +97,50 @@ void TestBremKernelG(char *filedir) {
   }
 
   fclose(fptr);
+}
+
+int main() {
+  // @TODO: put here values for comparison
+  // Comparison values
+  const double ref_em_ker  = 6.29472e-30; // [cm^3 s^-1]
+  const double ref_abs_ker = 7.60512e-29; // [cm^3 s^-1]
+  
+  // Kernel parameters
+  BremKernelParams kernel_pars;
+
+  kernel_pars.omega = 10.; // [MeV]
+  kernel_pars.omega_prime = 20.; // [MeV]
+
+  // EOS parameters
+  MyEOSParams eos_pars;
+
+  // @TODO: decide a global baryon mass to convert number to mass density and vice versa
+  eos_pars.nb   = 3.73e+14 / kMb; // [cm-3]
+  eos_pars.temp = 12.04;  // [MeV]
+  eos_pars.yn   = 0.6866; 
+  eos_pars.yp   = 0.3134;
+ 
+  // Compute kernels
+  MyKernelQuantity out = BremKernels(&kernel_pars, &eos_pars);
+  
+  // Print kernels
+  printf("Output emission   kernel = %.5e cm^3/s\n", out.em_e);
+  printf("Output absorption kernel = %.5e cm^3/s\n", out.abs_e);
+  printf("\n");
+
+  // Compare kernels
+  const double tol = 1.0E-06; // tolerance on relative difference
+  const double em_diff  = fabs(out.em_e  - ref_em_ker ) / ref_em_ker;  // emission kernel difference
+  const double abs_diff = fabs(out.abs_e - ref_abs_ker) / ref_abs_ker; // absorption kernel difference
+
+  if ( (em_diff > tol) || (abs_diff > tol) ) {
+    printf("Test failed!\n");
+    printf("Comparison values are:\n");
+    printf("Emission   kernel = %.5e cm^3/s\n", ref_em_ker);
+    printf("Absorption kernel = %.5e cm^3/s\n", ref_abs_ker);
+  } else {
+    printf("Test passed!\n");
+  } 
+
+  return 0;
 }
