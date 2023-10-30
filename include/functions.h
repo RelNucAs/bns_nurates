@@ -48,7 +48,7 @@ double SFPsi(const double x);
 
 // Computation of Fermi-Dirac distribution function
 double FermiDistr(const double e, const double temp, const double mu);
-double pair_fermi_dirac(double omega_prime, double eta_prime_electron, double Temp);
+
 /*===========================================================================*/
 
 // gamma.c

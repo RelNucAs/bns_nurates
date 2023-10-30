@@ -280,7 +280,7 @@ struct GreyOpacityParams {
   MyEOSParams eos_pars;            // eos parameters
   NuDistributionParams distr_pars; // neutrino distribution function parameters
   M1Quantities m1_pars;            // M1 related quantities
-  OpacityFlags opacity_flags;   // flags to turn on and off reactions
+  OpacityFlags opacity_flags;      // flags to turn on and off reactions
 };
 typedef struct GreyOpacityParams GreyOpacityParams;
 

@@ -154,9 +154,9 @@ int main() {
     my_grey_opacity_params.distr_pars.eta_t[2] = 0.;
 
 
-    my_grey_opacity_params.m1_pars.chi[0] = 1;
-    my_grey_opacity_params.m1_pars.chi[1] = 1;
-    my_grey_opacity_params.m1_pars.chi[2] = 1;
+    my_grey_opacity_params.m1_pars.chi[0] = 1.;
+    my_grey_opacity_params.m1_pars.chi[1] = 1.;
+    my_grey_opacity_params.m1_pars.chi[2] = 1.;
 
 
     // disable thin distribution function for the time being

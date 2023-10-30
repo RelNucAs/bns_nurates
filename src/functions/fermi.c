@@ -23,7 +23,3 @@ double FermiDistr(const double e, const double temp, const double mu) {
   }
 
 }
-
-double pair_fermi_dirac(double omega_prime, double eta_prime_electron, double Temp) {
-  return 1. / (exp(omega_prime / Temp - eta_prime_electron) + 1.);
-}
