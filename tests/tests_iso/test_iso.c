@@ -68,7 +68,7 @@ int main () {
   double w1_n[n_data], w1_p[n_data];  // weak magnetism correction to first Legendre term of scattering kernel (on neutrons and protons, respectively)
 
   // Opacity parameters (correction to rates)
-  OpacityParams opacity_pars = {.use_WM_sc = false}; // WM correction turned off
+  OpacityParams opacity_pars = {.use_WM_sc = true}; // WM correction turned on
   
   // EOS parameters
   MyEOSParams eos_pars;
@@ -125,8 +125,8 @@ int main () {
   fprintf(fptr_out, "#  9: Ya\n");
   fprintf(fptr_out, "# 10: Yp\n");
   fprintf(fptr_out, "# 11: Yn\n");
-  fprintf(fptr_out, "# 12: Fortran R_iso w/o WM [cm-1]\n");
-  fprintf(fptr_out, "# 13: C R_iso w/o WM [cm-1]\n");
+  fprintf(fptr_out, "# 12: Fortran R_iso with WM [cm-1]\n");
+  fprintf(fptr_out, "# 13: C R_iso with WM [cm-1]\n");
   fprintf(fptr_out, "\n");
   
   // Read in data from profile, compute rates and store results in output file
@@ -167,7 +167,10 @@ int main () {
     eos_pars.yn   = yn[i];          
 
     // Compute isoenergetic scatterig kernel
-    double out = IsoScattTotal(omega, &opacity_pars, &eos_pars); 
+    double out = IsoScattTotal(omega, &opacity_pars, &eos_pars);
+
+    // Adjust to compare the same quantity
+    out = out * pow(kHClight, 3.) * omega * omega * 4. * kPi / kClight;
 
     fprintf(fptr_out, "%d %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e\n",
              zone[i], r[i], rho[i], temp[i], ye[i], mu_e[i], mu_hat[i],

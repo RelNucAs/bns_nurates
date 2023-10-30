@@ -64,7 +64,7 @@ void generate_comparison_data(const bool use_dU) {
   double w1_n[n_data], w1_p[n_data];  // weak magnetism correction to first Legendre term of scattering kernel (on neutrons and protons, respectively)
 
   // Opacity parameters (correction to rates)
-  OpacityParams opacity_pars = {.use_dU = use_dU, .use_WM_ab = false}; // WM correction turned off
+  OpacityParams opacity_pars = {.use_dU = use_dU, .use_WM_ab = true}; // WM correction turned on
   
   // EOS parameters
   MyEOSParams eos_pars;
@@ -126,8 +126,8 @@ void generate_comparison_data(const bool use_dU) {
   fprintf(fptr_out, "# 10: Yp\n");
   fprintf(fptr_out, "# 11: Yn\n");
   fprintf(fptr_out, "# 12: dU [MeV]\n");
-  fprintf(fptr_out, "# 13-16: Fortran rates w/o WM (em_nue [s-1], ab_nue [cm-1], em_anue [s-1], ab_anue [cm-1])\n");
-  fprintf(fptr_out, "# 17-20: C rates w/o WM (em_nue [s-1], ab_nue [cm-1], em_anue [s-1], ab_anue [cm-1])\n");
+  fprintf(fptr_out, "# 13-16: Fortran rates with WM (em_nue [s-1], ab_nue [cm-1], em_anue [s-1], ab_anue [cm-1])\n");
+  fprintf(fptr_out, "# 17-20: C rates with WM (em_nue [s-1], ab_nue [cm-1], em_anue [s-1], ab_anue [cm-1])\n");
   fprintf(fptr_out, "\n");
   
   // Read in data from profile, compute rates and store results in output file
