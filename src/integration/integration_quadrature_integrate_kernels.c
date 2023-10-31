@@ -8,6 +8,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <ctype.h>
 #include "integration.h"
 #include "bns_nurates.h"
 
@@ -98,27 +99,29 @@ MyQuadratureIntegrand GaussLegendreIntegrate2D(MyQuadrature *quad, MyFunctionMul
   double w_y[quad->ny];
   double var[2];
 
+  MyQuadratureIntegrand f1_vals, f2_vals;
   MyQuadratureIntegrand result;
 
   for (int k = 0; k < num_integrands; ++k) {
-
+    
     for (int j = 0; j < quad->ny; j++) {
 
       var[1] = ty[k] * quad->points[quad->nx + j];
-
+      
       for (int i = 0; i < quad->nx; i++) {
       
         var[0] = tx[k] * quad->points[i];
         MyQuadratureIntegrand f1_vals = func->function(var, func->params);
         f1_x[k][i] = f1_vals.integrand[k];
-      
+
         var[0] = tx[k] / quad->points[i];
         MyQuadratureIntegrand f2_vals = func->function(var, func->params);
         f2_x[k][i] = f2_vals.integrand[k] / (quad->points[i] * quad->points[i]);
+
       }
 
       f1_y[k][j] = tx[k] * (DoIntegration(quad->nx, quad->w, f1_x[k]) + DoIntegration(quad->nx, quad->w, f2_x[k]));
-    
+
       var[1] = ty[k] / quad->points[quad->nx + j];
 
       for (int i = 0; i < quad->nx; i++) {
@@ -129,12 +132,12 @@ MyQuadratureIntegrand GaussLegendreIntegrate2D(MyQuadrature *quad, MyFunctionMul
 
         var[0] = tx[k] / quad->points[i];
         MyQuadratureIntegrand f2_vals = func->function(var, func->params);
-        f2_x[k][i] = f2_vals.integrand[k] / (quad->points[i] * quad->points[i]);
-      
+        f2_x[k][i] = f2_vals.integrand[k] / (quad->points[i] * quad->points[i]);    
+
       }
 
       f2_y[k][j] = tx[k] * (DoIntegration(quad->nx, quad->w, f1_x[k]) + DoIntegration(quad->nx, quad->w, f2_x[k]));
-  
+
       w_y[j] = quad->w[quad->nx + j];
     
     }

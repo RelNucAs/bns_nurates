@@ -191,10 +191,10 @@ MyOpacity AbsOpacity(double omega, OpacityParams *opacity_pars, MyEOSParams *eos
   double el_out[4] = {0.0};
   AbsOpacitySingleLep(omega, opacity_pars, eos_pars, kMe, eos_pars->mu_e, el_out);
 
-  MyOut.ab_nue = el_out[0];
-  MyOut.em_nue = el_out[1];
-  MyOut.ab_anue = el_out[2];
-  MyOut.em_anue = el_out[3];
+  MyOut.abs[id_nue] = el_out[0];
+  MyOut.em[id_nue] = el_out[1];
+  MyOut.abs[id_anue] = el_out[2];
+  MyOut.em[id_anue] = el_out[3];
 
   // Uncomment the following when considering also muons 
   // // Muon (anti)neutrino
@@ -220,14 +220,14 @@ MyOpacity AbsOpacity(double omega, OpacityParams *opacity_pars, MyEOSParams *eos
  */
 MyOpacity StimAbsOpacity(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
   MyOpacity abs_opacity = AbsOpacity(omega, opacity_pars, eos_pars);
-  MyOpacity stim_abs_opacity = {.em_nue  = abs_opacity.em_nue,
-      //.ab_nue  = abs_opacity.ab_nue,
-      .ab_nue  = abs_opacity.ab_nue + abs_opacity.em_nue,
-      .em_anue = abs_opacity.em_anue,
-      //.ab_anue = abs_opacity.ab_anue,
-      .ab_anue = abs_opacity.ab_anue + abs_opacity.em_anue,
-      .ab_nux  = 0.,
-      .em_nux  = 0.};
+  MyOpacity stim_abs_opacity = {
+      .em[id_nue]  = abs_opacity.em[id_nue],
+      .abs[id_nue]  = abs_opacity.abs[id_nue] + abs_opacity.em[id_nue],
+      .em[id_anue] = abs_opacity.em[id_anue],
+      .abs[id_anue] = abs_opacity.abs[id_anue] + abs_opacity.em[id_anue],
+      .abs[id_nux] = 0.,
+      .em[id_nux] = 0.
+  };
 
   return stim_abs_opacity;
 }
@@ -244,7 +244,7 @@ double NueBetaNumberEmissivityIntegrand(double *x, void *p) {
 
   MyOpacity out = AbsOpacity(x[0], &grey_pars->opacity_pars, &grey_pars->eos_pars);
 
-  return x[0] * x[0] * out.em_nue;
+  return x[0] * x[0] * out.em[id_nue];
 }
 
 // NueBetaEnergyEmissivityIntegrand function
@@ -266,7 +266,7 @@ double ANueBetaNumberEmissivityIntegrand(double *x, void *p) {
 
   MyOpacity out = AbsOpacity(x[0], &grey_pars->opacity_pars, &grey_pars->eos_pars);
 
-  return x[0] * x[0] * out.em_anue;
+  return x[0] * x[0] * out.em[id_anue];
 }
 
 // ANueBetaEnergyEmissivityIntegrand function
@@ -289,7 +289,7 @@ double NueBetaNumberOpacityIntegrand(double *x, void *p) {
 
   MyOpacity out = StimAbsOpacity(x[0], &grey_pars->opacity_pars, &grey_pars->eos_pars);
 
-  return x[0] * x[0] * out.ab_nue * TotalNuF(x[0], &grey_pars->distr_pars, 0);
+  return x[0] * x[0] * out.abs[id_nue] * TotalNuF(x[0], &grey_pars->distr_pars, 0);
 }
 
 // NueBetaEnergyOpacityIntegrand function
@@ -313,7 +313,7 @@ double ANueBetaNumberOpacityIntegrand(double *x, void *p) {
 
   MyOpacity out = StimAbsOpacity(x[0], &grey_pars->opacity_pars, &grey_pars->eos_pars);
 
-  return x[0] * x[0] * out.ab_anue * TotalNuF(x[0], &grey_pars->distr_pars, 1);
+  return x[0] * x[0] * out.abs[id_anue] * TotalNuF(x[0], &grey_pars->distr_pars, 1);
 }
 
 // ANueBetaEnergyOpacityIntegrand function

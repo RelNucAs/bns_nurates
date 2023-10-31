@@ -51,9 +51,9 @@ MyQuadratureIntegrand NuNumberIntegrand(double *x, void *p) {
   MyQuadratureIntegrand result;
 
   result.n = 3;
-  result.integrand[0] = x[0] * x[0] * TotalNuF(x[0], distr_pars, 0);
-  result.integrand[1] = x[0] * x[0] * TotalNuF(x[0], distr_pars, 1);
-  result.integrand[2] = x[0] * x[0] * TotalNuF(x[0], distr_pars, 2);
+  result.integrand[0] = x[0] * x[0] * TotalNuF(x[0], distr_pars, id_nue);
+  result.integrand[1] = x[0] * x[0] * TotalNuF(x[0], distr_pars, id_anue);
+  result.integrand[2] = x[0] * x[0] * TotalNuF(x[0], distr_pars, id_nux);
 
   return result;
 }
@@ -73,11 +73,11 @@ MyQuadratureIntegrand NuNumber(NuDistributionParams *distr_pars) {
 
   GaussLegendreMultiD(&quad);
 
-  double s[3];
+  double s[total_num_species];
   
-  s[0] = fabs(distr_pars->temp_t[0] * distr_pars->eta_t[0]);
-  s[1] = fabs(distr_pars->temp_t[1] * distr_pars->eta_t[1]);
-  s[2] = fabs(distr_pars->temp_t[2] * distr_pars->eta_t[2]);
+  s[id_nue] = fabs(distr_pars->temp_t[id_nue] * distr_pars->eta_t[id_nue]);
+  s[id_anue] = fabs(distr_pars->temp_t[id_anue] * distr_pars->eta_t[id_anue]);
+  s[id_nux] = s[id_nue]; // @TODO: cannot be equal to zero
 
   integrand.function = &NuNumberIntegrand;
   MyQuadratureIntegrand result = GaussLegendreIntegrate1D(&quad, &integrand, s);
@@ -119,11 +119,11 @@ MyQuadratureIntegrand NuEnergy(NuDistributionParams *distr_pars) {
 
   GaussLegendreMultiD(&quad);
 
-  double s[3];
+  double s[total_num_species];
   
-  s[0] = fabs(distr_pars->temp_t[0] * distr_pars->eta_t[0]);
-  s[1] = fabs(distr_pars->temp_t[1] * distr_pars->eta_t[1]);
-  s[2] = fabs(distr_pars->temp_t[2] * distr_pars->eta_t[2]);
+  s[id_nue] = fabs(distr_pars->temp_t[id_nue] * distr_pars->eta_t[id_nue]);
+  s[id_anue] = fabs(distr_pars->temp_t[id_anue] * distr_pars->eta_t[id_anue]);
+  s[id_nux] = s[id_nue]; // @TODO: cannot be equal to zero
   
   integrand.function = &NuEnergyIntegrand;
   MyQuadratureIntegrand result = GaussLegendreIntegrate1D(&quad, &integrand, s);

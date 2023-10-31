@@ -196,18 +196,18 @@ int main() {
 
     printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
             r[i],
-            isoscatt_opacities.eta_0_nue, isoscatt_opacities.eta_0_anue, isoscatt_opacities.eta_0_nux,
-            isoscatt_opacities.eta_nue, isoscatt_opacities.eta_anue, isoscatt_opacities.eta_nux,
-            isoscatt_opacities.kappa_0_a_nue, isoscatt_opacities.kappa_0_a_anue, isoscatt_opacities.kappa_0_a_nux,
-            isoscatt_opacities.kappa_a_nue, isoscatt_opacities.kappa_a_anue, isoscatt_opacities.kappa_a_nux,
-            isoscatt_opacities.kappa_s_nue, isoscatt_opacities.kappa_s_anue, isoscatt_opacities.kappa_s_nux);
+            isoscatt_opacities.eta_0[id_nue], isoscatt_opacities.eta_0[id_anue], isoscatt_opacities.eta_0[id_nux],
+            isoscatt_opacities.eta[id_nue], isoscatt_opacities.eta[id_anue], isoscatt_opacities.eta[id_nux],
+            isoscatt_opacities.kappa_0_a[id_nue], isoscatt_opacities.kappa_0_a[id_anue], isoscatt_opacities.kappa_0_a[id_nux],
+            isoscatt_opacities.kappa_a[id_nue], isoscatt_opacities.kappa_a[id_anue], isoscatt_opacities.kappa_a[id_nux],
+            isoscatt_opacities.kappa_s[id_nue], isoscatt_opacities.kappa_s[id_anue], isoscatt_opacities.kappa_s[id_nux]);
     fprintf(file, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
             r[i],
-            isoscatt_opacities.eta_0_nue, isoscatt_opacities.eta_0_anue, isoscatt_opacities.eta_0_nux,
-            isoscatt_opacities.eta_nue, isoscatt_opacities.eta_anue, isoscatt_opacities.eta_nux,
-            isoscatt_opacities.kappa_0_a_nue, isoscatt_opacities.kappa_0_a_anue, isoscatt_opacities.kappa_0_a_nux,
-            isoscatt_opacities.kappa_a_nue, isoscatt_opacities.kappa_a_anue, isoscatt_opacities.kappa_a_nux,
-            isoscatt_opacities.kappa_s_nue, isoscatt_opacities.kappa_s_anue, isoscatt_opacities.kappa_s_nux);
+            isoscatt_opacities.eta_0[id_nue], isoscatt_opacities.eta_0[id_anue], isoscatt_opacities.eta_0[id_nux],
+            isoscatt_opacities.eta[id_nue], isoscatt_opacities.eta[id_anue], isoscatt_opacities.eta[id_nux],
+            isoscatt_opacities.kappa_0_a[id_nue], isoscatt_opacities.kappa_0_a[id_anue], isoscatt_opacities.kappa_0_a[id_nux],
+            isoscatt_opacities.kappa_a[id_nue], isoscatt_opacities.kappa_a[id_anue], isoscatt_opacities.kappa_a[id_nux],
+            isoscatt_opacities.kappa_s[id_nue], isoscatt_opacities.kappa_s[id_anue], isoscatt_opacities.kappa_s[id_nux]);
   }
 
   fclose(file);

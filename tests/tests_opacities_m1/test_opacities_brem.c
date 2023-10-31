@@ -181,18 +181,18 @@ int main() {
 
     printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
             r[i], diff_distr,
-            brem_opacities.eta_0_nue, brem_opacities.eta_0_anue, brem_opacities.eta_0_nux,
-            brem_opacities.eta_nue, brem_opacities.eta_anue, brem_opacities.eta_nux,
-            brem_opacities.kappa_0_a_nue, brem_opacities.kappa_0_a_anue, brem_opacities.kappa_0_a_nux,
-            brem_opacities.kappa_a_nue, brem_opacities.kappa_a_anue, brem_opacities.kappa_a_nux,
-            brem_opacities.kappa_s_nue, brem_opacities.kappa_s_anue, brem_opacities.kappa_s_nux);
+            brem_opacities.eta_0[id_nue], brem_opacities.eta_0[id_anue], brem_opacities.eta_0[id_nux],
+            brem_opacities.eta[id_nue], brem_opacities.eta[id_anue], brem_opacities.eta[id_nux],
+            brem_opacities.kappa_0_a[id_nue], brem_opacities.kappa_0_a[id_anue], brem_opacities.kappa_0_a[id_nux],
+            brem_opacities.kappa_a[id_nue], brem_opacities.kappa_a[id_anue], brem_opacities.kappa_a[id_nux],
+            brem_opacities.kappa_s[id_nue], brem_opacities.kappa_s[id_anue], brem_opacities.kappa_s[id_nux]);
     fprintf(file, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
             r[i], diff_distr,
-            brem_opacities.eta_0_nue, brem_opacities.eta_0_anue, brem_opacities.eta_0_nux,
-            brem_opacities.eta_nue, brem_opacities.eta_anue, brem_opacities.eta_nux,
-            brem_opacities.kappa_0_a_nue, brem_opacities.kappa_0_a_anue, brem_opacities.kappa_0_a_nux,
-            brem_opacities.kappa_a_nue, brem_opacities.kappa_a_anue, brem_opacities.kappa_a_nux,
-            brem_opacities.kappa_s_nue, brem_opacities.kappa_s_anue, brem_opacities.kappa_s_nux);
+            brem_opacities.eta_0[id_nue], brem_opacities.eta_0[id_anue], brem_opacities.eta_0[id_nux],
+            brem_opacities.eta[id_nue], brem_opacities.eta[id_anue], brem_opacities.eta[id_nux],
+            brem_opacities.kappa_0_a[id_nue], brem_opacities.kappa_0_a[id_anue], brem_opacities.kappa_0_a[id_nux],
+            brem_opacities.kappa_a[id_nue], brem_opacities.kappa_a[id_anue], brem_opacities.kappa_a[id_nux],
+            brem_opacities.kappa_s[id_nue], brem_opacities.kappa_s[id_anue], brem_opacities.kappa_s[id_nux]);
     }
     
   fclose(file);

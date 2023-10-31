@@ -10,6 +10,11 @@
 
 #include <stdbool.h>
 
+// Define indices of neutrino species
+#define id_nue  0
+#define id_anue 1
+#define id_nux  2
+
 #define total_num_species 3
 
 /* ==================================================================================
@@ -189,21 +194,11 @@ typedef struct MyEOSParams MyEOSParams;
  * Can be used in the general case or the energy integrated case.
  *
  * Note: For the moment let's consider muonic (anti)neutrinos as nux
- *       Add in ab_(a)num, em_(a)num when we also muons will be considered
  *
- * @TODO: Add in ab_(a)num, em_(a)num when muons are considered
  */
 struct MyOpacity {
-  double ab_nue;    // electron neutrino absorptivity
-  double em_nue;    // electron neutrino emissivity
-  double ab_anue;   // electron antineutrino absorptivity
-  double em_anue;   // electron antineutrino emissivity
-  double ab_nux;    // heavy (anti)neutrino absorptivity
-  double em_nux;    // heavy (anti)neutrino emissivity
-  //double ab_num;    // muon neutrino absorptivity
-  //double em_num;    // muon neutrino emissivity
-  //double ab_anum;   // muon antineutrino absorptivity
-  //double em_anum;   // muon antineutrino emissivity
+  double abs[total_num_species];    // absorptivity
+  double em[total_num_species];     // emissivity
 };
 typedef struct MyOpacity MyOpacity;
 
@@ -242,7 +237,7 @@ struct NuDistributionParams {
   // parameters for optically thin distribution function
   double w_f[total_num_species];         // contribution factor
   double temp_f[total_num_species];      // temperature
-  double c_f[total_num_species];         // constant in power from Ferederico's notes
+  double c_f[total_num_species];         // constant in power from Federico's notes
 
 };
 typedef struct NuDistributionParams NuDistributionParams;
@@ -291,27 +286,13 @@ typedef struct GreyOpacityParams GreyOpacityParams;
  */
 struct M1Opacities {
   /* Number coefficients */
-  double eta_0_nue;       // number emissivity coefficient for nue
-  double eta_0_anue;      // number emissivity coefficient for anue
-  double eta_0_nux;       // number emissivity coefficient for nux
-
-  double kappa_0_a_nue;   // number absorption coefficient for nue
-  double kappa_0_a_anue;  // number absorption coefficient for anue
-  double kappa_0_a_nux;   // number absorption coefficient for nux
-
+  double eta_0[total_num_species];       // number emissivity coefficient
+  double kappa_0_a[total_num_species];   // number absorption coefficient
+ 
   /* Energy coefficients */
-  double eta_nue;       // energy emissivity coefficient for nue
-  double eta_anue;      // energy emissivity coefficient for anue
-  double eta_nux;       // energy emissivity coefficient for nux
-
-  double kappa_a_nue;   // energy absorption coefficient for nue
-  double kappa_a_anue;  // energy absorption coefficient for anue
-  double kappa_a_nux;   // energy absorption coefficient for nux
-
-  double kappa_s_nue;   // scattering coefficient for nue
-  double kappa_s_anue;  // scattering coefficient for anue
-  double kappa_s_nux;   // scattering coefficient for nux
-
+  double eta[total_num_species];         // energy emissivity coefficient
+  double kappa_a[total_num_species];     // energy absorption coefficient
+  double kappa_s[total_num_species];     // scattering coefficient
 
 };
 typedef struct M1Opacities M1Opacities;

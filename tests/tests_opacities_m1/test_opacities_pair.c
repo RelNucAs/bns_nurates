@@ -181,18 +181,18 @@ int main() {
 
     printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
             r[i], diff_distr,
-            pair_opacities.eta_0_nue, pair_opacities.eta_0_anue, pair_opacities.eta_0_nux,
-            pair_opacities.eta_nue, pair_opacities.eta_anue, pair_opacities.eta_nux,
-            pair_opacities.kappa_0_a_nue, pair_opacities.kappa_0_a_anue, pair_opacities.kappa_0_a_nux,
-            pair_opacities.kappa_a_nue, pair_opacities.kappa_a_anue, pair_opacities.kappa_a_nux,
-            pair_opacities.kappa_s_nue, pair_opacities.kappa_s_anue, pair_opacities.kappa_s_nux);
+            pair_opacities.eta_0[id_nue], pair_opacities.eta_0[id_anue], pair_opacities.eta_0[id_nux],
+            pair_opacities.eta[id_nue], pair_opacities.eta[id_anue], pair_opacities.eta[id_nux],
+            pair_opacities.kappa_0_a[id_nue], pair_opacities.kappa_0_a[id_anue], pair_opacities.kappa_0_a[id_nux],
+            pair_opacities.kappa_a[id_nue], pair_opacities.kappa_a[id_anue], pair_opacities.kappa_a[id_nux],
+            pair_opacities.kappa_s[id_nue], pair_opacities.kappa_s[id_anue], pair_opacities.kappa_s[id_nux]);
     fprintf(file, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
             r[i], diff_distr,
-            pair_opacities.eta_0_nue, pair_opacities.eta_0_anue, pair_opacities.eta_0_nux,
-            pair_opacities.eta_nue, pair_opacities.eta_anue, pair_opacities.eta_nux,
-            pair_opacities.kappa_0_a_nue, pair_opacities.kappa_0_a_anue, pair_opacities.kappa_0_a_nux,
-            pair_opacities.kappa_a_nue, pair_opacities.kappa_a_anue, pair_opacities.kappa_a_nux,
-            pair_opacities.kappa_s_nue, pair_opacities.kappa_s_anue, pair_opacities.kappa_s_nux);
+            pair_opacities.eta_0[id_nue], pair_opacities.eta_0[id_anue], pair_opacities.eta_0[id_nux],
+            pair_opacities.eta[id_nue], pair_opacities.eta[id_anue], pair_opacities.eta[id_nux],
+            pair_opacities.kappa_0_a[id_nue], pair_opacities.kappa_0_a[id_anue], pair_opacities.kappa_0_a[id_nux],
+            pair_opacities.kappa_a[id_nue], pair_opacities.kappa_a[id_anue], pair_opacities.kappa_a[id_nux],
+            pair_opacities.kappa_s[id_nue], pair_opacities.kappa_s[id_anue], pair_opacities.kappa_s[id_nux]);
     }
 
   fclose(file);

@@ -173,7 +173,7 @@ void generate_comparison_data(const bool use_dU) {
              zone[i], r[i], rho[i], temp[i], ye[i], mu_e[i], mu_hat[i],
              yh[i], ya[i], yp[i], yn[i], du[i],
              em_nue[i], ab_nue[i], em_anue[i], ab_anue[i],
-             out.em_nue, out.ab_nue / kClight, out.em_anue, out.ab_anue / kClight);
+             out.em[id_nue], out.abs[id_nue] / kClight, out.em[id_anue], out.abs[id_anue] / kClight);
    
     i++;
   }
