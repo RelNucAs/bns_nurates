@@ -172,7 +172,10 @@ SourceCoeffs IsoScattCoeffs(GreyOpacityParams *grey_pars) {
 
   GaussLegendreMultiD(&quad);
 
-  double s = 2. * grey_pars->distr_pars.eta_t[0] * grey_pars->distr_pars.temp_t[0]; //@TODO: we are choose the same s for all species
+  double s[3];
+  s[0] = 2. * grey_pars->distr_pars.eta_t[0] * grey_pars->distr_pars.temp_t[0]; //@TODO: we are choose the same s for all species
+  s[1] = s[0];
+  s[2] = s[0];
 
   out.R_nue = 0.;
   out.R_anue = 0.;

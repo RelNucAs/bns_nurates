@@ -208,7 +208,7 @@ int main() {
             isoscatt_opacities.kappa_0_a_nue, isoscatt_opacities.kappa_0_a_anue, isoscatt_opacities.kappa_0_a_nux,
             isoscatt_opacities.kappa_a_nue, isoscatt_opacities.kappa_a_anue, isoscatt_opacities.kappa_a_nux,
             isoscatt_opacities.kappa_s_nue, isoscatt_opacities.kappa_s_anue, isoscatt_opacities.kappa_s_nux);
-    }
+  }
 
   fclose(file);
 

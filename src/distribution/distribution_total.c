@@ -58,7 +58,7 @@ MyQuadratureIntegrand NuNumberIntegrand(double *x, void *p) {
   return result;
 }
 
-/* Compute neutrino number density (besides 4*pi factor)
+/* Compute neutrino number density
  *
  * Computes this for three neutrino species
  */
@@ -73,7 +73,11 @@ MyQuadratureIntegrand NuNumber(NuDistributionParams *distr_pars) {
 
   GaussLegendreMultiD(&quad);
 
-  double s = fabs(distr_pars->temp_t[0] * distr_pars->eta_t[0]); // @TODO: currently breaking the integral at the same point for all species
+  double s[3];
+  
+  s[0] = fabs(distr_pars->temp_t[0] * distr_pars->eta_t[0]);
+  s[1] = fabs(distr_pars->temp_t[1] * distr_pars->eta_t[1]);
+  s[2] = fabs(distr_pars->temp_t[2] * distr_pars->eta_t[2]);
 
   integrand.function = &NuNumberIntegrand;
   MyQuadratureIntegrand result = GaussLegendreIntegrate1D(&quad, &integrand, s);
@@ -85,7 +89,6 @@ MyQuadratureIntegrand NuNumber(NuDistributionParams *distr_pars) {
 
   return result;
 }
-
 
 /* Integrand for computing the neutrino energy density
  *
@@ -101,7 +104,7 @@ MyQuadratureIntegrand NuEnergyIntegrand(double *x, void *p) {
   return result;
 }
 
-/* Compute neutrino energy density (besides 4*pi factor)
+/* Compute neutrino energy density
  *
  * Computes this for three neutrino species
  */
@@ -116,8 +119,12 @@ MyQuadratureIntegrand NuEnergy(NuDistributionParams *distr_pars) {
 
   GaussLegendreMultiD(&quad);
 
-  double s = fabs(distr_pars->temp_t[0] * distr_pars->eta_t[0]); // @TODO: currently breaking the integral at the same point for all species
-
+  double s[3];
+  
+  s[0] = fabs(distr_pars->temp_t[0] * distr_pars->eta_t[0]);
+  s[1] = fabs(distr_pars->temp_t[1] * distr_pars->eta_t[1]);
+  s[2] = fabs(distr_pars->temp_t[2] * distr_pars->eta_t[2]);
+  
   integrand.function = &NuEnergyIntegrand;
   MyQuadratureIntegrand result = GaussLegendreIntegrate1D(&quad, &integrand, s);
   const double result_factor = 4. * kPi / pow(kH * kClight, 3.);
