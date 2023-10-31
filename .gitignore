@@ -430,3 +430,9 @@ TSWLatexianTemp*
 ./doc/*
 !./doc/Doxyfile
 !./doc/theme/*
+
+# txt files generated during tests
+tests/tests_opacities_m1/output/*.txt
+
+# VSC workspace files
+*.code-workspace
