@@ -103,13 +103,13 @@ MyQuadratureIntegrand GaussLegendreIntegrate2D(MyQuadrature *quad, MyFunctionMul
   MyQuadratureIntegrand result;
 
   for (int k = 0; k < num_integrands; ++k) {
-    
+
     for (int j = 0; j < quad->ny; j++) {
 
       var[1] = ty[k] * quad->points[quad->nx + j];
-      
+
       for (int i = 0; i < quad->nx; i++) {
-      
+
         var[0] = tx[k] * quad->points[i];
         MyQuadratureIntegrand f1_vals = func->function(var, func->params);
         f1_x[k][i] = f1_vals.integrand[k];
@@ -132,18 +132,18 @@ MyQuadratureIntegrand GaussLegendreIntegrate2D(MyQuadrature *quad, MyFunctionMul
 
         var[0] = tx[k] / quad->points[i];
         MyQuadratureIntegrand f2_vals = func->function(var, func->params);
-        f2_x[k][i] = f2_vals.integrand[k] / (quad->points[i] * quad->points[i]);    
+        f2_x[k][i] = f2_vals.integrand[k] / (quad->points[i] * quad->points[i]);
 
       }
 
       f2_y[k][j] = tx[k] * (DoIntegration(quad->nx, quad->w, f1_x[k]) + DoIntegration(quad->nx, quad->w, f2_x[k]));
 
       w_y[j] = quad->w[quad->nx + j];
-    
+
     }
-  
+
     result.integrand[k] = ty[k] * (DoIntegration(quad->ny, w_y, f1_y[k]) + DoIntegration(quad->ny, w_y, f2_y[k]));
-  
+
   }
 
   return result;
@@ -161,17 +161,17 @@ MyQuadratureIntegrand GaussLegendreIntegrate1D(MyQuadrature *quad, MyFunctionMul
   double f1_x[num_integrands][quad->nx], f2_x[num_integrands][quad->nx];
   double var[2];
   MyQuadratureIntegrand result;
-  
+
   result.n = num_integrands;
 
   for (int k = 0; k < num_integrands; ++k) {
 
     for (int i = 0; i < quad->nx; i++) {
 
-      var[0] = t[k] * quad->points[i];  
-      MyQuadratureIntegrand f1_vals = func->function(var, func->params);      
+      var[0] = t[k] * quad->points[i];
+      MyQuadratureIntegrand f1_vals = func->function(var, func->params);
       f1_x[k][i] = f1_vals.integrand[k];
-          
+
       var[0] = t[k] / quad->points[i];
       MyQuadratureIntegrand f2_vals = func->function(var, func->params);
       f2_x[k][i] = f2_vals.integrand[k] / (quad->points[i] * quad->points[i]);
@@ -186,4 +186,83 @@ MyQuadratureIntegrand GaussLegendreIntegrate1D(MyQuadrature *quad, MyFunctionMul
 
 }
 
+/* Perform 1d integration (finite interval) of multiple functions using a Gauss-Legendre quadrature
+ *
+ * quad:    must be a properly populated 1d quadrature generated from between interval of integration
+ * func:    the function(s) to be integrated
+ */
+MyQuadratureIntegrand GaussLegendreIntegrate1DFiniteInterval(MyQuadrature *quad, MyFunctionMultiD *func, double *t) {
 
+  int num_integrands = func->my_quadrature_integrand.n;
+  double f_x[num_integrands][quad->nx];
+  double var[2];
+  MyQuadratureIntegrand result;
+
+  result.n = num_integrands;
+
+  for (int k = 0; k < num_integrands; ++k) {
+    for (int i = 0; i < quad->nx; i++) {
+
+      var[0] = quad->points[i];
+      MyQuadratureIntegrand f1_vals = func->function(var, func->params);
+      f_x[k][i] = f1_vals.integrand[k];
+
+    }
+    result.integrand[k] = DoIntegration(quad->nx, quad->w, f_x[k]);
+  }
+
+  return result;
+
+}
+
+/* Perform 2d integration (finite interval) of multiple functions using a Gauss-Legendre quadrature
+ *
+ * The first variable is integrated within a finite interval, the second variable is integrated from 0 to inf
+ *
+ * quad:    must be a properly populated 2d quadrature generated from between interval of integration
+ * func:    the function(s) to be integrated
+ */
+MyQuadratureIntegrand GaussLegendreIntegrate2DFiniteInterval(MyQuadrature *quad, MyFunctionMultiD *func, double *tx, double *ty) {
+
+  int num_integrands = func->my_quadrature_integrand.n;
+
+  double f1_x[num_integrands][quad->nx];
+  double f1_y[num_integrands][quad->ny], f2_y[num_integrands][quad->ny];
+
+  double w_y[quad->ny];
+  double var[2];
+
+  MyQuadratureIntegrand result;
+
+  for (int k = 0; k < num_integrands; ++k) {
+
+    for (int j = 0; j < quad->ny; j++) {
+
+      var[1] = ty[k] * quad->points[quad->nx + j];
+      for (int i = 0; i < quad->nx; i++) {
+        var[0] = quad->points[i];
+        MyQuadratureIntegrand f1_vals = func->function(var, func->params);
+        f1_x[k][i] = f1_vals.integrand[k];
+      }
+
+      f1_y[k][j] = DoIntegration(quad->nx, quad->w, f1_x[k]);
+
+      var[1] = ty[k] / quad->points[quad->nx + j];
+      for (int i = 0; i < quad->nx; i++) {
+        var[0] = quad->points[i];
+        MyQuadratureIntegrand f1_vals = func->function(var, func->params);
+        f1_x[k][i] = f1_vals.integrand[k];
+      }
+
+      f2_y[k][j] = DoIntegration(quad->nx, quad->w, f1_x[k]);
+
+      w_y[j] = quad->w[quad->nx + j];
+
+    }
+
+    result.integrand[k] = ty[k] * (DoIntegration(quad->ny, w_y, f1_y[k]) + DoIntegration(quad->ny, w_y, f2_y[k]));
+
+  }
+
+  return result;
+}
