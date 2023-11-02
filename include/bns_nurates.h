@@ -115,6 +115,7 @@ typedef struct MyFunctionMultiD MyFunctionMultiD;
 struct BremKernelParams {
   double omega;         // neutrino energy before interaction
   double omega_prime;   // neutrino energy after interaction
+  int l;                // order of Legendre coefficient
 };
 typedef struct BremKernelParams BremKernelParams;
 

@@ -11,24 +11,24 @@
 
 
 #include <math.h>
+#include <assert.h>
+
 #include "kernels.h"
 #include "constants.h"
 #include "bns_nurates.h"
 #include "functions.h"
 
 // Constants for the bremsstrahlung reaction
-static const double kBremXmin = 1.e-10;
-static const double kBremYmin = 1.e-10;
-static const double kBremEtamin = 1.e-10;
-static const double kPiSquared = kPi * kPi;
-static const double kHSquared = kH * kH;
-static const double kFiveThirds = 5. / 3.;
-static const double kFiveSixths = 5. / 6.;
-static const double kCa = -1.26 / 2.;
-// @TODO: decide how to define the following constant
-static const double kGfBrem = 1.1663787e-11; //MeV-2
-static const double kMnGrams = kMn * kMeV / (kClight * kClight); // neutron mass in grams
-static const double kMpGrams = kMp * kMeV / (kClight * kClight); // proton mass in grams
+#define kBremXmin 1.0E-10
+#define kBremYmin 1.0E-10
+#define kBremEtamin 1.0E-10
+#define kCa -0.63 // -1.26 / 2.
+#define kSqrtPi 1.7724538509055159 // sqrt(kPi)
+#define kPiSquared 9.869604401089358 // kPi * kPi;
+#define kFourPiSquared 39.47841760435743 // 4. * kPiSquared
+#define kPi2OneEighth 1.1538350678499893 // pow(kPi, 1. / 8.)
+#define kPiHalfToFiveHalves 3.0924286813991433 // pow(0.5 * kPi, 2.5)
+//#define kGfBrem 1.1663787E-11 // [MeV^-2]
 
 /* Compute the analytical fit for the s-component of the kernel for
  * neutrino bremsstrahlung and inelastic scattering in a nucleon field
@@ -44,34 +44,29 @@ static const double kMpGrams = kMp * kMeV / (kClight * kClight); // proton mass 
  *      s:  a dimensionless quantity as defined in Eqn. (49)
  */
 double BremKernelS(double x, double y, double eta_star) {
+  static const double kFiveThirds = 5. / 3.;
+  static const double kFiveSixths = 5. / 6.;
+
+  // check non negativity of input quantities
+  assert(x >= 0.);
+  assert(y >= 0.);
+  assert(eta_star >= 0.);
 
   // prevent singular behaviour
-  if (x >= 0.) {
-    x = (x > kBremXmin) ? x : kBremXmin;
-  } else {
-    x = (x < -kBremXmin) ? x : kBremXmin;
-  }
-
+  x = (x > kBremXmin) ? x : kBremXmin;
   y = (y > kBremYmin) ? y : kBremYmin;
   eta_star = (eta_star > kBremEtamin) ? eta_star : kBremEtamin;
 
   // compute non-degenerate approximation, s_nd in Eqn. (45)
-  // @TODO: compute kSqrtPi and kPi2OneEighth only once
-  const double kSqrtPi = sqrt(kPi);
-  const double kPi2OneEighth = pow(kPi, 1. / 8.);
-  double s_nd_numerator = 2. * kSqrtPi * pow(x + 2. - exp(-y / 12.), 1.5) * (x * x + 2. * x * y + kFiveThirds * y * y + 1.);
-  double s_nd_denominator = kSqrtPi + pow(kPi2OneEighth + x + y, 4.);
-  double s_nd = s_nd_numerator / s_nd_denominator;
 
-  // detail balance behaviour in Eqn. (41)
-  if (x < 0.) {
-    s_nd = s_nd * SafeExp(-x);
-  }
+  const double s_nd_numerator = 2. * kSqrtPi * pow(x + 2. - exp(-y / 12.), 1.5) * (x * x + 2. * x * y + kFiveThirds * y * y + 1.);
+  const double s_nd_denominator = kSqrtPi + pow(kPi2OneEighth + x + y, 4.);
+  const double s_nd = s_nd_numerator / s_nd_denominator;
 
   // compute degenerate approximation, s_d in Eqn. (46)
-  double u = sqrt(y / (2. * eta_star)) + 1.e-10;
-  double u2 = u * u;
-  double u_arg = u2 / (2. * sqrt(2. * u2 + 4.));
+  const double u = sqrt(y / (2. * eta_star)) + 1.e-10;
+  const double u2 = u * u;
+  const double u_arg = u2 / (2. * sqrt(2. * u2 + 4.));
   double f_u = (1. - kFiveSixths * u * atan(2. / u) + u2 / (3. * (u2 + 4.)) + atan(1. / u_arg) * u_arg / 3.);
 
   // @TODO: Leonardo check this! Doing this to prevent s_d from being a large negative number
@@ -79,8 +74,7 @@ double BremKernelS(double x, double y, double eta_star) {
     f_u = 1.e-14;
   }
 
-  // @TODO: compute pow(0.5 * kPi, 2.5) constant only once
-  double s_d = 3. * pow(0.5 * kPi, 2.5) * pow(eta_star, -2.5) * (x * x + 4. * kPiSquared) * x * f_u / (4. * kPiSquared * (1. - SafeExp(-x)));
+  const double s_d = 3. * kPiHalfToFiveHalves * pow(eta_star, -2.5) * (x * x + kFourPiSquared) * x * f_u / (kFourPiSquared * (1. - SafeExp(-x)));
 
   /*
   if (s_d < 0.) {
@@ -93,27 +87,26 @@ double BremKernelS(double x, double y, double eta_star) {
     printf("f_u = %.5e\n"              , f_u);
   } */
 
-  // F, Eqn. (50)
-  double f_denominator = (3. + pow(x - 1.2, 2.) + pow(x, -4.)) * (1. + eta_star * eta_star) * (1. + pow(y, 4.));
-  double f_brem = 1. + 1. / f_denominator; //Eq.(50)
+  const double pow_x_1_1 = pow(x, 1.1);
 
-  // @TODO: compute pow(x, 1.1) only once
+  // F, Eqn. (50)
+  const double f_denominator = (3. + pow(x - 1.2, 2.) + pow(x, -4.)) * (1. + eta_star * eta_star) * (1. + pow(y, 4.));
+  const double f_brem = 1. + 1. / f_denominator; //Eq.(50)
+
   // G, Eqn. (50)
-  double g_brem = 1. - 0.0044 * pow(x, 1.1) * y / (0.8 + 0.06 * pow(y, 1.05)) * sqrt(eta_star) / (eta_star + 0.2);
+  const double g_brem = 1. - 0.0044 * pow_x_1_1 * y / (0.8 + 0.06 * pow(y, 1.05)) * sqrt(eta_star) / (eta_star + 0.2);
 
   // h and C, Eqn. (50)
-  double h_brem = 0.1 * eta_star / (2.39 + 0.1 * pow(eta_star, 1.1));
-  double c_brem = 1.1 * pow(x, 1.1) * h_brem / (2.3 + h_brem * pow(x, 0.93) + 0.0001 * pow(x, 1.2)) * 30. / (30. + 0.005 * pow(x, 2.8));
+  const double h_brem = 0.1 * eta_star / (2.39 + 0.1 * pow(eta_star, 1.1));
+  const double c_brem = 1.1 * pow_x_1_1 * h_brem / (2.3 + h_brem * pow(x, 0.93) + 0.0001 * pow(x, 1.2)) * 30. / (30. + 0.005 * pow(x, 2.8));
 
   // p, Eqn. (50)
-  double p_brem = 0.67 + 0.18 * pow(y, 0.4);
-
-  // @TODO: decide what to do here in case of errors
-  //if (s_nd < 0.) printf("\ns_ND = %.5e\n", s_nd);
-  //if (s_d < 0.) printf("s_D  = %.5e\n", s_d);
+  const double p_brem = 0.67 + 0.18 * pow(y, 0.4);
 
   // interpolated formula for s in Eqn. (49)
-  double s_brem = pow(pow(s_nd, -p_brem) + pow(s_d, -p_brem), -1. / p_brem) * f_brem * (1. + c_brem * g_brem);
+  const double s_brem = pow(pow(s_nd, -p_brem) + pow(s_d, -p_brem), -1. / p_brem) * f_brem * (1. + c_brem * g_brem);
+
+  assert(s_brem >= 0.);
 
   return s_brem;
 }
@@ -130,108 +123,141 @@ double BremKernelS(double x, double y, double eta_star) {
  *    g: a dimensionless quantity as defined in Eqn. (52)
  */
 double BremKernelG(double y, double eta_star) {
-
+  // check non negativity of input quantities
+  assert(y >= 0.);
+  assert(eta_star >= 0.);
+  
   // prevent singular behavior
   y = (y > kBremYmin) ? y : kBremYmin;
   eta_star = (eta_star > kBremEtamin) ? eta_star : kBremEtamin;
 
   // alpha_1, Eqn. (53)
-  double y2 = y * y;
-  double eta_star_inv = 1. / eta_star;
-  double alpha_1_denom = 25. * y2 + 1.;
-
-  double alpha_1 = (0.5 + eta_star_inv) / (1. + eta_star_inv) * (1. / alpha_1_denom) + (0.5 + eta_star / 15.6) * 25. * y2 / alpha_1_denom;
+  const double y2 = y * y;
+  const double eta_star_inv = 1. / eta_star;
+  const double alpha_1_denom = 25. * y2 + 1.;
+  
+  const double alpha_1 = (0.5 + eta_star_inv) / (1. + eta_star_inv) * (1. / alpha_1_denom) + (0.5 + eta_star / 15.6) * 25. * y2 / alpha_1_denom;
 
   // alpha_2, Eqn. (53)
-  double alpha_2 = (0.63 + 0.04 * pow(eta_star, 1.45)) / (1. + 0.02 * pow(eta_star, 2.5));
+  const double alpha_2 = (0.63 + 0.04 * pow(eta_star, 1.45)) / (1. + 0.02 * pow(eta_star, 2.5));
 
-  // @TODO: compute pow(eta_star, 1.5) only once
+  const double pow_eta_star_1_5 = pow(eta_star, 1.5);
+
   // alpha_3, Eqn. (53)
-  double alpha_3 = 1.2 * SafeExp(0.6 * eta_star - 0.4 * pow(eta_star, 1.5));
+  const double alpha_3 = 1.2 * SafeExp(0.6 * eta_star - 0.4 * pow_eta_star_1_5);
 
   // p_1, Eqn. (53)
-  double p_1 = (1.8 + 0.45 * eta_star) / (1. + 0.15 * pow(eta_star, 1.5));
+  const double p_1 = (1.8 + 0.45 * eta_star) / (1. + 0.15 * pow_eta_star_1_5);
 
   // p_2, Eqn. (53)
-  double p_2 = 2.3 - 0.05 * eta_star / (1. + 0.025 * eta_star);
+  const double p_2 = 2.3 - 0.05 * eta_star / (1. + 0.025 * eta_star);
 
   // g, Eqn. (52)
-  double g = (alpha_1 + alpha_2 * pow(y, p_1)) / (1. + alpha_3 * pow(y, p_2) + alpha_2 * pow(y, p_1 + 2.) / 13.75);
+  const double g = (alpha_1 + alpha_2 * pow(y, p_1)) / (1. + alpha_3 * pow(y, p_2) + alpha_2 * pow(y, p_1 + 2.) / 13.75);
+
+  assert(g >= 0.);
 
   return g;
 }
 
 /* Compute the absorption kernels for a given NN Bremsstrahlung channel */
-double BremSingleChannelAbsKernel(double n_nuc, double m_nuc, BremKernelParams *kernel_params, MyEOSParams *eos_params) {
+double BremSingleChannelAbsKernel(const double n_nuc, const double m_nuc, BremKernelParams *kernel_params, MyEOSParams *eos_params) {
+  static const double kHSquared = kH * kH; // [MeV^2 s^2]
 
   // EOS parameters
-  double temp = eos_params->temp;
+  const double temp = eos_params->temp; // temperature [MeV]
 
   // kernel parameters
-  double omega = kernel_params->omega;
-  double omega_prime = kernel_params->omega_prime;
-
-  // temperature in units of 10 MeV
-  double temp_10 = temp / 10.;
-
-  // @TODO: optimize computation of constants
-  // nucleon effective degeneracy parameter, Eqn. (36) using baryon number density instead of matter density
-  double eta_star = pow(3. * kPiSquared * n_nuc, 2. / 3.) * (kHSquared * kMeV / (4. * kPiSquared)) / (2. * m_nuc * temp);
-
-  // spin-fluctuation rate gamma, Eqn. (37)
-  double gamma = 1.63 * pow(eta_star, 3. / 2.) * temp_10;
-
-  // pion mass parameter y, Eqn. (38)
-  double y = 1.94 / temp_10;
+  const double omega = kernel_params->omega; // neutrino energy [MeV]
+  const double omega_prime = kernel_params->omega_prime; // primed neutrino energy [MeV]
 
   // dimensionless neutrino energy sum
-  double x = (omega + omega_prime) / temp;
+  const double x = (omega + omega_prime) / temp;
+ 
+  // temperature in units of 10 MeV
+  const double temp_10 = temp / 10.;
 
-  // dimensionless fitting parameter s, N.B.: x and y values are not changed by the function
+  // nucleon effective degeneracy parameter, Eqn. (36) using baryon number density instead of matter density
+  const double eta_star = pow(3. * kPiSquared * n_nuc, 2. / 3.) * (kHSquared * kMeV / kFourPiSquared) / (2. * m_nuc * temp);
+
+  // spin-fluctuation rate gamma, Eqn. (37)
+  const double gamma = 1.63 * pow(eta_star, 3. / 2.) * temp_10;
+
+  // pion mass parameter y, Eqn. (38)
+  const double y = 1.94 / temp_10;
+
+  // dimensionless fitting parameter s
   const double sb = BremKernelS(x, y, eta_star);
 
-  // dimensionless fitting parameter g, N.B.: x and y values are not changed by the function
+  // dimensionless fitting parameter g
   const double gb = BremKernelG(y, eta_star);
 
   // differential absorption kernel, Eqn. (35)
-  double s_kernel_abs = gamma / (x * x + pow(0.5 * gamma * gb, 2.)) * sb / temp;
+  const double s_kernel_abs = gamma / (x * x + pow(0.5 * gamma * gb, 2.)) * sb / temp;
 
   return s_kernel_abs;
 }
 
-/* Compute the production and absorption kernels for the Bremsstrahlung reactions by summing
+/* Compute the angular independent part of the absorption kernels for the Bremsstrahlung reactions by summing
  the contributions of all NN channels */
-MyKernelQuantity BremKernels(BremKernelParams *kernel_params, MyEOSParams *eos_params) {
-  // @TODO: compute the following constant only once
-  const double kBremConst = kClight * pow(kHbar * kClight, 5.) * kCa * kCa * kGfBrem * kGfBrem;
+double BremAllChannelsAbsKernel(BremKernelParams *kernel_params, MyEOSParams *eos_params) {
+  static const double kTwentyeightThirds = 28. / 3.;
+
+  static const double kMnGrams = kMn * kMeV / (kClight * kClight); // neutron mass in grams
+  static const double kMpGrams = kMp * kMeV / (kClight * kClight); // proton mass in grams
+  const double kMAvgGrams = sqrt(kMnGrams * kMpGrams); // geometric mean of nucleon masses in grams
+
+  static const double kBremConst = kCa * kCa * kGf * kGf / kHbar; // kClight * pow(kHbar * kClight, 5.) * kCa * kCa * kGfBrem * kGfBrem
 
   // EOS parameters
-  double nb = eos_params->nb;
-  double temp = eos_params->temp;
-  double xn = eos_params->yn;
-  double xp = eos_params->yp;
+  const double nb = eos_params->nb;      // baryon number density [cm^-3]
+  const double xn = eos_params->yn;      // neutron abundance/mass fraction
+  const double xp = eos_params->yp;      // proton abundance/mass fraction
 
-  double x_mean = sqrt(xn * xp);
-
-  // kernel parameters
-  double omega = kernel_params->omega;
-  double omega_prime = kernel_params->omega_prime;
-
-  // dimensionless neutrino energy sum
-  double x = (omega + omega_prime) / temp;
+  const double x_mean = sqrt(xn * xp);   // geometric mean of nucleon abundances/mass fractions
+  
+  const double nn = nb * xn;         // neutron number density [cm^-3]
+  const double np = nb * xp;         // protron number density [cm^-3]
+  const double n_mean = nb * x_mean; // geometric mean of nucleon number densities [cm^-3]
 
   // compute single channel kernels
-  double s_abs_nn = BremSingleChannelAbsKernel(nb * xn, kMnGrams, kernel_params, eos_params);
-  double s_abs_pp = BremSingleChannelAbsKernel(nb * xp, kMpGrams, kernel_params, eos_params);
-  // @TODO: compute sqrt(kMnGrams*kMpGrams) only once
-  double s_abs_np = BremSingleChannelAbsKernel(nb * x_mean, sqrt(kMnGrams * kMpGrams), kernel_params, eos_params);
+  const double s_abs_nn = BremSingleChannelAbsKernel(nn, kMnGrams, kernel_params, eos_params); // neutron-neutron
+  const double s_abs_pp = BremSingleChannelAbsKernel(np, kMpGrams, kernel_params, eos_params); // const proton-proton
+  const double s_abs_np = BremSingleChannelAbsKernel(n_mean, kMAvgGrams, kernel_params, eos_params); // neutron-proton
 
-  // @TODO: compute 28./3. only once
   // total absorption kernel
-  double s_abs_tot = kBremConst * nb * (xn * s_abs_nn + xp * s_abs_pp + 28. / 3. * x_mean * s_abs_np);
-  // total production kernel (from detailed balance)
-  double s_em_tot = s_abs_tot * SafeExp(-x);
-  MyKernelQuantity brem_kernel = {.abs_e = s_abs_tot, .em_e = s_em_tot, .abs_x = s_abs_tot, .em_x = s_em_tot};
+  return kBremConst * (nn * s_abs_nn + np * s_abs_pp + kTwentyeightThirds * n_mean * s_abs_np);
+}
+
+/* Compute a specific Legendre coefficient in the expansion of production and absorption kernels for the Bremsstrahlung reactions */
+MyKernelQuantity BremKernelsLegCoeff(BremKernelParams *kernel_params, MyEOSParams *eos_params) {
+  // kernel parameters
+  const double l = kernel_params->l; // order of Legendre coefficient
+  const double omega = kernel_params->omega; // neutrino energy [MeV]
+  const double omega_prime = kernel_params->omega_prime; // primed neutrino energy [MeV]
+
+  assert(l >= 0 && l <= 1);
+ 
+  // EOS parameters
+  const double temp = eos_params->temp;  // temperature [MeV]
+ 
+  // dimensionless neutrino energy sum
+  const double x = (omega + omega_prime) / temp;
+
+  // angular independent part of absorption kernel
+  double s_abs = BremAllChannelsAbsKernel(kernel_params, eos_params);
+
+  if (l == 0) {
+    s_abs =  3. * s_abs; // zeroth Legedre coefficient
+  } else {
+    s_abs = -1. * s_abs; // first Legedre coefficient
+  }
+
+  // production kernel from detailed balance
+  double s_em = s_abs * SafeExp(-x);
+
+  MyKernelQuantity brem_kernel = {.abs_e = s_abs, .em_e = s_em, .abs_x = s_abs, .em_x = s_em};
 
   return brem_kernel;
+  
 }

@@ -64,7 +64,8 @@ MyQuadratureIntegrand M1DoubleIntegrand(double *var, void *p) {
   if (opacity_flags.use_brem) {
     my_kernel_params.brem_kernel_params.omega = nu;
     my_kernel_params.brem_kernel_params.omega_prime = nubar;
-    brem_kernels_m1 = BremKernels(&my_kernel_params.brem_kernel_params, &my_eos_params);
+    my_kernel_params.brem_kernel_params.l = 0;
+    brem_kernels_m1 = BremKernelsLegCoeff(&my_kernel_params.brem_kernel_params, &my_eos_params);
   }
 
   const double pro_term_nue = (pair_kernels_m1.em_e + brem_kernels_m1.em_e) * (1. - g_nu_bar[id_anue]);
