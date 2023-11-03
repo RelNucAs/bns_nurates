@@ -168,6 +168,8 @@ void AbsOpacitySingleLep(const double omega, OpacityParams *opacity_pars, MyEOSP
     // without detailed balance
     //out[2] = etapn * aux * (1. - fd_p); // Antineutrino absorptivity [s-1], Eq.(C19)
   }
+
+  return;
 }
 
 /* Compute the absortivity and inverse mean free path
