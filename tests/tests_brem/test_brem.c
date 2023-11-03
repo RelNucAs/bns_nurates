@@ -110,7 +110,8 @@ int main() {
 
   kernel_pars.omega = 10.; // [MeV]
   kernel_pars.omega_prime = 20.; // [MeV]
-
+  kernel_pars.l = 0;
+  
   // EOS parameters
   MyEOSParams eos_pars;
 
@@ -121,7 +122,7 @@ int main() {
   eos_pars.yp   = 0.3134;
  
   // Compute kernels
-  MyKernelQuantity out = BremKernels(&kernel_pars, &eos_pars);
+  MyKernelQuantity out = BremKernelsLegCoeff(&kernel_pars, &eos_pars);
   
   // Print kernels
   printf("Output emission   kernel = %.5e cm^3/s\n", out.em_e);

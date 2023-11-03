@@ -12,7 +12,7 @@
 
 
 // Exception handling from Numerical Recipes
-// @TODO: decide how to handling errors in the code
+// @TODO: decide how to handle errors in the code
 
 #ifndef _USENRERRORCLASS_
 #define throw(message) { \
