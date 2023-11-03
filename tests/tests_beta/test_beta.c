@@ -166,7 +166,6 @@ void generate_comparison_data(const bool use_dU) {
     eos_pars.mu_e = mu_e[i];        
     eos_pars.dU   = du[i];
 
-    printf("r = %.5e cm\n", r[i]);
     // Compute emissivity and inverse mean free path for electron-type (anti)neutrinos
     MyOpacity out    = AbsOpacity(omega, &opacity_pars, &eos_pars); 
 
