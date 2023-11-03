@@ -4,7 +4,7 @@
 // ================================================
 /**
  * @file nu_scatt_iso.c
- * @brief Implementation of iso-energetic scattering of neutrinos with nucleons.
+ * @brief Implementation of iso-energetic scattering of neutrinos on nucleons.
  *
  * This file implements iso-energetic scattering on nucleons from [Bruenn 1985](https://articles.adsabs.harvard.edu/pdf/1985ApJS...58..771B)
  * with optional inclusion of phase space, recoil and weak magnetism corrections from [Horowitz 2002](https://journals.aps.org/prd/abstract/10.1103/PhysRevD.65.043001)
@@ -20,11 +20,12 @@
 #include "distribution.h"
 #include "integration.h"
 
-// Definition of local constants
+// Constants for the isoenergetic scattering on nucleons
+#define kThreePiSquared2TwoThird 9.570780000627304
 //#define kIsoKer (2. * kPi *  kGf *  kGf) / kHbar / (kHbarClight * kHbarClight * kHbarClight * kHbarClight * kHbarClight * kHbarClight) // 2 pi Gf^2 / hbar [MeV cm^6 s^-1] from Eqn. (C36) of Bruenn
 
 /**
- * @fn double EtaNNsc(const double nb, const double temp, const double yN)
+ * @fn double EtaNNSc(const double nb, const double temp, const double yN)
  * @brief Computes degeneracy parameter \f$\eta_{NN}\f$ from Eqn. (C37) of Bruenn.
  *
  * @param nb    baryon number density \f$[cm^{-3}]\f$
@@ -32,19 +33,17 @@
  * @param yN    proton/neutron fraction
  * @return      The degeneracy parameter \f$\eta_{NN} [cm^-3]\f$
  */
-double EtaNNsc(const double nb, const double temp, const double yN) {
-
-  static const double three_pi_sqr = 3. * kPi * kPi;
+double EtaNNSc(const double nb, const double temp, const double yN) {
   static const double eF_const = 0.5 * kHbar * kHbar / kMb * kMeV; // constant in Fermi energy calculation
 
-  const double nN = yN * nb;
+  const double nN = yN * nb; // nucleon (neutron/proton) number density [cm^-3]
 
   if (nN <= 0.) return 0.;  // Enforce zero rates if no nucleons are present
 
   // Linear interpolation between degenerate and non-degnerate limit in Eq.(C37)
-  const double eFN = eF_const * pow(three_pi_sqr * nN, 2. / 3.); // Fermi energy computation [MeV]
-  const double tmp = 1.5 * temp / eFN;
-  return nN * tmp / sqrt(1. + tmp * tmp); // [cm-3]
+  const double eFN = eF_const * kThreePiSquared2TwoThird * pow(nN, 2. / 3.); // Fermi energy computation [MeV]
+  const double aux = 1.5 * temp / eFN;
+  return nN * aux / sqrt(1. + aux * aux); // [cm-3]
 
 }
 
@@ -58,26 +57,26 @@ double EtaNNsc(const double nb, const double temp, const double yN) {
  * @param reacflag      choice of nucleon (1: proton scattering 2: neutron scattering)
  * @return              "Eq.(A41)" \f$[MeV cm^{3} s^{-1}]\f$
  */
-double IsoScattNucleon(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars, const double yN, const int reacflag) {
-  const static double kIsoKer = (2. * kPi *  kGf *  kGf) / kHbar / (kHClight * kHClight * kHClight * kHClight * kHClight * kHClight);
+double IsoScattNucleon(const double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars, const double yN, const int reacflag) {
+  static const double kIsoKer = (2. * kPi *  kGf *  kGf) / kHbar / (kHClight * kHClight * kHClight);
     
-  const static double h0_p = kHpv * kHpv + 3. * kHpa * kHpa;          // 0th Legendre coefficient (protons)
-  const static double h1_p = kHpv * kHpv - kHpa * kHpa;          // 1st Legedndre coefficient (protons)
-  const static double h0_n = kHnv * kHnv + 3. * kHna * kHna;          // 0th Legendre coefficient (neutrons)
-  const static double h1_n = kHnv * kHnv - kHna * kHna;          // 1st Legendre coefficient (neutrons)
+  static const double h0_p = kHpv * kHpv + 3. * kHpa * kHpa;   
+  static const double h1_p = kHpv * kHpv - kHpa * kHpa;        
+  static const double h0_n = kHnv * kHnv + 3. * kHna * kHna;   
+  static const double h1_n = kHnv * kHnv - kHna * kHna;        
 
-  static double c0_p = kIsoKer * h0_p;                    // 0th Legendre coefficient (protons)
-  static double c1_p = kIsoKer * h1_p;              // 1st Legendre coefficient (protons)
-  static double c0_n = kIsoKer * h0_n;                    // 0th Legendre coefficient (neutrons)
-  static double c1_n = kIsoKer * h1_n;                    // 1st Legendre coefficient (neutrons)
+  static const double c0_p = kIsoKer * h0_p;  // 0th Legendre coefficient (protons)
+  static const double c1_p = kIsoKer * h1_p;  // 1st Legendre coefficient (protons)
+  static const double c0_n = kIsoKer * h0_n;  // 0th Legendre coefficient (neutrons)
+  static const double c1_n = kIsoKer * h1_n;  // 1st Legendre coefficient (neutrons)
 
   double R0 = 1., R1 = 1.;
   double leg_0, leg_1;
 
-  const double nb = eos_pars->nb;   // Number baryon density [cm-3]
+  const double nb = eos_pars->nb;     // Number baryon density [cm^-3]
   const double temp = eos_pars->temp; // Temperature [MeV]
 
-  const double etaNN = EtaNNsc(nb, temp, yN); // degeneracy parameter eta_NN [cm^-3] from Eqn. (C37) of Bruenn
+  const double etaNN = EtaNNSc(nb, temp, yN); // degeneracy parameter eta_NN [cm^-3] from Eqn. (C37) of Bruenn
 
   // Phase space, recoil and weak magnetism corrections
   // R0 (R1) is the correction to the zeroth (first) Legendre coefficient
@@ -104,7 +103,7 @@ double IsoScattNucleon(double omega, OpacityParams *opacity_pars, MyEOSParams *e
  * @param eos_pars      structure for equation of state parameters
  * @return              "Eq.(A41)" \f$[MeV cm{^3} s^{-1}]\f$
  */
-double IsoScattProton(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
+double IsoScattProton(const double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
   return IsoScattNucleon(omega, opacity_pars, eos_pars, eos_pars->yp, 1);
 }
 
@@ -116,7 +115,7 @@ double IsoScattProton(double omega, OpacityParams *opacity_pars, MyEOSParams *eo
  * @param eos_pars      structure for equation of state parameters
  * @return              "Eq.(A41)" \f$[MeV cm{^3} s^{-1}]\f$
  */
-double IsoScattNeutron(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
+double IsoScattNeutron(const double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
   return IsoScattNucleon(omega, opacity_pars, eos_pars, eos_pars->yn, 2);
 }
 
@@ -128,74 +127,10 @@ double IsoScattNeutron(double omega, OpacityParams *opacity_pars, MyEOSParams *e
  * @param eos_pars      structure for equation of state parameters
  * @return              "Eq.(A41)" \f$[MeV cm{^3} s^{-1}]\f$
  */
-double IsoScattTotal(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
+double IsoScattTotal(const double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
   const double iso_nu_p = IsoScattProton(omega, opacity_pars, eos_pars); // proton contribution
   const double iso_nu_n = IsoScattNeutron(omega, opacity_pars, eos_pars); // neutron contribution
 
   return iso_nu_p + iso_nu_n;
-}
-
-
-// @TODO: generalize all the following functions with structures containing all nu species
-
-// NuEnergyScatteringIntegrand function
-// integrand for the computation of the energy opacity
-// scattering coefficient
-// (constants are added after the integration)
-MyQuadratureIntegrand NuEnergyScatteringIntegrand(double *x, void *p) {
-  GreyOpacityParams *grey_pars = (GreyOpacityParams *) p;
-
-  const double iso_scatt = IsoScattTotal(x[0], &grey_pars->opacity_pars, &grey_pars->eos_pars);
-
-  MyQuadratureIntegrand result;
-
-  result.integrand[0] = x[0] * x[0] * x[0] * iso_scatt * TotalNuF(x[0], &grey_pars->distr_pars, 0);
-  result.integrand[1] = x[0] * x[0] * x[0] * iso_scatt * TotalNuF(x[0], &grey_pars->distr_pars, 1);
-  result.integrand[2] = x[0] * x[0] * x[0] * iso_scatt * TotalNuF(x[0], &grey_pars->distr_pars, 2);
-
-  return result;
-}
-
-// Computation of scattering coefficients
-SourceCoeffs IsoScattCoeffs(GreyOpacityParams *grey_pars) {
-  MyQuadratureIntegrand iso;
-
-  SourceCoeffs out;
-
-  MyFunctionMultiD integrand;
-
-  integrand.dim = 1;
-  integrand.params = grey_pars;
-  integrand.my_quadrature_integrand.n = 3;
-
-  MyQuadrature quad = quadrature_default; //{.type=kGauleg, .dim=1, .nx=32, .ny=1, .nz=1, .alpha=0., .x1=0., .x2=1., .y1=-42., .y2=-42., .z1=-42., .z2=-42.};
-
-  GaussLegendreMultiD(&quad);
-
-  double s[3];
-  s[0] = 2. * grey_pars->distr_pars.eta_t[0] * grey_pars->distr_pars.temp_t[0]; //@TODO: we are choose the same s for all species
-  s[1] = s[0];
-  s[2] = s[0];
-
-  out.R_nue = 0.;
-  out.R_anue = 0.;
-
-  //out.R_num  = 0.;
-  //out.R_anum = 0.;
-
-  out.R_nux = 0.;
-
-  integrand.function = &NuEnergyScatteringIntegrand;
-  iso = GaussLegendreIntegrate1D(&quad, &integrand, s);
-
-  out.Q_nue = 4. * kPi * iso.integrand[0] / grey_pars->m1_pars.J[0] / kClight;
-  out.Q_anue = 4. * kPi * iso.integrand[1] / grey_pars->m1_pars.J[1] / kClight;
-
-  //out.Q_num  = iso;
-  //out.Q_anum = iso;
-
-  out.Q_nux = 4. * kPi * iso.integrand[2] / grey_pars->m1_pars.J[2] / kClight;
-
-  return out;
 }
 

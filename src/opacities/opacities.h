@@ -18,32 +18,23 @@
 // nu_abs_em_beta.c
 
 // (Anti)neutrino absorption on nucleons
-MyOpacity AbsOpacity(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars);
+MyOpacity AbsOpacity(const double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars);
 
 // Stimulated absoption version
-MyOpacity StimAbsOpacity(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars);
-
-// Emission coefficients
-SourceCoeffs BetaEmissionCoeffs(GreyOpacityParams *grey_pars);
-
-// Absoprtion coefficients
-SourceCoeffs BetaOpacityCoeffs(GreyOpacityParams *grey_pars);
+MyOpacity StimAbsOpacity(const double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars);
 
 /*===========================================================================*/
 
 // nu_scatt_iso.c
 
 // Isoenergetic scattering on protons
-double IsoScattProton(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars);
+double IsoScattProton(const double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars);
 
 // Isoenergetic scattering on neutrons
-double IsoScattNeutron(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars);
+double IsoScattNeutron(const double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars);
 
 // Sum of the two contributions for neutrino-nucleon scattering (protons + neutrons)
-double IsoScattTotal(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars);
-
-// Scattering coefficients
-SourceCoeffs IsoScattCoeffs(GreyOpacityParams *grey_pars);
+double IsoScattTotal(const double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars);
 
 /*===========================================================================*/
 
@@ -55,8 +46,6 @@ SourceCoeffs IsoScattCoeffs(GreyOpacityParams *grey_pars);
 // Total opacity coefficients
 //SourceCoeffs OpacityCoeffs(GreyOpacityParams *grey_pars);
 
-// Total scattering coefficients
-//SourceCoeffs ScatteringCoeffs(GreyOpacityParams *grey_pars);
 
 /*===========================================================================*/
 

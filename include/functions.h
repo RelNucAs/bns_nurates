@@ -85,4 +85,11 @@ double SafeExp(const double x);
 
 /*===========================================================================*/
 
+// theta.c
+
+// Theta step function
+double StepFunction(const double x);
+
+/*===========================================================================*/
+
 #endif //BNS_NURATES_SRC_FUNCTIONS_FUNCTIONS_H_

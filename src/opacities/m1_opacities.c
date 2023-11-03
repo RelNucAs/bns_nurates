@@ -59,7 +59,7 @@ MyQuadratureIntegrand M1DoubleIntegrand(double *var, void *p) {
     pair_kernels_m1 = PairKernelsM1(&my_eos_params, &my_kernel_params.pair_kernel_params);
   }
 
-  // compute the bremsstrahlung kernels (TODO: Leonardo, check this!)
+  // compute the bremsstrahlung kernels
   MyKernelQuantity brem_kernels_m1 = {.em_e = 0., .abs_e = 0., .em_x = 0., .abs_x = 0.};
   if (opacity_flags.use_brem) {
     my_kernel_params.brem_kernel_params.omega = nu;
@@ -185,9 +185,9 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
   }
 
   if (opacity_flags.use_iso == 1) {
-    e_integrand_3_nue = (4. * kPi / (kClight * J[id_nue])) * 4. * kPi * nu * nu * nu * nu * nu * g_nu[id_nue] * iso_scatt;
-    e_integrand_3_anue = (4. * kPi / (kClight * J[id_anue])) * 4. * kPi * nu * nu * nu * nu * nu * g_nu[id_anue] * iso_scatt;
-    e_integrand_3_nux = (4. * kPi / (kClight * J[id_nux])) * 4. * kPi * nu * nu * nu * nu * nu * g_nu[id_nux] * iso_scatt;
+    e_integrand_3_nue = four_pi_hc3 * 4. * kPi * nu * nu * nu * nu * nu * g_nu[id_nue] * iso_scatt;
+    e_integrand_3_anue = four_pi_hc3 * 4. * kPi * nu * nu * nu * nu * nu * g_nu[id_anue] * iso_scatt;
+    e_integrand_3_nux = four_pi_hc3 * 4. * kPi * nu * nu * nu * nu * nu * g_nu[id_nux] * iso_scatt;
   }
 
   MyQuadratureIntegrand result = {.n = 11};
@@ -200,9 +200,9 @@ MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p) {
   result.integrand[5] = e_integrand_1_anue;
   result.integrand[6] = (1. / (kClight * J[id_nue])) * e_integrand_2_nue;
   result.integrand[7] = (1. / (kClight * J[id_anue])) * e_integrand_2_anue;
-  result.integrand[8] = e_integrand_3_nue;
-  result.integrand[9] = e_integrand_3_anue;
-  result.integrand[10] = e_integrand_3_nux;
+  result.integrand[8] = (1. / (kClight * J[id_nue])) * e_integrand_3_nue;
+  result.integrand[9] = (1. / (kClight * J[id_anue])) * e_integrand_3_anue;
+  result.integrand[10] = (1. / (kClight * J[id_nux])) * e_integrand_3_nux;
 
   return result;
 }
