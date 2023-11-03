@@ -113,7 +113,7 @@ void AbsOpacitySingleLep(const double omega, OpacityParams *opacity_pars, MyEOSP
   double E_e, E_p;
   double aux, fd_e, fd_p;
   double R = 1., Rbar = 1.;
-  double dU = 0.;
+  double dU = 0., dQ = kQ;
 
   const double nb = eos_pars->nb;         // Number baryon density [cm-3]
   const double temp = eos_pars->temp;     // Temperature [MeV]
@@ -125,13 +125,14 @@ void AbsOpacitySingleLep(const double omega, OpacityParams *opacity_pars, MyEOSP
   const double nn = nb * yn;              // Neutron number density [cm-3]
   const double np = nb * yp;              // Proton number density  [cm-3]
 
-  // Neutron minus proton chem. potentials (corrected for the mass difference)
-  const double mu_hat = mu_n - mu_p - kQ; // [MeV] //kQ needed if mu_p and mu_n are relativistic chem. potentials
-
-  // Nucleon interaction correction to chemical potential
+  // Mean field corrections
   if (opacity_pars->use_dU) dU = eos_pars->dU; // [MeV]
+  if (opacity_pars->use_dm_eff) dQ = eos_pars->dm_eff; // [MeV]
 
-  Qprime = kQ + dU;     // [MeV], Eq.(79) in Hempel
+  // Neutron minus proton chem. potentials (corrected for the mass difference)
+  const double mu_hat = mu_n - mu_p - dQ; // [MeV]
+
+  Qprime = dQ + dU;    // [MeV], Eq.(79) in Hempel
   mu_np = mu_hat - dU; // [MeV], Eq.(80,86) in Hempel
 
   etanp = EtaNP(nn, np, mu_np, temp); // Eq. (C14)
@@ -158,7 +159,7 @@ void AbsOpacitySingleLep(const double omega, OpacityParams *opacity_pars, MyEOSP
 
   // Check kinematics constraint for antineutrino absorption
   if (E_p - mLep > 0.) {
-    aux = Rbar * kClight * kAbsEmConst * E_p * E_p * sqrt(1. - mLep * mLep / (E_p * E_p)); // remove c to get output in cm-1
+    aux = Rbar * kAbsEmConst * E_p * E_p * sqrt(1. - mLep * mLep / (E_p * E_p)); // remove c to get output in cm-1
     fd_p = FermiDistr(E_p, temp, -muLep);
     // @TODO: eventually think about a specifically designed function for (1-FermiDistr)
     out[3] = etanp * aux * fd_p;        // Antineutrino emissivity   [s-1], Eq.(C20)

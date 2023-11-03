@@ -1,15 +1,18 @@
 import numpy as np
 import re
 import matplotlib.pyplot as plt
+from argparse import ArgumentParser 
 
 ## Plot emissivity and inverse mean free path along
 ## 1D CCSN SN profile + comparison with results from
 ## reference Fortran code
 
-## @TODO: add effective mass correction when it will be implemented in the code
+parser = ArgumentParser(description="Inclusion of dU correction")
+parser.add_argument('--du', dest='du', default=False, action='store_true')
+args = parser.parse_args()
 
 ## Inclusion of dU correction
-use_dU = True # True
+use_dU = args.du
 print("use_dU = %r" %use_dU)
 print("")
 

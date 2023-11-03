@@ -167,7 +167,8 @@ typedef struct MyKernelQuantity MyKernelQuantity;
 /* MyEOSParams struct
  *
  * Holds EOS parameters
- * @TODO: decide if using standard or non-rel chemical potentials
+ *
+ * Chemical potentials include the rest mass contribution
  */
 struct MyEOSParams {
   double nb;      // baryon number density
@@ -178,7 +179,8 @@ struct MyEOSParams {
   double mu_n;    // neutron chemical potential
   double mu_e;    // electron chemical potential
   double mu_mu;   // muon chemical potential (this will be needed when including muon-dependent reactions)
-  double dU;      // nuclear interaction correction on nuclear chemical potentials (as in Hempel 2015)
+  double dU;      // nonrelativistic mean field intereaction potential difference (as in Hempel 2015, Oertel et al. 2020)
+  double dm_eff;  // nonrelativistic mean field effective nucleon mass differenece
 };
 typedef struct MyEOSParams MyEOSParams;
 
@@ -208,9 +210,10 @@ typedef struct MyOpacity MyOpacity;
  * Store additional flags when computing opacities
  */
 struct OpacityParams {
-  bool use_dU;     // flag for dU correction
-  bool use_WM_ab;  // flag for WM correction (and related) on absorption rates
-  bool use_WM_sc;  // flag for WM correction (and related) on scattering rates
+  bool use_dU;      // flag for dU correction
+  bool use_dm_eff;  // flag for dm_eff correction
+  bool use_WM_ab;   // flag for WM correction (and related) on absorption rates
+  bool use_WM_sc;   // flag for WM correction (and related) on scattering rates
 };
 typedef struct OpacityParams OpacityParams;
 

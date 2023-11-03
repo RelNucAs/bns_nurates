@@ -64,7 +64,7 @@ void generate_comparison_data(const bool use_dU) {
   double w1_n[n_data], w1_p[n_data];  // weak magnetism correction to first Legendre term of scattering kernel (on neutrons and protons, respectively)
 
   // Opacity parameters (correction to rates)
-  OpacityParams opacity_pars = {.use_dU = use_dU, .use_WM_ab = true}; // WM correction turned on
+  OpacityParams opacity_pars = {.use_dU = use_dU, .use_dm_eff = false, .use_WM_ab = true}; // WM correction turned on
   
   // EOS parameters
   MyEOSParams eos_pars;
