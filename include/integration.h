@@ -28,8 +28,5 @@ MyQuadratureIntegrand GaussLegendreIntegrateFixedSplit2D(MyQuadrature *quad, MyF
 MyQuadratureIntegrand GaussLegendreIntegrateFixedSplit1D(MyQuadrature *quad, MyFunctionMultiD *func, double t);
 MyQuadratureIntegrand GaussLegendreIntegrate2D(MyQuadrature *quad, MyFunctionMultiD *func, double *tx, double *ty);
 MyQuadratureIntegrand GaussLegendreIntegrate1D(MyQuadrature *quad, MyFunctionMultiD *func, double *t);
-MyQuadratureIntegrand IntegrateTest1D(MyQuadrature *quad, double (*func[2]) (double, void *), double *t, void *p);
-MyQuadratureIntegrand IntegrateTest2D(MyQuadrature *quad, double (*func[2]) (double *, void *), double *tx, double *ty, void *p);
-
 
 #endif //BNS_NURATES_SRC_INTEGRATION_INTEGRATION_H_
