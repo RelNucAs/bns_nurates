@@ -283,10 +283,12 @@ struct GreyOpacityParams {
 };
 typedef struct GreyOpacityParams GreyOpacityParams;
 
+
 /* M1Opacities struct
  *
  * Stores the emissivity, absorption and scattering coefficients
  * for electron neutrino (nue), electron anti-neutrino (anue) and mu/tau neutrinos (nux)
+ * as in Radice et al. (2022)
  */
 struct M1Opacities {
   /* Number coefficients */
@@ -297,33 +299,26 @@ struct M1Opacities {
   double eta[total_num_species];         // energy emissivity coefficient
   double kappa_a[total_num_species];     // energy absorption coefficient
   double kappa_s[total_num_species];     // scattering coefficient
-
 };
 typedef struct M1Opacities M1Opacities;
+
+/* SpectralOpacities struct
+ *
+ * Stores the emissivity and inverse mean free path
+ * for electron neutrino (nue), electron anti-neutrino (anue) and mu/tau neutrinos (nux)
+ */
+struct SpectralOpacities {
+  double j[total_num_species];       // emissivity
+  double kappa[total_num_species];   // absorptivity / inverse mean free path
+  double j_s[total_num_species];     // "emissivity" for scattering
+  double kappa_s[total_num_species];  // inverse mean free path for scattering
+};
+typedef struct SpectralOpacities SpectralOpacities;
 
 /* ==================================================================================
  * Legacy and unused structures @TODO: repurpose or remove safely
  * ==================================================================================
  */
-
-// SourceCoeffs struct
-// structure needed for storing the values of the
-// emissivity and absoprtion/scattering coefficients
-// for the different neutrino species as in Radice
-// et al. (2022)
-struct SourceCoeffs {
-  double R_nue;    // number, electron-type neutrino
-  double R_anue;   // number, electron-type antineutrino
-  //double R_num;    // number, muon-type neutrino
-  //double R_anum;   // number, muon-type antineutrino
-  double R_nux;    // number, heavy-type (anti)neutrino
-  double Q_nue;    // energy, electron-type neutrino
-  double Q_anue;   // energy, electron-type antineutrino
-  //double Q_num;    // energy, muon-type neutrino
-  //double Q_anum;   // energy, muon-type antineutrino
-  double Q_nux;    // energy, heavy-type (anti)neutrino
-};
-typedef struct SourceCoeffs SourceCoeffs;
 
 // special function struct
 // function returns 4 values

@@ -54,37 +54,6 @@ int main() {
   //                               .distr_pars = distr_pars,
   //                               .m1_pars = m1_pars};
 
-  /* Compute emission coefficients */
-
-  // SourceCoeffs em_coeffs = ... 
-
-  // Print results to screen
-  //printf("Emission coefficients:\n");
-  //printf("R_nue = %.5e, R_anue = %.5e, R_nux = %.5e\n", em_coeffs.R_nue, em_coeffs.R_anue , em_coeffs.R_nux);
-  //printf("Q_nue = %.5e, Q_anue = %.5e, Q_nux = %.5e\n", em_coeffs.Q_nue, em_coeffs.Q_anue , em_coeffs.Q_nux);
-  //printf("\n");
-
-
-  /* Compute opacity coefficients */
-  
-  // SourceCoeffs ab_coeffs = ...
-
-  // Print result to screen
-  //printf("Opacity coefficients:\n");
-  //printf("R_nue = %.5e, R_anue = %.5e, R_nux = %.5e\n", ab_coeffs.R_nue, ab_coeffs.R_anue , ab_coeffs.R_nux);
-  //printf("Q_nue = %.5e, Q_anue = %.5e, Q_nux = %.5e\n", ab_coeffs.Q_nue, ab_coeffs.Q_anue , ab_coeffs.Q_nux);
-  //printf("\n");
-
-
-  /* Compute scattering coefficients */
-  
-  // SourceCoeffs sc_coeffs = ...
-
-  // Print result to screen
-  //printf("Scattering coefficients:\n");
-  //printf("R_nue = %.5e, R_anue = %.5e, R_nux = %.5e\n", sc_coeffs.R_nue, sc_coeffs.R_anue , sc_coeffs.R_nux);
-  //printf("Q_nue = %.5e, Q_anue = %.5e, Q_nux = %.5e\n", sc_coeffs.Q_nue, sc_coeffs.Q_anue , sc_coeffs.Q_nux);
-  //printf("\n");
 
   return 0;
 }

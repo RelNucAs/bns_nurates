@@ -13,6 +13,7 @@
  */
 
 #include <math.h>
+#include <assert.h>
 
 #include "opacities.h"
 #include "constants.h"
@@ -48,7 +49,7 @@ double EtaNNSc(const double nb, const double temp, const double yN) {
 }
 
 /**
- * @fn double IsoScattNucleon(double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars, const double yN, const int reacflag)
+ * @fn double IsoScattNucleon(const double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars, const double yN, const int reacflag)
  * @brief Computes Spectral scattering opacity for iso-energetic scattering on nucleons (protons/neutrons)
  * @param omega         neutrino energy \f$[MeV]\f$
  * @param opacity_pars  structure containing opacity parameters
@@ -134,3 +135,56 @@ double IsoScattTotal(const double omega, OpacityParams *opacity_pars, MyEOSParam
   return iso_nu_p + iso_nu_n;
 }
 
+
+/**
+ * @fn double IsoScattLegCoeff(const double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars, const int l)
+ * @brief Computes Spectral scattering opacity for iso-energetic scattering on nucleons (protons/neutrons)
+ * @param omega         neutrino energy \f$[MeV]\f$
+ * @param opacity_pars  structure containing opacity parameters
+ * @param eos_pars      structure containing equation of state parameters (needs baryon number density \f$[cm^{-3}]\f$ and temperature \f$[MeV]\f$)
+ * @param l             order of Legendre coefficient 
+ * @return              Legendre coefficient of order l of the isoscattering kernel
+ */
+double IsoScattLegCoeff(const double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars, const int l) {
+  assert(l >= 0 && l <= 1); // Legendre order must be either zero or one
+
+  static const double kIsoKer = (2. * kPi *  kGf *  kGf) / kHbar / (kHClight * kHClight * kHClight);
+    
+  static const double h0_p = kHpv * kHpv + 3. * kHpa * kHpa;   
+  static const double h1_p = kHpv * kHpv - kHpa * kHpa;        
+  static const double h0_n = kHnv * kHnv + 3. * kHna * kHna;   
+  static const double h1_n = kHnv * kHnv - kHna * kHna;        
+
+  static const double c0_p = kIsoKer * h0_p;  // 0th Legendre coefficient (protons)
+  static const double c1_p = kIsoKer * h1_p;  // 1st Legendre coefficient (protons)
+  static const double c0_n = kIsoKer * h0_n;  // 0th Legendre coefficient (neutrons)
+  static const double c1_n = kIsoKer * h1_n;  // 1st Legendre coefficient (neutrons)
+
+  double R0_n = 1., R1_n = 1.;
+  double R0_p = 1., R1_p = 1.;
+  double leg;
+
+  const double nb = eos_pars->nb;     // Number baryon density [cm^-3]
+  const double temp = eos_pars->temp; // Temperature [MeV]
+  const double yp = eos_pars->yp;     // Proton fraction
+  const double yn = eos_pars->yn;     // Neutron fraction
+
+  // degeneracy parameter from Eqn. (C37) of Bruenn
+  const double eta_pp = EtaNNSc(nb, temp, yp); // scattering on protons [cm^-3]
+  const double eta_nn = EtaNNSc(nb, temp, yn); // scattering on neutrons [cm^-3]
+
+  // Phase space, recoil and weak magnetism corrections
+  // R0 (R1) is the correction to the zeroth (first) Legendre coefficient
+  if (opacity_pars->use_WM_sc) {
+     WMScatt(omega, &R0_p, &R1_p, 1);
+     WMScatt(omega, &R0_n, &R1_n, 2);
+  }
+
+  if (l == 0) {
+    leg = eta_pp * c0_p * R0_p + eta_nn * c0_n * R0_n; // [MeV cm^6 s^-1]
+  } else {
+    leg = eta_pp * c1_p * R1_p + eta_nn * c1_n * R1_n; // [MeV cm^6 s^-1]
+  }
+
+  return leg;
+}

@@ -36,16 +36,8 @@ double IsoScattNeutron(const double omega, OpacityParams *opacity_pars, MyEOSPar
 // Sum of the two contributions for neutrino-nucleon scattering (protons + neutrons)
 double IsoScattTotal(const double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars);
 
-/*===========================================================================*/
-
-// nu_grey_total.c
-
-// Total emission coefficients
-//SourceCoeffs EmissionCoeffs(GreyOpacityParams *grey_pars);
-
-// Total opacity coefficients
-//SourceCoeffs OpacityCoeffs(GreyOpacityParams *grey_pars);
-
+// Legendre coefficient of order l fot the isoenergetic scattering kernel
+double IsoScattLegCoeff(const double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars, const int l);
 
 /*===========================================================================*/
 
@@ -57,8 +49,11 @@ MyKernelQuantity BremEmissivityAbsorptivityIntegrandFermi(double omega_prime, My
 MyKernelQuantity BremOpacitiesFermi(MyQuadrature *quad, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);
 
 // M1 opacities
-MyQuadratureIntegrand M1DoubleIntegrand(double *var, void *p);
-MyQuadratureIntegrand M1SingleIntegrand(double *var, void *p);
+MyQuadratureIntegrand M1CoeffsDoubleIntegrand(double *var, void *p);
+MyQuadratureIntegrand M1CoeffsSingleIntegrand(double *var, void *p);
 M1Opacities ComputeM1Opacities(MyQuadrature *quad_1d, MyQuadrature *quad_2d, GreyOpacityParams *my_grey_opacity_params);
+
+SpectralOpacities ComputeSpectralOpacities(const double nu, MyQuadrature *quad_1d, GreyOpacityParams *my_grey_opacity_params);
+
 
 #endif //BNS_NURATES_SRC_OPACITIES_OPACITIES_H_
