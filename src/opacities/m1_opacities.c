@@ -64,15 +64,15 @@ MyQuadratureIntegrand M1CoeffsDoubleIntegrand(double *var, void *p) {
  
   double pro_term[total_num_species];
 
-  pro_term[id_nue] = (pair_kernels_m1.em_e + brem_kernels_m1.em_e) * (1. - g_nu[id_anue]);
-  pro_term[id_anue] = (pair_kernels_m1.em_e + brem_kernels_m1.em_e) * (1. - g_nu[id_nue]);
-  pro_term[id_nux] = (pair_kernels_m1.em_x + brem_kernels_m1.em_x) * (1. - g_nu[id_nux]);
+  pro_term[id_nue] = (pair_kernels_m1.em_e + brem_kernels_m1.em_e); // * (1. - g_nu_bar[id_anue]);
+  pro_term[id_anue] = (pair_kernels_m1.em_e + brem_kernels_m1.em_e); // * (1. - g_nu_bar[id_nue]);
+  pro_term[id_nux] = (pair_kernels_m1.em_x + brem_kernels_m1.em_x); // * (1. - g_nu_bar[id_nux]);
 
   double ann_term[total_num_species];
 
-  ann_term[id_nue] = (pair_kernels_m1.abs_e + brem_kernels_m1.abs_e) * g_nu[id_anue];
-  ann_term[id_anue] = (pair_kernels_m1.abs_e + brem_kernels_m1.abs_e) * g_nu[id_nue];
-  ann_term[id_nux] = (pair_kernels_m1.abs_x + brem_kernels_m1.abs_x) * g_nu[id_nux];
+  ann_term[id_nue] = (pair_kernels_m1.abs_e + brem_kernels_m1.abs_e) * g_nu_bar[id_anue];
+  ann_term[id_anue] = (pair_kernels_m1.abs_e + brem_kernels_m1.abs_e) * g_nu_bar[id_nue];
+  ann_term[id_nux] = (pair_kernels_m1.abs_x + brem_kernels_m1.abs_x) * g_nu_bar[id_nux];
 
   double n_integrand_1[total_num_species], e_integrand_1[total_num_species];
   double n_integrand_2[total_num_species], e_integrand_2[total_num_species];
@@ -81,7 +81,7 @@ MyQuadratureIntegrand M1CoeffsDoubleIntegrand(double *var, void *p) {
     n_integrand_1[idx] = nu * nu * nu_bar * nu_bar * pro_term[idx];
     e_integrand_1[idx] = nu * n_integrand_1[idx];
 
-    n_integrand_2[idx] = g_nu[idx] * nu * nu * nu_bar * nu_bar * (pro_term[idx] + ann_term[idx]);
+    n_integrand_2[idx] = g_nu[idx] * nu * nu * nu_bar * nu_bar * ann_term[idx]; //(pro_term[idx] + ann_term[idx]);
     e_integrand_2[idx] = nu * n_integrand_2[idx];
   }
 
@@ -143,7 +143,7 @@ MyQuadratureIntegrand M1CoeffsSingleIntegrand(double *var, void *p) {
       e_integrand_1[idx] = nu * n_integrand_1[idx]; // [cm^-3 s^-1]
 
       n_integrand_2[idx] = nu * nu * g_nu[idx] * abs_em_beta.abs[id_nue]; // ab = em + ab (stimulated absorption)
-      e_integrand_2[idx] = nu * e_integrand_2[idx];
+      e_integrand_2[idx] = nu * n_integrand_2[idx];
     }
   }
 
