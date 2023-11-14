@@ -134,23 +134,41 @@ struct PairKernelParams {
 };
 typedef struct PairKernelParams PairKernelParams;
 
+/* PairKernelParams struct
+ *
+ * Parameters for the inelastic NES/NPS kernel
+ */
+struct InelasticScattKernelParams {
+  double omega;         // neutrino energy
+  double omega_prime;   // anti-neutrino energy
+  // @TODO: complete here
+};
+typedef struct InelasticScattKernelParams InelasticScattKernelParams;
+
 /* MyKernelParams struct
  *
  * Unified structure for holding parameters for multiple kernels
  */
 struct MyKernelParams {
   PairKernelParams pair_kernel_params;    // pair kernel parameters
-  BremKernelParams brem_kernel_params;    // Bremsstrahlung kernel parameters
+  BremKernelParams brem_kernel_params;    // Bremsstrahlung kernel 
+  InelasticScattKernelParams inelastic_kernel_params; // inelastic scattering kernel parameters
 };
 typedef struct MyKernelParams MyKernelParams;
 
-// MyKernelQuantity struct
+// MyKernelOutput struct
 //
-/* MyKernelQuantity struct
+/* MyKernelOutput struct
  *
- * holds emission/absorption related quantities for the pair and Bremsstrahlung process
- * for electron 'e' neutrinos and mu/tau 'x' neutrinos.
+ * holds emission/absorption related quantities for the pair and Bremsstrahlung process and for inelastic scattering on leptons
  */
+struct MyKernelOutput {
+  double em[total_num_species];  // emission/production kernel
+  double abs[total_num_species]; // absorption/annihilation kernel
+};
+typedef struct MyKernelOutput MyKernelOutput;
+
+// @TODO: decide what to do with the following
 struct MyKernelQuantity {
   double em_e;    // quantity related to emission/production for electron neutrinos
   double abs_e;   // quantity related to absorption for electron neutrinos
@@ -263,11 +281,12 @@ struct OpacityFlags {
   int use_abs_em;
   int use_pair;
   int use_brem;
+  int use_inelastic_scatt;
   int use_iso;
 };
 typedef struct OpacityFlags OpacityFlags;
-static OpacityFlags opacity_flags_default_all = {.use_abs_em = 1., .use_pair = 1., .use_brem = 1., .use_iso = 1.};
-static OpacityFlags opacity_flags_default_none = {.use_abs_em = 0., .use_pair = 0., .use_brem = 0., .use_iso = 0.};
+static OpacityFlags opacity_flags_default_all = {.use_abs_em = 1., .use_pair = 1., .use_brem = 1., .use_inelastic_scatt = 1., .use_iso = 1.};
+static OpacityFlags opacity_flags_default_none = {.use_abs_em = 0., .use_pair = 0., .use_brem = 0., .use_inelastic_scatt = 0., .use_iso = 0.};
 
 /* GreyOpacityParams struct
  *

@@ -18,7 +18,7 @@
 // bremsstrahlung helper functions and kernels
 double BremKernelS(double x, double y, double eta_star);
 double BremKernelG(double y, double eta_star);
-MyKernelQuantity BremKernelsLegCoeff(BremKernelParams *kernel_params, MyEOSParams *eos_params);
+MyKernelOutput BremKernelsLegCoeff(BremKernelParams *kernel_params, MyEOSParams *eos_params);
 
 // End of Bremsstrahlung kernel
 // ===============================================================================
@@ -39,5 +39,19 @@ MyKernelQuantity PairKernelsPhiMuIntegrated(MyEOSParams *eos_pars, PairKernelPar
 // End of pair process kernel
 // ===============================================================================
 /*===========================================================================*/
+
+
+// ===============================================================================
+// (3) Neutrino-electron (positron) scattering kernel
+
+// @TODO: add here functions from src/opacities/kernels/kernel_nes.c
+MyKernelOutput NESKernels(InelasticScattKernelParams *kernel_params, MyEOSParams *eos_params);
+MyKernelOutput NPSKernels(InelasticScattKernelParams *kernel_params, MyEOSParams *eos_params);
+MyKernelOutput InelasticScattKernels(InelasticScattKernelParams *kernel_params, MyEOSParams *eos_params);
+
+// End of pair process kernel
+// ===============================================================================
+/*===========================================================================*/
+
 
 #endif //BNS_NURATES_SRC_OPACITIES_KERNELS_KERNELS_H_

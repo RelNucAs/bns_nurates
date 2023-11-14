@@ -2,8 +2,8 @@
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
-//! \file  tests_opacities_pair.c
-//  \brief Generate a table for pair opacities
+//! \file  tests_opacities_inelastic_scattering.c
+//  \brief Generate a table for inelastic scattering on electrons/positrons
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,15 +18,15 @@
 
 int main() {
 
-  printf("=================================================== \n");
-  printf("Testing opacities for pair ... \n");
-  printf("=================================================== \n");
+  printf("============================================== \n");
+  printf("Testing opacities for inelastic scattering ... \n");
+  printf("============================================== \n");
 
   char filepath[300] = {'\0'};
   char filedir[300] = SOURCE_DIR;
   char outname[200] = "/tests/tests_opacities_m1/nurates_CCSN/nurates_1.008E+01.txt";
 
-  char data_fileout[200] = "/tests/tests_opacities_m1/output/m1_opacities_pair.txt";
+  char data_fileout[200] = "/tests/tests_opacities_m1/output/m1_opacities_inelastic_scatt.txt";
   char data_filepath[300] = {'\0'};
 
   strcat(filepath, filedir);
@@ -108,7 +108,7 @@ int main() {
   // activate only abs_em
   GreyOpacityParams my_grey_opacity_params;
   my_grey_opacity_params.opacity_flags = opacity_flags_default_none;
-  my_grey_opacity_params.opacity_flags.use_pair = 1;
+  my_grey_opacity_params.opacity_flags.use_inelastic_scatt = 1;
 
   FILE *file;
   file = fopen(data_filepath, "w+");
@@ -178,26 +178,24 @@ int main() {
     double distr_nuftot = TotalNuF(123.4, &my_grey_opacity_params.distr_pars, 0);
     double diff_distr = fabs(distr_fermi - distr_nuftot);
 
-    M1Opacities pair_opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
-
+    M1Opacities inelastic_scatt_opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
     printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
             r[i], diff_distr,
-            pair_opacities.eta_0[id_nue], pair_opacities.eta_0[id_anue], pair_opacities.eta_0[id_nux],
-            pair_opacities.eta[id_nue], pair_opacities.eta[id_anue], pair_opacities.eta[id_nux],
-            pair_opacities.kappa_0_a[id_nue], pair_opacities.kappa_0_a[id_anue], pair_opacities.kappa_0_a[id_nux],
-            pair_opacities.kappa_a[id_nue], pair_opacities.kappa_a[id_anue], pair_opacities.kappa_a[id_nux],
-            pair_opacities.kappa_s[id_nue], pair_opacities.kappa_s[id_anue], pair_opacities.kappa_s[id_nux]);
+            inelastic_scatt_opacities.eta_0[id_nue], inelastic_scatt_opacities.eta_0[id_anue], inelastic_scatt_opacities.eta_0[id_nux],
+            inelastic_scatt_opacities.eta[id_nue], inelastic_scatt_opacities.eta[id_anue], inelastic_scatt_opacities.eta[id_nux],
+            inelastic_scatt_opacities.kappa_0_a[id_nue], inelastic_scatt_opacities.kappa_0_a[id_anue], inelastic_scatt_opacities.kappa_0_a[id_nux],
+            inelastic_scatt_opacities.kappa_a[id_nue], inelastic_scatt_opacities.kappa_a[id_anue], inelastic_scatt_opacities.kappa_a[id_nux],
+            inelastic_scatt_opacities.kappa_s[id_nue], inelastic_scatt_opacities.kappa_s[id_anue], inelastic_scatt_opacities.kappa_s[id_nux]);
     fprintf(file, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
             r[i], diff_distr,
-            pair_opacities.eta_0[id_nue], pair_opacities.eta_0[id_anue], pair_opacities.eta_0[id_nux],
-            pair_opacities.eta[id_nue], pair_opacities.eta[id_anue], pair_opacities.eta[id_nux],
-            pair_opacities.kappa_0_a[id_nue], pair_opacities.kappa_0_a[id_anue], pair_opacities.kappa_0_a[id_nux],
-            pair_opacities.kappa_a[id_nue], pair_opacities.kappa_a[id_anue], pair_opacities.kappa_a[id_nux],
-            pair_opacities.kappa_s[id_nue], pair_opacities.kappa_s[id_anue], pair_opacities.kappa_s[id_nux]);
+            inelastic_scatt_opacities.eta_0[id_nue], inelastic_scatt_opacities.eta_0[id_anue], inelastic_scatt_opacities.eta_0[id_nux],
+            inelastic_scatt_opacities.eta[id_nue], inelastic_scatt_opacities.eta[id_anue], inelastic_scatt_opacities.eta[id_nux],
+            inelastic_scatt_opacities.kappa_0_a[id_nue], inelastic_scatt_opacities.kappa_0_a[id_anue], inelastic_scatt_opacities.kappa_0_a[id_nux],
+            inelastic_scatt_opacities.kappa_a[id_nue], inelastic_scatt_opacities.kappa_a[id_anue], inelastic_scatt_opacities.kappa_a[id_nux],
+            inelastic_scatt_opacities.kappa_s[id_nue], inelastic_scatt_opacities.kappa_s[id_anue], inelastic_scatt_opacities.kappa_s[id_nux]);
     }
 
   fclose(file);
-
   return 0;
 }
 

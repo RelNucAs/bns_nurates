@@ -54,7 +54,7 @@ MyQuadratureIntegrand M1CoeffsDoubleIntegrand(double *var, void *p) {
   }
 
   // compute the bremsstrahlung kernels
-  MyKernelQuantity brem_kernels_m1 = {.em_e = 0., .abs_e = 0., .em_x = 0., .abs_x = 0.};
+  MyKernelOutput brem_kernels_m1 = {0.};
   if (opacity_flags.use_brem) {
     my_grey_opacity_params->kernel_pars.brem_kernel_params.omega = nu;
     my_grey_opacity_params->kernel_pars.brem_kernel_params.omega_prime = nu_bar;
@@ -62,17 +62,25 @@ MyQuadratureIntegrand M1CoeffsDoubleIntegrand(double *var, void *p) {
     brem_kernels_m1 = BremKernelsLegCoeff(&my_grey_opacity_params->kernel_pars.brem_kernel_params, &my_grey_opacity_params->eos_pars);
   }
  
+  // compute the inelastic NES/NPS kernels
+  MyKernelOutput inelastic_kernels_m1 = {0.};
+  if (opacity_flags.use_inelastic_scatt) {
+    my_grey_opacity_params->kernel_pars.inelastic_kernel_params.omega = nu;
+    my_grey_opacity_params->kernel_pars.inelastic_kernel_params.omega_prime = nu_bar;
+    inelastic_kernels_m1 = InelasticScattKernels(&my_grey_opacity_params->kernel_pars.inelastic_kernel_params, &my_grey_opacity_params->eos_pars);
+  }
+
   double pro_term[total_num_species];
 
-  pro_term[id_nue] = (pair_kernels_m1.em_e + brem_kernels_m1.em_e) * (1. - g_nu_bar[id_anue]);
-  pro_term[id_anue] = (pair_kernels_m1.em_e + brem_kernels_m1.em_e) * (1. - g_nu_bar[id_nue]);
-  pro_term[id_nux] = (pair_kernels_m1.em_x + brem_kernels_m1.em_x) * (1. - g_nu_bar[id_nux]);
+  pro_term[id_nue] = (pair_kernels_m1.em_e + brem_kernels_m1.em[id_nue]) * (1. - g_nu_bar[id_anue]) + inelastic_kernels_m1.em[id_nue] * g_nu_bar[id_nue];
+  pro_term[id_anue] = (pair_kernels_m1.em_e + brem_kernels_m1.em[id_anue]) * (1. - g_nu_bar[id_nue]) + inelastic_kernels_m1.em[id_anue] * g_nu_bar[id_anue];
+  pro_term[id_nux] = (pair_kernels_m1.em_x + brem_kernels_m1.em[id_nux]) * (1. - g_nu_bar[id_nux]) + inelastic_kernels_m1.em[id_nux] * g_nu_bar[id_nux];
 
   double ann_term[total_num_species];
 
-  ann_term[id_nue] = (pair_kernels_m1.abs_e + brem_kernels_m1.abs_e) * g_nu_bar[id_anue];
-  ann_term[id_anue] = (pair_kernels_m1.abs_e + brem_kernels_m1.abs_e) * g_nu_bar[id_nue];
-  ann_term[id_nux] = (pair_kernels_m1.abs_x + brem_kernels_m1.abs_x) * g_nu_bar[id_nux];
+  ann_term[id_nue] = (pair_kernels_m1.abs_e + brem_kernels_m1.abs[id_nue]) * g_nu_bar[id_anue] + inelastic_kernels_m1.abs[id_nue] * (1. - g_nu_bar[id_nue]);
+  ann_term[id_anue] = (pair_kernels_m1.abs_e + brem_kernels_m1.abs[id_anue]) * g_nu_bar[id_nue] + inelastic_kernels_m1.abs[id_anue] * (1. - g_nu_bar[id_anue]);
+  ann_term[id_nux] = (pair_kernels_m1.abs_x + brem_kernels_m1.abs[id_nux]) * g_nu_bar[id_nux] + inelastic_kernels_m1.abs[id_nux] * (1. - g_nu_bar[id_nux]);
 
   double n_integrand_1[total_num_species], e_integrand_1[total_num_species];
   double n_integrand_2[total_num_species], e_integrand_2[total_num_species];
@@ -283,37 +291,47 @@ MyQuadratureIntegrand SpectralIntegrand(double *var, void *p) {
   }
 
   // compute the bremsstrahlung kernels
-  MyKernelQuantity brem_kernels_m1 = {.em_e = 0., .abs_e = 0., .em_x = 0., .abs_x = 0.};
+  MyKernelOutput brem_kernels_m1 = {0.};
   if (opacity_flags.use_brem) {
     my_grey_opacity_params->kernel_pars.brem_kernel_params.omega_prime = nu_bar;
     my_grey_opacity_params->kernel_pars.brem_kernel_params.l = 0;
     brem_kernels_m1 = BremKernelsLegCoeff(&my_grey_opacity_params->kernel_pars.brem_kernel_params, &my_eos_params);
   }
 
-  const double pro_term_nue = (pair_kernels_m1.em_e + brem_kernels_m1.em_e) * (1. - g_nu[id_anue]);
-  const double pro_term_anue = (pair_kernels_m1.em_e + brem_kernels_m1.em_e) * (1. - g_nu[id_nue]);
-  const double pro_term_nux = (pair_kernels_m1.em_x + brem_kernels_m1.em_x) * (1. - g_nu[id_nux]);
+  // compute the inelastic NES/NPS kernels
+  MyKernelOutput inelastic_kernels_m1 = {0.};
+  if (opacity_flags.use_inelastic_scatt) {
+    my_grey_opacity_params->kernel_pars.inelastic_kernel_params.omega_prime = nu_bar;
+    inelastic_kernels_m1 = InelasticScattKernels(&my_grey_opacity_params->kernel_pars.inelastic_kernel_params, &my_grey_opacity_params->eos_pars);
+  }
 
-  const double ann_term_nue = (pair_kernels_m1.abs_e + brem_kernels_m1.abs_e) * g_nu[id_anue];
-  const double ann_term_anue = (pair_kernels_m1.abs_e + brem_kernels_m1.abs_e) * g_nu[id_nue];
-  const double ann_term_nux = (pair_kernels_m1.abs_x + brem_kernels_m1.abs_x) * g_nu[id_nux];
+  double pro_term[total_num_species];
 
-  double integrand_1_nue = nu_bar * nu_bar * pro_term_nue;
-  double integrand_1_anue = nu_bar * nu_bar * pro_term_anue;
-  double integrand_1_nux = nu_bar * nu_bar * pro_term_nux;
+  pro_term[id_nue] = (pair_kernels_m1.em_e + brem_kernels_m1.em[id_nue]) * (1. - g_nu[id_anue]) + inelastic_kernels_m1.em[id_nue] * g_nu[id_nue];
+  pro_term[id_anue] = (pair_kernels_m1.em_e + brem_kernels_m1.em[id_anue]) * (1. - g_nu[id_nue]) + inelastic_kernels_m1.em[id_anue] * g_nu[id_anue];
+  pro_term[id_nux] = (pair_kernels_m1.em_x + brem_kernels_m1.em[id_nux]) * (1. - g_nu[id_nux]) + inelastic_kernels_m1.em[id_nux] * g_nu[id_nux];
 
-  double integrand_2_nue = nu_bar * nu_bar * ann_term_nue; //(pro_term_nue + ann_term_nue);
-  double integrand_2_anue = nu_bar * nu_bar * ann_term_anue; //(pro_term_anue + ann_term_anue);
-  double integrand_2_nux = nu_bar * nu_bar * ann_term_nux; //(pro_term_nux + ann_term_nux);
+  double ann_term[total_num_species];
+
+  ann_term[id_nue] = (pair_kernels_m1.abs_e + brem_kernels_m1.abs[id_nue]) * g_nu[id_anue] + inelastic_kernels_m1.abs[id_nue] * (1. - g_nu[id_nue]);
+  ann_term[id_anue] = (pair_kernels_m1.abs_e + brem_kernels_m1.abs[id_anue]) * g_nu[id_nue] + inelastic_kernels_m1.abs[id_anue] * (1. - g_nu[id_anue]);
+  ann_term[id_nux] = (pair_kernels_m1.abs_x + brem_kernels_m1.abs[id_nux]) * g_nu[id_nux] + inelastic_kernels_m1.abs[id_nux] * (1. - g_nu[id_nux]);
+
+  double integrand_1[total_num_species], integrand_2[total_num_species];
+
+  for (int idx=0; idx<12; idx++) {
+    integrand_1[idx] = nu_bar * nu_bar * pro_term[idx];
+    integrand_2[idx] = nu_bar * nu_bar * ann_term[idx];
+  }
 
   MyQuadratureIntegrand result = {.n = 6};
 
-  result.integrand[0] = integrand_1_nue;
-  result.integrand[1] = integrand_1_anue;
-  result.integrand[2] = integrand_1_nux;
-  result.integrand[3] = integrand_2_nue;
-  result.integrand[4] = integrand_2_anue;
-  result.integrand[5] = integrand_2_nux;
+  result.integrand[0] = integrand_1[id_nue];
+  result.integrand[1] = integrand_1[id_anue];
+  result.integrand[2] = integrand_1[id_nux];
+  result.integrand[3] = integrand_2[id_nue];
+  result.integrand[4] = integrand_2[id_anue];
+  result.integrand[5] = integrand_2[id_nux];
 
   return result;
 }
@@ -345,6 +363,7 @@ SpectralOpacities ComputeSpectralOpacities(const double nu, MyQuadrature *quad_1
 
   my_grey_opacity_params->kernel_pars.pair_kernel_params.omega = nu;
   my_grey_opacity_params->kernel_pars.brem_kernel_params.omega = nu;
+  my_grey_opacity_params->kernel_pars.inelastic_kernel_params.omega = nu;
 
   MyQuadratureIntegrand integrals_1d = GaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s);
 

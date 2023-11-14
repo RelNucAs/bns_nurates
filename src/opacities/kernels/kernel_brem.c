@@ -230,7 +230,7 @@ double BremAllChannelsAbsKernel(BremKernelParams *kernel_params, MyEOSParams *eo
 }
 
 /* Compute a specific Legendre coefficient in the expansion of production and absorption kernels for the Bremsstrahlung reactions */
-MyKernelQuantity BremKernelsLegCoeff(BremKernelParams *kernel_params, MyEOSParams *eos_params) {
+MyKernelOutput BremKernelsLegCoeff(BremKernelParams *kernel_params, MyEOSParams *eos_params) {
   // kernel parameters
   const double l = kernel_params->l; // order of Legendre coefficient
   const double omega = kernel_params->omega; // neutrino energy [MeV]
@@ -256,7 +256,12 @@ MyKernelQuantity BremKernelsLegCoeff(BremKernelParams *kernel_params, MyEOSParam
   // production kernel from detailed balance
   double s_em = s_abs * SafeExp(-x);
 
-  MyKernelQuantity brem_kernel = {.abs_e = s_abs, .em_e = s_em, .abs_x = s_abs, .em_x = s_em};
+  MyKernelOutput brem_kernel;
+  
+  for (int idx=0; idx<total_num_species; idx++) {
+    brem_kernel.abs[idx] = s_abs;
+    brem_kernel.em[idx] = s_em;
+  }
 
   return brem_kernel;
   

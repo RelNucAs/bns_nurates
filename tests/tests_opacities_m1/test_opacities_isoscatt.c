@@ -140,7 +140,7 @@ int main() {
     my_grey_opacity_params.opacity_pars.use_WM_ab = false;
     my_grey_opacity_params.opacity_pars.use_WM_sc = false;
     my_grey_opacity_params.opacity_pars.use_dU = false;
-
+    my_grey_opacity_params.opacity_pars.use_dm_eff = false;
 
     // only enable Fermi distribution function for the three neutrino species
     my_grey_opacity_params.distr_pars.temp_t[0] = T[i];

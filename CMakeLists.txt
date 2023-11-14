@@ -39,6 +39,7 @@ add_executable(bns_nurates
         src/integration/integration_quadrature_integrate.c
         src/opacities/kernels/kernel_brem.c
         src/opacities/kernels/kernel_pair.c
+        src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
         src/integration/integration_quadrature_integrate_kernels.c
@@ -692,6 +693,50 @@ add_executable(test_opacities_brem
 
 target_link_libraries(test_opacities_brem GSL::gsl GSL::gslcblas)
 target_link_libraries(test_opacities_brem m)
+
+# test opacities inelastic scattering
+add_executable(test_opacities_inelastic_scatt
+        include/constants.h
+        include/bns_nurates.h
+        include/distribution.h
+        src/distribution/distribution_opt_thick.c
+        src/distribution/distribution_opt_thin.c
+        src/distribution/distribution_total.c
+        include/functions.h
+        src/functions/digamma.c
+        src/functions/fermi.c
+        src/functions/gamma.c
+        src/functions/lambert.c
+        src/functions/mnewt.c
+        src/functions/safe_exp.c
+        include/integration.h
+        include/kernels.h
+        include/weak_magnetism.h
+        src/opacities/weak_magnetism/weak_magnetism.c
+        src/opacities/weak_magnetism/nucfrmfac.c
+        src/opacities/opacities.h
+        src/opacities/nu_abs_em_beta.c
+        src/opacities/nu_scatt_iso.c
+        src/output/outputs.h
+        include/eos.h
+        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
+        tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.c
+        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
+        src/integration/integration_quadrature_schemes.c
+        src/integration/integration_quadrature_io.c
+        src/integration/integration_quadrature_integrate.c
+        src/opacities/kernels/kernel_brem.c
+        src/opacities/kernels/kernel_pair.c
+        src/opacities/kernels/kernel_nes.c
+        src/opacities/nu_abs_em_pair.c
+        src/opacities/nu_abs_em_brem.c
+        src/integration/integration_quadrature_integrate_kernels.c
+        src/opacities/m1_opacities.c
+        tests/tests_opacities_m1/test_opacities_inelastic_scatt.c
+)
+
+target_link_libraries(test_opacities_inelastic_scatt GSL::gsl GSL::gslcblas)
+target_link_libraries(test_opacities_inelastic_scatt m)
 
 # test opacities isoscatt
 add_executable(test_opacities_isoscatt
