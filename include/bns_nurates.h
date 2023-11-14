@@ -233,6 +233,7 @@ struct OpacityParams {
   bool use_dm_eff;  // flag for dm_eff correction
   bool use_WM_ab;   // flag for WM correction (and related) on absorption rates
   bool use_WM_sc;   // flag for WM correction (and related) on scattering rates
+  bool use_decay;   // flag for inclusion of nucleon decay rates
 };
 typedef struct OpacityParams OpacityParams;
 static OpacityParams opacity_params_default_all = {.use_dU = true, .use_dm_eff = true, .use_WM_ab = true, .use_WM_sc = true};

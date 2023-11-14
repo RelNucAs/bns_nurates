@@ -87,8 +87,11 @@ double SafeExp(const double x);
 
 // theta.c
 
-// Theta step function
-double StepFunction(const double x);
+// Step function implementation with if statement
+double HeavisidePiecewise(const double x);
+
+// Step function approximation with tanh - (Eq.5)
+double HeavisideTanhApprox(const double x);
 
 /*===========================================================================*/
 

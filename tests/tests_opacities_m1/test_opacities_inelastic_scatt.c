@@ -105,7 +105,7 @@ int main() {
   GaussLegendreMultiD(&my_quadrature_2d);
   printf("Quadratures generated.\n");
 
-  // activate only abs_em
+  // activate only inelastic scatt 
   GreyOpacityParams my_grey_opacity_params;
   my_grey_opacity_params.opacity_flags = opacity_flags_default_none;
   my_grey_opacity_params.opacity_flags.use_inelastic_scatt = 1;
@@ -132,36 +132,11 @@ int main() {
     my_grey_opacity_params.eos_pars.yn = Yn[i];
     my_grey_opacity_params.eos_pars.nb = rho[i] / kMu;
 
-    my_grey_opacity_params.opacity_pars.use_WM_ab = false;
-    my_grey_opacity_params.opacity_pars.use_WM_sc = false;
-    my_grey_opacity_params.opacity_pars.use_dU = false;
-    my_grey_opacity_params.opacity_pars.use_dm_eff = false;
+    // Opacity parameters (corrections all switched off)
+    my_grey_opacity_params.opacity_pars = opacity_params_default_none;
 
-    // only enable Fermi distribution function for the three neutrino species
-    my_grey_opacity_params.distr_pars.temp_t[0] = T[i];
-    my_grey_opacity_params.distr_pars.temp_t[1] = T[i];
-    my_grey_opacity_params.distr_pars.temp_t[2] = T[i];
-    my_grey_opacity_params.distr_pars.w_t[0] = 1.;
-    my_grey_opacity_params.distr_pars.w_t[1] = 1.;
-    my_grey_opacity_params.distr_pars.w_t[2] = 1.;
-    my_grey_opacity_params.distr_pars.eta_t[0] = (my_grey_opacity_params.eos_pars.mu_e - my_grey_opacity_params.eos_pars.mu_n + my_grey_opacity_params.eos_pars.mu_p) / T[i];
-    my_grey_opacity_params.distr_pars.eta_t[1] = -(my_grey_opacity_params.eos_pars.mu_e - my_grey_opacity_params.eos_pars.mu_n + my_grey_opacity_params.eos_pars.mu_p) / T[i];
-    my_grey_opacity_params.distr_pars.eta_t[2] = 0.;
-
-    my_grey_opacity_params.m1_pars.chi[0] = 1.;
-    my_grey_opacity_params.m1_pars.chi[1] = 1.;
-    my_grey_opacity_params.m1_pars.chi[2] = 1.;
-
-    // disable thin distribution function for the time being
-    my_grey_opacity_params.distr_pars.w_f[0] = 0.;
-    my_grey_opacity_params.distr_pars.w_f[1] = 0.;
-    my_grey_opacity_params.distr_pars.w_f[2] = 0.;
-    my_grey_opacity_params.distr_pars.c_f[0] = 1.;
-    my_grey_opacity_params.distr_pars.c_f[1] = 1.;
-    my_grey_opacity_params.distr_pars.c_f[2] = 1.;
-    my_grey_opacity_params.distr_pars.temp_f[0] = T[i];
-    my_grey_opacity_params.distr_pars.temp_f[1] = T[i];
-    my_grey_opacity_params.distr_pars.temp_f[2] = T[i];
+    // Distribution parameters
+    my_grey_opacity_params.distr_pars = NuEquilibriumParams(&my_grey_opacity_params.eos_pars); // consider neutrino distribution function at equilibrium
 
     // M1 parameters
     MyQuadratureIntegrand Jvals = NuEnergy(&my_grey_opacity_params.distr_pars);

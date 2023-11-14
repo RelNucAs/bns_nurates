@@ -108,10 +108,14 @@ void AbsOpacitySingleLep(const double omega, OpacityParams *opacity_pars, MyEOSP
   static const double k2 = kGv * kGv + 3. * kGa * kGa; 
   static const double kAbsEmConst = k1 * k2; // constant in Eq.(C13,C15,C19,C20)
 
+  const double mLep_squared = mLep * mLep;
+
   double Qprime, mu_np;
   double etanp, etapn;
   double E_e, E_p;
-  double aux, fd_e, fd_p;
+  double E_e_squared, E_p_squared;
+  double cap_term = 0., dec_term = 0.;
+  double fd_e, fd_p;
   double R = 1., Rbar = 1.;
   double dU = 0., dQ = kQ;
 
@@ -144,31 +148,49 @@ void AbsOpacitySingleLep(const double omega, OpacityParams *opacity_pars, MyEOSP
   // Phase space, recoil and weak magnetism correction
   if (opacity_pars->use_WM_ab) WMAbsEm(omega, &R, &Rbar);
 
-  // @TODO: Leonardo -> look for smartest choice to check kinematics constraints
-  // Check kinematics constraint for neutrino absorption
-  if (E_e - mLep > 0.) {
-    aux = R *  kAbsEmConst * E_e * E_e * sqrt(1. - mLep * mLep / (E_e * E_e)); // remove c to get output in cm-1
-    fd_e = FermiDistr(E_e, temp, muLep);
-    // @TODO: eventually think about a specifically designed function for (1-FermiDistr)
-    out[1] = etapn * aux * fd_e;       // Neutrino emissivity   [s-1], Eq.(C15)
-    out[0] = out[1] * SafeExp((omega - (mu_p + muLep - mu_n)) / temp);
+  // Electron/muon-type neutrino
+  E_e = omega + Qprime;  // Electron energy [MeV]
+  E_p = -E_e;            // Positron energy [MeV]
 
-    // without detailed balance
-    //out[0] = etanp * aux * (1 - fd_e); // Neutrino absorptivity [s-1], Eq.(C13)
+  E_e_squared = E_e * E_e;
+  E_p_squared = E_p * E_p;
+  
+  fd_e = FermiDistr(E_e, temp,  muLep);
+  fd_p = FermiDistr(E_p, temp, -muLep);
+
+  // @TODO: HeavisideTanhApprox is 0.5 instead of 1 in E = m
+  cap_term = E_e_squared * sqrt(1. - mLep_squared / E_e_squared) * HeavisideTanhApprox(E_e - mLep) * R;
+
+  if (opacity_pars->use_decay) {
+    dec_term = E_p_squared * sqrt(1. - mLep_squared / E_p_squared) * HeavisideTanhApprox(E_p - mLep);
   }
 
-  // Check kinematics constraint for antineutrino absorption
-  if (E_p - mLep > 0.) {
-    aux = Rbar * kAbsEmConst * E_p * E_p * sqrt(1. - mLep * mLep / (E_p * E_p)); // remove c to get output in cm-1
-    fd_p = FermiDistr(E_p, temp, -muLep);
-    // @TODO: eventually think about a specifically designed function for (1-FermiDistr)
-    out[3] = etanp * aux * fd_p;        // Antineutrino emissivity   [s-1], Eq.(C20)
-    out[2] = out[3] * SafeExp((omega - (mu_n - mu_p - muLep)) / temp);
+  // @TODO: eventually think about a specifically designed function for (1-FermiDistr)
+  out[1] = kAbsEmConst * etapn * (cap_term * fd_e + dec_term * (1. - fd_p)); // Neutrino emissivity [s-1], Eq.(C15), remove c to get output in cm-1
+  out[0] = out[1] * SafeExp((omega - (mu_p + muLep - mu_n)) / temp); // Neutrino absorptivity [s-1]
+
+  // without detailed balance
+  //out[0] = kAbsEmConst * etanp * (cap_term * (1. - fd_e) + dec_term * fd_p); // Neutrino absorptivity [s-1], Eq.(C13)
+  
+  E_p = omega - Qprime;  // Positron energy [MeV]
+  E_e = -E_p;            // Electron energy [MeV]
+
+  fd_e = FermiDistr(E_e, temp,  muLep);
+  fd_p = FermiDistr(E_p, temp, -muLep);
+
+  cap_term = E_p_squared * sqrt(1. - mLep_squared / E_p_squared) * HeavisideTanhApprox(E_p - mLep) * Rbar;
+  
+  if (opacity_pars->use_decay) {
+    dec_term = E_e_squared * sqrt(1. - mLep_squared / E_e_squared) * HeavisideTanhApprox(E_e - mLep);
+  }
+
+  // @TODO: eventually think about a specifically designed function for (1-FermiDistr)
+  out[3] = kAbsEmConst * etanp * (cap_term * fd_p + dec_term * (1. - fd_e)); // Antineutrino emissivity [s-1], Eq.(C20), remove c to get output in cm-1
+  out[2] = out[3] * SafeExp((omega - (mu_n - mu_p - muLep)) / temp); // Antineutrino absorptivity [s-1]
     
-    // without detailed balance
-    //out[2] = etapn * aux * (1. - fd_p); // Antineutrino absorptivity [s-1], Eq.(C19)
-  }
-
+  // without detailed balance
+  //out[2] = kAbsEmConst * etapn * (cap_term * (1 - fd_p) + dec_term * fd_e); // Antineutrino absorptivity [s-1], Eq.(C19)
+  
   return;
 }
 

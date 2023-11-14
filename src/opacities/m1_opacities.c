@@ -397,7 +397,7 @@ SpectralOpacities ComputeSpectralOpacities(const double nu, MyQuadrature *quad_1
   sp_opacities.j_s[id_anue] = 4. * kPi * nu * nu * g_nu[id_anue] * iso_scatt;
   sp_opacities.j_s[id_nux] = 4. * kPi * nu * nu * g_nu[id_nux] * iso_scatt;
 
-  sp_opacities.kappa_s[id_nue] = 4. * kPi * nu * nu * iso_scatt;
+  sp_opacities.kappa_s[id_nue] = 4. * kPi * nu * nu * iso_scatt / kClight;
   sp_opacities.kappa_s[id_anue] = sp_opacities.kappa_s[id_nue];
   sp_opacities.kappa_s[id_nux] = sp_opacities.kappa_s[id_nue];
 

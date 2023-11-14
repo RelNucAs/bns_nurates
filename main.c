@@ -8,6 +8,7 @@
 #include "include/integration.h"
 #include "include/distribution.h"
 #include "include/constants.h"
+#include "include/functions.h"
 #include "include/kernels.h"
 #include "include/functions.h"
 #include "src/opacities/opacities.h"

@@ -21,6 +21,7 @@ add_executable(bns_nurates
         src/functions/lambert.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         include/integration.h
         include/kernels.h
         include/weak_magnetism.h
@@ -62,6 +63,7 @@ add_library(nurates SHARED
         src/functions/lambert.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
         src/opacities/nu_abs_em_beta.c
@@ -186,6 +188,7 @@ add_executable(test_pair_opacities
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         include/integration.h
         include/kernels.h
         src/opacities/opacities.h
@@ -216,6 +219,7 @@ add_executable(test_beta
         src/functions/lambert.c
         #src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         #src/integration/integration.h
         #src/opacities/kernels/kernels.h
         include/weak_magnetism.h
@@ -249,6 +253,7 @@ add_executable(test_iso
         src/functions/lambert.c
         #src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         #src/integration/integration.h
         #src/opacities/kernels/kernels.h
         include/weak_magnetism.h
@@ -282,6 +287,7 @@ add_executable(test_brem
         src/functions/lambert.c
         #src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         #src/integration/integration.h
         #src/opacities/kernels/kernels.h
         include/weak_magnetism.h
@@ -311,6 +317,7 @@ add_executable(test_m1_coeffs
         src/distribution/distribution_total.c
         include/functions.h
         src/functions/lambert.c
+        src/functions/theta.c
         src/opacities/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
@@ -341,6 +348,7 @@ add_executable(test_gauss_legendre_1d
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
@@ -361,6 +369,7 @@ add_executable(test_gauss_legendre_2d
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
@@ -381,6 +390,7 @@ add_executable(test_gauss_legendre_3d
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
@@ -401,6 +411,7 @@ add_executable(test_gauss_laguerre_1d
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
@@ -421,6 +432,7 @@ add_executable(test_quadrature_io
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
@@ -443,6 +455,7 @@ add_executable(test_integration_1d
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
@@ -465,6 +478,7 @@ add_executable(test_integration_2d
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
@@ -487,6 +501,7 @@ add_executable(test_integration_3d
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
@@ -509,6 +524,7 @@ add_executable(test_integration_special
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
@@ -532,6 +548,7 @@ add_executable(test_integration_multi_func_1d
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
@@ -555,6 +572,7 @@ add_executable(test_integration_multi_func_2d
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
@@ -580,6 +598,7 @@ add_executable(test_opacities_electron_capture
         src/functions/lambert.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         include/integration.h
         include/kernels.h
         include/weak_magnetism.h
@@ -623,6 +642,7 @@ add_executable(test_opacities_pair
         src/functions/lambert.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         include/integration.h
         include/kernels.h
         include/weak_magnetism.h
@@ -666,6 +686,7 @@ add_executable(test_opacities_brem
         src/functions/lambert.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         include/integration.h
         include/kernels.h
         include/weak_magnetism.h
@@ -709,6 +730,7 @@ add_executable(test_opacities_inelastic_scatt
         src/functions/lambert.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         include/integration.h
         include/kernels.h
         include/weak_magnetism.h
@@ -753,6 +775,7 @@ add_executable(test_opacities_isoscatt
         src/functions/lambert.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         include/integration.h
         include/kernels.h
         include/weak_magnetism.h
@@ -796,6 +819,7 @@ add_executable(test_m1_distribution
         src/functions/lambert.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
+        src/functions/theta.c
         include/integration.h
         include/kernels.h
         include/weak_magnetism.h
