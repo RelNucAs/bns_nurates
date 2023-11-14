@@ -191,6 +191,7 @@ typedef struct MyKernelQuantity MyKernelQuantity;
 struct MyEOSParams {
   double nb;      // baryon number density
   double temp;    // temperature
+  double ye;      // electron fraction
   double yp;      // proton fraction
   double yn;      // neutron fraction
   double mu_p;    // proton chemical potential
@@ -234,6 +235,8 @@ struct OpacityParams {
   bool use_WM_sc;   // flag for WM correction (and related) on scattering rates
 };
 typedef struct OpacityParams OpacityParams;
+static OpacityParams opacity_params_default_all = {.use_dU = true, .use_dm_eff = true, .use_WM_ab = true, .use_WM_sc = true};
+static OpacityParams opacity_params_default_none = {.use_dU = false, .use_dm_eff = false, .use_WM_ab = false, .use_WM_sc = false};
 
 /* ==================================================================================
  * M1 structures

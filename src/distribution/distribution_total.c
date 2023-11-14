@@ -10,6 +10,32 @@
 #include "distribution.h"
 #include "constants.h"
 #include "integration.h"
+ 
+/* Function for evaluating parameters of neutrino distribution function at equilibrium
+*/
+NuDistributionParams NuEquilibriumParams(MyEOSParams *eos_pars){
+  NuDistributionParams out_distr;
+
+  const double temp = eos_pars->temp; // [MeV]
+  const double mu_e = eos_pars->mu_e; // [MeV]
+  const double mu_p = eos_pars->mu_p; // [MeV]
+  const double mu_n = eos_pars->mu_n; // [MeV]
+
+  for (int idx = 0; idx < total_num_species; idx++) {
+    out_distr.w_t[idx] = 1.;
+    out_distr.temp_t[idx] = temp;
+    
+    out_distr.w_f[idx] = 0.;
+    out_distr.c_f[idx] = 1.; // 
+    out_distr.temp_f[idx] = temp;
+  }
+  
+  out_distr.eta_t[id_nue] = (mu_e - mu_n + mu_p) / temp;
+  out_distr.eta_t[id_anue] = - out_distr.eta_t[id_nue];
+  out_distr.eta_t[id_nux] = 0.;
+
+  return out_distr;
+}
 
 /* Total neutrino distribution combining optically thick and thin regimes
  *

@@ -45,6 +45,13 @@ double TotalNuF(double omega, NuDistributionParams *distr_pars, int species);
 NuDistributionParams CalculateDistrParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars);
 
 /* ===========================================================================
+ * Function for evaluating parameters of neutrino distribution function at equilibrium
+ * ===========================================================================
+ */
+
+NuDistributionParams NuEquilibriumParams(MyEOSParams *eos_pars);
+
+/* ===========================================================================
  * Functions for computing neutrino number and energy density
  * ===========================================================================
  */
