@@ -142,9 +142,6 @@ void AbsOpacitySingleLep(const double omega, OpacityParams *opacity_pars, MyEOSP
   etanp = EtaNP(nn, np, mu_np, temp); // Eq. (C14)
   etapn = EtaPN(nn, np, mu_np, temp);
 
-  E_e = omega + Qprime;  // Electron energy [MeV]
-  E_p = omega - Qprime;  // Positron energy [MeV]
-
   // Phase space, recoil and weak magnetism correction
   if (opacity_pars->use_WM_ab) WMAbsEm(omega, &R, &Rbar);
 
@@ -171,9 +168,12 @@ void AbsOpacitySingleLep(const double omega, OpacityParams *opacity_pars, MyEOSP
 
   // without detailed balance
   //out[0] = kAbsEmConst * etanp * (cap_term * (1. - fd_e) + dec_term * fd_p); // Neutrino absorptivity [s-1], Eq.(C13)
-  
+ 
   E_p = omega - Qprime;  // Positron energy [MeV]
   E_e = -E_p;            // Electron energy [MeV]
+
+  E_e_squared = E_e * E_e;
+  E_p_squared = E_p * E_p;
 
   fd_e = FermiDistr(E_e, temp,  muLep);
   fd_p = FermiDistr(E_p, temp, -muLep);
