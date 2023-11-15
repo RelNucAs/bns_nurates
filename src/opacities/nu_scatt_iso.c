@@ -176,8 +176,8 @@ double IsoScattLegCoeff(const double omega, OpacityParams *opacity_pars, MyEOSPa
   // Phase space, recoil and weak magnetism corrections
   // R0 (R1) is the correction to the zeroth (first) Legendre coefficient
   if (opacity_pars->use_WM_sc) {
-     WMScatt(omega, &R0_p, &R1_p, 1);
-     WMScatt(omega, &R0_n, &R1_n, 2);
+    WMScatt(omega, &R0_p, &R1_p, 1);
+    WMScatt(omega, &R0_n, &R1_n, 2);
   }
 
   if (l == 0) {

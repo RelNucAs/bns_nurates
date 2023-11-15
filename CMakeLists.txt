@@ -76,6 +76,7 @@ add_library(nurates SHARED
         src/integration/integration_quadrature_integrate.c
         src/opacities/kernels/kernel_brem.c
         src/opacities/kernels/kernel_pair.c
+        src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
         src/integration/integration_quadrature_integrate_kernels.c
@@ -617,6 +618,7 @@ add_executable(test_opacities_electron_capture
         src/integration/integration_quadrature_integrate.c
         src/opacities/kernels/kernel_brem.c
         src/opacities/kernels/kernel_pair.c
+        src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
         src/integration/integration_quadrature_integrate_kernels.c
@@ -661,6 +663,7 @@ add_executable(test_opacities_pair
         src/integration/integration_quadrature_integrate.c
         src/opacities/kernels/kernel_brem.c
         src/opacities/kernels/kernel_pair.c
+        src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
         src/integration/integration_quadrature_integrate_kernels.c
@@ -705,6 +708,7 @@ add_executable(test_opacities_brem
         src/integration/integration_quadrature_integrate.c
         src/opacities/kernels/kernel_brem.c
         src/opacities/kernels/kernel_pair.c
+        src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
         src/integration/integration_quadrature_integrate_kernels.c
@@ -794,6 +798,7 @@ add_executable(test_opacities_isoscatt
         src/integration/integration_quadrature_integrate.c
         src/opacities/kernels/kernel_brem.c
         src/opacities/kernels/kernel_pair.c
+        src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
         src/integration/integration_quadrature_integrate_kernels.c
@@ -838,6 +843,7 @@ add_executable(test_m1_distribution
         src/integration/integration_quadrature_integrate.c
         src/opacities/kernels/kernel_brem.c
         src/opacities/kernels/kernel_pair.c
+        src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
         src/integration/integration_quadrature_integrate_kernels.c
