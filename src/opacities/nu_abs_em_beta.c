@@ -156,10 +156,14 @@ void AbsOpacitySingleLep(const double omega, OpacityParams *opacity_pars, MyEOSP
   fd_p = FermiDistr(E_p, temp, -muLep);
 
   // @TODO: HeavisideTanhApprox is 0.5 instead of 1 in E = m
-  cap_term = E_e_squared * sqrt(1. - mLep_squared / E_e_squared) * HeavisideTanhApprox(E_e - mLep) * R;
-
+  if (E_e - mLep >= 0.) {
+    cap_term = E_e_squared * sqrt(1. - mLep_squared / E_e_squared) * R; // * HeavisideTanhApprox(E_e - mLep)
+  }
+  
   if (opacity_pars->use_decay) {
-    dec_term = E_p_squared * sqrt(1. - mLep_squared / E_p_squared) * HeavisideTanhApprox(E_p - mLep);
+    if (E_p - mLep >= 0.) {
+      dec_term = E_p_squared * sqrt(1. - mLep_squared / E_p_squared); // * HeavisideTanhApprox(E_p - mLep)
+    }
   }
 
   // @TODO: eventually think about a specifically designed function for (1-FermiDistr)
@@ -169,6 +173,9 @@ void AbsOpacitySingleLep(const double omega, OpacityParams *opacity_pars, MyEOSP
   // without detailed balance
   //out[0] = kAbsEmConst * etanp * (cap_term * (1. - fd_e) + dec_term * fd_p); // Neutrino absorptivity [s-1], Eq.(C13)
  
+  cap_term = 0.;
+  dec_term = 0.;
+
   E_p = omega - Qprime;  // Positron energy [MeV]
   E_e = -E_p;            // Electron energy [MeV]
 
@@ -178,10 +185,14 @@ void AbsOpacitySingleLep(const double omega, OpacityParams *opacity_pars, MyEOSP
   fd_e = FermiDistr(E_e, temp,  muLep);
   fd_p = FermiDistr(E_p, temp, -muLep);
 
-  cap_term = E_p_squared * sqrt(1. - mLep_squared / E_p_squared) * HeavisideTanhApprox(E_p - mLep) * Rbar;
-  
+  if (E_p - mLep >= 0.) {
+    cap_term = E_p_squared * sqrt(1. - mLep_squared / E_p_squared) * Rbar; // * HeavisideTanhApprox(E_p - mLep)
+  }
+
   if (opacity_pars->use_decay) {
-    dec_term = E_e_squared * sqrt(1. - mLep_squared / E_e_squared) * HeavisideTanhApprox(E_e - mLep);
+    if (E_e - mLep >= 0.) {
+      dec_term = E_e_squared * sqrt(1. - mLep_squared / E_e_squared); // * HeavisideTanhApprox(E_e - mLep)
+    }
   }
 
   // @TODO: eventually think about a specifically designed function for (1-FermiDistr)
