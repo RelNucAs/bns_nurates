@@ -122,17 +122,17 @@ int main() {
   eos_pars.yp   = 0.3134;
  
   // Compute kernels
-  MyKernelQuantity out = BremKernelsLegCoeff(&kernel_pars, &eos_pars);
+  MyKernelOutput out = BremKernelsLegCoeff(&kernel_pars, &eos_pars);
   
   // Print kernels
-  printf("Output emission   kernel = %.5e cm^3/s\n", out.em_e);
-  printf("Output absorption kernel = %.5e cm^3/s\n", out.abs_e);
+  printf("Output emission   kernel = %.5e cm^3/s\n", out.em[id_nue]);
+  printf("Output absorption kernel = %.5e cm^3/s\n", out.abs[id_nue]);
   printf("\n");
 
   // Compare kernels
   const double tol = 1.0E-06; // tolerance on relative difference
-  const double em_diff  = fabs(out.em_e  - ref_em_ker ) / ref_em_ker;  // emission kernel difference
-  const double abs_diff = fabs(out.abs_e - ref_abs_ker) / ref_abs_ker; // absorption kernel difference
+  const double em_diff  = fabs(out.em[id_nue]  - ref_em_ker ) / ref_em_ker;  // emission kernel difference
+  const double abs_diff = fabs(out.abs[id_nue] - ref_abs_ker) / ref_abs_ker; // absorption kernel difference
 
   if ( (em_diff > tol) || (abs_diff > tol) ) {
     printf("Test failed!\n");
