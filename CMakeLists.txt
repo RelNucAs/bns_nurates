@@ -640,6 +640,7 @@ add_executable(test_opacities_pair
         src/distribution/distribution_total.c
         include/functions.h
         src/functions/digamma.c
+        src/functions/fermi_integrals.c
         src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c

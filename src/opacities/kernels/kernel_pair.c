@@ -146,7 +146,7 @@ double PairG(int n, double a, double b, double eta, double y, double z) {
  * Output:
  *      Psi_l(y,z) = sum_{n=0..2} [c_{ln} G_n(y,y+z) + d_{ln} G_n(z,y+z)] + sum_{n=3..(2l+5)} a_{ln} [G_n(0,min(y,z)) - G_n(max(y,z),y+z)]
  */
-double PairPsi(int l, double y, double z, double eta) {
+void PairPsiOptimized(int l, double y, double z, double eta, double *psi_out) {
 
   assert(0 <= l && l <= 3);
 
@@ -221,23 +221,34 @@ double PairPsi(int l, double y, double z, double eta) {
   d[3][1] = 4. * z2 * (3. * y3 + 24. * y2 * z + 130. * y * z2 / 3. + 200. * z3 / 9.) / (35. * y5);
   d[3][2] = -4. * z2 * (50. * z2 / 63. + 6. * z * y / 7. + 6. * y2 / 35.) / y5;
 
-  double result = 0.;
+  double aux;
+
+  double result_y_z = 0., result_z_y = 0.;
+  double pair_g_y = 0., pair_g_z = 0.;
 
   for (int n = 0; n <= 2; n++) {
-    result += c[l][n] * PairG(n, y, y + z, eta, y, z) + d[l][n] * PairG(n, z, y + z, eta, y, z);
+    pair_g_y = PairG(n, y, y + z, eta, y, z); // a = y
+    pair_g_z = PairG(n, z, y + z, eta, y, z); // a = z
+    result_y_z += c[l][n] * pair_g_y + d[l][n] * pair_g_z;
+    result_z_y += d[l][n] * pair_g_y + c[l][n] * pair_g_z;
   }
 
   double min_yz = (y > z) ? z : y;
   double max_yz = (y > z) ? y : z;
 
   for (int n = 3; n <= 2 * l + 5; n++) {
-    result += a[l][n] * (PairG(n, 0, min_yz, eta, y, z) - PairG(n, max_yz, y + z, eta, y, z));
+    aux = a[l][n] * (PairG(n, 0, min_yz, eta, y, z) - PairG(n, max_yz, y + z, eta, y, z));
+    result_y_z += aux;
+    result_z_y += aux;
   }
+  
+  psi_out[0] = result_y_z; // Psi(y,z)
+  psi_out[1] = result_z_y; // Psi(z,y)
 
-  return result;
+  return;
 }
 
-double PairPsiOld(int l, double y, double z, double eta) {
+double PairPsi(int l, double y, double z, double eta) {
 
   assert(0 <= l && l <= 3);
 
@@ -336,12 +347,13 @@ void PairPhiAllFlavors(int l, double omega, double omega_prime, double eta, doub
 
   const double y = omega / temp;
   const double z = omega_prime / temp;
+ 
+  double pair_psi[2] = {0.};
 
-  const double psi_1 = PairPsi(l, y, z, eta);
-  const double psi_2 = PairPsi(l, z, y, eta);
+  PairPsiOptimized(l, y, z, eta, pair_psi);
   
-  phi_out[0] = kPairPhi * temp * temp * (kAlpha1[0] * kAlpha1[0] * psi_1 + kAlpha2[0] * kAlpha2[0] * psi_2) / (1. - exp(y + z));
-  phi_out[1] = kPairPhi * temp * temp * (kAlpha1[1] * kAlpha1[1] * psi_1 + kAlpha2[1] * kAlpha2[1] * psi_2) / (1. - exp(y + z));
+  phi_out[0] = kPairPhi * temp * temp * (kAlpha1[0] * kAlpha1[0] * pair_psi[0] + kAlpha2[0] * kAlpha2[0] * pair_psi[1]) / (1. - exp(y + z));
+  phi_out[1] = kPairPhi * temp * temp * (kAlpha1[1] * kAlpha1[1] * pair_psi[0] + kAlpha2[1] * kAlpha2[1] * pair_psi[1]) / (1. - exp(y + z));
 
   return;
 }
