@@ -152,6 +152,97 @@ double PairPsi(int l, double y, double z, double eta) {
 
   double a[4][12], c[4][3], d[4][3];
 
+  const double y2 = y * y;
+  const double y3 = y * y2;
+  const double y4 = y * y3;
+  const double y5 = y * y4;
+
+  const double z2 = z * z;
+  const double z3 = z * z2;
+  const double z4 = z * z3;
+  const double z5 = z * z4; 
+
+  a[0][3] = 8. / (3. * y2);
+  a[0][4] = -4. / (3. * y2 * z);
+  a[0][5] = 4. / (15. * y2 * z2);
+  c[0][0] = (4. * y / z2) * (2. * z2 / 3. + y * z + 2. * y2 / 5.);
+  c[0][1] = -(4. * y / (3. * z2)) * (3. * y + 4. * z);
+  c[0][2] = 8. * y / (3. * z2);
+  d[0][0] = 4. * z3 / (15. * y2);
+  d[0][1] = -4. * z2 / (3. * y2);
+  d[0][2] = 8. * z / (3. * y2);
+
+  // Coefficients for l = 1
+  a[1][3] = 8. / (3. * y2);
+  a[1][4] = -4. * (4. * y + 3. * z) / (3. * y3 * z);
+  a[1][5] = 4. * (13. * y + 18. * z) / (15. * y3 * z2);
+  a[1][6] = -4. * (y + 3. * z) / (5. * y3 * z3);
+  a[1][7] = 16. / (35. * y3 * z3);
+  c[1][0] = -(4. * y / z3) *
+      (2. * y3 / 7. + 4. * y2 * z / 5. + 4. * y * z2 / 5. + z3 / 3.);
+  c[1][1] = (4. * y / z3) * (4. * y2 / 5. + 7. * y * z / 5. + 2. * z2 / 3.);
+  c[1][2] = -(4. * y / z3) * (3. * y / 5. + z / 3.);
+  d[1][0] = -(4. * z3 / (105. * y3)) * (14. * y + 9. * z);
+  d[1][1] = (4. * z2 / (5. * y3)) * (7. * y / 3. + 2. * z);
+  d[1][2] = -(4. * z / y3) * (y / 3. + 3. * z / 5.);
+
+  // Coefficients for l = 2
+  a[2][3] = 8. / (3. * y2);
+  a[2][4] = -4. * (10. * y + 9. * z) / (3. * y3 * z);
+  a[2][5] = 4. * (73. * y2 + 126. * y * z + 36. * z * z) / (15. * y4 * z * z);
+  a[2][6] = -12. * (y2 + 3. * y * z + 8. * z2 / 5.) / (y4 * z3);
+  a[2][7] = 48. * (2. * y2 + 13. * y * z + 12. * z2) / (35. * y4 * z4);
+  a[2][8] = -24. * (y + 2. * z) / (7. * y4 * z4);
+  a[2][9] = 8. / (7. * y4 * z4);
+  c[2][0] = 4. * y * (2. * y4 / 7. + 6. * y3 * z / 7 + 32. * y2 * z2 / 35. +
+      2. * y * z3 / 5. + z4 / 15.) / z4;
+  c[2][1] =
+      -4. * y * (6. * y3 / 7. + 12. * y2 * z / 7. + y * z2 + 2. * z3 / 15.) / z4;
+  c[2][2] = 8. * y * (z2 / 6. + 3 * y * z / 2. + 12 * y2 / 7.) / (5. * z4);
+  d[2][0] = 4. * z3 * (16. * y2 + 27. * y * z + 12. * z2) / (105. * y4);
+  d[2][1] = -4. * z2 * (18. * z2 / 35. + 6. * y * z / 7. + y2 / 3.) / y4;
+  d[2][2] = 8. * z * (y2 / 6. + 3. * y * z / 2. + 12. * z2 / 7.) / (5. * y4);
+
+  // Coefficients for l = 3
+  a[3][3] = 8. / (3. * y2);
+  a[3][4] = -4. * (19. * y + 18. * z) / (3. * y3 * z);
+  a[3][5] = 4. * (253. * y2 + 468. * y * z + 180. * z2) / (15. * y4 * z2);
+  a[3][6] = -8. * (149. * y3 + 447. * y2 * z + 330. * y * z2 + 50. * z3) / (15. * y5 * z3);
+  a[3][7] = 8. * (116. * y3 + 2916. * y2 * z / 5. + 696. * y * z2 + 200. * z3) / (21. * y5 * z4);
+  a[3][8] = -40. * (5. * y3 + 54. * y2 * z + 108. * y * z2 + 50. * z3) / (21. * y5 * z5);
+  a[3][9] = 40. * (10. * y2 + 43. * y * z + 100. * z2 / 3.) / (21. * y5 * z5);
+  a[3][10] = -40. * (3. * y + 5. * z) / (9. * y5 * z5);
+  a[3][11] = 320. / (99. * y5 * z5);
+  c[3][0] = -4. * y2 * (10. * y4 / 33. + 20. * y3 * z / 21. + 68. * y2 * z2 / 63. + 18. * y * z3 / 35. + 3. * z4 / 35.)
+      / z5;
+  c[3][1] = 4. * y2 * (20. * y3 / 21. + 130. * y2 * z / 63. + 48. * y * z2 / 35. + 9. * z3 / 35.) / z5;
+  c[3][2] = -4. * y2 * (50. * y2 / 63. + 6. * y * z / 7. + 6. * z2 / 35.) / z5;
+  d[3][0] = -4. * z3 * (9. * y3 + 34. * y2 * z + 40. * y * z2 + 500. * z3 / 33.) / (105. * y5);
+  d[3][1] = 4. * z2 * (3. * y3 + 24. * y2 * z + 130. * y * z2 / 3. + 200. * z3 / 9.) / (35. * y5);
+  d[3][2] = -4. * z2 * (50. * z2 / 63. + 6. * z * y / 7. + 6. * y2 / 35.) / y5;
+
+  double result = 0.;
+
+  for (int n = 0; n <= 2; n++) {
+    result += c[l][n] * PairG(n, y, y + z, eta, y, z) + d[l][n] * PairG(n, z, y + z, eta, y, z);
+  }
+
+  double min_yz = (y > z) ? z : y;
+  double max_yz = (y > z) ? y : z;
+
+  for (int n = 3; n <= 2 * l + 5; n++) {
+    result += a[l][n] * (PairG(n, 0, min_yz, eta, y, z) - PairG(n, max_yz, y + z, eta, y, z));
+  }
+
+  return result;
+}
+
+double PairPsiOld(int l, double y, double z, double eta) {
+
+  assert(0 <= l && l <= 3);
+
+  double a[4][12], c[4][3], d[4][3];
+
   a[0][3] = 8. / (3. * y * y);
   a[0][4] = -4. / (3. * y * y * z);
   a[0][5] = 4. / (15. * y * y * z * z);
@@ -240,6 +331,21 @@ double PairPsi(int l, double y, double z, double eta) {
  * Output:
  *      Phi_l(y,z) = (G^2 temp^2)/(pi (1 - e^{y+z})) [alpha1 Psi_l(y,z) + alpha2 Psi_l(z,y)]
  */
+void PairPhiAllFlavors(int l, double omega, double omega_prime, double eta, double temp, double *phi_out) {
+  static const double kPairPhi = kGSqr / kPi;
+
+  const double y = omega / temp;
+  const double z = omega_prime / temp;
+
+  const double psi_1 = PairPsi(l, y, z, eta);
+  const double psi_2 = PairPsi(l, z, y, eta);
+  
+  phi_out[0] = kPairPhi * temp * temp * (kAlpha1[0] * kAlpha1[0] * psi_1 + kAlpha2[0] * kAlpha2[0] * psi_2) / (1. - exp(y + z));
+  phi_out[1] = kPairPhi * temp * temp * (kAlpha1[1] * kAlpha1[1] * psi_1 + kAlpha2[1] * kAlpha2[1] * psi_2) / (1. - exp(y + z));
+
+  return;
+}
+
 double PairPhi(int l, double omega, double omega_prime, double eta, double temp, int e_x) {
 
   assert(e_x >= 0 && e_x <= 1);
@@ -323,14 +429,17 @@ MyKernelQuantity PairKernelsM1(MyEOSParams *eos_pars, PairKernelParams *kernel_p
   double pair_kernel_absorption_e = 0.;
   double pair_kernel_production_x = 0.;
   double pair_kernel_absorption_x = 0.;
-  double pair_phi_e = 0.;
-  double pair_phi_x = 0.;
+  double pair_phi[2] = {0.};
+  //double pair_phi_e = 0.;
+  //double pair_phi_x = 0.;
 
-  pair_phi_e = PairPhi(0, omega, omega_prime, eta, temp, 0);
-  pair_phi_x = PairPhi(0, omega, omega_prime, eta, temp, 1);
+  //pair_phi_e = PairPhi(0, omega, omega_prime, eta, temp, 0);
+  //pair_phi_x = PairPhi(0, omega, omega_prime, eta, temp, 1);
 
-  pair_kernel_production_e = 0.5 * pair_phi_e;
-  pair_kernel_production_x = 0.5 * pair_phi_x;
+  PairPhiAllFlavors(0, omega, omega_prime, eta, temp, pair_phi);
+
+  pair_kernel_production_e = 0.5 * pair_phi[0];
+  pair_kernel_production_x = 0.5 * pair_phi[1];
 
   pair_kernel_absorption_e = SafeExp((omega + omega_prime) / temp) * pair_kernel_production_e;
   pair_kernel_absorption_x = SafeExp((omega + omega_prime) / temp) * pair_kernel_production_x;
