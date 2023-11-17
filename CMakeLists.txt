@@ -16,6 +16,7 @@ add_executable(bns_nurates
         src/distribution/distribution_total.c
         include/functions.h
         src/functions/digamma.c
+        src/functions/fermi_integrals.c
         src/functions/fermi.c
         src/functions/gamma.c
         src/functions/lambert.c
@@ -729,6 +730,7 @@ add_executable(test_opacities_inelastic_scatt
         src/distribution/distribution_total.c
         include/functions.h
         src/functions/digamma.c
+        src/functions/fermi_integrals.c
         src/functions/fermi.c
         src/functions/gamma.c
         src/functions/lambert.c

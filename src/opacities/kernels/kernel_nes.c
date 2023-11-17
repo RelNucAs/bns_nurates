@@ -7,15 +7,17 @@
 //         on electrons and positrons
 //
 // Computation of inelastic neutrino-electron and neutrino-positron
-// scattering using .... from ....
-// @TODO: add paper from which kernel is taken
+// scattering using Eq. (43) from Mezzacappa & Bruenn, ApJ v.410, p.740 (1993)
+// https://ui.adsabs.harvard.edu/abs/1993ApJ...410..740M/abstract
 
-// @TODO: inclusion of headers here
+#include "math.h"
+
 #include "kernels.h"
 #include "bns_nurates.h"
 #include "functions.h"
-#include "fermi_integrals.h"
+#include "functions.h"
 #include "constants.h"
+
 
 #define __SIN2W__  0.2229
 
