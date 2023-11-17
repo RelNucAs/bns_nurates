@@ -85,7 +85,7 @@ MyQuadratureIntegrand M1CoeffsDoubleIntegrand(double *var, void *p) {
   double n_integrand_1[total_num_species], e_integrand_1[total_num_species];
   double n_integrand_2[total_num_species], e_integrand_2[total_num_species];
 
-  for (int idx=0; idx<12; idx++) {
+  for (int idx=0; idx<total_num_species; idx++) {
     n_integrand_1[idx] = nu * nu * nu_bar * nu_bar * pro_term[idx];
     e_integrand_1[idx] = nu * n_integrand_1[idx];
 
@@ -319,7 +319,7 @@ MyQuadratureIntegrand SpectralIntegrand(double *var, void *p) {
 
   double integrand_1[total_num_species], integrand_2[total_num_species];
 
-  for (int idx=0; idx<12; idx++) {
+  for (int idx=0; idx<total_num_species; idx++) {
     integrand_1[idx] = nu_bar * nu_bar * pro_term[idx];
     integrand_2[idx] = nu_bar * nu_bar * ann_term[idx];
   }
