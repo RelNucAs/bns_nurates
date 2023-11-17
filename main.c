@@ -22,7 +22,7 @@ int main() {
   printf("\n");
 
   const double dens =  1.; // [g cm^-3];
-  const double temp = 1.; // [MeV]
+  const double temp = 10.; // [MeV]
   const double ye = 0.1;
   
   // EOS parameters
@@ -48,7 +48,7 @@ int main() {
   // Kernel parameters
   InelasticScattKernelParams inelastic_pars;
   inelastic_pars.omega = 10.;       // [MeV]
-  inelastic_pars.omega_prime = 10.; // [MeV]
+  inelastic_pars.omega_prime = 20.; // [MeV]
 
   printf("E_nu       = %.5lf MeV\n", inelastic_pars.omega);
   printf("E_nu_prime = %.5lf MeV\n", inelastic_pars.omega_prime);
@@ -106,7 +106,7 @@ int main() {
                                  .opacity_flags = opacity_flags};
 
   // Compute emissivity and inverse mean free path
-  SpectralOpacities inelastic_output = ComputeSpectralOpacities(e_nu, &my_quadrature_1d, &grey_pars);
+  SpectralOpacities inelastic_output = ComputeSpectralOpacitiesNotStimulated(e_nu, &my_quadrature_1d, &grey_pars);
 
   // Print emissivity and inverse mean free path
   printf("Emissivity [s-1] and inverse mean free path [cm-1] (E = %.2lf MeV):\n", e_nu);
@@ -212,7 +212,7 @@ int main() {
     // Neutrino distribution function at equilibrium
     grey_pars.distr_pars = NuEquilibriumParams(&grey_pars.eos_pars); 
     
-    inelastic_output = ComputeSpectralOpacities(e_nu, &my_quadrature_1d, &grey_pars);
+    inelastic_output = ComputeSpectralOpacitiesNotStimulated(e_nu, &my_quadrature_1d, &grey_pars);
 
     printf("%e %e %e %e %e %e %e\n",
             r[i], 

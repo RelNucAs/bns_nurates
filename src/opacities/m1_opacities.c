@@ -337,7 +337,7 @@ MyQuadratureIntegrand SpectralIntegrand(double *var, void *p) {
 }
 
 /* Computes the spectral emissivity and inverse mean free path */
-SpectralOpacities ComputeSpectralOpacities(const double nu, MyQuadrature *quad_1d, GreyOpacityParams *my_grey_opacity_params) {
+SpectralOpacities ComputeSpectralOpacitiesNotStimulated(const double nu, MyQuadrature *quad_1d, GreyOpacityParams *my_grey_opacity_params) {
   // compute some constants
   static const double four_pi_hc3 = (4. * kPi) / (kHClight * kHClight * kHClight); // [MeV^-3 cm^-3]
 
@@ -359,6 +359,7 @@ SpectralOpacities ComputeSpectralOpacities(const double nu, MyQuadrature *quad_1
   double s[6];
   for (int i=0; i<6; i++) {
     s[i] = 1.5 * my_grey_opacity_params->eos_pars.temp;
+
   }
 
   my_grey_opacity_params->kernel_pars.pair_kernel_params.omega = nu;
@@ -389,9 +390,9 @@ SpectralOpacities ComputeSpectralOpacities(const double nu, MyQuadrature *quad_1
   sp_opacities.j[id_anue] = abs_em_beta.em[id_anue] + four_pi_hc3 * integrals_1d.integrand[1];
   sp_opacities.j[id_nux] = abs_em_beta.em[id_nux] + four_pi_hc3 * integrals_1d.integrand[2];
 
-  sp_opacities.kappa[id_nue] = (abs_em_beta.abs[id_nue] + four_pi_hc3 * (integrals_1d.integrand[0] + integrals_1d.integrand[3])) / kClight;
-  sp_opacities.kappa[id_anue] = (abs_em_beta.abs[id_anue] + four_pi_hc3 * (integrals_1d.integrand[1] + integrals_1d.integrand[4])) / kClight;
-  sp_opacities.kappa[id_nux] = (abs_em_beta.abs[id_nux] + four_pi_hc3 * (integrals_1d.integrand[2] + integrals_1d.integrand[5])) / kClight;
+  sp_opacities.kappa[id_nue] = (abs_em_beta.abs[id_nue] + four_pi_hc3 * integrals_1d.integrand[3]) / kClight;
+  sp_opacities.kappa[id_anue] = (abs_em_beta.abs[id_anue] + four_pi_hc3 * integrals_1d.integrand[4]) / kClight;
+  sp_opacities.kappa[id_nux] = (abs_em_beta.abs[id_nux] + four_pi_hc3 * integrals_1d.integrand[5]) / kClight;
 
   sp_opacities.j_s[id_nue] =  4. * kPi * nu * nu * g_nu[id_nue] * iso_scatt;
   sp_opacities.j_s[id_anue] = 4. * kPi * nu * nu * g_nu[id_anue] * iso_scatt;
