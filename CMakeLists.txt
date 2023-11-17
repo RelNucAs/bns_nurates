@@ -595,6 +595,7 @@ add_executable(test_opacities_electron_capture
         src/distribution/distribution_total.c
         include/functions.h
         src/functions/digamma.c
+        src/functions/fermi_integrals.c
         src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c
@@ -686,6 +687,7 @@ add_executable(test_opacities_brem
         src/distribution/distribution_total.c
         include/functions.h
         src/functions/digamma.c
+        src/functions/fermi_integrals.c
         src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c
@@ -777,6 +779,7 @@ add_executable(test_opacities_isoscatt
         src/distribution/distribution_total.c
         include/functions.h
         src/functions/digamma.c
+        src/functions/fermi_integrals.c
         src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c
@@ -812,7 +815,7 @@ add_executable(test_opacities_isoscatt
 target_link_libraries(test_opacities_isoscatt GSL::gsl GSL::gslcblas)
 target_link_libraries(test_opacities_isoscatt m)
 
-# test opacities bremsstrahlung
+# test m1 distribution
 add_executable(test_m1_distribution
         include/constants.h
         include/bns_nurates.h
@@ -822,6 +825,7 @@ add_executable(test_m1_distribution
         src/distribution/distribution_total.c
         include/functions.h
         src/functions/digamma.c
+        src/functions/fermi_integrals.c
         src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c

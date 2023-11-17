@@ -41,12 +41,13 @@ double PairT(int l, double alpha, double tolerance) {
     double val = fabs(42. * tolerance);
     double result = 0.;
     int n = 1;
-
+    printf("I'm about to enter the while loop!\n");
     while (tolerance < fabs(val)) {
       val = pow(-1., n + 1) * exp(-n * alpha) / pow(n, l);
       result += val;
       n++;
     }
+    printf("n = %d\n", n);
     return result;
   }
 }
@@ -127,6 +128,30 @@ double PairF(int k, double eta, double x1) {
  * Output:
  *    G_n(a,b,eta,y,z) = F_n(eta,b) - F_n(eta,a) - F_n(eta+y+z,b) + F_n(eta+y+z,a)
  * */
+void PairGOptimized(int n, double eta, double y, double z, double *g_out) {
+  const double pair_f_y_z_1 = PairF(n, eta, y + z);
+  const double pair_f_y_z_2 = PairF(n, eta + y + z, y + z);
+
+  const double pair_f_y_1 = PairF(n, eta, y);
+  const double pair_f_y_2 = PairF(n, eta + y + z, y);
+
+  const double pair_f_z_1 = PairF(n, eta, z);
+  const double pair_f_z_2 = PairF(n, eta + y + z, z);
+ 
+  double pair_f_min_1 = (y > z) ? pair_f_z_1 : pair_f_y_1;
+  double pair_f_max_1 = (y > z) ? pair_f_y_1 : pair_f_z_1;
+
+  double pair_f_min_2 = (y > z) ? pair_f_z_2 : pair_f_y_2;
+  double pair_f_max_2 = (y > z) ? pair_f_y_2 : pair_f_z_2;
+
+  g_out[0] = pair_f_y_z_1 - pair_f_y_1 - (pair_f_y_z_2 - pair_f_y_2);
+  g_out[1] = pair_f_y_z_1 - pair_f_z_1 - (pair_f_y_z_2 - pair_f_z_2);
+  g_out[2] = pair_f_min_1 - pair_f_min_2;
+  g_out[3] = pair_f_y_z_1 - pair_f_max_1 - (pair_f_y_z_2 - pair_f_max_2);
+
+  return;
+}
+
 double PairG(int n, double a, double b, double eta, double y, double z) {
 
   double result = 0.;
@@ -224,11 +249,16 @@ void PairPsiOptimized(int l, double y, double z, double eta, double *psi_out) {
   double aux;
 
   double result_y_z = 0., result_z_y = 0.;
-  double pair_g_y = 0., pair_g_z = 0.;
+
+  double pair_g_y, pair_g_z;
+
+  double pair_g[4] = {0.};
+
 
   for (int n = 0; n <= 2; n++) {
-    pair_g_y = PairG(n, y, y + z, eta, y, z); // a = y
-    pair_g_z = PairG(n, z, y + z, eta, y, z); // a = z
+    PairGOptimized(n, eta, y, z, pair_g);
+    pair_g_y = pair_g[0]; //PairG(n, y, y + z, eta, y, z); // a = y
+    pair_g_z = pair_g[1]; //PairG(n, z, y + z, eta, y, z); // a = z
     result_y_z += c[l][n] * pair_g_y + d[l][n] * pair_g_z;
     result_z_y += d[l][n] * pair_g_y + c[l][n] * pair_g_z;
   }
@@ -237,7 +267,9 @@ void PairPsiOptimized(int l, double y, double z, double eta, double *psi_out) {
   double max_yz = (y > z) ? y : z;
 
   for (int n = 3; n <= 2 * l + 5; n++) {
-    aux = a[l][n] * (PairG(n, 0, min_yz, eta, y, z) - PairG(n, max_yz, y + z, eta, y, z));
+    PairGOptimized(n, eta, y, z, pair_g);
+    aux = a[l][n] * (pair_g[2] - pair_g[3]);
+    //aux = a[l][n] * (PairG(n, 0, min_yz, eta, y, z) - PairG(n, max_yz, y + z, eta, y, z));
     result_y_z += aux;
     result_z_y += aux;
   }
