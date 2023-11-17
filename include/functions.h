@@ -156,7 +156,7 @@ double FDI_p212(const double x);
 
 /*===========================================================================*/
 
-// fermi.c
+// fermi_distr.c
 
 // Computation of Fermi-Dirac distribution function
 double FermiDistr(const double e, const double temp, const double mu);

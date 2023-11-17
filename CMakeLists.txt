@@ -17,7 +17,7 @@ add_executable(bns_nurates
         include/functions.h
         src/functions/digamma.c
         src/functions/fermi_integrals.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
@@ -59,7 +59,7 @@ add_library(nurates SHARED
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
@@ -186,7 +186,7 @@ add_executable(test_pair_opacities
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -216,7 +216,7 @@ add_executable(test_beta
         src/distribution/distribution_opt_thin.c
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c
         #src/functions/mnewt.c
@@ -250,7 +250,7 @@ add_executable(test_iso
         src/distribution/distribution_opt_thin.c
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c
         #src/functions/mnewt.c
@@ -284,7 +284,7 @@ add_executable(test_brem
         src/distribution/distribution_opt_thin.c
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c
         #src/functions/mnewt.c
@@ -332,7 +332,7 @@ add_executable(test_m1_coeffs
         src/integration/integration_quadrature_integrate.c
         src/integration/integration_quadrature_integrate_kernels.c
         include/functions.h
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/safe_exp.c
 )
@@ -346,7 +346,7 @@ add_executable(test_gauss_legendre_1d
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -367,7 +367,7 @@ add_executable(test_gauss_legendre_2d
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -388,7 +388,7 @@ add_executable(test_gauss_legendre_3d
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -409,7 +409,7 @@ add_executable(test_gauss_laguerre_1d
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -430,7 +430,7 @@ add_executable(test_quadrature_io
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -453,7 +453,7 @@ add_executable(test_integration_1d
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -476,7 +476,7 @@ add_executable(test_integration_2d
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -499,7 +499,7 @@ add_executable(test_integration_3d
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -522,7 +522,7 @@ add_executable(test_integration_special
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -546,7 +546,7 @@ add_executable(test_integration_multi_func_1d
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -570,7 +570,7 @@ add_executable(test_integration_multi_func_2d
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -595,7 +595,7 @@ add_executable(test_opacities_electron_capture
         src/distribution/distribution_total.c
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
@@ -640,7 +640,7 @@ add_executable(test_opacities_pair
         src/distribution/distribution_total.c
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
@@ -685,7 +685,7 @@ add_executable(test_opacities_brem
         src/distribution/distribution_total.c
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
@@ -731,7 +731,7 @@ add_executable(test_opacities_inelastic_scatt
         include/functions.h
         src/functions/digamma.c
         src/functions/fermi_integrals.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
@@ -776,7 +776,7 @@ add_executable(test_opacities_isoscatt
         src/distribution/distribution_total.c
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
@@ -821,7 +821,7 @@ add_executable(test_m1_distribution
         src/distribution/distribution_total.c
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
