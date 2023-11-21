@@ -52,15 +52,15 @@ void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, Nu
 
   for (int species = 0; species < total_num_species; species++) {
 
-    out_distr_pars->w_t[species] = 0.5 * (3. * M1_pars->chi[species] - 1.);
+    out_distr_pars->w_t[species] = 1.5 * (1. - M1_pars->chi[species]);
     out_distr_pars->temp_t[species] = eos_pars->temp;
 
     // @TODO: Currently disabling alternative. What do we do with this ?
-    //double y = fmax(M1_pars->J[species] / (M1_pars->n[species] * eos_pars->temp), 3.05); // average neutrino energy over thermal energy
-    //double y_0 = 114.;
+    double y = fmax(M1_pars->J[species] / (M1_pars->n[species] * eos_pars->temp), 3.05); // average neutrino energy over thermal energy
+    double y_0 = 114.;
 
-    //out_distr_pars->eta_t[species] =
-    //    y < y_0 ? (y * (y * (y * (y * (y * (kFitA * y + kFitB) + kFitC) + kFitD) + kFitE) + kFitF) + kFitG) / (y * (y * (y * (y * (y + kFitH) + kFitI) + kFitL) + kFitM) + kFitN) : kFourThirds * y;
+    out_distr_pars->eta_t[species] =
+        y < y_0 ? (y * (y * (y * (y * (y * (kFitA * y + kFitB) + kFitC) + kFitD) + kFitE) + kFitF) + kFitG) / (y * (y * (y * (y * (y + kFitH) + kFitI) + kFitL) + kFitM) + kFitN) : kFourThirds * y;
 
   }
 }

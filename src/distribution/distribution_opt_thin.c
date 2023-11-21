@@ -47,7 +47,7 @@ void CalculateThinParamsFromM1(M1Quantities *M1_pars, NuDistributionParams *out_
     double argW0 = -2. * log_A / (B * B);
     double x = argW0 > -ie ? -W0(argW0) / (2. * log_A) : 3.;
 
-    out_distr_pars->w_f[species] = 1.5 * (1. - M1_pars->chi[species]);
+    out_distr_pars->w_f[species] = 0.5 * (3. * M1_pars->chi[species] - 1.);
 
     out_distr_pars->c_f[species] = fmax(x - 3., 0.);
     out_distr_pars->temp_f[species] = j_over_n / x;
