@@ -31,9 +31,11 @@ static const double kQ = 1.2935;                 // [MeV]
 static const double kMb = 1.674e-24;             // [g]
 static const double kMu = 1.66054e-24;           // [g]
 
+static const double kPi = 3.1415926535898;         //  acos(static_cast<double>(-1.));
+
 // Physical constants
 static const double kHbar = 6.582119569e-22;       // [MeV s]
-static const double kH = 4.1356943e-21;            // [MeV s]
+static const double kH = 2. * kPi * kHbar;         // [MeV s]
 static const double kClight = 2.997924562e+10;     // [cm s^-1]
 static const double kHClight = kH * kClight;       // [MeV cm]
 static const double kHbarClight = kHbar * kClight; // [MeV cm]
@@ -41,7 +43,6 @@ static const double kGf0 = 1.1663787E-11;          // [MeV^-2]
 // @TODO: decide how to define the Fermi constant
 static const double kGf = kGf0 * kHbarClight * kHbarClight * kHbarClight;               // [MeV cm^3]
 //static const double kGf = 8.957e-44;               // [MeV cm^3]
-static const double kPi = 3.1415926535898;         //  acos(static_cast<double>(-1.));
 static const double kKB = 8.617333262e-11;         // [MeV K^-1]
 
 // Coupling constants
