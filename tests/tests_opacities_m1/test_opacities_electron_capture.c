@@ -10,7 +10,7 @@
 #include <string.h>
 #include <math.h>
 #include <unistd.h>
-#include "../../src/opacities/opacities.h"
+#include "opacities.h"
 #include "../../include/integration.h"
 #include "../../include/distribution.h"
 #include "../../include/constants.h"

@@ -11,7 +11,7 @@
 #include "include/functions.h"
 #include "include/kernels.h"
 #include "include/functions.h"
-#include "src/opacities/opacities.h"
+#include "opacities.h"
 
 
 int main() {

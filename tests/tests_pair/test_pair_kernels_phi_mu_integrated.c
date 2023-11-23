@@ -10,7 +10,7 @@
 #include "../../include/bns_nurates.h"
 #include "../../include/constants.h"
 #include "../../include/integration.h"
-#include "../../src/opacities/opacities.h"
+#include "opacities.h"
 #include "../../include/kernels.h"
 
 int main() {

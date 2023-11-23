@@ -14,7 +14,7 @@
 #include "bns_nurates.h"
 #include "../../include/kernels.h"
 #include "integration.h"
-#include "../src/opacities/opacities.h"
+#include "opacities.h"
 
 // Write data for plotting Fig. 3 of Hannestadt and Raffelt
 void TestBremKernelS(char *filedir) {

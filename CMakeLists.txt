@@ -28,7 +28,7 @@ add_executable(bns_nurates
         include/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
-        src/opacities/opacities.h
+        include/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
         src/output/outputs.h
@@ -193,7 +193,7 @@ add_executable(test_pair_opacities
         src/functions/theta.c
         include/integration.h
         include/kernels.h
-        src/opacities/opacities.h
+        include/opacities.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
@@ -219,7 +219,7 @@ add_executable(test_beta
         src/functions/theta.c
         include/integration.h
         include/kernels.h
-        src/opacities/opacities.h
+        include/opacities.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
@@ -249,7 +249,7 @@ add_executable(test_iso
         src/functions/theta.c
         include/integration.h
         include/kernels.h
-        src/opacities/opacities.h
+        include/opacities.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
@@ -279,7 +279,7 @@ add_executable(test_brem
         src/functions/theta.c
         include/integration.h
         include/kernels.h
-        src/opacities/opacities.h
+        include/opacities.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
@@ -309,7 +309,7 @@ add_executable(test_m1_coeffs
         src/distribution/distribution_total.c
         src/functions/lambert.c
         src/functions/theta.c
-        src/opacities/opacities.h
+        include/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
         include/weak_magnetism.h
@@ -596,7 +596,7 @@ add_executable(test_opacities_electron_capture
         include/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
-        src/opacities/opacities.h
+        include/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
         src/output/outputs.h
@@ -642,7 +642,7 @@ add_executable(test_opacities_pair
         include/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
-        src/opacities/opacities.h
+        include/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
         src/output/outputs.h
@@ -688,7 +688,7 @@ add_executable(test_opacities_brem
         include/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
-        src/opacities/opacities.h
+        include/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
         src/output/outputs.h
@@ -734,7 +734,7 @@ add_executable(test_opacities_inelastic_scatt
         include/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
-        src/opacities/opacities.h
+        include/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
         src/output/outputs.h
@@ -780,7 +780,7 @@ add_executable(test_opacities_isoscatt
         include/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
-        src/opacities/opacities.h
+        include/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
         src/output/outputs.h
@@ -826,7 +826,7 @@ add_executable(test_m1_distribution
         include/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
-        src/opacities/opacities.h
+        include/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
         src/output/outputs.h
