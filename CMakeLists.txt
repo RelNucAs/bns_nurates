@@ -47,6 +47,7 @@ add_executable(bns_nurates
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c)
 
+target_compile_options(bns_nurates PRIVATE -Wall -Wextra -pedantic)
 target_include_directories(bns_nurates PRIVATE include)
 target_include_directories(bns_nurates PRIVATE src)
 
