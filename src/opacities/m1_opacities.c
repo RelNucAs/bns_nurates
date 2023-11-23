@@ -50,7 +50,8 @@ MyQuadratureIntegrand M1CoeffsDoubleIntegrand(double *var, void *p) {
     my_grey_opacity_params->kernel_pars.pair_kernel_params.lmax = 0;
     my_grey_opacity_params->kernel_pars.pair_kernel_params.mu = 1.;
     my_grey_opacity_params->kernel_pars.pair_kernel_params.mu_prime = 1.;
-    pair_kernels_m1 = PairKernelsM1(&my_grey_opacity_params->eos_pars, &my_grey_opacity_params->kernel_pars.pair_kernel_params);
+    //pair_kernels_m1 = PairKernelsM1(&my_grey_opacity_params->eos_pars, &my_grey_opacity_params->kernel_pars.pair_kernel_params);
+    pair_kernels_m1 = PairKernelsM1Optimized(&my_grey_opacity_params->eos_pars, &my_grey_opacity_params->kernel_pars.pair_kernel_params);
   }
 
   // compute the bremsstrahlung kernels
@@ -287,7 +288,8 @@ MyQuadratureIntegrand SpectralIntegrand(double *var, void *p) {
     my_grey_opacity_params->kernel_pars.pair_kernel_params.lmax = 0;
     my_grey_opacity_params->kernel_pars.pair_kernel_params.mu = 1.;
     my_grey_opacity_params->kernel_pars.pair_kernel_params.mu_prime = 1.;
-    pair_kernels_m1 = PairKernelsM1(&my_eos_params, &my_grey_opacity_params->kernel_pars.pair_kernel_params);
+    //pair_kernels_m1 = PairKernelsM1(&my_eos_params, &my_grey_opacity_params->kernel_pars.pair_kernel_params);
+    pair_kernels_m1 = PairKernelsM1Optimized(&my_eos_params, &my_grey_opacity_params->kernel_pars.pair_kernel_params);
   }
 
   // compute the bremsstrahlung kernels
