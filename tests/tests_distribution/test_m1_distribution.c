@@ -79,6 +79,7 @@ int main() {
            &n_anue[i], &j_anue[i], &chi_anue[i],
            &n_muon[i], &j_muon[i], &chi_muon[i],
            &n_amuon[i], &j_amuon[i], &chi_amuon[i]);
+    printf("%lf %lf %lf %lf\n", T[i], mu_p[i], mu_e[i], mu_n[i]);
     i++;
   }
 

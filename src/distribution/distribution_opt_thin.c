@@ -41,7 +41,7 @@ void CalculateThinParamsFromM1(M1Quantities *M1_pars, NuDistributionParams *out_
 
     double j_over_n = j / n;
     double A = j_over_n / e;
-    double B = n * isqrt_32_pi3;
+    double B = n * isqrt_32_pi3 * (kHClight * kHClight * kHClight); //@TODO: warning!
     double log_A = log(A);
 
     double argW0 = -2. * log_A / (B * B);
