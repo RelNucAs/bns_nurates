@@ -264,7 +264,7 @@ struct NuDistributionParams {
   double w_f[total_num_species];         // contribution factor
   double temp_f[total_num_species];      // temperature
   double c_f[total_num_species];         // constant in power from Federico's notes
-
+  double beta_f[total_num_species];      // from Federico's notes
 };
 typedef struct NuDistributionParams NuDistributionParams;
 
