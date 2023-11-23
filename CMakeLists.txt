@@ -60,6 +60,7 @@ add_library(nurates SHARED
         src/distribution/distribution_total.c
         src/functions/digamma.c
         src/functions/fermi_distr.c
+        src/functions/fermi_integrals.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
