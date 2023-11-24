@@ -69,3 +69,22 @@ void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, Nu
     out_distr_pars->temp_t[species] = FDI_p2(out_distr_pars->eta_t[species]) * M1_pars->J[species] / (FDI_p3(out_distr_pars->eta_t[species]) * M1_pars->n[species]);
   }
 }
+
+// use equilibrium parameters for the total distribution function
+void CalculateEquilibriumParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, NuDistributionParams *out_distr_pars) {
+
+  out_distr_pars->eta_t[0] = (eos_pars->mu_p + eos_pars->mu_e - eos_pars->mu_n) / eos_pars->temp;
+  out_distr_pars->eta_t[1] = -(eos_pars->mu_p + eos_pars->mu_e - eos_pars->mu_n) / eos_pars->temp;
+  out_distr_pars->eta_t[2] = 0.;
+
+  for (int species = 0; species < total_num_species; species++) {
+
+    out_distr_pars->w_t[species] = 1.;
+    out_distr_pars->temp_t[species] = eos_pars->temp;
+
+    out_distr_pars->w_f[species] = 0.;
+    out_distr_pars->c_f[species] = 1.;
+    out_distr_pars->temp_f[species] = 1.;
+    out_distr_pars->beta_f[species] = 0.;
+  }
+}
