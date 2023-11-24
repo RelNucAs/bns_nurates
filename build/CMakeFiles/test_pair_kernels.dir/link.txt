@@ -1,1 +1,0 @@
-/usr/bin/cc -rdynamic CMakeFiles/test_pair_kernels.dir/tests/tests_pair/test_pair_kernels.c.o CMakeFiles/test_pair_kernels.dir/src/functions/safe_exp.c.o CMakeFiles/test_pair_kernels.dir/src/opacities/kernels/kernel_pair.c.o -o test_pair_kernels  /usr/lib/x86_64-linux-gnu/libgsl.so /usr/lib/x86_64-linux-gnu/libgslcblas.so -lm 
