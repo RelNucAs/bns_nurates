@@ -11,7 +11,7 @@
 #include "include/functions.h"
 #include "include/kernels.h"
 #include "include/functions.h"
-#include "src/opacities/opacities.h"
+#include "include/opacities.h"
 
 
 int main() {
@@ -48,7 +48,7 @@ int main() {
   // Kernel parameters
   InelasticScattKernelParams inelastic_pars;
   inelastic_pars.omega = 10.;       // [MeV]
-  inelastic_pars.omega_prime = 10.; // [MeV]
+  inelastic_pars.omega_prime = 20.; // [MeV]
 
   printf("E_nu       = %.5lf MeV\n", inelastic_pars.omega);
   printf("E_nu_prime = %.5lf MeV\n", inelastic_pars.omega_prime);

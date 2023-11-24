@@ -21,6 +21,7 @@
 #define kSinWeinbergThetaSquared  0.2229
 
 static const double kNes = 2. * kGf0 * kGf0 * kClight * kHbarClight * kHbarClight/ (3. * kPi);
+// static const double kNes = 2. * kGf * kGf * kClight / (3. * kPi * kHbarClight * kHbarClight * kHbarClight * kHbarClight);
 
 double kBPlus = (2. * kSinWeinbergThetaSquared + 1.) * (2. * kSinWeinbergThetaSquared + 1.);
 double kBMinus = (2. * kSinWeinbergThetaSquared - 1.) * (2. * kSinWeinbergThetaSquared - 1.);

@@ -7,13 +7,10 @@ find_package(GSL)
 add_definitions(-DSOURCE_DIR="${CMAKE_SOURCE_DIR}")
 
 add_executable(bns_nurates
-        compare_kernels.c
+        main.c
         include/constants.h
         include/bns_nurates.h
         include/distribution.h
-        include/nes.h
-        include/fermi_integrals.h
-        src/functions/fermi_integrals.c
         src/distribution/distribution_opt_thick.c
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c

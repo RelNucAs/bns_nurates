@@ -26,7 +26,7 @@
  */
 void GaussLegendre(MyQuadrature *quad) {
 
-  const double kEps = 1.0e-12; //1.0e-14;
+  const double kEps = 1.0e-10; //1.0e-14;
 
   assert(quad->dim == 1);
   assert(quad->type == kGauleg);
@@ -44,7 +44,7 @@ void GaussLegendre(MyQuadrature *quad) {
   xl = 0.5 * (quad->x2 - quad->x1);
 
   for (int i = 0; i < m; i++) {
-    z = cos(3.14159265 * (i + 0.75) / (n + 0.5));
+    z = cos(3.141592654 * (i + 0.75) / (n + 0.5));
     do {
       p1 = 1.0;
       p2 = 0.0;
