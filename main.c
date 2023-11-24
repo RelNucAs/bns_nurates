@@ -11,7 +11,7 @@
 #include "include/functions.h"
 #include "include/kernels.h"
 #include "include/functions.h"
-#include "opacities.h"
+#include "src/opacities/opacities.h"
 
 
 int main() {
@@ -48,7 +48,7 @@ int main() {
   // Kernel parameters
   InelasticScattKernelParams inelastic_pars;
   inelastic_pars.omega = 10.;       // [MeV]
-  inelastic_pars.omega_prime = 20.; // [MeV]
+  inelastic_pars.omega_prime = 10.; // [MeV]
 
   printf("E_nu       = %.5lf MeV\n", inelastic_pars.omega);
   printf("E_nu_prime = %.5lf MeV\n", inelastic_pars.omega_prime);
@@ -78,7 +78,7 @@ int main() {
   ///////////////////////////////////////////
 
   // Generate quadratures
-  MyQuadrature my_quadrature_1d = {.nx = 60, .dim = 1, .type = kGauleg, .x1 = 0., .x2 = 1.};
+  MyQuadrature my_quadrature_1d = {.nx = 64, .dim = 1, .type = kGauleg, .x1 = 0., .x2 = 1.};
   GaussLegendreMultiD(&my_quadrature_1d);
 
   // Opacity parameters (corrections all switched off)
@@ -96,7 +96,7 @@ int main() {
   kernel_pars.inelastic_kernel_params = inelastic_pars;
 
   // Neutrino energy
-  double e_nu = 10.; // [MeV]
+  double e_nu = 110.; // [MeV]
 
   // M1 Grey Coefficient parameters  
   GreyOpacityParams grey_pars = {.distr_pars = distr_pars,

@@ -360,8 +360,7 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulated(const double nu, MyQuadr
   
   double s[6];
   for (int i=0; i<6; i++) {
-    s[i] = 1.5 * my_grey_opacity_params->eos_pars.temp;
-
+    s[i] = nu;
   }
 
   my_grey_opacity_params->kernel_pars.pair_kernel_params.omega = nu;
