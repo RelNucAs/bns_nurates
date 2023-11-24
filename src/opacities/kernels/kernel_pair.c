@@ -347,32 +347,39 @@ double PairG(int n, double a, double b, double eta, double y, double z) {
 }
 
 void PairGOptimized(PairKernelParams *kernel_pars, int n, double eta, double y, double z, double *g_out) {
-  //const double pair_f_y_z_1 = PairFOptimized(n, eta, y + z);
-  //const double pair_f_y_z_2 = PairFOptimized(n, eta + y + z, y + z);
-
-  //const double pair_f_y_z_1 = PairFInterpolated(kernel_pars, n, eta, y + z);
-  //const double pair_f_y_z_2 = PairFInterpolated(kernel_pars, eta + y + z, y + z);
-
+  /*
   const double pair_f_y_z_1 = PairF(n, eta, y + z);
   const double pair_f_y_z_2 = PairF(n, eta + y + z, y + z);
-
-  //const double pair_f_y_1 = PairFOptimized(n, eta, y);
-  //const double pair_f_y_2 = PairFOptimized(n, eta + y + z, y);
-
-  //const double pair_f_y_1 = PairFInterpolated(kernel_pars, n, eta, y);
-  //const double pair_f_y_1 = PairFInterpolated(kernel_pars, eta + y + z, y);
 
   const double pair_f_y_1 = PairF(n, eta, y);
   const double pair_f_y_2 = PairF(n, eta + y + z, y);
 
-  //const double pair_f_z_1 = PairFOptimized(n, eta, z);
-  //const double pair_f_z_2 = PairFOptimized(n, eta + y + z, z);
-  
-  //const double pair_f_z_1 = PairFInterpolated(kernel_pars, n, eta, z);
-  //const double pair_f_z_2 = PairFInterpolated(kernel_pars, eta + y + z, z);
-
   const double pair_f_z_1 = PairF(n, eta, z);
   const double pair_f_z_2 = PairF(n, eta + y + z, z);
+  */
+
+  // /*
+  const double pair_f_y_z_1 = PairFOptimized(n, eta, y + z);
+  const double pair_f_y_z_2 = PairFOptimized(n, eta + y + z, y + z);
+
+  const double pair_f_y_1 = PairFOptimized(n, eta, y);
+  const double pair_f_y_2 = PairFOptimized(n, eta + y + z, y);
+
+  const double pair_f_z_1 = PairFOptimized(n, eta, z);
+  const double pair_f_z_2 = PairFOptimized(n, eta + y + z, z);
+  // */
+
+  /*
+  const double pair_f_y_z_1 = PairFInterpolated(kernel_pars, n, eta, y + z);
+  const double pair_f_y_z_2 = PairFInterpolated(kernel_pars, eta + y + z, y + z);
+
+  const double pair_f_y_1 = PairFInterpolated(kernel_pars, n, eta, y);
+  const double pair_f_y_1 = PairFInterpolated(kernel_pars, eta + y + z, y);
+
+  const double pair_f_z_1 = PairFInterpolated(kernel_pars, n, eta, z);
+  const double pair_f_z_2 = PairFInterpolated(kernel_pars, eta + y + z, z);
+  */
+
 
   double pair_f_min_1 = (y > z) ? pair_f_z_1 : pair_f_y_1;
   double pair_f_max_1 = (y > z) ? pair_f_y_1 : pair_f_z_1;

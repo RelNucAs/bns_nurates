@@ -110,6 +110,9 @@ int main() {
     my_grey_opacity_params.m1_pars.n[id_nux] = n_muon[i];
     my_grey_opacity_params.m1_pars.J[id_nux] = j_muon[i];
     my_grey_opacity_params.m1_pars.chi[id_nux] = chi_muon[i];
+    my_grey_opacity_params.m1_pars.n[id_anux] = n_muon[i];
+    my_grey_opacity_params.m1_pars.J[id_anux] = j_muon[i];
+    my_grey_opacity_params.m1_pars.chi[id_anux] = chi_muon[i];
 
     NuDistributionParams my_nudistributionparams = CalculateDistrParamsFromM1(&my_grey_opacity_params.m1_pars, &my_grey_opacity_params.eos_pars);
 

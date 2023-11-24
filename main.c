@@ -63,7 +63,8 @@ int main() {
 
   printf("nue:  R_in = %.5e, R_out = %.5e\n", nes_kernels.em[id_nue] , nes_kernels.abs[id_nue]);
   printf("anue: R_in = %.5e, R_out = %.5e\n", nes_kernels.em[id_anue], nes_kernels.abs[id_anue]);
-  printf("nux:  R_in = %.5e, R_out = %.5e\n", nes_kernels.em[id_nux],  nes_kernels.abs[id_nux]);
+  printf("nux:  R_in = %.5e, R_out = %.5e\n", nes_kernels.em[id_nux] , nes_kernels.abs[id_nux]);
+  printf("anux: R_in = %.5e, R_out = %.5e\n", nes_kernels.em[id_anux], nes_kernels.abs[id_anux]);
   printf("\n");
 
   printf("NPS kernels [cm^3 s^-1]:\n");
@@ -71,6 +72,7 @@ int main() {
   printf("nue:  R_in = %.5e, R_out = %.5e\n", nps_kernels.em[id_nue] , nps_kernels.abs[id_nue]);
   printf("anue: R_in = %.5e, R_out = %.5e\n", nps_kernels.em[id_anue], nps_kernels.abs[id_anue]);
   printf("nux:  R_in = %.5e, R_out = %.5e\n", nps_kernels.em[id_nux],  nps_kernels.abs[id_nux]);
+  printf("anux: R_in = %.5e, R_out = %.5e\n", nps_kernels.em[id_anux], nps_kernels.abs[id_anux]);
   printf("\n");
 
   ///////////////////////////////////////////
@@ -111,9 +113,10 @@ int main() {
   // Print emissivity and inverse mean free path
   printf("Emissivity [s-1] and inverse mean free path [cm-1] (E = %.2lf MeV):\n", e_nu);
 
-  printf("nue:  eta = %.5e, kappa = %.5e\n", inelastic_output.j[id_nue], inelastic_output.kappa[id_nue]);
+  printf("nue:  eta = %.5e, kappa = %.5e\n", inelastic_output.j[id_nue] , inelastic_output.kappa[id_nue]);
   printf("anue: eta = %.5e, kappa = %.5e\n", inelastic_output.j[id_anue], inelastic_output.kappa[id_anue]);
-  printf("nux:  eta = %.5e, kappa = %.5e\n", inelastic_output.j[id_nux], inelastic_output.kappa[id_nux]);
+  printf("nux:  eta = %.5e, kappa = %.5e\n", inelastic_output.j[id_nux] , inelastic_output.kappa[id_nux]);
+  printf("anux: eta = %.5e, kappa = %.5e\n", inelastic_output.j[id_anux], inelastic_output.kappa[id_anux]);
   printf("\n");
 
   ///////////////////////////
@@ -195,7 +198,7 @@ int main() {
   printf("\n");
 
   printf("Generated table:\n");
-  printf("r j-nue j-anue j-nux kappa-nue kappa-anue kappa-nux\n");
+  printf("r j-nue j-anue j-nux j-anux kappa-nue kappa-anue kappa-nux kappa-anux\n");
 
   for (int i = 0; i < 102; i++) {
 
@@ -216,8 +219,8 @@ int main() {
 
     printf("%e %e %e %e %e %e %e\n",
             r[i], 
-            inelastic_output.j[id_nue], inelastic_output.j[id_anue], inelastic_output.j[id_nux],
-            inelastic_output.kappa[id_nue], inelastic_output.kappa[id_anue], inelastic_output.kappa[id_nux]
+            inelastic_output.j[id_nue], inelastic_output.j[id_anue], inelastic_output.j[id_nux], inelastic_output.j[id_anux],
+            inelastic_output.kappa[id_nue], inelastic_output.kappa[id_anue], inelastic_output.kappa[id_nux], inelastic_output.kappa[id_anux]
           );
     
   }

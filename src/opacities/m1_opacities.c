@@ -75,13 +75,15 @@ MyQuadratureIntegrand M1CoeffsDoubleIntegrand(double *var, void *p) {
 
   pro_term[id_nue] = (pair_kernels_m1.em_e + brem_kernels_m1.em[id_nue]) * (1. - g_nu_bar[id_anue]) + inelastic_kernels_m1.em[id_nue] * g_nu_bar[id_nue];
   pro_term[id_anue] = (pair_kernels_m1.em_e + brem_kernels_m1.em[id_anue]) * (1. - g_nu_bar[id_nue]) + inelastic_kernels_m1.em[id_anue] * g_nu_bar[id_anue];
-  pro_term[id_nux] = (pair_kernels_m1.em_x + brem_kernels_m1.em[id_nux]) * (1. - g_nu_bar[id_nux]) + inelastic_kernels_m1.em[id_nux] * g_nu_bar[id_nux];
+  pro_term[id_nux] = (pair_kernels_m1.em_x + brem_kernels_m1.em[id_nux]) * (1. - g_nu_bar[id_anux]) + inelastic_kernels_m1.em[id_nux] * g_nu_bar[id_nux];
+  pro_term[id_anux] = (pair_kernels_m1.em_x + brem_kernels_m1.em[id_anux]) * (1. - g_nu_bar[id_nux]) + inelastic_kernels_m1.em[id_anux] * g_nu_bar[id_anux];
 
   double ann_term[total_num_species];
 
   ann_term[id_nue] = (pair_kernels_m1.abs_e + brem_kernels_m1.abs[id_nue]) * g_nu_bar[id_anue] + inelastic_kernels_m1.abs[id_nue] * (1. - g_nu_bar[id_nue]);
   ann_term[id_anue] = (pair_kernels_m1.abs_e + brem_kernels_m1.abs[id_anue]) * g_nu_bar[id_nue] + inelastic_kernels_m1.abs[id_anue] * (1. - g_nu_bar[id_anue]);
-  ann_term[id_nux] = (pair_kernels_m1.abs_x + brem_kernels_m1.abs[id_nux]) * g_nu_bar[id_nux] + inelastic_kernels_m1.abs[id_nux] * (1. - g_nu_bar[id_nux]);
+  ann_term[id_nux] = (pair_kernels_m1.abs_x + brem_kernels_m1.abs[id_nux]) * g_nu_bar[id_anux] + inelastic_kernels_m1.abs[id_nux] * (1. - g_nu_bar[id_nux]);
+  ann_term[id_anux] = (pair_kernels_m1.abs_x + brem_kernels_m1.abs[id_anux]) * g_nu_bar[id_nux] + inelastic_kernels_m1.abs[id_anux] * (1. - g_nu_bar[id_anux]);
 
   double n_integrand_1[total_num_species], e_integrand_1[total_num_species];
   double n_integrand_2[total_num_species], e_integrand_2[total_num_species];
@@ -94,20 +96,24 @@ MyQuadratureIntegrand M1CoeffsDoubleIntegrand(double *var, void *p) {
     e_integrand_2[idx] = nu * n_integrand_2[idx];
   }
 
-  MyQuadratureIntegrand result = {.n = 12};
+  MyQuadratureIntegrand result = {.n = 16};
 
   result.integrand[0] = n_integrand_1[id_nue];
   result.integrand[1] = n_integrand_1[id_anue];
   result.integrand[2] = n_integrand_1[id_nux];
-  result.integrand[3] = n_integrand_2[id_nue];
-  result.integrand[4] = n_integrand_2[id_anue];
-  result.integrand[5] = n_integrand_2[id_nux];
-  result.integrand[6] = e_integrand_1[id_nue];
-  result.integrand[7] = e_integrand_1[id_anue];
-  result.integrand[8] = e_integrand_1[id_nux];
-  result.integrand[9] = e_integrand_2[id_nue];
-  result.integrand[10] = e_integrand_2[id_anue];
-  result.integrand[11] = e_integrand_2[id_nux];
+  result.integrand[3] = n_integrand_1[id_anux];
+  result.integrand[4] = n_integrand_2[id_nue];
+  result.integrand[5] = n_integrand_2[id_anue];
+  result.integrand[6] = n_integrand_2[id_nux];
+  result.integrand[7] = n_integrand_2[id_anux];
+  result.integrand[8] = e_integrand_1[id_nue];
+  result.integrand[9] = e_integrand_1[id_anue];
+  result.integrand[10] = e_integrand_1[id_nux];
+  result.integrand[11] = e_integrand_1[id_anux];
+  result.integrand[12] = e_integrand_2[id_nue];
+  result.integrand[13] = e_integrand_2[id_anue];
+  result.integrand[14] = e_integrand_2[id_nux];
+  result.integrand[15] = e_integrand_2[id_anux];
 
   return result;
 } 
@@ -151,7 +157,7 @@ MyQuadratureIntegrand M1CoeffsSingleIntegrand(double *var, void *p) {
       n_integrand_1[idx] = nu * nu * abs_em_beta.em[idx]; // [MeV^-1 cm^-3 s^-1]
       e_integrand_1[idx] = nu * n_integrand_1[idx]; // [cm^-3 s^-1]
 
-      n_integrand_2[idx] = nu * nu * g_nu[idx] * abs_em_beta.abs[id_nue]; // ab = em + ab (stimulated absorption)
+      n_integrand_2[idx] = nu * nu * g_nu[idx] * abs_em_beta.abs[idx]; // ab = em + ab (stimulated absorption)
       e_integrand_2[idx] = nu * n_integrand_2[idx];
     }
   }
@@ -165,7 +171,7 @@ MyQuadratureIntegrand M1CoeffsSingleIntegrand(double *var, void *p) {
   }
   
 
-  MyQuadratureIntegrand result = {.n = 11};
+  MyQuadratureIntegrand result = {.n = 12};
 
   result.integrand[0] = n_integrand_1[id_nue];
   result.integrand[1] = n_integrand_1[id_anue];
@@ -178,6 +184,7 @@ MyQuadratureIntegrand M1CoeffsSingleIntegrand(double *var, void *p) {
   result.integrand[8] = e_integrand_3[id_nue];
   result.integrand[9] = e_integrand_3[id_anue];
   result.integrand[10] = e_integrand_3[id_nux];;
+  result.integrand[11] = e_integrand_3[id_anux];;
 
   return result;
 }
@@ -193,7 +200,7 @@ M1Opacities ComputeM1Opacities(MyQuadrature *quad_1d, MyQuadrature *quad_2d, Gre
 
   // set up 1d integration
   MyFunctionMultiD integrand_m1_1d;
-  MyQuadratureIntegrand integrand_m1_1d_info = {.n = 11};
+  MyQuadratureIntegrand integrand_m1_1d_info = {.n = 12};
   integrand_m1_1d.function = &M1CoeffsSingleIntegrand;
   integrand_m1_1d.dim = 1;
   integrand_m1_1d.params = my_grey_opacity_params;
@@ -201,7 +208,7 @@ M1Opacities ComputeM1Opacities(MyQuadrature *quad_1d, MyQuadrature *quad_2d, Gre
 
   // set up 2d integration
   MyFunctionMultiD integrand_m1_2d;
-  MyQuadratureIntegrand integrand_m1_2d_info = {.n = 12};
+  MyQuadratureIntegrand integrand_m1_2d_info = {.n = 16};
   integrand_m1_2d.function = &M1CoeffsDoubleIntegrand;
   integrand_m1_2d.dim = 2;
   integrand_m1_2d.params = my_grey_opacity_params;
@@ -239,22 +246,27 @@ M1Opacities ComputeM1Opacities(MyQuadrature *quad_1d, MyQuadrature *quad_2d, Gre
   m1_opacities.eta_0[id_nue] = four_pi_hc3 * (four_pi_hc3 * integrals_2d.integrand[0] + integrals_1d.integrand[0]);
   m1_opacities.eta_0[id_anue] = four_pi_hc3 * (four_pi_hc3 * integrals_2d.integrand[1] + integrals_1d.integrand[1]);
   m1_opacities.eta_0[id_nux] = four_pi_hc3_sqr * integrals_2d.integrand[2];
+  m1_opacities.eta_0[id_anux] = four_pi_hc3_sqr * integrals_2d.integrand[3];
 
-  m1_opacities.kappa_0_a[id_nue] = four_pi_hc3 / (kClight * n[id_nue]) * (four_pi_hc3 * integrals_2d.integrand[3] + integrals_1d.integrand[2]);
-  m1_opacities.kappa_0_a[id_anue] = four_pi_hc3 / (kClight * n[id_anue]) * (four_pi_hc3 * integrals_2d.integrand[4] + integrals_1d.integrand[3]);
-  m1_opacities.kappa_0_a[id_nux] = four_pi_hc3_sqr / (kClight * n[id_nux]) * integrals_2d.integrand[5];
+  m1_opacities.kappa_0_a[id_nue] = four_pi_hc3 / (kClight * n[id_nue]) * (four_pi_hc3 * integrals_2d.integrand[4] + integrals_1d.integrand[2]);
+  m1_opacities.kappa_0_a[id_anue] = four_pi_hc3 / (kClight * n[id_anue]) * (four_pi_hc3 * integrals_2d.integrand[5] + integrals_1d.integrand[3]);
+  m1_opacities.kappa_0_a[id_nux] = four_pi_hc3_sqr / (kClight * n[id_nux]) * integrals_2d.integrand[6];
+  m1_opacities.kappa_0_a[id_anux] = four_pi_hc3_sqr / (kClight * n[id_anux]) * integrals_2d.integrand[7];
 
-  m1_opacities.eta[id_nue] = four_pi_hc3 * (four_pi_hc3 * integrals_2d.integrand[6] + integrals_1d.integrand[4]);
-  m1_opacities.eta[id_anue] = four_pi_hc3 * (four_pi_hc3 * integrals_2d.integrand[7] + integrals_1d.integrand[5]);
-  m1_opacities.eta[id_nux] = four_pi_hc3_sqr * integrals_2d.integrand[8];
+  m1_opacities.eta[id_nue] = four_pi_hc3 * (four_pi_hc3 * integrals_2d.integrand[8] + integrals_1d.integrand[4]);
+  m1_opacities.eta[id_anue] = four_pi_hc3 * (four_pi_hc3 * integrals_2d.integrand[9] + integrals_1d.integrand[5]);
+  m1_opacities.eta[id_nux] = four_pi_hc3_sqr * integrals_2d.integrand[10];
+  m1_opacities.eta[id_anux] = four_pi_hc3_sqr * integrals_2d.integrand[11];
 
-  m1_opacities.kappa_a[id_nue] = four_pi_hc3 / (kClight * J[id_nue]) * (four_pi_hc3 * integrals_2d.integrand[9] + integrals_1d.integrand[6]);
-  m1_opacities.kappa_a[id_anue] = four_pi_hc3 / (kClight * J[id_anue]) * (four_pi_hc3 * integrals_2d.integrand[10] + integrals_1d.integrand[7]);
-  m1_opacities.kappa_a[id_nux] = four_pi_hc3_sqr / (kClight * J[id_nux]) * integrals_2d.integrand[11];
+  m1_opacities.kappa_a[id_nue] = four_pi_hc3 / (kClight * J[id_nue]) * (four_pi_hc3 * integrals_2d.integrand[12] + integrals_1d.integrand[6]);
+  m1_opacities.kappa_a[id_anue] = four_pi_hc3 / (kClight * J[id_anue]) * (four_pi_hc3 * integrals_2d.integrand[13] + integrals_1d.integrand[7]);
+  m1_opacities.kappa_a[id_nux] = four_pi_hc3_sqr / (kClight * J[id_nux]) * integrals_2d.integrand[14];
+  m1_opacities.kappa_a[id_anux] = four_pi_hc3_sqr / (kClight * J[id_anux]) * integrals_2d.integrand[15];
 
   m1_opacities.kappa_s[id_nue] = four_pi_hc3 / (kClight * J[id_nue]) * integrals_1d.integrand[8];
   m1_opacities.kappa_s[id_anue] = four_pi_hc3 / (kClight * J[id_anue]) * integrals_1d.integrand[9];
   m1_opacities.kappa_s[id_nux] = four_pi_hc3 / (kClight * J[id_nux]) * integrals_1d.integrand[10];
+  m1_opacities.kappa_s[id_anux] = four_pi_hc3 / (kClight * J[id_anux]) * integrals_1d.integrand[11];
 
   return m1_opacities;
 }
@@ -311,13 +323,15 @@ MyQuadratureIntegrand SpectralIntegrand(double *var, void *p) {
 
   pro_term[id_nue] = (pair_kernels_m1.em_e + brem_kernels_m1.em[id_nue]) * (1. - g_nu[id_anue]) + inelastic_kernels_m1.em[id_nue] * g_nu[id_nue];
   pro_term[id_anue] = (pair_kernels_m1.em_e + brem_kernels_m1.em[id_anue]) * (1. - g_nu[id_nue]) + inelastic_kernels_m1.em[id_anue] * g_nu[id_anue];
-  pro_term[id_nux] = (pair_kernels_m1.em_x + brem_kernels_m1.em[id_nux]) * (1. - g_nu[id_nux]) + inelastic_kernels_m1.em[id_nux] * g_nu[id_nux];
+  pro_term[id_nux] = (pair_kernels_m1.em_x + brem_kernels_m1.em[id_nux]) * (1. - g_nu[id_anux]) + inelastic_kernels_m1.em[id_nux] * g_nu[id_nux];
+  pro_term[id_anux] = (pair_kernels_m1.em_x + brem_kernels_m1.em[id_anux]) * (1. - g_nu[id_nux]) + inelastic_kernels_m1.em[id_nux] * g_nu[id_anux];
 
   double ann_term[total_num_species];
 
   ann_term[id_nue] = (pair_kernels_m1.abs_e + brem_kernels_m1.abs[id_nue]) * g_nu[id_anue] + inelastic_kernels_m1.abs[id_nue] * (1. - g_nu[id_nue]);
   ann_term[id_anue] = (pair_kernels_m1.abs_e + brem_kernels_m1.abs[id_anue]) * g_nu[id_nue] + inelastic_kernels_m1.abs[id_anue] * (1. - g_nu[id_anue]);
-  ann_term[id_nux] = (pair_kernels_m1.abs_x + brem_kernels_m1.abs[id_nux]) * g_nu[id_nux] + inelastic_kernels_m1.abs[id_nux] * (1. - g_nu[id_nux]);
+  ann_term[id_nux] = (pair_kernels_m1.abs_x + brem_kernels_m1.abs[id_nux]) * g_nu[id_anux] + inelastic_kernels_m1.abs[id_nux] * (1. - g_nu[id_nux]);
+  ann_term[id_anux] = (pair_kernels_m1.abs_x + brem_kernels_m1.abs[id_anux]) * g_nu[id_nux] + inelastic_kernels_m1.abs[id_nux] * (1. - g_nu[id_anux]);
 
   double integrand_1[total_num_species], integrand_2[total_num_species];
 
@@ -326,14 +340,16 @@ MyQuadratureIntegrand SpectralIntegrand(double *var, void *p) {
     integrand_2[idx] = nu_bar * nu_bar * ann_term[idx];
   }
 
-  MyQuadratureIntegrand result = {.n = 6};
+  MyQuadratureIntegrand result = {.n = 8};
 
   result.integrand[0] = integrand_1[id_nue];
   result.integrand[1] = integrand_1[id_anue];
   result.integrand[2] = integrand_1[id_nux];
-  result.integrand[3] = integrand_2[id_nue];
-  result.integrand[4] = integrand_2[id_anue];
-  result.integrand[5] = integrand_2[id_nux];
+  result.integrand[3] = integrand_1[id_anux];
+  result.integrand[4] = integrand_2[id_nue];
+  result.integrand[5] = integrand_2[id_anue];
+  result.integrand[6] = integrand_2[id_nux];
+  result.integrand[7] = integrand_2[id_anux];
 
   return result;
 }
@@ -369,11 +385,7 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulated(const double nu, MyQuadr
 
   MyQuadratureIntegrand integrals_1d = GaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s);
 
-  MyOpacity abs_em_beta;
-  for (int idx=0; idx<total_num_species; idx++) {
-    abs_em_beta.em[idx] = 0.;
-    abs_em_beta.abs[idx] = 0.;
-  }
+  MyOpacity abs_em_beta = {0.};
   if (my_grey_opacity_params->opacity_flags.use_abs_em) {
     abs_em_beta = StimAbsOpacity(nu, &my_grey_opacity_params->opacity_pars, &my_grey_opacity_params->eos_pars); // [s^-1]
   }
@@ -390,18 +402,22 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulated(const double nu, MyQuadr
   sp_opacities.j[id_nue] = abs_em_beta.em[id_nue] + four_pi_hc3 * integrals_1d.integrand[0];
   sp_opacities.j[id_anue] = abs_em_beta.em[id_anue] + four_pi_hc3 * integrals_1d.integrand[1];
   sp_opacities.j[id_nux] = abs_em_beta.em[id_nux] + four_pi_hc3 * integrals_1d.integrand[2];
+  sp_opacities.j[id_anux] = abs_em_beta.em[id_anux] + four_pi_hc3 * integrals_1d.integrand[3];
 
-  sp_opacities.kappa[id_nue] = (abs_em_beta.abs[id_nue] + four_pi_hc3 * integrals_1d.integrand[3]) / kClight;
-  sp_opacities.kappa[id_anue] = (abs_em_beta.abs[id_anue] + four_pi_hc3 * integrals_1d.integrand[4]) / kClight;
-  sp_opacities.kappa[id_nux] = (abs_em_beta.abs[id_nux] + four_pi_hc3 * integrals_1d.integrand[5]) / kClight;
+  sp_opacities.kappa[id_nue] = (abs_em_beta.abs[id_nue] + four_pi_hc3 * integrals_1d.integrand[4]) / kClight;
+  sp_opacities.kappa[id_anue] = (abs_em_beta.abs[id_anue] + four_pi_hc3 * integrals_1d.integrand[5]) / kClight;
+  sp_opacities.kappa[id_nux] = (abs_em_beta.abs[id_nux] + four_pi_hc3 * integrals_1d.integrand[6]) / kClight;
+  sp_opacities.kappa[id_anux] = (abs_em_beta.abs[id_anux] + four_pi_hc3 * integrals_1d.integrand[7]) / kClight;
 
   sp_opacities.j_s[id_nue] =  4. * kPi * nu * nu * g_nu[id_nue] * iso_scatt;
   sp_opacities.j_s[id_anue] = 4. * kPi * nu * nu * g_nu[id_anue] * iso_scatt;
   sp_opacities.j_s[id_nux] = 4. * kPi * nu * nu * g_nu[id_nux] * iso_scatt;
+  sp_opacities.j_s[id_anux] = 4. * kPi * nu * nu * g_nu[id_anux] * iso_scatt;
 
   sp_opacities.kappa_s[id_nue] = 4. * kPi * nu * nu * iso_scatt / kClight;
   sp_opacities.kappa_s[id_anue] = sp_opacities.kappa_s[id_nue];
   sp_opacities.kappa_s[id_nux] = sp_opacities.kappa_s[id_nue];
+  sp_opacities.kappa_s[id_anux] = sp_opacities.kappa_s[id_nue];
 
   return sp_opacities;
 }

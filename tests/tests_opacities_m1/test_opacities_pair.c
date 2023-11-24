@@ -116,9 +116,9 @@ int main() {
   printf("\n");
 
   printf("Generated tables:\n");
-  printf("r diff_distr j0-nue j0-anue j0-nux j-nue j-anue j-nux kappa0-a-nue kappa0-a-anue kappa0-a-nux kappa-a-nue kappa-a-anue kappa-a-nux kappa-s-nue kappa-s-anue kappa-s-nux\n");
+  printf("r diff_distr j0-nue j0-anue j0-nux j0-anux j-nue j-anue j-nux j-anux kappa0-a-nue kappa0-a-anue kappa0-a-nux kappa0-a-anux kappa-a-nue kappa-a-anue kappa-a-nux kappa-a-anux kappa-s-nue kappa-s-anue kappa-s-nux kappa-s-anux\n");
 
-  fprintf(file, "# r diff_distr j0-nue j0-anue j0-nux j-nue j-anue j-nux kappa0-a-nue kappa0-a-anue kappa0-a-nux kappa-a-nue kappa-a-anue kappa-a-nux kappa-s-nue kappa-s-anue kappa-s-nux\n");
+  fprintf(file, "#  diff_distr j0-nue j0-anue j0-nux j0-anux j-nue j-anue j-nux j-anux kappa0-a-nue kappa0-a-anue kappa0-a-nux kappa0-a-anux kappa-a-nue kappa-a-anue kappa-a-nux kappa-a-anux kappa-s-nue kappa-s-anue kappa-s-nux kappa-s-anux\n");
   // printf("r: [cm], diff_distr [should be zero, checks Fermi Dirac with NuFTotal], j-nue, ");
 
   for (int i = 0; i < 102; i++) {
@@ -141,35 +141,33 @@ int main() {
     // M1 parameters
     MyQuadratureIntegrand Jvals = NuEnergy(&my_grey_opacity_params.distr_pars);
     MyQuadratureIntegrand nvals = NuNumber(&my_grey_opacity_params.distr_pars);
-    my_grey_opacity_params.m1_pars.J[0] = Jvals.integrand[0];
-    my_grey_opacity_params.m1_pars.J[1] = Jvals.integrand[1];
-    my_grey_opacity_params.m1_pars.J[2] = Jvals.integrand[2];
-    my_grey_opacity_params.m1_pars.n[0] = nvals.integrand[0];
-    my_grey_opacity_params.m1_pars.n[1] = nvals.integrand[1];
-    my_grey_opacity_params.m1_pars.n[2] = nvals.integrand[2];
+    for (int idx = 0; idx < total_num_species; idx++) {
+      my_grey_opacity_params.m1_pars.n[idx] = nvals.integrand[idx];
+      my_grey_opacity_params.m1_pars.J[idx] = Jvals.integrand[idx];
+    }
 
     double distr_fermi =
         FermiDistr(123.4, my_grey_opacity_params.eos_pars.temp, my_grey_opacity_params.eos_pars.mu_e - my_grey_opacity_params.eos_pars.mu_n + my_grey_opacity_params.eos_pars.mu_p);
     double distr_nuftot = TotalNuF(123.4, &my_grey_opacity_params.distr_pars, 0);
     double diff_distr = fabs(distr_fermi - distr_nuftot);
 
-    M1Opacities pair_opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
+    M1Opacities coeffs = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
 
-    printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
+    printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
             r[i], diff_distr,
-            pair_opacities.eta_0[id_nue], pair_opacities.eta_0[id_anue], pair_opacities.eta_0[id_nux],
-            pair_opacities.eta[id_nue], pair_opacities.eta[id_anue], pair_opacities.eta[id_nux],
-            pair_opacities.kappa_0_a[id_nue], pair_opacities.kappa_0_a[id_anue], pair_opacities.kappa_0_a[id_nux],
-            pair_opacities.kappa_a[id_nue], pair_opacities.kappa_a[id_anue], pair_opacities.kappa_a[id_nux],
-            pair_opacities.kappa_s[id_nue], pair_opacities.kappa_s[id_anue], pair_opacities.kappa_s[id_nux]);
-    fprintf(file, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
+            coeffs.eta_0[id_nue], coeffs.eta_0[id_anue], coeffs.eta_0[id_nux], coeffs.eta_0[id_anux],
+            coeffs.eta[id_nue], coeffs.eta[id_anue], coeffs.eta[id_nux], coeffs.eta[id_anux],
+            coeffs.kappa_0_a[id_nue], coeffs.kappa_0_a[id_anue], coeffs.kappa_0_a[id_nux], coeffs.kappa_0_a[id_anux],
+            coeffs.kappa_a[id_nue], coeffs.kappa_a[id_anue], coeffs.kappa_a[id_nux], coeffs.kappa_a[id_anux],
+            coeffs.kappa_s[id_nue], coeffs.kappa_s[id_anue], coeffs.kappa_s[id_nux], coeffs.kappa_s[id_anux]);
+    fprintf(file, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
             r[i], diff_distr,
-            pair_opacities.eta_0[id_nue], pair_opacities.eta_0[id_anue], pair_opacities.eta_0[id_nux],
-            pair_opacities.eta[id_nue], pair_opacities.eta[id_anue], pair_opacities.eta[id_nux],
-            pair_opacities.kappa_0_a[id_nue], pair_opacities.kappa_0_a[id_anue], pair_opacities.kappa_0_a[id_nux],
-            pair_opacities.kappa_a[id_nue], pair_opacities.kappa_a[id_anue], pair_opacities.kappa_a[id_nux],
-            pair_opacities.kappa_s[id_nue], pair_opacities.kappa_s[id_anue], pair_opacities.kappa_s[id_nux]);
-    }
+            coeffs.eta_0[id_nue], coeffs.eta_0[id_anue], coeffs.eta_0[id_nux], coeffs.eta_0[id_anux],
+            coeffs.eta[id_nue], coeffs.eta[id_anue], coeffs.eta[id_nux], coeffs.eta[id_anux],
+            coeffs.kappa_0_a[id_nue], coeffs.kappa_0_a[id_anue], coeffs.kappa_0_a[id_nux], coeffs.kappa_0_a[id_anux],
+            coeffs.kappa_a[id_nue], coeffs.kappa_a[id_anue], coeffs.kappa_a[id_nux], coeffs.kappa_a[id_anux],
+            coeffs.kappa_s[id_nue], coeffs.kappa_s[id_anue], coeffs.kappa_s[id_nux], coeffs.kappa_s[id_anux]);
+  }
 
   fclose(file);
 

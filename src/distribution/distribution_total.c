@@ -33,6 +33,7 @@ NuDistributionParams NuEquilibriumParams(MyEOSParams *eos_pars){
   out_distr.eta_t[id_nue] = (mu_e - mu_n + mu_p) / temp;
   out_distr.eta_t[id_anue] = - out_distr.eta_t[id_nue];
   out_distr.eta_t[id_nux] = 0.;
+  out_distr.eta_t[id_anux] = 0.;
 
   return out_distr;
 }
@@ -76,10 +77,10 @@ MyQuadratureIntegrand NuNumberIntegrand(double *x, void *p) {
 
   MyQuadratureIntegrand result;
 
-  result.n = 3;
-  result.integrand[0] = x[0] * x[0] * TotalNuF(x[0], distr_pars, id_nue);
-  result.integrand[1] = x[0] * x[0] * TotalNuF(x[0], distr_pars, id_anue);
-  result.integrand[2] = x[0] * x[0] * TotalNuF(x[0], distr_pars, id_nux);
+  result.n = total_num_species;
+  for (int idx = 0; idx < total_num_species; idx++) {
+    result.integrand[idx] = x[0] * x[0] * TotalNuF(x[0], distr_pars, idx);
+  }
 
   return result;
 }
@@ -93,7 +94,7 @@ MyQuadratureIntegrand NuNumber(NuDistributionParams *distr_pars) {
 
   integrand.dim = 1;
   integrand.params = distr_pars;
-  integrand.my_quadrature_integrand.n = 3;
+  integrand.my_quadrature_integrand.n = total_num_species;
 
   MyQuadrature quad = quadrature_default;
 
@@ -104,12 +105,13 @@ MyQuadratureIntegrand NuNumber(NuDistributionParams *distr_pars) {
   s[id_nue] = fabs(distr_pars->temp_t[id_nue] * distr_pars->eta_t[id_nue]);
   s[id_anue] = fabs(distr_pars->temp_t[id_anue] * distr_pars->eta_t[id_anue]);
   s[id_nux] = s[id_nue]; // @TODO: cannot be equal to zero
+  s[id_anux] = s[id_nue]; // @TODO: cannot be equal to zero
 
   integrand.function = &NuNumberIntegrand;
   MyQuadratureIntegrand result = GaussLegendreIntegrate1D(&quad, &integrand, s);
   const double result_factor = 4. * kPi / pow(kH * kClight, 3.);
 
-  for (int species = 0; species < 3; species++) {
+  for (int species = 0; species < total_num_species; species++) {
     result.integrand[species] = result.integrand[species] * result_factor;
   }
 
@@ -123,7 +125,7 @@ MyQuadratureIntegrand NuNumber(NuDistributionParams *distr_pars) {
 MyQuadratureIntegrand NuEnergyIntegrand(double *x, void *p) {
   MyQuadratureIntegrand result = NuNumberIntegrand(x, p);
 
-  for (int species = 0; species < 3; species++) {
+  for (int species = 0; species < total_num_species; species++) {
     result.integrand[species] = x[0] * result.integrand[species];
   }
 
@@ -139,7 +141,7 @@ MyQuadratureIntegrand NuEnergy(NuDistributionParams *distr_pars) {
 
   integrand.dim = 1;
   integrand.params = distr_pars;
-  integrand.my_quadrature_integrand.n = 3;
+  integrand.my_quadrature_integrand.n = total_num_species;
 
   MyQuadrature quad = quadrature_default;
 
@@ -150,12 +152,13 @@ MyQuadratureIntegrand NuEnergy(NuDistributionParams *distr_pars) {
   s[id_nue] = fabs(distr_pars->temp_t[id_nue] * distr_pars->eta_t[id_nue]);
   s[id_anue] = fabs(distr_pars->temp_t[id_anue] * distr_pars->eta_t[id_anue]);
   s[id_nux] = s[id_nue]; // @TODO: cannot be equal to zero
-  
+  s[id_anux] = s[id_nue]; // @TODO: cannot be equal to zero
+
   integrand.function = &NuEnergyIntegrand;
   MyQuadratureIntegrand result = GaussLegendreIntegrate1D(&quad, &integrand, s);
   const double result_factor = 4. * kPi / pow(kH * kClight, 3.);
 
-  for (int species = 0; species < 3; species++) {
+  for (int species = 0; species < total_num_species; species++) {
     result.integrand[species] = result.integrand[species] * result_factor;
   }
 

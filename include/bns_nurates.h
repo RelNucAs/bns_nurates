@@ -15,8 +15,9 @@
 #define id_nue  0
 #define id_anue 1
 #define id_nux  2
+#define id_anux 3
 
-#define total_num_species 3
+#define total_num_species 4
 
 // Define dimension of tabulated PairT function
 #define dim_pair_t 10000
@@ -90,7 +91,7 @@ typedef struct MyFunction MyFunction;
  */
 struct MyQuadratureIntegrand {
   int n;                  // number of integrands/integrals
-  double integrand[12];   // values of integrands/integrals (max: 12)
+  double integrand[16];   // values of integrands/integrals (max: 16)
 };
 typedef struct MyQuadratureIntegrand MyQuadratureIntegrand;
 

@@ -251,14 +251,9 @@ MyOpacity AbsOpacity(const double omega, OpacityParams *opacity_pars, MyEOSParam
  */
 MyOpacity StimAbsOpacity(const double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
   MyOpacity abs_opacity = AbsOpacity(omega, opacity_pars, eos_pars);
-  MyOpacity stim_abs_opacity = {
-      .em[id_nue]  = abs_opacity.em[id_nue],
-      .abs[id_nue]  = abs_opacity.abs[id_nue] + abs_opacity.em[id_nue],
-      .em[id_anue] = abs_opacity.em[id_anue],
-      .abs[id_anue] = abs_opacity.abs[id_anue] + abs_opacity.em[id_anue],
-      .abs[id_nux] = 0.,
-      .em[id_nux] = 0.
-  };
+  
+  abs_opacity.abs[id_nue] = abs_opacity.abs[id_nue] + abs_opacity.em[id_nue];
+  abs_opacity.abs[id_anue] = abs_opacity.abs[id_anue] + abs_opacity.em[id_anue];
 
-  return stim_abs_opacity;
+  return abs_opacity;
 }

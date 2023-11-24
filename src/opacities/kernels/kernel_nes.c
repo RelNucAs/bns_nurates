@@ -95,12 +95,12 @@ MyKernelOutput NESKernels(InelasticScattKernelParams *kernel_params, MyEOSParams
   output.abs[id_nue] = kNes * t * t * MezzacappaIntOut(w, wp, kBPlus, kBZero, fdi_diff_w, fdi_diff_abs);
   output.abs[id_anue] = kNes * t * t * MezzacappaIntOut(w, wp, kBZero, kBPlus, fdi_diff_w, fdi_diff_abs);
   output.abs[id_nux] = kNes * t * t * MezzacappaIntOut(w, wp, kBMinus, kBZero, fdi_diff_w, fdi_diff_abs);
-  //output.abs[id_anux] = kNes * MezzacappaIntOut(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs); @TODO: extend library for including anux
+  output.abs[id_anux] = kNes * t * t * MezzacappaIntOut(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs);
 
   output.em[id_nue] = kNes * t * t * MezzacappaIntIn(w, wp, kBPlus, kBZero, fdi_diff_w, fdi_diff_abs);
   output.em[id_anue] = kNes * t * t * MezzacappaIntIn(w, wp, kBZero, kBPlus, fdi_diff_w, fdi_diff_abs);
   output.em[id_nux] = kNes * t * t * MezzacappaIntIn(w, wp, kBMinus, kBZero, fdi_diff_w, fdi_diff_abs);
-  //output.em[id_anux] = kNes * MezzacappaIntIn(wp, w, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs); @TODO: extend library for including anux
+  output.em[id_anux] = kNes * t * t * MezzacappaIntIn(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs);
 
   return output;
 }
@@ -120,13 +120,13 @@ MyKernelOutput NPSKernels(InelasticScattKernelParams *kernel_params, MyEOSParams
   output.abs[id_nue] = kNes * t * t * MezzacappaIntOut(w, wp, kBZero, kBPlus, fdi_diff_w, fdi_diff_abs);
   output.abs[id_anue] = kNes * t * t * MezzacappaIntOut(w, wp, kBPlus, kBZero, fdi_diff_w, fdi_diff_abs);
   output.abs[id_nux] = kNes * t * t * MezzacappaIntOut(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs);
-  //output.abs[id_anux] = kNes * MezzacappaIntOut(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs); @TODO: extend library for including anux
+  output.abs[id_anux] = kNes * t * t *  MezzacappaIntOut(w, wp, kBMinus, kBZero, fdi_diff_w, fdi_diff_abs);
 
   output.em[id_nue] = kNes * t * t * MezzacappaIntIn(w, wp, kBZero, kBPlus, fdi_diff_w, fdi_diff_abs);
   output.em[id_anue] = kNes * t * t * MezzacappaIntIn(w, wp, kBPlus, kBZero, fdi_diff_w, fdi_diff_abs);
   output.em[id_nux] = kNes * t * t * MezzacappaIntIn(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs);
-  //output.em[id_anux] = kNes * MezzacappaIntIn(wp, w, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs); @TODO: extend library for including anux
-
+  output.em[id_anux] = kNes * t * t * MezzacappaIntIn(w, wp, kBMinus, kBZero, fdi_diff_w, fdi_diff_abs);
+  
   return output;
 }
 
