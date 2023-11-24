@@ -1,0 +1,1 @@
+/usr/bin/cc -rdynamic CMakeFiles/test_pair_phi.dir/tests/tests_pair/test_pair_phi.c.o CMakeFiles/test_pair_phi.dir/src/functions/safe_exp.c.o CMakeFiles/test_pair_phi.dir/src/opacities/kernels/kernel_pair.c.o -o test_pair_phi  /usr/lib/x86_64-linux-gnu/libgsl.so /usr/lib/x86_64-linux-gnu/libgslcblas.so -lm 
