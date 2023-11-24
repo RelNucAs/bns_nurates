@@ -10,12 +10,16 @@
 
 #include <stdbool.h>
 
+
 // Define indices of neutrino species
 #define id_nue  0
 #define id_anue 1
 #define id_nux  2
 
 #define total_num_species 3
+
+// Define dimension of tabulated PairT function
+#define dim_pair_t 10000
 
 /* ==================================================================================
  * Integration structures
@@ -131,6 +135,8 @@ struct PairKernelParams {
   double mu_prime;      // cosine of anti-neutrino polar angle
   double lmax;          // maximum value of l for Legendre expansion
   double filter;        // filter parameter for pair kernel positivity
+  double alpha[dim_pair_t];
+  double pair_t[6][dim_pair_t];
 };
 typedef struct PairKernelParams PairKernelParams;
 
@@ -264,7 +270,7 @@ struct NuDistributionParams {
   double w_f[total_num_species];         // contribution factor
   double temp_f[total_num_species];      // temperature
   double c_f[total_num_species];         // constant in power from Federico's notes
-
+  double beta_f[total_num_species];      // from Federico's notes
 };
 typedef struct NuDistributionParams NuDistributionParams;
 

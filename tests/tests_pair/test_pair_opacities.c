@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include "../../include/bns_nurates.h"
 #include "../../include/integration.h"
-#include "../../src/opacities/opacities.h"
+#include "opacities.h"
 
 int main() {
 

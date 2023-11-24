@@ -44,7 +44,119 @@ double SFPsi(const double x);
 
 /*===========================================================================*/
 
-// fermi.c
+// fermi_integrals.c
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = -9/2 */
+double FDI_m92(const double x);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = -7/2 */
+double FDI_m72(const double x);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k=-5/2 */
+double FDI_m52(const double x);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = -3/2 */
+double FDI_m32(const double x);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = -1/2 */
+double FDI_m12(const double x);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 0 */
+double FDI_0(const double y);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 1/2 */
+double FDI_p12(const double x);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 1 */
+double FDI_p1(const double y);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 3/2 */
+double FDI_p32(const double x);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 2 */
+double FDI_p2(const double y);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 5/2 */
+double FDI_p52(const double x);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 3 */
+double FDI_p3(const double y);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 7/2 */
+double FDI_p72(const double x);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 4 */
+double FDI_p4(const double y);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 9/2 */
+double FDI_p92(const double x);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 5 */
+double FDI_p5(const double y);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 11/2 */
+double FDI_p112(const double x);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 6 */
+double FDI_p6(const double y);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 13/2 */
+double FDI_p132(const double x);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 7 */
+double FDI_p7(const double y);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 15/2 */
+double FDI_p152(const double x);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 8 */
+double FDI_p8(const double y);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 17/2 */
+double FDI_p172(const double x);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 9 */
+double FDI_p9(const double y);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 19/2 */
+double FDI_p192(const double x);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 10 */
+double FDI_p10(const double y);
+
+/* double precision rational minimax approximation of non-relativistic */
+/* Fermi-Dirac integral of order k = 21/2 */
+double FDI_p212(const double x);
+
+/*===========================================================================*/
+
+// fermi_distr.c
 
 // Computation of Fermi-Dirac distribution function
 double FermiDistr(const double e, const double temp, const double mu);

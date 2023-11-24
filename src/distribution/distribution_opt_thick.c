@@ -9,21 +9,8 @@
 
 #include "distribution.h"
 #include "bns_nurates.h"
+#include "constants.h"
 #include "functions.h"
-
-#define kFourThirds 1.333333333333333333333333
-#define kFitA  1.3300219438752203
-#define kFitB  368.1278987362366
-#define kFitC (-2701.5865312193273)
-#define kFitD 3930.881704339285
-#define kFitE 11356.551670239718
-#define kFitF (-33734.77092570755)
-#define kFitG 21233.158792661736
-#define kFitH 275.93123409700814
-#define kFitI (-2015.9177416521718)
-#define kFitL 4403.086279325216
-#define kFitM (-1871.7098365259042)
-#define kFitN (-2166.313342616665)
 
 /* Neutrino distribution function in optically thick regime: Fermi-Dirac distribution
  *
@@ -43,24 +30,42 @@ double NuFThick(double omega, NuDistributionParams *distr_pars, int species) {
  * eos_pars:        uses fluid temperature
  * out_distr_pars:  computes trapped neutrino temperature and degeneracy parameter
  */
+
+
 void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, NuDistributionParams *out_distr_pars) {
 
   // set degeneracy parameter for different neutrino species
-  out_distr_pars->eta_t[0] = (eos_pars->mu_p + eos_pars->mu_e - eos_pars->mu_n) / eos_pars->temp;
-  out_distr_pars->eta_t[1] = -(eos_pars->mu_p + eos_pars->mu_e - eos_pars->mu_n) / eos_pars->temp;
-  out_distr_pars->eta_t[2] = 0.;
+
+  //out_distr_pars->eta_t[0] = (eos_pars->mu_p + eos_pars->mu_e - eos_pars->mu_n) / eos_pars->temp;
+  //out_distr_pars->eta_t[1] = -(eos_pars->mu_p + eos_pars->mu_e - eos_pars->mu_n) / eos_pars->temp;
+  //out_distr_pars->eta_t[2] = 0.;
 
   for (int species = 0; species < total_num_species; species++) {
 
-    out_distr_pars->w_t[species] = 0.5 * (3. * M1_pars->chi[species] - 1.);
-    out_distr_pars->temp_t[species] = eos_pars->temp;
+    out_distr_pars->w_t[species] = 1.5 * (1. - M1_pars->chi[species]);
+    //out_distr_pars->temp_t[species] = eos_pars->temp;
 
     // @TODO: Currently disabling alternative. What do we do with this ?
-    //double y = fmax(M1_pars->J[species] / (M1_pars->n[species] * eos_pars->temp), 3.05); // average neutrino energy over thermal energy
-    //double y_0 = 114.;
 
-    //out_distr_pars->eta_t[species] =
-    //    y < y_0 ? (y * (y * (y * (y * (y * (kFitA * y + kFitB) + kFitC) + kFitD) + kFitE) + kFitF) + kFitG) / (y * (y * (y * (y * (y + kFitH) + kFitI) + kFitL) + kFitM) + kFitN) : kFourThirds * y;
+    double y = M1_pars->n[species] * M1_pars->n[species] * M1_pars->n[species] * M1_pars->n[species] * kHClight * kHClight * kHClight
+        / (4. * M_PI * M1_pars->J[species] * M1_pars->J[species] * M1_pars->J[species]);
 
+    if (y < 0.04) {
+      out_distr_pars->eta_t[species] =
+          (y * (y * (y * (y * (193601090.674965 - 1108185464.38267 * y) - 5417182.68352186) - 132141.667235385) - 103.882788946162) - 0.0014855034293057) /
+              (y * (y * (y * (1.0 * y + 5426593.58422611) + 35266.6610309076) + 15.7105593937989) + 7.27351598778796e-5);
+    } else if (y <= 0.7) {
+      out_distr_pars->eta_t[species] =
+          (y * (y * (y * (y * (2.98735454268239 * y - 4.88726196424146) - 0.901791627658626) + 2.4819363543555) - 0.00548761969223768) - 0.00769760353422157) /
+              (y * (y * (y * (1.0 * y - 1.58869835679685) + 0.441658509378521) + 0.14883216362587) + 0.0024946879233069);
+    } else if (y > 0.7 && y < 0.7901234567745267) {
+      out_distr_pars->eta_t[species] =
+          (y * (y * (y * (y * (2827.84724452959 * y - 3707.82829755322) - 2.49562579572847) + 1254.79286964601) - 258.239389707494) - 3.58793204563292) /
+              (y * (y * (y * (1.0 * y + 85.5940548187225) - 68.8227897049312) - 55.1337376497705) + 43.9181682873458);
+    } else {
+      out_distr_pars->eta_t[species] = 1000.;
+    }
+
+    out_distr_pars->temp_t[species] = FDI_p2(out_distr_pars->eta_t[species]) * M1_pars->J[species] / (FDI_p3(out_distr_pars->eta_t[species]) * M1_pars->n[species]);
   }
 }

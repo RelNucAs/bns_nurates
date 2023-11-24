@@ -12,7 +12,7 @@
 
 #include "../../include/constants.h"
 #include "../../include/weak_magnetism.h"
-#include "../../src/opacities/opacities.h"
+#include "opacities.h"
 
 int main () {
   printf("Kernel is compared with the result of a tested Fortran code\n");

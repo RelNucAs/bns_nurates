@@ -11,7 +11,7 @@
 
 #include "../../include/constants.h"
 #include "../../include/weak_magnetism.h"
-#include "../../src/opacities/opacities.h"
+#include "opacities.h"
 
 void generate_comparison_data(const bool use_dU) {
 

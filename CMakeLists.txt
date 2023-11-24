@@ -16,7 +16,8 @@ add_executable(bns_nurates
         src/distribution/distribution_total.c
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_integrals.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
@@ -27,7 +28,7 @@ add_executable(bns_nurates
         include/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
-        src/opacities/opacities.h
+        include/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
         src/output/outputs.h
@@ -46,6 +47,7 @@ add_executable(bns_nurates
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c)
 
+target_compile_options(bns_nurates PRIVATE -Wall -Wextra -pedantic)
 target_include_directories(bns_nurates PRIVATE include)
 target_include_directories(bns_nurates PRIVATE src)
 
@@ -58,7 +60,8 @@ add_library(nurates SHARED
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
+        src/functions/fermi_integrals.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
@@ -185,14 +188,14 @@ add_executable(test_pair_opacities
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
         src/functions/theta.c
         include/integration.h
         include/kernels.h
-        src/opacities/opacities.h
+        include/opacities.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
@@ -208,31 +211,27 @@ target_link_libraries(test_pair_opacities m)
 add_executable(test_beta
         tests/tests_beta/test_beta.c
         include/constants.h
-        #src/bns_nurates.h
-        #src/distribution/distribution.h
-        src/distribution/distribution_total.c
-        src/distribution/distribution_opt_thick.c
-        src/distribution/distribution_opt_thin.c
+        include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
-        src/functions/lambert.c
-        #src/functions/mnewt.c
+        src/functions/mnewt.c
         src/functions/safe_exp.c
         src/functions/theta.c
-        #src/integration/integration.h
-        #src/opacities/kernels/kernels.h
-        include/weak_magnetism.h
-        src/opacities/weak_magnetism/weak_magnetism.c
-        src/opacities/weak_magnetism/nucfrmfac.c
-        src/opacities/opacities.h
+        include/integration.h
+        include/kernels.h
+        include/opacities.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
         src/opacities/kernels/kernel_pair.c
-        src/opacities/nu_abs_em_beta.c
+        src/opacities/nu_abs_em_pair.c
         src/integration/integration_quadrature_integrate_kernels.c
+        include/weak_magnetism.h
+        src/opacities/weak_magnetism/weak_magnetism.c
+        src/opacities/weak_magnetism/nucfrmfac.c
+        src/opacities/nu_abs_em_beta.c
 )
 
 target_link_libraries(test_beta GSL::gsl GSL::gslcblas)
@@ -242,31 +241,27 @@ target_link_libraries(test_beta m)
 add_executable(test_iso
         tests/tests_iso/test_iso.c
         include/constants.h
-        #src/bns_nurates.h
-        #src/distribution/distribution.h
-        src/distribution/distribution_total.c
-        src/distribution/distribution_opt_thick.c
-        src/distribution/distribution_opt_thin.c
+        include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
-        src/functions/lambert.c
-        #src/functions/mnewt.c
+        src/functions/mnewt.c
         src/functions/safe_exp.c
         src/functions/theta.c
-        #src/integration/integration.h
-        #src/opacities/kernels/kernels.h
-        include/weak_magnetism.h
-        src/opacities/weak_magnetism/weak_magnetism.c
-        src/opacities/weak_magnetism/nucfrmfac.c
-        src/opacities/opacities.h
+        include/integration.h
+        include/kernels.h
+        include/opacities.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
         src/opacities/kernels/kernel_pair.c
-        src/opacities/nu_scatt_iso.c
+        src/opacities/nu_abs_em_pair.c
         src/integration/integration_quadrature_integrate_kernels.c
+        include/weak_magnetism.h
+        src/opacities/weak_magnetism/weak_magnetism.c
+        src/opacities/weak_magnetism/nucfrmfac.c
+        src/opacities/nu_scatt_iso.c
 )
 
 target_link_libraries(test_iso GSL::gsl GSL::gslcblas)
@@ -276,32 +271,28 @@ target_link_libraries(test_iso m)
 add_executable(test_brem
         tests/tests_brem/test_brem.c
         include/constants.h
-        #src/bns_nurates.h
-        #src/distribution/distribution.h
-        src/distribution/distribution_total.c
-        src/distribution/distribution_opt_thick.c
-        src/distribution/distribution_opt_thin.c
+        include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
-        src/functions/lambert.c
-        #src/functions/mnewt.c
+        src/functions/mnewt.c
         src/functions/safe_exp.c
         src/functions/theta.c
-        #src/integration/integration.h
-        #src/opacities/kernels/kernels.h
-        include/weak_magnetism.h
-        src/opacities/weak_magnetism/weak_magnetism.c
-        src/opacities/weak_magnetism/nucfrmfac.c
-        src/opacities/opacities.h
+        include/integration.h
+        include/kernels.h
+        include/opacities.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
         src/opacities/kernels/kernel_pair.c
-        include/kernels.h
-        src/opacities/kernels/kernel_brem.c
+        src/opacities/nu_abs_em_pair.c
         src/integration/integration_quadrature_integrate_kernels.c
+        include/weak_magnetism.h
+        src/opacities/weak_magnetism/weak_magnetism.c
+        src/opacities/weak_magnetism/nucfrmfac.c
+        src/opacities/nu_abs_em_brem.c
+        src/opacities/kernels/kernel_brem.c
 )
 
 target_link_libraries(test_brem GSL::gsl GSL::gslcblas)
@@ -313,13 +304,14 @@ add_executable(test_m1_coeffs
         include/constants.h
         include/bns_nurates.h
         include/distribution.h
+        include/functions.h
+        src/functions/fermi_integrals.c
         src/distribution/distribution_opt_thick.c
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
-        include/functions.h
         src/functions/lambert.c
         src/functions/theta.c
-        src/opacities/opacities.h
+        include/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
         include/weak_magnetism.h
@@ -331,7 +323,7 @@ add_executable(test_m1_coeffs
         src/integration/integration_quadrature_integrate.c
         src/integration/integration_quadrature_integrate_kernels.c
         include/functions.h
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/safe_exp.c
 )
@@ -345,7 +337,7 @@ add_executable(test_gauss_legendre_1d
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -366,7 +358,7 @@ add_executable(test_gauss_legendre_2d
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -387,7 +379,7 @@ add_executable(test_gauss_legendre_3d
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -408,7 +400,7 @@ add_executable(test_gauss_laguerre_1d
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -429,7 +421,7 @@ add_executable(test_quadrature_io
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -452,7 +444,7 @@ add_executable(test_integration_1d
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -475,7 +467,7 @@ add_executable(test_integration_2d
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -498,7 +490,7 @@ add_executable(test_integration_3d
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -521,7 +513,7 @@ add_executable(test_integration_special
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -545,7 +537,7 @@ add_executable(test_integration_multi_func_1d
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -569,7 +561,7 @@ add_executable(test_integration_multi_func_2d
         include/bns_nurates.h
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -594,7 +586,8 @@ add_executable(test_opacities_electron_capture
         src/distribution/distribution_total.c
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_integrals.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
@@ -605,7 +598,7 @@ add_executable(test_opacities_electron_capture
         include/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
-        src/opacities/opacities.h
+        include/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
         src/output/outputs.h
@@ -639,7 +632,8 @@ add_executable(test_opacities_pair
         src/distribution/distribution_total.c
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_integrals.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
@@ -650,7 +644,7 @@ add_executable(test_opacities_pair
         include/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
-        src/opacities/opacities.h
+        include/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
         src/output/outputs.h
@@ -684,7 +678,8 @@ add_executable(test_opacities_brem
         src/distribution/distribution_total.c
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_integrals.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
@@ -695,7 +690,7 @@ add_executable(test_opacities_brem
         include/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
-        src/opacities/opacities.h
+        include/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
         src/output/outputs.h
@@ -729,7 +724,8 @@ add_executable(test_opacities_inelastic_scatt
         src/distribution/distribution_total.c
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_integrals.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
@@ -740,7 +736,7 @@ add_executable(test_opacities_inelastic_scatt
         include/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
-        src/opacities/opacities.h
+        include/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
         src/output/outputs.h
@@ -774,7 +770,8 @@ add_executable(test_opacities_isoscatt
         src/distribution/distribution_total.c
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_integrals.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
@@ -785,7 +782,7 @@ add_executable(test_opacities_isoscatt
         include/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
-        src/opacities/opacities.h
+        include/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
         src/output/outputs.h
@@ -809,7 +806,7 @@ add_executable(test_opacities_isoscatt
 target_link_libraries(test_opacities_isoscatt GSL::gsl GSL::gslcblas)
 target_link_libraries(test_opacities_isoscatt m)
 
-# test opacities bremsstrahlung
+# test m1 distribution
 add_executable(test_m1_distribution
         include/constants.h
         include/bns_nurates.h
@@ -819,7 +816,8 @@ add_executable(test_m1_distribution
         src/distribution/distribution_total.c
         include/functions.h
         src/functions/digamma.c
-        src/functions/fermi.c
+        src/functions/fermi_integrals.c
+        src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/lambert.c
         src/functions/mnewt.c
@@ -830,7 +828,7 @@ add_executable(test_m1_distribution
         include/weak_magnetism.h
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
-        src/opacities/opacities.h
+        include/opacities.h
         src/opacities/nu_abs_em_beta.c
         src/opacities/nu_scatt_iso.c
         src/output/outputs.h

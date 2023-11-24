@@ -53,7 +53,7 @@ MyQuadratureIntegrand M1CoeffsDoubleIntegrand(double *var, void *p);
 MyQuadratureIntegrand M1CoeffsSingleIntegrand(double *var, void *p);
 M1Opacities ComputeM1Opacities(MyQuadrature *quad_1d, MyQuadrature *quad_2d, GreyOpacityParams *my_grey_opacity_params);
 
-SpectralOpacities ComputeSpectralOpacities(const double nu, MyQuadrature *quad_1d, GreyOpacityParams *my_grey_opacity_params);
+SpectralOpacities ComputeSpectralOpacitiesNotStimulated(const double nu, MyQuadrature *quad_1d, GreyOpacityParams *my_grey_opacity_params);
 
 
 #endif //BNS_NURATES_SRC_OPACITIES_OPACITIES_H_

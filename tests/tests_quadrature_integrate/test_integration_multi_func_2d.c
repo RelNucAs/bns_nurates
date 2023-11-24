@@ -51,7 +51,7 @@ int main() {
   GaussLegendreMultiD(&quad);
 
   double s = 20.;
-  MyQuadratureIntegrand gauleg_inf = GaussLegendreIntegrate2D(&quad, &test_function, s);
+  MyQuadratureIntegrand gauleg_inf = GaussLegendreIntegrateFixedSplit2D(&quad, &test_function, s);
 
   double correct_answer[5] = {1./3., 0.4431134627263790068245418, 0.79138248703032128290432602198572815, 0.2, 1.};
   double error = 42.;
