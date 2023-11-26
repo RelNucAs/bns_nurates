@@ -59,13 +59,8 @@ double TotalNuF(double omega, NuDistributionParams *distr_pars, int species) {
  * M1_params:   M1 quantities
  * eos_params:  parameters from EOS
  */
-NuDistributionParams CalculateDistrParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, bool use_equilibrium) {
+NuDistributionParams CalculateDistrParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars) {
   NuDistributionParams out_distr_pars;
-
-  if(use_equilibrium) {
-    CalculateEquilibriumParamsFromM1(M1_pars, eos_pars, &out_distr_pars);
-    return out_distr_pars;
-  }
 
   CalculateThickParamsFromM1(M1_pars, eos_pars, &out_distr_pars);
   CalculateThinParamsFromM1(M1_pars, &out_distr_pars);

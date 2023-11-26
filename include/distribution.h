@@ -22,8 +22,6 @@ double NuFThick(double omega, NuDistributionParams *distr_pars, int species);
 // Recover parameters of thick distribution function from M1 quantities
 void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, NuDistributionParams *out_distr_pars);
 
-// Recover parameters considering equilibrium with fluid
-void CalculateEquilibriumParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, NuDistributionParams *out_distr_pars);
 /* ===========================================================================
  * Functions for the optically thin distribution function
  * ===========================================================================
@@ -44,7 +42,7 @@ void CalculateThinParamsFromM1(M1Quantities *M1_pars, NuDistributionParams *out_
 double TotalNuF(double omega, NuDistributionParams *distr_pars, int species);
 
 // Recover parameters of thick and thin distribution function from M1 quantities
-NuDistributionParams CalculateDistrParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, bool use_equilibrium);
+NuDistributionParams CalculateDistrParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars);
 
 /* ===========================================================================
  * Function for evaluating parameters of neutrino distribution function at equilibrium
