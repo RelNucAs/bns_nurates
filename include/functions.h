@@ -168,6 +168,9 @@ double FermiDistr(const double e, const double temp, const double mu);
 // Computation of gamma function
 double Gammln(const double xx);
 
+// Computation of gamma function using Stirling's approximation
+double GammaStirling(const double x);
+
 /*===========================================================================*/
 
 // lambert.c

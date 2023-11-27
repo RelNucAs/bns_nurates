@@ -93,7 +93,7 @@ int main() {
     exit(1);
   }
   fputs(
-      "#w_t_nue temp_t_nue eta_t_nue w_f_nue temp_f_nue c_f_nue w_t_anue temp_t_anue eta_t_anue w_f_anue temp_f_anue c_f_anue w_t_nux temp_t_nux eta_t_nux w_f_nux temp_f_nux c_f_nux\n",
+      "#w_t_nue temp_t_nue eta_t_nue w_f_nue temp_f_nue c_f_nue beta_f_nue w_t_anue temp_t_anue eta_t_anue w_f_anue temp_f_anue c_f_anue beta_f_anue w_t_nux temp_t_nux eta_t_nux w_f_nux temp_f_nux c_f_nux beta_f_nux\n",
       fptr);
 
   for (i = 0; i < num_data; i++) {
@@ -116,13 +116,13 @@ int main() {
 
     NuDistributionParams my_nudistributionparams = CalculateDistrParamsFromM1(&my_grey_opacity_params.m1_pars, &my_grey_opacity_params.eos_pars);
 
-    sprintf(fileline, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
+    sprintf(fileline, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
             my_nudistributionparams.w_t[id_nue], my_nudistributionparams.temp_t[id_nue], my_nudistributionparams.eta_t[id_nue], my_nudistributionparams.w_f[id_nue],
-            my_nudistributionparams.temp_f[id_nue], my_nudistributionparams.c_f[id_nue],
+            my_nudistributionparams.temp_f[id_nue], my_nudistributionparams.c_f[id_nue], my_nudistributionparams.beta_f[id_nue],
             my_nudistributionparams.w_t[id_anue], my_nudistributionparams.temp_t[id_anue], my_nudistributionparams.eta_t[id_anue], my_nudistributionparams.w_f[id_anue],
-            my_nudistributionparams.temp_f[id_anue], my_nudistributionparams.c_f[id_anue],
+            my_nudistributionparams.temp_f[id_anue], my_nudistributionparams.c_f[id_anue], my_nudistributionparams.beta_f[id_anue],
             my_nudistributionparams.w_t[id_nux], my_nudistributionparams.temp_t[id_nux], my_nudistributionparams.eta_t[id_nux], my_nudistributionparams.w_f[id_nux],
-            my_nudistributionparams.temp_f[id_nux], my_nudistributionparams.c_f[id_nux]);
+            my_nudistributionparams.temp_f[id_nux], my_nudistributionparams.c_f[id_nux], my_nudistributionparams.beta_f[id_nux]);
     fputs(fileline, fptr);
 
   }

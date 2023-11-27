@@ -1,5 +1,5 @@
 #include <math.h>
-
+#include <assert.h>
 #include "functions.h"
 
 // Computation of gamma function
@@ -28,4 +28,15 @@ double Gammln(const double xx) {
   ser = 0.999999999999997092;
   for (j=0;j<14;j++) ser += cof[j]/++y;
   return tmp+log(2.5066282746310005*ser/x);
+}
+
+// Compute the Gamma function using Serling's approximation
+double GammaStirling(const double x)
+{
+    static const double e  = 2.718281828459045235360287471352;
+    static const double twopi  = 6.283185307179586;
+
+    assert(x > 0.);
+
+    return sqrt(twopi / x) * pow(x / e, x);
 }
