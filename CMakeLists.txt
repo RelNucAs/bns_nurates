@@ -811,9 +811,6 @@ add_executable(test_opacities_all_reactions
         src/opacities/nu_scatt_iso.c
         src/output/outputs.h
         include/eos.h
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.c
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
@@ -828,9 +825,6 @@ add_executable(test_opacities_all_reactions
         tests/tests_opacities_m1/test_m1_opacities.c
         tests/tests.h 
 )
-
-target_link_libraries(test_opacities_all_reactions GSL::gsl GSL::gslcblas)
-target_link_libraries(test_opacities_all_reactions m)
 
 # test m1 distribution
 add_executable(test_m1_distribution
