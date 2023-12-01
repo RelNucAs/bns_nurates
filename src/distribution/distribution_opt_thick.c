@@ -69,3 +69,4 @@ void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, Nu
     out_distr_pars->temp_t[species] = FDI_p2(out_distr_pars->eta_t[species]) * M1_pars->J[species] / (FDI_p3(out_distr_pars->eta_t[species]) * M1_pars->n[species]);
   }
 }
+
