@@ -33,6 +33,7 @@ void TabulatePairTFunction(double xi, double xf, double x[dim_pair_t], double t[
 
 // pair helper functions and kernels
 void PairTInterpolated(PairKernelParams *kernel_pars, double alpha, double *out);
+double PairTFitted(int l, double alpha);
 double PairT(int l, double alpha, double tolerance);
 double PairF(int k, double eta, double x1);
 double PairG(int n, double a, double b, double eta, double y, double z);

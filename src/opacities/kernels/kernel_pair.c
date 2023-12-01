@@ -44,15 +44,155 @@ void TabulatePairTFunction(double xi, double xf, double x[dim_pair_t], double t[
  *    T_l(alpha) = sum_{n=1..inf} (-1)^{n+1} e^{-n alpha} / n^l
  */
 double PairTWithAlpha0(int l) {
-  static const double log2 = 0.6931471805599453; //log(2.0);
-  if (l == 1) {
-    return log2;
-  } else {
-    return pow(2., -l) * (pow(2., l) - 2.) * gsl_sf_zeta_int(l);  // Computed in Mathematica
+  switch(l) {
+    case 1:
+      return 0.693147180559945309417; // log(2.0)
+      break;
+
+    // else : pow(2., -l) * (pow(2., l) - 2.) * gsl_sf_zeta_int(l);  // Computed in Mathematica
+    case 2:
+      return 0.822467033424113218236; // kPi * kPi / 12.
+      break;
+
+    case 3:
+      return 0.901542677369695714050; // 3. * zeta(3.) / 4.
+      break;
+
+    case 4:
+      return 0.947032829497245917577; // 7. * kPi * kPi * kPi * kPi / 720.
+      break;
+
+    case 5:
+      return 0.972119770446909305936; // 15. * zeta(5.) / 16.
+      break;
+
+    case 6:
+      return 0.985551091297435104098; // 31. * pow(kPi, 6) / 30240.
+      break;
+    
+    default:
+      printf("PairTWithAlpha0 (kernel_pair.c): l = %d must be within 1 and 6", l);
+      exit(EXIT_FAILURE);
   }
-}
+} 
+
+
 
 double PairTFitted(int l, double alpha) {
+  double fit_poly = 1.;
+  double fit_exp = exp(1.1599894050697828e-11 - 1.0000000000000557 * alpha); // fitting coefficients are the same for l = 1,...,6
+    
+  if (alpha < 15.) { 
+    if (alpha == 0) return PairTWithAlpha0(l);
+   
+    switch (l) {
+      
+      case 1:
+        fit_poly = 0.6932349884688382 + alpha *
+                   (0.19153844068873888 + alpha *
+                    (-0.022454086684801058 + alpha *
+                     (-0.01862035702348546 + alpha *
+                      (0.010059951727924867 + alpha *
+                       (-0.0025591672605759157 + alpha *
+              	        (0.00040809016119114534 + alpha *
+                         (-4.382673963153738e-05 + alpha *
+                          (3.2238390304643073e-06 + alpha *
+                           (-1.6018407662684595e-07 + alpha *
+                            (5.130720144162727e-09 + alpha *
+                             (-9.531900556136287e-11 + alpha *
+                               7.764460276911894e-13) ) ) ) ) ) ) ) ) ) );
+        break;
+            
+      case 2:  
+        fit_poly = 0.8224794727922443 + alpha *
+                   (0.1290371349050982 + alpha *
+                    (-0.030657101372762428 + alpha *
+                     (-0.003453495292249957 + alpha *
+                      (0.00426086049575675 + alpha *
+                       (-0.0013457908088575755 + alpha *
+              	        (0.0002501877313487743 + alpha *
+                         (-3.0919945500091964e-05 + alpha *
+                          (2.6176160114632282e-06 + alpha *
+                           (-1.5051104090763755e-07 + alpha *
+                            (5.628852629867178e-09 + alpha *
+                             (-1.2360258213665597e-10 + alpha *
+                               1.2097121671548247e-12) ) ) ) ) ) ) ) ) ) );
+        break;      
+
+      case 3:
+        fit_poly = 0.9015387115221923 + alpha *
+                   (0.0791164948210426 + alpha *
+                    (-0.025154468942278033 + alpha *
+                     (0.0021057203236187075 + alpha *
+                      (0.0011880768678479855 + alpha *
+                       (-0.0005242569477484338 + alpha *
+                  	    (0.00011078575689764255 + alpha *
+                         (-1.48222315936738e-05 + alpha *
+                          (1.331164063502168e-06 + alpha *
+                           (-8.029349298289137e-08 + alpha *
+                            (3.1269450241639527e-09 + alpha *
+                             (-7.111741520288681e-11 + alpha *
+                               7.17877896667645e-13) ) ) ) ) ) ) ) ) ) );
+        break;
+
+      case 4:
+        fit_poly = 0.9470282577605772 + alpha *
+                   (0.045559097999768754 + alpha *
+                    (-0.016997198961210103 + alpha *
+                     (0.0030071993630479362 + alpha *
+                      (2.1281035907218678e-05 + alpha *
+                       (-0.00014559133060632152 + alpha *
+                  	    (3.856825962408047e-05 + alpha *
+                         (-5.677096233745809e-06 + alpha *
+                          (5.389942800937989e-07 + alpha *
+                           (-3.3760229096333e-08 + alpha *
+                            (1.3519272756431448e-09 + alpha *
+                             (-3.1423838815286814e-11 + alpha *
+                               3.228347864267874e-13) ) ) ) ) ) ) ) ) ) );
+        break;
+
+      case 5:
+        fit_poly = 0.9721171063352136 + alpha *
+                   (0.025128000871717175 + alpha *
+                    (-0.010335683014480727 + alpha *
+                     (0.0023768431000457074 + alpha *
+                      (-0.0002672125800539407 + alpha *
+                       (-1.096586220062312e-05 + alpha *
+                  	    (9.471179226979555e-06 + alpha *
+                         (-1.7228094292976135e-06 + alpha *
+                          (1.7941662304610306e-07 + alpha *
+                           (-1.1844514209510994e-08 + alpha *
+                            (4.908468308315054e-10 + alpha *
+                             (-1.1689674516055724e-11 + alpha *
+                               1.223042342844013e-13) ) ) ) ) ) ) ) ) ) );
+        break;
+
+      case 6:
+        fit_poly = 0.9855501299373773 + alpha *
+                   (0.013449009951258391 + alpha *
+                    (-0.005890098985143524 + alpha *
+                     (0.00154830636662188 + alpha *
+                      (-0.00025382574940076774 + alpha *
+                       (2.257168344772742e-05 + alpha *
+                  	    (7.929667164380111e-08 + alpha *
+                         (-3.0974403462775056e-07 + alpha *
+                          (4.3475802836454606e-08 + alpha *
+                           (-3.249472337669054e-09 + alpha *
+                            (1.4415672453643435e-10 + alpha *
+                             (-3.584054805259039e-12 + alpha *
+                               3.862549379641218e-14) ) ) ) ) ) ) ) ) ) );
+        break;
+      
+      default:
+        printf("PairTFitted (kernel_pair.c): l = %d must be within 1 and 6", l);
+        exit(EXIT_FAILURE);
+    }
+  }
+
+  return fit_poly * fit_exp;
+}
+
+double PairTFittedTest(int l, double alpha) {
   static const double PairTFit1[6][2] = {
 {-1.0000000000000557, 1.1599894050697828e-11},
 {-1.0000000000000557, 1.1599894050697828e-11},
