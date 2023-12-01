@@ -17,9 +17,7 @@
 int main () {
   printf("Kernel is compared with the result of a tested Fortran code\n");
   printf("\n");
-
-  bool use_dU = false;
-  
+ 
   printf("========================================================== \n");
   printf("Testing kernel for isoenergetic scattering on nucleons ... \n");
   printf("========================================================== \n");
@@ -171,7 +169,7 @@ int main () {
     double out = IsoScattTotal(omega, &opacity_pars, &eos_pars);
 
     // Adjust to compare the same quantity
-    out = out * pow(kHClight, 3.) * omega * omega * 4. * kPi / kClight;
+    out = out * omega * omega * 4. * kPi / kClight;
 
     fprintf(fptr_out, "%d %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e\n",
              zone[i], r[i], rho[i], temp[i], ye[i], mu_e[i], mu_hat[i],

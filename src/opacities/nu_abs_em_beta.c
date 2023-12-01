@@ -172,7 +172,9 @@ void AbsOpacitySingleLep(const double omega, OpacityParams *opacity_pars, MyEOSP
 
   // without detailed balance
   //out[0] = kAbsEmConst * etanp * (cap_term * (1. - fd_e) + dec_term * fd_p); // Neutrino absorptivity [s-1], Eq.(C13)
- 
+  //double mu_nue = (eos_pars->mu_e - eos_pars->mu_n + eos_pars->mu_p) / temp;
+  //out[0] = kAbsEmConst * etanp * cap_term / (1. + exp(eos_pars->mu_e / temp - FDI_p5(mu_nue)/FDI_p4(mu_nue)));
+
   cap_term = 0.;
   dec_term = 0.;
 
