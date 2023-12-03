@@ -33,6 +33,7 @@ double NuFThick(double omega, NuDistributionParams *distr_pars, int species) {
 
 
 void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, NuDistributionParams *out_distr_pars) {
+  (void)eos_pars;
 
   // set degeneracy parameter for different neutrino species
 

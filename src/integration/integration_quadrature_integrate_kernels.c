@@ -207,6 +207,7 @@ MyQuadratureIntegrand GaussLegendreIntegrateFixedSplit1D(MyQuadrature *quad, MyF
  * func:    the function(s) to be integrated
  */
 MyQuadratureIntegrand GaussLegendreIntegrate1DFiniteInterval(MyQuadrature *quad, MyFunctionMultiD *func, double *t) {
+  (void)t;
 
   int num_integrands = func->my_quadrature_integrand.n;
   double f_x[num_integrands][quad->nx];
@@ -238,6 +239,7 @@ MyQuadratureIntegrand GaussLegendreIntegrate1DFiniteInterval(MyQuadrature *quad,
  * func:    the function(s) to be integrated
  */
 MyQuadratureIntegrand GaussLegendreIntegrate2DFiniteInterval(MyQuadrature *quad, MyFunctionMultiD *func, double *tx, double *ty) {
+  (void)tx;
 
   int num_integrands = func->my_quadrature_integrand.n;
 
@@ -299,7 +301,6 @@ MyQuadratureIntegrand GaussLegendreIntegrate2D(MyQuadrature *quad, MyFunctionMul
   double w_y[quad->ny];
   double var[2];
 
-  MyQuadratureIntegrand f1_vals, f2_vals;
   MyQuadratureIntegrand result;
 
   for (int k = 0; k < num_integrands; ++k) {

@@ -55,7 +55,7 @@ MyQuadratureIntegrand M1CoeffsDoubleIntegrand(double *var, void *p) {
   }
 
   // compute the bremsstrahlung kernels
-  MyKernelOutput brem_kernels_m1 = {0.};
+  MyKernelOutput brem_kernels_m1 = {0};
   if (opacity_flags.use_brem) {
     my_grey_opacity_params->kernel_pars.brem_kernel_params.omega = nu;
     my_grey_opacity_params->kernel_pars.brem_kernel_params.omega_prime = nu_bar;
@@ -64,7 +64,7 @@ MyQuadratureIntegrand M1CoeffsDoubleIntegrand(double *var, void *p) {
   }
  
   // compute the inelastic NES/NPS kernels
-  MyKernelOutput inelastic_kernels_m1 = {0.};
+  MyKernelOutput inelastic_kernels_m1 = {0};
   if (opacity_flags.use_inelastic_scatt) {
     my_grey_opacity_params->kernel_pars.inelastic_kernel_params.omega = nu;
     my_grey_opacity_params->kernel_pars.inelastic_kernel_params.omega_prime = nu_bar;
@@ -312,7 +312,7 @@ MyQuadratureIntegrand SpectralIntegrand(double *var, void *p) {
   }
 
   // compute the bremsstrahlung kernels
-  MyKernelOutput brem_kernels_m1 = {0.};
+  MyKernelOutput brem_kernels_m1 = {0};
   if (opacity_flags.use_brem) {
     my_grey_opacity_params->kernel_pars.brem_kernel_params.omega_prime = nu_bar;
     my_grey_opacity_params->kernel_pars.brem_kernel_params.l = 0;
@@ -320,7 +320,7 @@ MyQuadratureIntegrand SpectralIntegrand(double *var, void *p) {
   }
 
   // compute the inelastic NES/NPS kernels
-  MyKernelOutput inelastic_kernels_m1 = {0.};
+  MyKernelOutput inelastic_kernels_m1 = {0};
   if (opacity_flags.use_inelastic_scatt) {
     my_grey_opacity_params->kernel_pars.inelastic_kernel_params.omega_prime = nu_bar;
     inelastic_kernels_m1 = InelasticScattKernels(&my_grey_opacity_params->kernel_pars.inelastic_kernel_params, &my_grey_opacity_params->eos_pars);
@@ -392,7 +392,7 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulated(const double nu, MyQuadr
 
   MyQuadratureIntegrand integrals_1d = GaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s);
 
-  MyOpacity abs_em_beta = {0.};
+  MyOpacity abs_em_beta = {0};
   if (my_grey_opacity_params->opacity_flags.use_abs_em) {
     abs_em_beta = StimAbsOpacity(nu, &my_grey_opacity_params->opacity_pars, &my_grey_opacity_params->eos_pars); // [s^-1]
   }
@@ -403,8 +403,6 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulated(const double nu, MyQuadr
   }
 
   SpectralOpacities sp_opacities;
-
-  M1Opacities m1_opacities = {0.};
 
   sp_opacities.j[id_nue] = abs_em_beta.em[id_nue] + four_pi_hc3 * integrals_1d.integrand[0];
   sp_opacities.j[id_anue] = abs_em_beta.em[id_anue] + four_pi_hc3 * integrals_1d.integrand[1];

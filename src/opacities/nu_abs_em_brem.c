@@ -13,6 +13,9 @@
 #include "integration.h"
 
 MyKernelQuantity BremEmissivityAbsorptivityIntegrandFermi(double *omega_prime, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params) {
+  (void)omega_prime;
+  (void)my_eos_params;
+  (void)my_kernel_params;
 
   MyKernelQuantity result = {.em_e = 0., .abs_e = 0., .em_x = 0., .abs_x = 0.};
   return result;

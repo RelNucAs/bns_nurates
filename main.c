@@ -217,7 +217,7 @@ int main() {
     
     inelastic_output = ComputeSpectralOpacitiesNotStimulated(e_nu, &my_quadrature_1d, &grey_pars);
 
-    printf("%e %e %e %e %e %e %e\n",
+    printf("%e %e %e %e %e %e %e %e %e\n",
             r[i], 
             inelastic_output.j[id_nue], inelastic_output.j[id_anue], inelastic_output.j[id_nux], inelastic_output.j[id_anux],
             inelastic_output.kappa[id_nue], inelastic_output.kappa[id_anue], inelastic_output.kappa[id_nux], inelastic_output.kappa[id_anux]

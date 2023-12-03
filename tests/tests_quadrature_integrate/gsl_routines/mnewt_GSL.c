@@ -76,7 +76,7 @@ void PrintState2d(size_t iter, const gsl_multiroot_fdfsolver * s) {
 // 2D Newton-Raphson with analytic Jacobian 
 int MNewt2dGSL(double *xi, double *xf, gsl_multiroot_function_fdf *fdf) {
   int status;
-  size_t i, iter = 0;
+  int iter = 0;
   
   const gsl_multiroot_fdfsolver_type *T = gsl_multiroot_fdfsolver_newton;
   gsl_multiroot_fdfsolver *s = gsl_multiroot_fdfsolver_alloc(T, fdf->n);
@@ -112,7 +112,7 @@ int MNewt2dGSL(double *xi, double *xf, gsl_multiroot_function_fdf *fdf) {
 // 2D Newton-Raphson with finite difference Jacobian
 int MNewt2dGSL_fd(double *xi, double *xf, gsl_multiroot_function * f) {
   int status;
-  size_t i, iter = 0;
+  int iter = 0;
   
   const gsl_multiroot_fsolver_type *T = gsl_multiroot_fsolver_dnewton;
   gsl_multiroot_fsolver *s = gsl_multiroot_fsolver_alloc(T, f->n);
