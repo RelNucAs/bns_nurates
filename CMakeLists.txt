@@ -825,6 +825,8 @@ add_executable(test_opacities_all_reactions
         tests/tests_opacities_m1/test_m1_opacities.c
         tests/tests.h 
 )
+target_link_libraries(test_opacities_all_reactions GSL::gsl GSL::gslcblas)
+target_link_libraries(test_opacities_all_reactions m)
 
 # test m1 distribution
 add_executable(test_m1_distribution
