@@ -134,7 +134,7 @@ MyKernelOutput InelasticScattKernels(InelasticScattKernelParams *kernel_params, 
   MyKernelOutput nes_kernel = NESKernels(kernel_params, eos_params);
   MyKernelOutput nps_kernel = NPSKernels(kernel_params, eos_params);
 
-  MyKernelOutput tot_kernel = {0.};
+  MyKernelOutput tot_kernel = {0};
 
   for (int idx = 0; idx<total_num_species; idx++) {
     tot_kernel.em[idx] = nes_kernel.em[idx] + nps_kernel.em[idx];

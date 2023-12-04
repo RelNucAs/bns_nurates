@@ -218,7 +218,7 @@ void AbsOpacitySingleLep(const double omega, OpacityParams *opacity_pars, MyEOSP
  * @TODO: add support for muons
  */
 MyOpacity AbsOpacity(const double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
-  MyOpacity MyOut = {0.0}; // initialize to zero
+  MyOpacity MyOut = {0}; // initialize to zero
 
   // Electron (anti)neutrino
   double el_out[4] = {0.0};

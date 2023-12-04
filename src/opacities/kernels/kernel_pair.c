@@ -487,6 +487,7 @@ double PairG(int n, double a, double b, double eta, double y, double z) {
 }
 
 void PairGOptimized(PairKernelParams *kernel_pars, int n, double eta, double y, double z, double *g_out) {
+  (void)kernel_pars;
   /*
   const double pair_f_y_z_1 = PairF(n, eta, y + z);
   const double pair_f_y_z_2 = PairF(n, eta + y + z, y + z);
@@ -722,8 +723,8 @@ void PairPsiOptimized(PairKernelParams *kernel_pars, int l, double y, double z, 
     result_z_y += d[l][n] * pair_g_y + c[l][n] * pair_g_z;
   }
 
-  double min_yz = (y > z) ? z : y;
-  double max_yz = (y > z) ? y : z;
+  //double min_yz = (y > z) ? z : y;
+  //double max_yz = (y > z) ? y : z;
 
   for (int n = 3; n <= 2 * l + 5; n++) {
     PairGOptimized(kernel_pars, n, eta, y, z, pair_g);

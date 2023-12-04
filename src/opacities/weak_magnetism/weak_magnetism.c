@@ -16,7 +16,6 @@
 // Input: omega -> neutrino energy [MeV]
 void WMAbsEm(const double omega, double* R, double* Rbar) { 
   double cv, ca, F2;
-  double R_nu, R_anu;
 
   NucFrmFac(omega, &cv, &ca, &F2, 3); //nuclear form factors
   

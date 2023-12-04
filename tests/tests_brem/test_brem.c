@@ -51,7 +51,7 @@ void TestBremKernelS(char *filedir) {
            BremKernelS(x[i], 2., 0.31), BremKernelS(x[i], 4., 0.31));
     sprintf(fileline, "%0.16e %0.16e %0.16e %0.16e %0.16e %0.16e\n", x[i], BremKernelS(x[i], 0., 0.31), BremKernelS(x[i], 0., 1.01), BremKernelS(x[i], 0., 2.42),
             BremKernelS(x[i], 2., 0.31), BremKernelS(x[i], 4., 0.31));
-    fprintf(fptr, fileline);
+    fputs(fileline, fptr);
   }
 
   fclose(fptr);
@@ -93,7 +93,7 @@ void TestBremKernelG(char *filedir) {
            BremKernelG(x[i], 4.22), BremKernelG(x[i], 6.14), BremKernelG(x[i], 8.11));
     sprintf(fileline, "%0.16e %0.16e %0.16e %0.16e %0.16e %0.16e %0.16e\n", x[i], BremKernelG(x[i], 0.31), BremKernelG(x[i], 1.01), BremKernelG(x[i], 2.42),
             BremKernelG(x[i], 4.22), BremKernelG(x[i], 6.14), BremKernelG(x[i], 8.11));
-    fprintf(fptr, fileline);
+    fputs(fileline, fptr);
   }
 
   fclose(fptr);

@@ -12,8 +12,6 @@
 
 int main() {
 
-  int max_error = -42.;
-
   // Data from Albino
   double temp = 30.;
   double mu_e = 4. * 30;

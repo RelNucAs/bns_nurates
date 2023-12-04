@@ -20,7 +20,7 @@
 double NuFThin(double omega, NuDistributionParams *distr_pars, int species) {
   double temp_f = distr_pars->temp_f[species];
   double c_f = distr_pars->c_f[species];
-  double beta_f = distr_pars->beta_f[species];
+  __attribute__((unused)) double beta_f = distr_pars->beta_f[species];
 
   return pow(omega / temp_f, c_f) * exp(-omega / temp_f); // @TODO: we need to change this later
 }
@@ -32,10 +32,10 @@ double NuFThin(double omega, NuDistributionParams *distr_pars, int species) {
  */
 void CalculateThinParamsFromM1(M1Quantities *M1_pars, NuDistributionParams *out_distr_pars) {
 
-  static const double exp3 = 20.085536923187668;
-  static const double e = 2.718281828459045235360287471352;
-  static const double ie = 1. / e;
-  static const double isqrt_32_pi3 = 0.031746817967120484;
+  //static const double exp3 = 20.085536923187668;
+  //static const double e = 2.718281828459045235360287471352;
+  //static const double ie = 1. / e;
+  //static const double isqrt_32_pi3 = 0.031746817967120484;
 
   for (int species = 0; species < total_num_species; species++) {
     double n = M1_pars->n[species];
