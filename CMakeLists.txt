@@ -831,6 +831,52 @@ target_link_libraries(test_opacities_all_reactions m)
 target_link_libraries(test_opacities_all_reactions GSL::gsl GSL::gslcblas)
 target_link_libraries(test_opacities_all_reactions m)
 
+add_executable(test_opacities_thc
+        include/constants.h
+        include/bns_nurates.h
+        include/distribution.h
+        src/distribution/distribution_opt_thick.c
+        src/distribution/distribution_opt_thin.c
+        src/distribution/distribution_total.c
+        include/functions.h
+        src/functions/digamma.c
+        src/functions/fermi_integrals.c
+        src/functions/fermi_distr.c
+        src/functions/gamma.c
+        src/functions/lambert.c
+        src/functions/mnewt.c
+        src/functions/safe_exp.c
+        src/functions/theta.c
+        include/integration.h
+        include/kernels.h
+        include/weak_magnetism.h
+        src/opacities/weak_magnetism/weak_magnetism.c
+        src/opacities/weak_magnetism/nucfrmfac.c
+        include/opacities.h
+        src/opacities/nu_abs_em_beta.c
+        src/opacities/nu_scatt_iso.c
+        src/output/outputs.h
+        include/eos.h
+        src/integration/integration_quadrature_schemes.c
+        src/integration/integration_quadrature_io.c
+        src/integration/integration_quadrature_integrate.c
+        src/opacities/kernels/kernel_brem.c
+        src/opacities/kernels/kernel_pair.c
+        src/opacities/kernels/kernel_nes.c
+        src/opacities/nu_abs_em_pair.c
+        src/opacities/nu_abs_em_brem.c
+        src/integration/integration_quadrature_integrate_kernels.c
+        src/opacities/m1_opacities.c
+        tests/tests_opacities_m1/test_opacities_thc.c
+        tests/tests_opacities_m1/test_m1_opacities.c
+        tests/tests.h
+)
+target_link_libraries(test_opacities_thc GSL::gsl GSL::gslcblas)
+target_link_libraries(test_opacities_thc m)
+
+target_link_libraries(test_opacities_thc GSL::gsl GSL::gslcblas)
+target_link_libraries(test_opacities_thc m)
+
 # test m1 distribution
 add_executable(test_m1_distribution
         include/constants.h
@@ -928,3 +974,5 @@ add_test(NAME test_opacities_isoscatt
         COMMAND $<TARGET_FILE:test_opacities_isoscatt>)
 add_test(NAME test_m1_distribution
         COMMAND $<TARGET_FILE:test_m1_distribution>)
+add_test(NAME test_opacities_thc
+        COMMAND $<TARGET_FILE:test_opacities_thc>)
