@@ -43,6 +43,16 @@ int main() {
   double ye;
   double nb;
 
+  double n_nue;
+  double j_nue;
+  double chi_nue;
+  double n_nua;
+  double j_nua;
+  double chi_nua;
+  double n_nux;
+  double j_nux;
+  double chi_nux;
+
   // dummy values for now
   use_abs_em = true;
   use_brem = true;
@@ -103,6 +113,19 @@ int main() {
   // reconstruct distribution function
   my_grey_opacity_params.distr_pars = NuEquilibriumParams(&my_grey_opacity_params.eos_pars);
 
+  // compute n andj
+  MyQuadratureIntegrand m1_densities_n_j = ComputeM1DensitiesEq(&my_grey_opacity_params.eos_pars, &my_grey_opacity_params.distr_pars);
+
+  // populate M1 quantities
+  my_grey_opacity_params.m1_pars.n[id_nue] = m1_densities_n_j.integrand[id_nue];
+  my_grey_opacity_params.m1_pars.J[id_nue] = m1_densities_n_j.integrand[id_nue + 1];
+  my_grey_opacity_params.m1_pars.chi[id_nue] = 1.;
+  my_grey_opacity_params.m1_pars.n[id_anue] = m1_densities_n_j.integrand[id_anue];
+  my_grey_opacity_params.m1_pars.J[id_anue] = m1_densities_n_j.integrand[id_anue + 1];
+  my_grey_opacity_params.m1_pars.chi[id_anue] = 1.;
+  my_grey_opacity_params.m1_pars.n[id_nux] = m1_densities_n_j.integrand[id_nux];
+  my_grey_opacity_params.m1_pars.J[id_nux] = m1_densities_n_j.integrand[id_nux + 1];
+  my_grey_opacity_params.m1_pars.chi[id_nux] = 1.;
   // compute opacities
   M1Opacities opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
 

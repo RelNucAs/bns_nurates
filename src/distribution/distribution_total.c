@@ -10,10 +10,11 @@
 #include "distribution.h"
 #include "constants.h"
 #include "integration.h"
- 
+#include "functions.h"
+
 /* Function for evaluating parameters of neutrino distribution function at equilibrium
 */
-NuDistributionParams NuEquilibriumParams(MyEOSParams *eos_pars){
+NuDistributionParams NuEquilibriumParams(MyEOSParams *eos_pars) {
   NuDistributionParams out_distr;
 
   const double temp = eos_pars->temp; // [MeV]
@@ -24,14 +25,14 @@ NuDistributionParams NuEquilibriumParams(MyEOSParams *eos_pars){
   for (int idx = 0; idx < total_num_species; idx++) {
     out_distr.w_t[idx] = 1.;
     out_distr.temp_t[idx] = temp;
-    
+
     out_distr.w_f[idx] = 0.;
     out_distr.c_f[idx] = 1.; // 
     out_distr.temp_f[idx] = temp;
   }
-  
+
   out_distr.eta_t[id_nue] = (mu_e - mu_n + mu_p) / temp;
-  out_distr.eta_t[id_anue] = - out_distr.eta_t[id_nue];
+  out_distr.eta_t[id_anue] = -out_distr.eta_t[id_nue];
   out_distr.eta_t[id_nux] = 0.;
   out_distr.eta_t[id_anux] = 0.;
 
@@ -101,7 +102,7 @@ MyQuadratureIntegrand NuNumber(NuDistributionParams *distr_pars) {
   GaussLegendreMultiD(&quad);
 
   double s[total_num_species];
-  
+
   s[id_nue] = fabs(distr_pars->temp_t[id_nue] * distr_pars->eta_t[id_nue]);
   s[id_anue] = fabs(distr_pars->temp_t[id_anue] * distr_pars->eta_t[id_anue]);
   s[id_nux] = s[id_nue]; // @TODO: cannot be equal to zero
@@ -148,7 +149,7 @@ MyQuadratureIntegrand NuEnergy(NuDistributionParams *distr_pars) {
   GaussLegendreMultiD(&quad);
 
   double s[total_num_species];
-  
+
   s[id_nue] = fabs(distr_pars->temp_t[id_nue] * distr_pars->eta_t[id_nue]);
   s[id_anue] = fabs(distr_pars->temp_t[id_anue] * distr_pars->eta_t[id_anue]);
   s[id_nux] = s[id_nue]; // @TODO: cannot be equal to zero
@@ -161,6 +162,27 @@ MyQuadratureIntegrand NuEnergy(NuDistributionParams *distr_pars) {
   for (int species = 0; species < total_num_species; species++) {
     result.integrand[species] = result.integrand[species] * result_factor;
   }
+
+  return result;
+}
+
+MyQuadratureIntegrand ComputeM1DensitiesEq(MyEOSParams *eos_params, NuDistributionParams *nu_distribution_params) {
+
+  MyQuadratureIntegrand result;
+  result.n = 6;
+
+  double four_pi_hc3 = 4. * M_PI / (kHClight * kHClight * kHClight);
+
+  result.integrand[0] = four_pi_hc3 * eos_params->temp * eos_params->temp * eos_params->temp * FDI_p2(nu_distribution_params->eta_t[id_nue]); // n_nue
+  result.integrand[1] = four_pi_hc3 * eos_params->temp * eos_params->temp * eos_params->temp * eos_params->temp * FDI_p3(nu_distribution_params->eta_t[id_nue]); // en_nue
+
+  result.integrand[2] = four_pi_hc3 * eos_params->temp * eos_params->temp * eos_params->temp * FDI_p2(nu_distribution_params->eta_t[id_anue]); // n_anue
+  result.integrand[3] =
+      four_pi_hc3 * eos_params->temp * eos_params->temp * eos_params->temp * eos_params->temp * FDI_p3(nu_distribution_params->eta_t[id_anue]); // en_anue
+
+  result.integrand[4] = 4. * four_pi_hc3 * eos_params->temp * eos_params->temp * eos_params->temp * FDI_p2(nu_distribution_params->eta_t[id_nux]); // n_nux
+  result.integrand[5] =
+      4. * four_pi_hc3 * eos_params->temp * eos_params->temp * eos_params->temp * eos_params->temp * FDI_p3(nu_distribution_params->eta_t[id_nux]); // n_nux
 
   return result;
 }
