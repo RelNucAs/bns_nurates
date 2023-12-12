@@ -180,9 +180,8 @@ MyQuadratureIntegrand ComputeM1DensitiesEq(MyEOSParams *eos_params, NuDistributi
   result.integrand[3] =
       four_pi_hc3 * eos_params->temp * eos_params->temp * eos_params->temp * eos_params->temp * FDI_p3(nu_distribution_params->eta_t[id_anue]); // en_anue
 
-  result.integrand[4] = 4. * four_pi_hc3 * eos_params->temp * eos_params->temp * eos_params->temp * FDI_p2(nu_distribution_params->eta_t[id_nux]); // n_nux
-  result.integrand[5] =
-      4. * four_pi_hc3 * eos_params->temp * eos_params->temp * eos_params->temp * eos_params->temp * FDI_p3(nu_distribution_params->eta_t[id_nux]); // n_nux
+  result.integrand[4] =  four_pi_hc3 * eos_params->temp * eos_params->temp * eos_params->temp * FDI_p2(nu_distribution_params->eta_t[id_nux]); // n_nux
+  result.integrand[5] = four_pi_hc3 * eos_params->temp * eos_params->temp * eos_params->temp * eos_params->temp * FDI_p3(nu_distribution_params->eta_t[id_nux]); // n_nux
 
   return result;
 }
