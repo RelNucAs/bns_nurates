@@ -74,6 +74,8 @@ int main() {
   // read in the data file
   int i = 0;
   char line[1000];
+  printf("\n");
+  printf("#nb temp ye mu_n mu_p mu_e\n");
   while (fgets(line, sizeof(line), fptr) != NULL) {
     if (line[0] == '#') {
       continue;
