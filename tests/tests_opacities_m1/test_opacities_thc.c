@@ -49,12 +49,12 @@ int main() {
   quad_ny = quad_nx;
 
   int num_data = 4;
-  double nb_array[4];
-  double temp_array[4];
-  double ye_array[4];
-  double mu_n_array[4];
-  double mu_p_array[4];
-  double mu_e_array[4];
+  double nb_array[num_data];
+  double temp_array[num_data];
+  double ye_array[num_data];
+  double mu_n_array[num_data];
+  double mu_p_array[num_data];
+  double mu_e_array[num_data];
 
   char filepath[300] = {'\0'};
   char filedir[300] = SOURCE_DIR;
