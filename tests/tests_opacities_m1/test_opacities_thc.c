@@ -36,23 +36,6 @@ int main() {
   bool use_WM_sc;
   bool use_dU;
 
-  double mu_e;
-  double mu_p;
-  double mu_n;
-  double temp;
-  double ye;
-  double nb;
-
-  double n_nue;
-  double j_nue;
-  double chi_nue;
-  double n_nua;
-  double j_nua;
-  double chi_nua;
-  double n_nux;
-  double j_nux;
-  double chi_nux;
-
   // dummy values for now
   use_abs_em = true;
   use_brem = true;
@@ -64,12 +47,51 @@ int main() {
 
   quad_nx = 60;
   quad_ny = quad_nx;
-  nb = 1.0512162546485660E+039;
-  temp = 55.800010783866689;
-  ye = 0.23432446891781622;
-  mu_n = 795.93707619905956;
-  mu_p = 439.37056823706115;
-  mu_e = 356.01566068372557;
+
+  int num_data = 4;
+  double nb_array[4];
+  double temp_array[4];
+  double ye_array[4];
+  double mu_n_array[4];
+  double mu_p_array[4];
+  double mu_e_array[4];
+
+  char filepath[300] = {'\0'};
+  char filedir[300] = SOURCE_DIR;
+  char outname[200] = "/tests/tests_distribution/data/thc_test_data.txt";
+  strcat(filepath, filedir);
+  strcat(filepath, outname);
+
+  printf("Data_directory: %s\n", filepath);
+
+  FILE *fptr;
+  fptr = fopen(filepath, "r");
+  if (fptr == NULL) {
+    printf("%s: The file %s does not exist!\n", __FILE__, filepath);
+    exit(1);
+  }
+
+  // read in the data file
+  int i = 0;
+  char line[1000];
+  while (fgets(line, sizeof(line), fptr) != NULL) {
+    if (line[0] == '#') {
+      continue;
+    }
+
+    sscanf(line, "%lf %lf %lf %lf %lf %lf\n",
+           &nb_array[i], &temp_array[i], &ye_array[i], &mu_n_array[i], &mu_p_array[i], &mu_e_array[i]);
+    printf("%e %lf %lf %lf %lf %lf\n", nb_array[i], temp_array[i], ye_array[i], mu_n_array[i], mu_p_array[i], mu_e_array[i]);
+
+    i++;
+  }
+  printf("\n");
+  // nb = 1.0512162546485660E+039;
+  // temp = 55.800010783866689;
+  // ye = 0.23432446891781622;
+  // mu_n = 795.93707619905956;
+  // mu_p = 439.37056823706115;
+  // mu_e = 356.01566068372557;
 
   // compute quadratures
   my_quadrature_1d.nx = quad_nx;
@@ -101,61 +123,65 @@ int main() {
   my_grey_opacity_params.opacity_pars.use_WM_sc = use_WM_sc;
   my_grey_opacity_params.opacity_pars.use_dU = use_dU;
 
-  // populate EOS quantities
-  my_grey_opacity_params.eos_pars.mu_e = mu_e;
-  my_grey_opacity_params.eos_pars.mu_p = mu_p;
-  my_grey_opacity_params.eos_pars.mu_n = mu_n;
-  my_grey_opacity_params.eos_pars.temp = temp;
-  my_grey_opacity_params.eos_pars.yp = ye;
-  my_grey_opacity_params.eos_pars.yn = 1 - ye;
-  my_grey_opacity_params.eos_pars.nb = nb;
-
-  // reconstruct distribution function
-  my_grey_opacity_params.distr_pars = NuEquilibriumParams(&my_grey_opacity_params.eos_pars);
-
-  // compute n andj
-  MyQuadratureIntegrand m1_densities_n_j = ComputeM1DensitiesEq(&my_grey_opacity_params.eos_pars, &my_grey_opacity_params.distr_pars);
-
-  // populate M1 quantities
-  my_grey_opacity_params.m1_pars.n[id_nue] = m1_densities_n_j.integrand[id_nue];
-  my_grey_opacity_params.m1_pars.J[id_nue] = m1_densities_n_j.integrand[id_nue + 1];
-  my_grey_opacity_params.m1_pars.chi[id_nue] = 1.;
-  my_grey_opacity_params.m1_pars.n[id_anue] = m1_densities_n_j.integrand[id_anue];
-  my_grey_opacity_params.m1_pars.J[id_anue] = m1_densities_n_j.integrand[id_anue + 1];
-  my_grey_opacity_params.m1_pars.chi[id_anue] = 1.;
-  my_grey_opacity_params.m1_pars.n[id_nux] = m1_densities_n_j.integrand[id_nux];
-  my_grey_opacity_params.m1_pars.J[id_nux] = m1_densities_n_j.integrand[id_nux + 1];
-  my_grey_opacity_params.m1_pars.chi[id_nux] = 1.;
-  // compute opacities
-  M1Opacities opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
-
-  // extract emissivities
-  double R_nue = opacities.eta_0[id_nue];
-  double R_nua = opacities.eta_0[id_anue];
-  double R_nux = 4.0 * opacities.eta_0[id_nux];
-  double Q_nue = opacities.eta[id_nue];
-  double Q_nua = opacities.eta[id_anue];
-  double Q_nux = 4.0 * opacities.eta[id_nux];
-
-  // extract absorption inverse mean-free path
-  double sigma_0_nue = opacities.kappa_0_a[id_nue];
-  double sigma_0_nua = opacities.kappa_0_a[id_anue];
-  double sigma_0_nux = opacities.kappa_0_a[id_nux];
-  double sigma_1_nue = opacities.kappa_a[id_nue];
-  double sigma_1_nua = opacities.kappa_a[id_anue];
-  double sigma_1_nux = opacities.kappa_a[id_nux];
-
-  // extract scattering inverse mean-free path
-  double scat_0_nue = 0;
-  double scat_0_nua = 0;
-  double scat_0_nux = 0;
-  double scat_1_nue = opacities.kappa_s[id_nue];
-  double scat_1_nua = opacities.kappa_s[id_anue];
-  double scat_1_nux = opacities.kappa_s[id_nux];
 
   printf(
-      "#R_nue R_nua R_nux Q_nue Q_nua Q_nux sigma_0_nue sigma_0_nua sigma_0_nux sigma_1_nue sigma_1_nua sigma_1_nux scat_0_nue scat_0_nua scat_0_nux scat_1_nue scat_1_nua scat_1_nux\n");
-  printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n", R_nue, R_nua, R_nux, Q_nue, Q_nua, Q_nux, sigma_0_nue, sigma_0_nua, sigma_0_nux,
-         sigma_1_nue, sigma_1_nua, sigma_1_nux, scat_0_nue, scat_0_nua, scat_0_nux, scat_1_nue, scat_1_nua, scat_1_nux);
+        "#R_nue R_nua R_nux Q_nue Q_nua Q_nux sigma_0_nue sigma_0_nua sigma_0_nux sigma_1_nue sigma_1_nua sigma_1_nux scat_0_nue scat_0_nua scat_0_nux scat_1_nue scat_1_nua scat_1_nux\n");
+  for (int idx = 0; idx < num_data; idx++) {
+    // populate EOS quantities
+    my_grey_opacity_params.eos_pars.mu_e = mu_e_array[idx];
+    my_grey_opacity_params.eos_pars.mu_p = mu_p_array[idx];
+    my_grey_opacity_params.eos_pars.mu_n = mu_n_array[idx];
+    my_grey_opacity_params.eos_pars.temp = temp_array[idx];
+    my_grey_opacity_params.eos_pars.yp = ye_array[idx];
+    my_grey_opacity_params.eos_pars.yn = 1 - ye_array[idx];
+    my_grey_opacity_params.eos_pars.nb = nb_array[idx];
+
+    // reconstruct distribution function
+    my_grey_opacity_params.distr_pars = NuEquilibriumParams(&my_grey_opacity_params.eos_pars);
+
+    // compute n andj
+    MyQuadratureIntegrand m1_densities_n_j = ComputeM1DensitiesEq(&my_grey_opacity_params.eos_pars, &my_grey_opacity_params.distr_pars);
+
+    // populate M1 quantities
+    my_grey_opacity_params.m1_pars.n[id_nue] = m1_densities_n_j.integrand[id_nue];
+    my_grey_opacity_params.m1_pars.J[id_nue] = m1_densities_n_j.integrand[id_nue + 1];
+    my_grey_opacity_params.m1_pars.chi[id_nue] = 1.;
+    my_grey_opacity_params.m1_pars.n[id_anue] = m1_densities_n_j.integrand[id_anue];
+    my_grey_opacity_params.m1_pars.J[id_anue] = m1_densities_n_j.integrand[id_anue + 1];
+    my_grey_opacity_params.m1_pars.chi[id_anue] = 1.;
+    my_grey_opacity_params.m1_pars.n[id_nux] = m1_densities_n_j.integrand[id_nux];
+    my_grey_opacity_params.m1_pars.J[id_nux] = m1_densities_n_j.integrand[id_nux + 1];
+    my_grey_opacity_params.m1_pars.chi[id_nux] = 1.;
+    // compute opacities
+    M1Opacities opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
+
+    // extract emissivities
+    double R_nue = opacities.eta_0[id_nue];
+    double R_nua = opacities.eta_0[id_anue];
+    double R_nux = 4.0 * opacities.eta_0[id_nux];
+    double Q_nue = opacities.eta[id_nue];
+    double Q_nua = opacities.eta[id_anue];
+    double Q_nux = 4.0 * opacities.eta[id_nux];
+
+    // extract absorption inverse mean-free path
+    double sigma_0_nue = opacities.kappa_0_a[id_nue];
+    double sigma_0_nua = opacities.kappa_0_a[id_anue];
+    double sigma_0_nux = opacities.kappa_0_a[id_nux];
+    double sigma_1_nue = opacities.kappa_a[id_nue];
+    double sigma_1_nua = opacities.kappa_a[id_anue];
+    double sigma_1_nux = opacities.kappa_a[id_nux];
+
+    // extract scattering inverse mean-free path
+    double scat_0_nue = 0;
+    double scat_0_nua = 0;
+    double scat_0_nux = 0;
+    double scat_1_nue = opacities.kappa_s[id_nue];
+    double scat_1_nua = opacities.kappa_s[id_anue];
+    double scat_1_nux = opacities.kappa_s[id_nux];
+
+
+    printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n", R_nue, R_nua, R_nux, Q_nue, Q_nua, Q_nux, sigma_0_nue, sigma_0_nua, sigma_0_nux,
+           sigma_1_nue, sigma_1_nua, sigma_1_nux, scat_0_nue, scat_0_nua, scat_0_nux, scat_1_nue, scat_1_nua, scat_1_nux);
+  }
   return 0;
 }
