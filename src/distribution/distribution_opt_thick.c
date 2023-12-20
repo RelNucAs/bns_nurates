@@ -33,7 +33,7 @@ double NuFThick(double omega, NuDistributionParams *distr_pars, int species) {
 
 
 void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, NuDistributionParams *out_distr_pars) {
-  (void)eos_pars;
+  (void) eos_pars;
 
   // set degeneracy parameter for different neutrino species
 
@@ -67,7 +67,19 @@ void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, Nu
       out_distr_pars->eta_t[species] = 1000.;
     }
 
-    out_distr_pars->temp_t[species] = FDI_p2(out_distr_pars->eta_t[species]) * M1_pars->J[species] / (FDI_p3(out_distr_pars->eta_t[species]) * M1_pars->n[species]);
+
+    if (out_distr_pars->eta_t[species] < -6. && species == id_nue) {
+      out_distr_pars->eta_t[species] = (eos_pars->mu_e - eos_pars->mu_n + eos_pars->mu_p) / eos_pars->temp;
+      out_distr_pars->temp_t[species] = eos_pars->temp;
+    } else if (out_distr_pars->eta_t[species] < -6. && species == id_anue) {
+      out_distr_pars->eta_t[species] = -(eos_pars->mu_e - eos_pars->mu_n + eos_pars->mu_p) / eos_pars->temp;
+      out_distr_pars->temp_t[species] = eos_pars->temp;
+    } else if ((out_distr_pars->eta_t[species] < -6 && species == id_nux) || (out_distr_pars->eta_t[species] < -4. && species == id_anux) ) {
+      out_distr_pars->eta_t[species] = 0.;
+      out_distr_pars->temp_t[species] = eos_pars->temp;
+    } else {
+      out_distr_pars->temp_t[species] = FDI_p2(out_distr_pars->eta_t[species]) * M1_pars->J[species] / (FDI_p3(out_distr_pars->eta_t[species]) * M1_pars->n[species]);
+    }
   }
 }
 
