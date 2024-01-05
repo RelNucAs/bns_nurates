@@ -98,9 +98,9 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
   printf("Test for distribution function implementation:\n");
 
   printf("Generating quadratures ...\n");
-  MyQuadrature my_quadrature_1d = {.nx = 40, .dim = 1, .type = kGauleg, .x1 = 0., .x2 = 1.};
+  MyQuadrature my_quadrature_1d = {.nx = 20, .dim = 1, .type = kGauleg, .x1 = 0., .x2 = 1.};
   GaussLegendreMultiD(&my_quadrature_1d);
-  MyQuadrature my_quadrature_2d = {.nx = 40, .ny = 40, .dim = 2, .type = kGauleg, .x1 = 0., .x2 = 1., .y1 = 0., .y2 = 1.};
+  MyQuadrature my_quadrature_2d = {.nx = 20, .ny = 20, .dim = 2, .type = kGauleg, .x1 = 0., .x2 = 1., .y1 = 0., .y2 = 1.};
   GaussLegendreMultiD(&my_quadrature_2d);
   printf("Quadratures generated.\n");
 
@@ -149,7 +149,7 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
     double diff_distr = fabs(distr_fermi - distr_nuftot);
 
     M1Opacities coeffs = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
-
+    
     printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
             r[i], diff_distr,
             coeffs.eta_0[id_nue], coeffs.eta_0[id_anue], coeffs.eta_0[id_nux], coeffs.eta_0[id_anux],
@@ -164,8 +164,8 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
             coeffs.kappa_0_a[id_nue], coeffs.kappa_0_a[id_anue], coeffs.kappa_0_a[id_nux], coeffs.kappa_0_a[id_anux],
             coeffs.kappa_a[id_nue], coeffs.kappa_a[id_anue], coeffs.kappa_a[id_nux], coeffs.kappa_a[id_anux],
             coeffs.kappa_s[id_nue], coeffs.kappa_s[id_anue], coeffs.kappa_s[id_nux], coeffs.kappa_s[id_anux]);
+  
   }
-
   fclose(file);
 
   return;

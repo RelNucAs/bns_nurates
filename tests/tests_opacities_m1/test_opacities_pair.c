@@ -35,7 +35,7 @@ int main() {
   start = clock();
 
   TestM1Opacities(filename, &opacity_flags, &opacity_pars);
-  
+
   end = clock();
 
   cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;

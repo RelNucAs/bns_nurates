@@ -259,3 +259,37 @@ MyOpacity StimAbsOpacity(const double omega, OpacityParams *opacity_pars, MyEOSP
 
   return abs_opacity;
 }
+
+
+void BetaOpacitiesTable(MyQuadrature *quad, MyEOSParams *eos_pars, OpacityParams *opacity_pars, double t, M1Matrix *out) {
+  const int n = quad->nx;
+
+  double nu;
+
+  MyOpacity beta_1, beta_2;
+
+  for (int idx = 0; idx < total_num_species; idx++) {
+    out->m1_mat_ab[idx] = (double **) malloc(sizeof(double *));
+    out->m1_mat_em[idx] = (double **) malloc(sizeof(double *));
+
+    out->m1_mat_ab[idx][0] = (double *) malloc(sizeof(double) * 2 * n);
+    out->m1_mat_em[idx][0] = (double *) malloc(sizeof(double) * 2 * n);
+  }
+
+  for (int i = 0; i < n; i++) {
+    
+    beta_1 = StimAbsOpacity(t * quad->points[i], opacity_pars, eos_pars);
+    beta_2 = StimAbsOpacity(t / quad->points[i], opacity_pars, eos_pars);
+
+    for (int idx = 0; idx < total_num_species; idx ++) {
+      out->m1_mat_ab[idx][0][i] = beta_1.abs[idx];
+      out->m1_mat_em[idx][0][i] = beta_1.em[idx];
+
+      out->m1_mat_ab[idx][0][n+i] = beta_2.abs[idx];
+      out->m1_mat_em[idx][0][n+i] = beta_2.em[idx];    
+    }
+      
+  }
+
+  return;
+}

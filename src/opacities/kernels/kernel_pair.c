@@ -629,12 +629,8 @@ double PairPsi(int l, double y, double z, double eta) {
   return result;
 }
 
-void PairPsiOptimized(PairKernelParams *kernel_pars, int l, double y, double z, double eta, double *psi_out) {
-
-  assert(0 <= l && l <= 3);
-
-  double a[4][12], c[4][3], d[4][3];
-
+// @TODO: compute only a coeffs needed for the specific l value
+void PairPsiCoeffs(double y, double z, double a[4][12], double c[4][3], double d[4][3]) {
   const double y2 = y * y;
   const double y3 = y * y2;
   const double y4 = y * y3;
@@ -706,12 +702,22 @@ void PairPsiOptimized(PairKernelParams *kernel_pars, int l, double y, double z, 
   d[3][1] = 4. * z2 * (3. * y3 + 24. * y2 * z + 130. * y * z2 / 3. + 200. * z3 / 9.) / (35. * y5);
   d[3][2] = -4. * z2 * (50. * z2 / 63. + 6. * z * y / 7. + 6. * y2 / 35.) / y5;
 
+  return;
+}
+
+void PairPsiOptimized(PairKernelParams *kernel_pars, int l, double y, double z, double eta, double *psi_out) {
+
+  assert(0 <= l && l <= 3);
+
+  double a_yz[4][12], c_yz[4][3], d_yz[4][3];
+  double a_zy[4][12], c_zy[4][3], d_zy[4][3];
+
+  PairPsiCoeffs(y, z, a_yz, c_yz, d_yz);
+  PairPsiCoeffs(z, y, a_zy, c_zy, d_zy);
+
   double aux;
-
   double result_y_z = 0., result_z_y = 0.;
-
   double pair_g_y, pair_g_z;
-
   double pair_g[4] = {0.};
 
 
@@ -719,8 +725,8 @@ void PairPsiOptimized(PairKernelParams *kernel_pars, int l, double y, double z, 
     PairGOptimized(kernel_pars, n, eta, y, z, pair_g);
     pair_g_y = pair_g[0]; //PairG(n, y, y + z, eta, y, z); // a = y, b = y + z
     pair_g_z = pair_g[1]; //PairG(n, z, y + z, eta, y, z); // a = z, b = y + z
-    result_y_z += c[l][n] * pair_g_y + d[l][n] * pair_g_z;
-    result_z_y += d[l][n] * pair_g_y + c[l][n] * pair_g_z;
+    result_y_z += c_yz[l][n] * pair_g_y + d_yz[l][n] * pair_g_z;
+    result_z_y += c_zy[l][n] * pair_g_z + d_zy[l][n] * pair_g_y;
   }
 
   //double min_yz = (y > z) ? z : y;
@@ -728,10 +734,10 @@ void PairPsiOptimized(PairKernelParams *kernel_pars, int l, double y, double z, 
 
   for (int n = 3; n <= 2 * l + 5; n++) {
     PairGOptimized(kernel_pars, n, eta, y, z, pair_g);
-    aux = a[l][n] * (pair_g[2] - pair_g[3]);
+    aux = pair_g[2] - pair_g[3];
     //aux = a[l][n] * (PairG(n, 0, min_yz, eta, y, z) - PairG(n, max_yz, y + z, eta, y, z));
-    result_y_z += aux;
-    result_z_y += aux;
+    result_y_z += a_yz[l][n] * aux;
+    result_z_y += a_zy[l][n] * aux;
   }
   
   psi_out[0] = result_y_z; // Psi(y,z)
@@ -904,6 +910,44 @@ MyKernelQuantity PairKernelsM1Optimized(MyEOSParams *eos_pars, PairKernelParams 
       .abs_x = pair_kernel_absorption_x, .em_x = pair_kernel_production_x};
 
   return pair_kernel;
+
+}
+
+
+void PairKernelsM1Test(MyEOSParams *eos_pars, PairKernelParams *kernel_pars, MyKernelQuantity *out_for, MyKernelQuantity *out_inv) {
+  static const double kPairPhi = kGSqr / kPi;
+
+  // EOS specific parameters
+  double eta = eos_pars->mu_e / eos_pars->temp;
+  double temp = eos_pars->temp;
+
+  // kernel specific parameters
+  double omega = kernel_pars->omega;
+  double omega_prime = kernel_pars->omega_prime;
+
+  const double y = omega / temp;
+  const double z = omega_prime / temp;
+
+  const double phi_prefactor = 0.5 * kPairPhi * temp * temp;
+  const double phi_denom = 1. - exp(y + z);
+
+  double pair_psi[2] = {0.};
+
+  PairPsiOptimized(kernel_pars, 0, y, z, eta, pair_psi);
+
+  out_for->em_e = phi_prefactor * (kAlpha1[0] * kAlpha1[0] * pair_psi[0] + kAlpha2[0] * kAlpha2[0] * pair_psi[1]) / phi_denom;
+  out_for->em_x = phi_prefactor * (kAlpha1[1] * kAlpha1[1] * pair_psi[0] + kAlpha2[1] * kAlpha2[1] * pair_psi[1]) / phi_denom;
+
+  out_for->abs_e = SafeExp((omega + omega_prime) / temp) * out_for->em_e;
+  out_for->abs_x = SafeExp((omega + omega_prime) / temp) * out_for->em_x;
+
+  out_inv->em_e = phi_prefactor * (kAlpha1[0] * kAlpha1[0] * pair_psi[1] + kAlpha2[0] * kAlpha2[0] * pair_psi[0]) / phi_denom;
+  out_inv->em_x = phi_prefactor * (kAlpha1[1] * kAlpha1[1] * pair_psi[1] + kAlpha2[1] * kAlpha2[1] * pair_psi[0]) / phi_denom;
+
+  out_inv->abs_e = SafeExp((omega + omega_prime) / temp) * out_inv->em_e;
+  out_inv->abs_x = SafeExp((omega + omega_prime) / temp) * out_inv->em_x;
+
+  return;
 
 }
 

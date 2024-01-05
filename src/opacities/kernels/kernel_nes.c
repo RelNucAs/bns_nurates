@@ -143,3 +143,18 @@ MyKernelOutput InelasticScattKernels(InelasticScattKernelParams *kernel_params, 
 
   return tot_kernel;
 }
+
+void CrossedInelasticScattKernels(InelasticScattKernelParams *kernel_params, MyEOSParams *eos_params, MyKernelOutput *out_1, MyKernelOutput *out_2) {
+
+  double omega = kernel_params->omega;
+  double omega_prime = kernel_params->omega_prime;
+
+  *out_1 = InelasticScattKernels(kernel_params, eos_params);
+
+  kernel_params->omega = omega_prime;
+  kernel_params->omega_prime = omega;
+
+  *out_2 = InelasticScattKernels(kernel_params, eos_params);
+
+  return;
+}

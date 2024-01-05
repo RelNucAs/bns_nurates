@@ -44,6 +44,7 @@ add_executable(bns_nurates
         src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
+        src/opacities/nu_abs_em_inelastic.c
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c)
 
@@ -82,6 +83,7 @@ add_library(nurates SHARED
         src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
+        src/opacities/nu_abs_em_inelastic.c
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c)
 
@@ -582,6 +584,7 @@ add_executable(test_opacities_electron_capture
         src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
+        src/opacities/nu_abs_em_inelastic.c
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
         tests/tests_opacities_m1/test_opacities_electron_capture.c
@@ -630,6 +633,7 @@ add_executable(test_opacities_pair
         src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
+        src/opacities/nu_abs_em_inelastic.c
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
         tests/tests_opacities_m1/test_opacities_pair.c
@@ -678,6 +682,7 @@ add_executable(test_opacities_brem
         src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
+        src/opacities/nu_abs_em_inelastic.c
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
         tests/tests_opacities_m1/test_opacities_brem.c
@@ -726,6 +731,7 @@ add_executable(test_opacities_inelastic_scatt
         src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
+        src/opacities/nu_abs_em_inelastic.c
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
         tests/tests_opacities_m1/test_opacities_inelastic_scatt.c
@@ -774,6 +780,7 @@ add_executable(test_opacities_isoscatt
         src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
+        src/opacities/nu_abs_em_inelastic.c
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
         tests/tests_opacities_m1/test_opacities_isoscatt.c
@@ -819,6 +826,7 @@ add_executable(test_opacities_all_reactions
         src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
+        src/opacities/nu_abs_em_inelastic.c
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
         tests/tests_opacities_m1/test_opacities_all_reactions.c
@@ -915,6 +923,7 @@ add_executable(test_m1_distribution
         src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
+        src/opacities/nu_abs_em_inelastic.c
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
         tests/tests_distribution/test_m1_distribution.c

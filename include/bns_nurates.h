@@ -337,6 +337,20 @@ struct M1Opacities {
 };
 typedef struct M1Opacities M1Opacities;
 
+
+/* M1Matrix struct
+ *
+ * Stores quantities related to the computation of M1 source
+ * coefficients in 2D matrix form
+ */
+
+struct M1Matrix {
+  double **m1_mat_em[total_num_species];
+  double **m1_mat_ab[total_num_species];
+};
+typedef struct M1Matrix M1Matrix;
+
+
 /* SpectralOpacities struct
  *
  * Stores the emissivity and inverse mean free path
