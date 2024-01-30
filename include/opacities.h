@@ -23,6 +23,9 @@ MyOpacity AbsOpacity(const double omega, OpacityParams *opacity_pars, MyEOSParam
 // Stimulated absoption version
 MyOpacity StimAbsOpacity(const double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars);
 
+// Build matrix for integration
+void BetaOpacitiesTable(MyQuadrature *quad, MyEOSParams *eos_pars, OpacityParams *opacity_pars, double t, M1Matrix *out);
+
 /*===========================================================================*/
 
 // nu_scatt_iso.c
@@ -44,14 +47,23 @@ double IsoScattLegCoeff(const double omega, OpacityParams *opacity_pars, MyEOSPa
 // pair opacities
 MyKernelQuantity PairEmissivityAbsorptivityIntegrand(double var, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);
 MyKernelQuantity PairOpacitiesFermi(MyQuadrature *quad, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);
+void PairOpacitiesTable(MyQuadrature *quad, MyEOSParams *eos_pars, MyKernelParams *kernel_pars, double t, M1Matrix *out);
+
 // bremsstrahlung opacities
 MyKernelQuantity BremEmissivityAbsorptivityIntegrandFermi(double omega_prime, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);
 MyKernelQuantity BremOpacitiesFermi(MyQuadrature *quad, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);
+void BremOpacitiesTable(MyQuadrature *quad, MyEOSParams *eos_pars, MyKernelParams *kernel_pars, double t, M1Matrix *out);
+
+// inelastic scattering opacities
+void InelasticOpacitiesTable(MyQuadrature *quad, MyEOSParams *eos_pars, MyKernelParams *kernel_pars, double t, M1Matrix *out);
+
 
 // M1 opacities
 MyQuadratureIntegrand M1CoeffsDoubleIntegrand(double *var, void *p);
 MyQuadratureIntegrand M1CoeffsSingleIntegrand(double *var, void *p);
 M1Opacities ComputeM1Opacities(MyQuadrature *quad_1d, MyQuadrature *quad_2d, GreyOpacityParams *my_grey_opacity_params);
+
+void ComputeM1OpacitiesTest(MyQuadrature *quad_1d, GreyOpacityParams *my_grey_opacity_params, double t, M1Matrix *out_n, M1Matrix *out_j);
 
 SpectralOpacities ComputeSpectralOpacitiesNotStimulated(const double nu, MyQuadrature *quad_1d, GreyOpacityParams *my_grey_opacity_params);
 

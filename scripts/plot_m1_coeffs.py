@@ -8,13 +8,35 @@ from argparse import ArgumentParser
 
 ## Use standard or modified output data
 parser = ArgumentParser(description="Comparison with modified data")
+parser.add_argument('-rmax', dest='max_radius', type=float)
+parser.add_argument('--beta', dest='beta', default=False, action='store_true')
+parser.add_argument('--pair', dest='pair', default=False, action='store_true')
+parser.add_argument('--brem', dest='brem', default=False, action='store_true')
+parser.add_argument('--iso', dest='iso', default=False, action='store_true')
 parser.add_argument('--mod', dest='mod', default=False, action='store_true')
 args = parser.parse_args()
 
 if args.mod:
     print("Using modified data to align with WeakRates definitions")
     print("")
-    
+
+[use_beta, use_pair, use_brem, use_iso] = [True for i in range(4)]
+
+if args.beta:
+    [use_beta, use_pair, use_brem, use_iso] = [False for i in range(4)]
+    use_beta = True
+
+if args.pair:
+    [use_beta, use_pair, use_brem, use_iso] = [False for i in range(4)]
+    use_pair = True
+
+if args.brem:
+    [use_beta, use_pair, use_brem, use_iso] = [False for i in range(4)]
+    use_brem = True
+
+if args.iso:
+    [use_beta, use_pair, use_brem, use_iso] = [False for i in range(4)]
+    use_iso = True
 
 ## Read WeakRates data
 def read_WeakRates_data(filename):
@@ -36,6 +58,9 @@ id_nob = 1 # index for modified (no blocking) WeakRates data
 
 r = eta_beta_WR[id_std][0] # radius of the profile
 
+## Find max radius index (if parsed)
+id_rmax = r.size - 1
+if (args.max_radius): id_rmax = np.argmin(abs(r - args.max_radius))
 
 ## Read bns_nurates data
 def read_nurates_data(filename):
@@ -52,6 +77,9 @@ iso_nurates  = read_nurates_data("m1_opacities_isoscatt.txt")
 pair_nurates = read_nurates_data("m1_opacities_pair.txt")
 brem_nurates = read_nurates_data("m1_opacities_brem.txt")
 
+brem_nurates[4] = 2.0 * brem_nurates[4] + 2.0 * brem_nurates[5] # sum of all heavy neutrino flavors 
+brem_nurates[8] = 2.0 * brem_nurates[8] + 2.0 * brem_nurates[9]
+
 ## Generic function for data plotting
 def make_plot(axs, WR_data, nurates_data, id_type, id_coeff):
     # Define index for reading data correctly
@@ -64,10 +92,10 @@ def make_plot(axs, WR_data, nurates_data, id_type, id_coeff):
         exit()
 
     id_WR = 3 * id_type + 1 
-    id_NR = 6 * id_coeff + 3 * id_type + 2 # two additional columns for r and diff_distr
+    id_NR = 8 * id_coeff + 4 * id_type + 2 # two additional columns for r and diff_distr
 
     if (id_coeff == 2):
-        id_NR = 6 * id_coeff + 2 - 1 # minus one since diff_distr column is missing for iso scattering
+        id_NR = 8 * id_coeff + 2
 
     axs[0][0].set_xscale("log")
     plt.subplots_adjust(hspace=0.)
@@ -87,7 +115,7 @@ def make_plot(axs, WR_data, nurates_data, id_type, id_coeff):
     # Plot data
     for idx in range(3):
         # Rates
-        axs[0][idx].plot(r, WR_data[id_std][id_WR+idx], color = "tab:blue", ls = "-", label="WR - std")
+        axs[0][idx].plot(r, WR_data[id_std][id_WR+idx], color = "tab:blue", ls = "-" , label="WR - std")
         axs[0][idx].plot(r, WR_data[id_nob][id_WR+idx], color = "tab:blue", ls = "--", label="WR - no bl")
 
         axs[0][idx].plot(r, nurates_data[id_NR+idx], color = "tab:orange", label="NR")
@@ -96,11 +124,27 @@ def make_plot(axs, WR_data, nurates_data, id_type, id_coeff):
         axs[1][idx].plot(r, ratio_std[idx], color = "tab:blue", ls = "-" , label="WR - std")
         axs[1][idx].plot(r, ratio_nob[idx], color = "tab:blue", ls = "--", label="WR - no bl")
 
-    for ax in axs[0]:
+    for idx, ax in enumerate(axs[0]):
         ax.set_yscale("log")
         ax.legend()
 
-    for ax in axs[:][1]:
+    if (args.max_radius):
+       for idx, ax in enumerate(axs[0]):
+            ax.set_xlim((r[0],r[id_rmax]))
+            
+            data_stack = np.row_stack((WR_data[id_std][id_WR+idx], WR_data[id_nob][id_WR+idx], nurates_data[id_NR+idx]))
+            y_min = np.amin(data_stack[:,:id_rmax+1])
+            y_max = np.amax(data_stack[:,:id_rmax+1])
+            if ((y_min != 0.) & (y_max != 0.)):
+                axs[0][idx].set_ylim((0.9*y_min, 1.1*y_max))
+            
+            data_stack = np.row_stack((ratio_std[idx], ratio_nob[idx]))
+            y_min = np.amin(data_stack[:,:id_rmax+1])
+            y_max = np.amax(data_stack[:,:id_rmax+1])
+            if ((y_min != 0.) & (y_max != 0.) & (np.isfinite(y_min)) & (np.isfinite(y_max))):
+                axs[1][idx].set_ylim((0.9*min(y_min,1.), 1.1*max(y_max,1.)))
+
+    for ax in axs[1][:]:
         ax.axhline(1., color = "k", ls = "--", zorder=1)
         ax.set_xlabel(r"$r~[{\rm cm}]$")
         ax.set_yscale("log")
@@ -112,94 +156,111 @@ def make_plot(axs, WR_data, nurates_data, id_type, id_coeff):
 ## id_type = 0 (number), 1 (energy)
 ## id_coeff = 0 (eta), 1 (kappa_a), 2 (kappa_s)
 
-## Beta decay - number
+##########################################################
 
-fig, axs = plt.subplots(2, 3, sharex="all", gridspec_kw={'height_ratios': [3, 1]})
+## Beta decay
 
-# Suptitle
-plt.suptitle("Emissivity coefficient for beta reactions - number")
+## Number
 
-# Ylabels
-axs[0][0].set_ylabel(r"$\eta^0~[{\rm MeV}\,{\rm cm}^{-3}\,{\rm s}^{-1}]$")
+if use_beta:
+    fig_name = "Emissivity coefficient for beta reactions - number"
 
-# Make plot
-make_plot(axs, eta_beta_WR, beta_nurates, 0, 0)
+    fig, axs = plt.subplots(2, 3, sharex="all", gridspec_kw={'height_ratios': [3, 1]}, num=fig_name)
+
+    # Suptitle
+    plt.suptitle(fig_name)
+
+    # Ylabels
+    axs[0][0].set_ylabel(r"$\eta^0~[{\rm MeV}\,{\rm cm}^{-3}\,{\rm s}^{-1}]$")
+
+    # Make plot
+    make_plot(axs, eta_beta_WR, beta_nurates, 0, 0)
+
+## Energy
+
+    fig_name = "Emissivity coefficient for beta reactions - energy"
+
+    fig, axs = plt.subplots(2, 3, sharex="all", gridspec_kw={'height_ratios': [3, 1]}, num=fig_name)
+
+    # Suptitle
+    plt.suptitle(fig_name)
+
+    # Ylabels
+    axs[0][0].set_ylabel(r"$\eta~[{\rm MeV}\,{\rm cm}^{-3}\,{\rm s}^{-1}]$")
+
+    # Make plot
+    make_plot(axs, eta_beta_WR, beta_nurates, 1, 0)
+
 
 ##########################################################
 
-## Beta decay - energy
+## Pair process
 
-fig, axs = plt.subplots(2, 3, sharex="all", gridspec_kw={'height_ratios': [3, 1]})
+## Number 
 
-# Suptitle
-plt.suptitle("Emissivity coefficient for beta reactions - energy")
+if use_pair:
+    fig_name = r"Emissivity coefficient for $e^\pm$ annihilation - number"
 
-# Ylabels
-axs[0][0].set_ylabel(r"$\eta~[{\rm MeV}\,{\rm cm}^{-3}\,{\rm s}^{-1}]$")
+    fig, axs = plt.subplots(2, 3, sharex="all", gridspec_kw={'height_ratios': [3, 1]}, num=fig_name)
 
-# Make plot
-make_plot(axs, eta_beta_WR, beta_nurates, 1, 0)
+    # Suptitle
+    plt.suptitle(fig_name)
 
+    # Ylabels
+    axs[0][0].set_ylabel(r"$\eta^0~[{\rm MeV}\,{\rm cm}^{-3}\,{\rm s}^{-1}]$")
 
-##########################################################
+    # Make plot
+    make_plot(axs, eta_pair_WR, pair_nurates, 0, 0)
 
-## Pair process - number 
+## Energy
 
-fig, axs = plt.subplots(2, 3, sharex="all", gridspec_kw={'height_ratios': [3, 1]})
+    fig_name = r"Emissivity coefficient for $e^\pm$ annihilation - energy"
 
-# Suptitle
-plt.suptitle(r"Emissivity coefficient for $e^\pm$ annihilation - number")
+    fig, axs = plt.subplots(2, 3, sharex="all", gridspec_kw={'height_ratios': [3, 1]}, num=fig_name)
 
-# Ylabels
-axs[0][0].set_ylabel(r"$\eta^0~[{\rm MeV}\,{\rm cm}^{-3}\,{\rm s}^{-1}]$")
+    # Suptitle
+    plt.suptitle(fig_name)
 
-# Make plot
-make_plot(axs, eta_pair_WR, pair_nurates, 0, 0)
+    # Ylabels
+    axs[0][0].set_ylabel(r"$\eta~[{\rm MeV}\,{\rm cm}^{-3}\,{\rm s}^{-1}]$")
 
-##########################################################
-
-## Pair process - energy 
-
-fig, axs = plt.subplots(2, 3, sharex="all", gridspec_kw={'height_ratios': [3, 1]})
-
-# Suptitle
-plt.suptitle(r"Emissivity coefficient for $e^\pm$ annihilation - energy")
-
-# Ylabels
-axs[0][0].set_ylabel(r"$\eta~[{\rm MeV}\,{\rm cm}^{-3}\,{\rm s}^{-1}]$")
-
-# Make plot
-make_plot(axs, eta_pair_WR, pair_nurates, 1, 0)
+    # Make plot
+    make_plot(axs, eta_pair_WR, pair_nurates, 1, 0)
 
 ##########################################################
 
-## Bremsstrahlung process - number
+## Bremsstrahlung process
 
-fig, axs = plt.subplots(2, 3, sharex="all", gridspec_kw={'height_ratios': [3, 1]})
+## Number
 
-# Suptitle
-plt.suptitle(r"Emissivity coefficient for NN bremsstrahlung - number")
+if use_brem:
+    fig_name = r"Emissivity coefficient for NN bremsstrahlung - number"
 
-# Ylabels
-axs[0][0].set_ylabel(r"$\eta^0~[{\rm MeV}\,{\rm cm}^{-3}\,{\rm s}^{-1}]$")
+    fig, axs = plt.subplots(2, 3, sharex="all", gridspec_kw={'height_ratios': [3, 1]}, num=fig_name)
 
-# Make plot
-make_plot(axs, eta_brem_WR, brem_nurates, 0, 0)
+    # Suptitle
+    plt.suptitle(fig_name)
 
-##########################################################
+    # Ylabels
+    axs[0][0].set_ylabel(r"$\eta^0~[{\rm MeV}\,{\rm cm}^{-3}\,{\rm s}^{-1}]$")
 
-## Bremsstrahlung process - energy
+    # Make plot
+    make_plot(axs, eta_brem_WR, brem_nurates, 0, 0)
 
-fig, axs = plt.subplots(2, 3, sharex="all", gridspec_kw={'height_ratios': [3, 1]})
+## Energy
 
-# Suptitle
-plt.suptitle(r"Emissivity coefficient for NN bremsstrahlung - energy")
+    fig_name = r"Emissivity coefficient for NN bremsstrahlung - energy"
 
-# Ylabels
-axs[0][0].set_ylabel(r"$\eta~[{\rm MeV}\,{\rm cm}^{-3}\,{\rm s}^{-1}]$")
+    fig, axs = plt.subplots(2, 3, sharex="all", gridspec_kw={'height_ratios': [3, 1]}, num=fig_name)
 
-# Make plot
-make_plot(axs, eta_brem_WR, brem_nurates, 1, 0)
+    # Suptitle
+    plt.suptitle(fig_name)
+
+    # Ylabels
+    axs[0][0].set_ylabel(r"$\eta~[{\rm MeV}\,{\rm cm}^{-3}\,{\rm s}^{-1}]$")
+
+    # Make plot
+    make_plot(axs, eta_brem_WR, brem_nurates, 1, 0)
 
 ##########################################################
 
@@ -207,47 +268,59 @@ make_plot(axs, eta_brem_WR, brem_nurates, 1, 0)
 ## Plot absoprtion coefficients ##
 ##################################
 
-## Absoprtion on nucleons - number
+## Absoprtion on nucleons
 
-fig, axs = plt.subplots(2, 3, sharex="all", gridspec_kw={'height_ratios': [3, 1]})
+## Number
 
-# Suptitle
-plt.suptitle(r"Absorption coefficient for beta reactions - number")
+if use_beta:
+    fig_name = r"Absorption coefficient for beta reactions - number"
 
-# Ylabels
-axs[0][0].set_ylabel(r"$\kappa^0_{\rm a}~[{\rm MeV}\,{\rm cm}^{-3}\,{\rm s}^{-1}]$")
+    fig, axs = plt.subplots(2, 3, sharex="all", gridspec_kw={'height_ratios': [3, 1]}, num=fig_name)
 
-# Make plot
-make_plot(axs, k_abs_WR, beta_nurates, 0, 1)
+    # Suptitle
+    plt.suptitle(fig_name)
+
+    # Ylabels
+    axs[0][0].set_ylabel(r"$\kappa^0_{\rm a}~[{\rm MeV}\,{\rm cm}^{-3}\,{\rm s}^{-1}]$")
+
+    # Make plot
+    make_plot(axs, k_abs_WR, beta_nurates, 0, 1)
+
+## Energy
+
+    fig_name = r"Absorption coefficient for beta reactions - energy"
+
+    fig, axs = plt.subplots(2, 3, sharex="all", gridspec_kw={'height_ratios': [3, 1]}, num=fig_name)
+
+    # Suptitle
+    plt.suptitle(fig_name)
+
+    # Ylabels
+    axs[0][0].set_ylabel(r"$\kappa_{\rm a}~[{\rm MeV}\,{\rm cm}^{-3}\,{\rm s}^{-1}]$")
+
+    # Make plot
+    make_plot(axs, k_abs_WR, beta_nurates, 1, 1)
 
 ##########################################################
 
-## Absoprtion on nucleons - energy
+## Isoenergetic scattering
 
-fig, axs = plt.subplots(2, 3, sharex="all", gridspec_kw={'height_ratios': [3, 1]})
+## Energy
 
-# Suptitle
-plt.suptitle(r"Absorption coefficient for beta reactions - energy")
+if use_iso:
+    fig_name = "Scattering coefficient for isoenergetic scattering - energy"
 
-# Ylabels
-axs[0][0].set_ylabel(r"$\kappa_{\rm a}~[{\rm MeV}\,{\rm cm}^{-3}\,{\rm s}^{-1}]$")
+    fig, axs = plt.subplots(2, 3, sharex="all", gridspec_kw={'height_ratios': [3, 1]}, num=fig_name)
 
-# Make plot
-make_plot(axs, k_abs_WR, beta_nurates, 1, 1)
+    # Suptitle
+    plt.suptitle(fig_name)
+
+    # Ylabels
+    axs[0][0].set_ylabel(r"$\kappa_{\rm s}~[{\rm MeV}\,{\rm cm}^{-3}\,{\rm s}^{-1}]$")
+
+    # Make plot
+    make_plot(axs, k_sct_WR, iso_nurates, 1, 2)
 
 ##########################################################
-
-## Isoenergetic scattering - energy
-
-fig, axs = plt.subplots(2, 3, sharex="all", gridspec_kw={'height_ratios': [3, 1]})
-
-# Suptitle
-plt.suptitle("Absorption coefficient for isoenergetic scattering - energy")
-
-# Ylabels
-axs[0][0].set_ylabel(r"$\kappa_{\rm s}~[{\rm MeV}\,{\rm cm}^{-3}\,{\rm s}^{-1}]$")
-
-# Make plot
-make_plot(axs, k_sct_WR, iso_nurates, 1, 2)
 
 plt.show()

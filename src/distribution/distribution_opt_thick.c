@@ -33,6 +33,7 @@ double NuFThick(double omega, NuDistributionParams *distr_pars, int species) {
 
 
 void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, NuDistributionParams *out_distr_pars) {
+  (void) eos_pars;
 
   // set degeneracy parameter for different neutrino species
 
@@ -50,22 +51,63 @@ void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, Nu
     double y = M1_pars->n[species] * M1_pars->n[species] * M1_pars->n[species] * M1_pars->n[species] * kHClight * kHClight * kHClight
         / (4. * M_PI * M1_pars->J[species] * M1_pars->J[species] * M1_pars->J[species]);
 
-    if (y < 0.04) {
-      out_distr_pars->eta_t[species] =
-          (y * (y * (y * (y * (193601090.674965 - 1108185464.38267 * y) - 5417182.68352186) - 132141.667235385) - 103.882788946162) - 0.0014855034293057) /
-              (y * (y * (y * (1.0 * y + 5426593.58422611) + 35266.6610309076) + 15.7105593937989) + 7.27351598778796e-5);
+    if (y < 0.005) {
+      out_distr_pars->eta_t[species] = log(
+          (y * (y * (y * (y * (y * (y + 0.19926987701997) + 38865.0149220478) +
+              14364.6331099737) +
+              5750.1878570758) +
+              1120.71610972194) +
+              1.60356108438235e-8) /
+              (y * (y * (y * (y * (y * (y + 1.0) + 38840.0743174942) -
+                  99.9009680656931) -
+                  171.874844843596) +
+                  75.7101579899442) +
+                  83.0160130941424));
     } else if (y <= 0.7) {
       out_distr_pars->eta_t[species] =
-          (y * (y * (y * (y * (2.98735454268239 * y - 4.88726196424146) - 0.901791627658626) + 2.4819363543555) - 0.00548761969223768) - 0.00769760353422157) /
-              (y * (y * (y * (1.0 * y - 1.58869835679685) + 0.441658509378521) + 0.14883216362587) + 0.0024946879233069);
+          (y * (y * (y * (y * (y * (41.3836568203438 * y + 32.5515666786612) -
+              157.774993512235) +
+              66.5726772426253) +
+              14.4883415579211) +
+              0.315360380575709) +
+              0.000660414331285249) /
+              (y * (y * (y * (y * (y * (y + 1.8888797407042) - 5.35488690539183) +
+                  1.94673781342617) +
+                  0.483128792035557) +
+                  0.0113386564109086) +
+                  2.64160073447322e-5) -
+              30.;
     } else if (y > 0.7 && y < 0.7901234567745267) {
-      out_distr_pars->eta_t[species] =
-          (y * (y * (y * (y * (2827.84724452959 * y - 3707.82829755322) - 2.49562579572847) + 1254.79286964601) - 258.239389707494) - 3.58793204563292) /
-              (y * (y * (y * (1.0 * y + 85.5940548187225) - 68.8227897049312) - 55.1337376497705) + 43.9181682873458);
+      out_distr_pars->eta_t[species] = exp(
+          (y * (y * (y * (y * (y * (3852.81416018959 * y - 5316.18895799799) +
+              1102.91561586553) +
+              1.54082262710661e-6) +
+              1732.89925128741) -
+              1769.59868329086) +
+              586.406885304906) /
+              (y * (y * (y * (y * (y * (y + 255.936658313629) + 9.42360945627147e-5) -
+                  81.2467063138386) -
+                  180.100197053091) -
+                  89.0343496217014) +
+                  143.849128123195));
     } else {
       out_distr_pars->eta_t[species] = 1000.;
     }
 
     out_distr_pars->temp_t[species] = FDI_p2(out_distr_pars->eta_t[species]) * M1_pars->J[species] / (FDI_p3(out_distr_pars->eta_t[species]) * M1_pars->n[species]);
+
+/*    if (out_distr_pars->eta_t[species] < -20. && species == id_nue) {
+      out_distr_pars->eta_t[species] = (eos_pars->mu_e - eos_pars->mu_n + eos_pars->mu_p) / eos_pars->temp;
+      out_distr_pars->temp_t[species] = eos_pars->temp;
+    } else if (out_distr_pars->eta_t[species] < -20. && species == id_anue) {
+      out_distr_pars->eta_t[species] = -(eos_pars->mu_e - eos_pars->mu_n + eos_pars->mu_p) / eos_pars->temp;
+      out_distr_pars->temp_t[species] = eos_pars->temp;
+    } else if ((out_distr_pars->eta_t[species] < -20 && species == id_nux) || (out_distr_pars->eta_t[species] < -4. && species == id_anux)) {
+      out_distr_pars->eta_t[species] = 0.;
+      out_distr_pars->temp_t[species] = eos_pars->temp;
+    } else {
+      out_distr_pars->temp_t[species] = FDI_p2(out_distr_pars->eta_t[species]) * M1_pars->J[species] / (FDI_p3(out_distr_pars->eta_t[species]) * M1_pars->n[species]);
+    } */
   }
 }
+

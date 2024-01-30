@@ -44,15 +44,155 @@ void TabulatePairTFunction(double xi, double xf, double x[dim_pair_t], double t[
  *    T_l(alpha) = sum_{n=1..inf} (-1)^{n+1} e^{-n alpha} / n^l
  */
 double PairTWithAlpha0(int l) {
-  static const double log2 = 0.6931471805599453; //log(2.0);
-  if (l == 1) {
-    return log2;
-  } else {
-    return pow(2., -l) * (pow(2., l) - 2.) * gsl_sf_zeta_int(l);  // Computed in Mathematica
+  switch(l) {
+    case 1:
+      return 0.693147180559945309417; // log(2.0)
+      break;
+
+    // else : pow(2., -l) * (pow(2., l) - 2.) * gsl_sf_zeta_int(l);  // Computed in Mathematica
+    case 2:
+      return 0.822467033424113218236; // kPi * kPi / 12.
+      break;
+
+    case 3:
+      return 0.901542677369695714050; // 3. * zeta(3.) / 4.
+      break;
+
+    case 4:
+      return 0.947032829497245917577; // 7. * kPi * kPi * kPi * kPi / 720.
+      break;
+
+    case 5:
+      return 0.972119770446909305936; // 15. * zeta(5.) / 16.
+      break;
+
+    case 6:
+      return 0.985551091297435104098; // 31. * pow(kPi, 6) / 30240.
+      break;
+    
+    default:
+      printf("PairTWithAlpha0 (kernel_pair.c): l = %d must be within 1 and 6", l);
+      exit(EXIT_FAILURE);
   }
-}
+} 
+
+
 
 double PairTFitted(int l, double alpha) {
+  double fit_poly = 1.;
+  double fit_exp = exp(1.1599894050697828e-11 - 1.0000000000000557 * alpha); // fitting coefficients are the same for l = 1,...,6
+    
+  if (alpha < 15.) { 
+    if (alpha == 0) return PairTWithAlpha0(l);
+   
+    switch (l) {
+      
+      case 1:
+        fit_poly = 0.6932349884688382 + alpha *
+                   (0.19153844068873888 + alpha *
+                    (-0.022454086684801058 + alpha *
+                     (-0.01862035702348546 + alpha *
+                      (0.010059951727924867 + alpha *
+                       (-0.0025591672605759157 + alpha *
+              	        (0.00040809016119114534 + alpha *
+                         (-4.382673963153738e-05 + alpha *
+                          (3.2238390304643073e-06 + alpha *
+                           (-1.6018407662684595e-07 + alpha *
+                            (5.130720144162727e-09 + alpha *
+                             (-9.531900556136287e-11 + alpha *
+                               7.764460276911894e-13) ) ) ) ) ) ) ) ) ) );
+        break;
+            
+      case 2:  
+        fit_poly = 0.8224794727922443 + alpha *
+                   (0.1290371349050982 + alpha *
+                    (-0.030657101372762428 + alpha *
+                     (-0.003453495292249957 + alpha *
+                      (0.00426086049575675 + alpha *
+                       (-0.0013457908088575755 + alpha *
+              	        (0.0002501877313487743 + alpha *
+                         (-3.0919945500091964e-05 + alpha *
+                          (2.6176160114632282e-06 + alpha *
+                           (-1.5051104090763755e-07 + alpha *
+                            (5.628852629867178e-09 + alpha *
+                             (-1.2360258213665597e-10 + alpha *
+                               1.2097121671548247e-12) ) ) ) ) ) ) ) ) ) );
+        break;      
+
+      case 3:
+        fit_poly = 0.9015387115221923 + alpha *
+                   (0.0791164948210426 + alpha *
+                    (-0.025154468942278033 + alpha *
+                     (0.0021057203236187075 + alpha *
+                      (0.0011880768678479855 + alpha *
+                       (-0.0005242569477484338 + alpha *
+                  	    (0.00011078575689764255 + alpha *
+                         (-1.48222315936738e-05 + alpha *
+                          (1.331164063502168e-06 + alpha *
+                           (-8.029349298289137e-08 + alpha *
+                            (3.1269450241639527e-09 + alpha *
+                             (-7.111741520288681e-11 + alpha *
+                               7.17877896667645e-13) ) ) ) ) ) ) ) ) ) );
+        break;
+
+      case 4:
+        fit_poly = 0.9470282577605772 + alpha *
+                   (0.045559097999768754 + alpha *
+                    (-0.016997198961210103 + alpha *
+                     (0.0030071993630479362 + alpha *
+                      (2.1281035907218678e-05 + alpha *
+                       (-0.00014559133060632152 + alpha *
+                  	    (3.856825962408047e-05 + alpha *
+                         (-5.677096233745809e-06 + alpha *
+                          (5.389942800937989e-07 + alpha *
+                           (-3.3760229096333e-08 + alpha *
+                            (1.3519272756431448e-09 + alpha *
+                             (-3.1423838815286814e-11 + alpha *
+                               3.228347864267874e-13) ) ) ) ) ) ) ) ) ) );
+        break;
+
+      case 5:
+        fit_poly = 0.9721171063352136 + alpha *
+                   (0.025128000871717175 + alpha *
+                    (-0.010335683014480727 + alpha *
+                     (0.0023768431000457074 + alpha *
+                      (-0.0002672125800539407 + alpha *
+                       (-1.096586220062312e-05 + alpha *
+                  	    (9.471179226979555e-06 + alpha *
+                         (-1.7228094292976135e-06 + alpha *
+                          (1.7941662304610306e-07 + alpha *
+                           (-1.1844514209510994e-08 + alpha *
+                            (4.908468308315054e-10 + alpha *
+                             (-1.1689674516055724e-11 + alpha *
+                               1.223042342844013e-13) ) ) ) ) ) ) ) ) ) );
+        break;
+
+      case 6:
+        fit_poly = 0.9855501299373773 + alpha *
+                   (0.013449009951258391 + alpha *
+                    (-0.005890098985143524 + alpha *
+                     (0.00154830636662188 + alpha *
+                      (-0.00025382574940076774 + alpha *
+                       (2.257168344772742e-05 + alpha *
+                  	    (7.929667164380111e-08 + alpha *
+                         (-3.0974403462775056e-07 + alpha *
+                          (4.3475802836454606e-08 + alpha *
+                           (-3.249472337669054e-09 + alpha *
+                            (1.4415672453643435e-10 + alpha *
+                             (-3.584054805259039e-12 + alpha *
+                               3.862549379641218e-14) ) ) ) ) ) ) ) ) ) );
+        break;
+      
+      default:
+        printf("PairTFitted (kernel_pair.c): l = %d must be within 1 and 6", l);
+        exit(EXIT_FAILURE);
+    }
+  }
+
+  return fit_poly * fit_exp;
+}
+
+double PairTFittedTest(int l, double alpha) {
   static const double PairTFit1[6][2] = {
 {-1.0000000000000557, 1.1599894050697828e-11},
 {-1.0000000000000557, 1.1599894050697828e-11},
@@ -347,32 +487,40 @@ double PairG(int n, double a, double b, double eta, double y, double z) {
 }
 
 void PairGOptimized(PairKernelParams *kernel_pars, int n, double eta, double y, double z, double *g_out) {
-  //const double pair_f_y_z_1 = PairFOptimized(n, eta, y + z);
-  //const double pair_f_y_z_2 = PairFOptimized(n, eta + y + z, y + z);
-
-  //const double pair_f_y_z_1 = PairFInterpolated(kernel_pars, n, eta, y + z);
-  //const double pair_f_y_z_2 = PairFInterpolated(kernel_pars, eta + y + z, y + z);
-
+  (void)kernel_pars;
+  /*
   const double pair_f_y_z_1 = PairF(n, eta, y + z);
   const double pair_f_y_z_2 = PairF(n, eta + y + z, y + z);
-
-  //const double pair_f_y_1 = PairFOptimized(n, eta, y);
-  //const double pair_f_y_2 = PairFOptimized(n, eta + y + z, y);
-
-  //const double pair_f_y_1 = PairFInterpolated(kernel_pars, n, eta, y);
-  //const double pair_f_y_1 = PairFInterpolated(kernel_pars, eta + y + z, y);
 
   const double pair_f_y_1 = PairF(n, eta, y);
   const double pair_f_y_2 = PairF(n, eta + y + z, y);
 
-  //const double pair_f_z_1 = PairFOptimized(n, eta, z);
-  //const double pair_f_z_2 = PairFOptimized(n, eta + y + z, z);
-  
-  //const double pair_f_z_1 = PairFInterpolated(kernel_pars, n, eta, z);
-  //const double pair_f_z_2 = PairFInterpolated(kernel_pars, eta + y + z, z);
-
   const double pair_f_z_1 = PairF(n, eta, z);
   const double pair_f_z_2 = PairF(n, eta + y + z, z);
+  */
+
+  // /*
+  const double pair_f_y_z_1 = PairFOptimized(n, eta, y + z);
+  const double pair_f_y_z_2 = PairFOptimized(n, eta + y + z, y + z);
+
+  const double pair_f_y_1 = PairFOptimized(n, eta, y);
+  const double pair_f_y_2 = PairFOptimized(n, eta + y + z, y);
+
+  const double pair_f_z_1 = PairFOptimized(n, eta, z);
+  const double pair_f_z_2 = PairFOptimized(n, eta + y + z, z);
+  // */
+
+  /*
+  const double pair_f_y_z_1 = PairFInterpolated(kernel_pars, n, eta, y + z);
+  const double pair_f_y_z_2 = PairFInterpolated(kernel_pars, eta + y + z, y + z);
+
+  const double pair_f_y_1 = PairFInterpolated(kernel_pars, n, eta, y);
+  const double pair_f_y_1 = PairFInterpolated(kernel_pars, eta + y + z, y);
+
+  const double pair_f_z_1 = PairFInterpolated(kernel_pars, n, eta, z);
+  const double pair_f_z_2 = PairFInterpolated(kernel_pars, eta + y + z, z);
+  */
+
 
   double pair_f_min_1 = (y > z) ? pair_f_z_1 : pair_f_y_1;
   double pair_f_max_1 = (y > z) ? pair_f_y_1 : pair_f_z_1;
@@ -481,12 +629,8 @@ double PairPsi(int l, double y, double z, double eta) {
   return result;
 }
 
-void PairPsiOptimized(PairKernelParams *kernel_pars, int l, double y, double z, double eta, double *psi_out) {
-
-  assert(0 <= l && l <= 3);
-
-  double a[4][12], c[4][3], d[4][3];
-
+// @TODO: compute only a coeffs needed for the specific l value
+void PairPsiCoeffs(double y, double z, double a[4][12], double c[4][3], double d[4][3]) {
   const double y2 = y * y;
   const double y3 = y * y2;
   const double y4 = y * y3;
@@ -558,12 +702,22 @@ void PairPsiOptimized(PairKernelParams *kernel_pars, int l, double y, double z, 
   d[3][1] = 4. * z2 * (3. * y3 + 24. * y2 * z + 130. * y * z2 / 3. + 200. * z3 / 9.) / (35. * y5);
   d[3][2] = -4. * z2 * (50. * z2 / 63. + 6. * z * y / 7. + 6. * y2 / 35.) / y5;
 
+  return;
+}
+
+void PairPsiOptimized(PairKernelParams *kernel_pars, int l, double y, double z, double eta, double *psi_out) {
+
+  assert(0 <= l && l <= 3);
+
+  double a_yz[4][12], c_yz[4][3], d_yz[4][3];
+  double a_zy[4][12], c_zy[4][3], d_zy[4][3];
+
+  PairPsiCoeffs(y, z, a_yz, c_yz, d_yz);
+  PairPsiCoeffs(z, y, a_zy, c_zy, d_zy);
+
   double aux;
-
   double result_y_z = 0., result_z_y = 0.;
-
   double pair_g_y, pair_g_z;
-
   double pair_g[4] = {0.};
 
 
@@ -571,19 +725,19 @@ void PairPsiOptimized(PairKernelParams *kernel_pars, int l, double y, double z, 
     PairGOptimized(kernel_pars, n, eta, y, z, pair_g);
     pair_g_y = pair_g[0]; //PairG(n, y, y + z, eta, y, z); // a = y, b = y + z
     pair_g_z = pair_g[1]; //PairG(n, z, y + z, eta, y, z); // a = z, b = y + z
-    result_y_z += c[l][n] * pair_g_y + d[l][n] * pair_g_z;
-    result_z_y += d[l][n] * pair_g_y + c[l][n] * pair_g_z;
+    result_y_z += c_yz[l][n] * pair_g_y + d_yz[l][n] * pair_g_z;
+    result_z_y += c_zy[l][n] * pair_g_z + d_zy[l][n] * pair_g_y;
   }
 
-  double min_yz = (y > z) ? z : y;
-  double max_yz = (y > z) ? y : z;
+  //double min_yz = (y > z) ? z : y;
+  //double max_yz = (y > z) ? y : z;
 
   for (int n = 3; n <= 2 * l + 5; n++) {
     PairGOptimized(kernel_pars, n, eta, y, z, pair_g);
-    aux = a[l][n] * (pair_g[2] - pair_g[3]);
+    aux = pair_g[2] - pair_g[3];
     //aux = a[l][n] * (PairG(n, 0, min_yz, eta, y, z) - PairG(n, max_yz, y + z, eta, y, z));
-    result_y_z += aux;
-    result_z_y += aux;
+    result_y_z += a_yz[l][n] * aux;
+    result_z_y += a_zy[l][n] * aux;
   }
   
   psi_out[0] = result_y_z; // Psi(y,z)
@@ -756,6 +910,44 @@ MyKernelQuantity PairKernelsM1Optimized(MyEOSParams *eos_pars, PairKernelParams 
       .abs_x = pair_kernel_absorption_x, .em_x = pair_kernel_production_x};
 
   return pair_kernel;
+
+}
+
+
+void PairKernelsM1Test(MyEOSParams *eos_pars, PairKernelParams *kernel_pars, MyKernelQuantity *out_for, MyKernelQuantity *out_inv) {
+  static const double kPairPhi = kGSqr / kPi;
+
+  // EOS specific parameters
+  double eta = eos_pars->mu_e / eos_pars->temp;
+  double temp = eos_pars->temp;
+
+  // kernel specific parameters
+  double omega = kernel_pars->omega;
+  double omega_prime = kernel_pars->omega_prime;
+
+  const double y = omega / temp;
+  const double z = omega_prime / temp;
+
+  const double phi_prefactor = 0.5 * kPairPhi * temp * temp;
+  const double phi_denom = 1. - exp(y + z);
+
+  double pair_psi[2] = {0.};
+
+  PairPsiOptimized(kernel_pars, 0, y, z, eta, pair_psi);
+
+  out_for->em_e = phi_prefactor * (kAlpha1[0] * kAlpha1[0] * pair_psi[0] + kAlpha2[0] * kAlpha2[0] * pair_psi[1]) / phi_denom;
+  out_for->em_x = phi_prefactor * (kAlpha1[1] * kAlpha1[1] * pair_psi[0] + kAlpha2[1] * kAlpha2[1] * pair_psi[1]) / phi_denom;
+
+  out_for->abs_e = SafeExp((omega + omega_prime) / temp) * out_for->em_e;
+  out_for->abs_x = SafeExp((omega + omega_prime) / temp) * out_for->em_x;
+
+  out_inv->em_e = phi_prefactor * (kAlpha1[0] * kAlpha1[0] * pair_psi[1] + kAlpha2[0] * kAlpha2[0] * pair_psi[0]) / phi_denom;
+  out_inv->em_x = phi_prefactor * (kAlpha1[1] * kAlpha1[1] * pair_psi[1] + kAlpha2[1] * kAlpha2[1] * pair_psi[0]) / phi_denom;
+
+  out_inv->abs_e = SafeExp((omega + omega_prime) / temp) * out_inv->em_e;
+  out_inv->abs_x = SafeExp((omega + omega_prime) / temp) * out_inv->em_x;
+
+  return;
 
 }
 

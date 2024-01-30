@@ -132,7 +132,7 @@ MyKernelOutput NESKernels(InelasticScattKernelParams *kernel_params, MyEOSParams
 
     const int sign = 2 * signbit(wp - w) - 1;
 
-    ComputeFDIForInelastic(w, wp, eta_e, fdi_diff_w, fdi_diff_abs);
+  ComputeFDIForInelastic(w, wp, eta_e, fdi_diff_w, fdi_diff_abs);
 
     output.abs[id_nue] = kNes * t * t * MezzacappaIntOut(w, wp, x, y, sign, kBPlus, kBZero, fdi_diff_w, fdi_diff_abs);
     output.abs[id_anue] = kNes * t * t * MezzacappaIntOut(w, wp, x, y, sign, kBZero, kBPlus, fdi_diff_w, fdi_diff_abs);
@@ -237,8 +237,6 @@ MyKernelOutput NPSKernels(InelasticScattKernelParams *kernel_params, MyEOSParams
     output.abs[idx] = output.abs[idx] * exp_factor;
     output.em[idx] = -output.em[idx] * exp_factor_exchanged;
   }
-
-  return output;
 }
 
 //Calculates the full in and out kernels
@@ -246,7 +244,7 @@ MyKernelOutput InelasticScattKernels(InelasticScattKernelParams *kernel_params, 
   MyKernelOutput nes_kernel = NESKernels(kernel_params, eos_params);
   MyKernelOutput nps_kernel = NPSKernels(kernel_params, eos_params);
 
-  MyKernelOutput tot_kernel = {0.};
+  MyKernelOutput tot_kernel = {0};
 
   for (int idx = 0; idx<total_num_species; idx++) {
     tot_kernel.em[idx] = nes_kernel.em[idx] + nps_kernel.em[idx];
@@ -254,4 +252,19 @@ MyKernelOutput InelasticScattKernels(InelasticScattKernelParams *kernel_params, 
   }
 
   return tot_kernel;
+}
+
+void CrossedInelasticScattKernels(InelasticScattKernelParams *kernel_params, MyEOSParams *eos_params, MyKernelOutput *out_1, MyKernelOutput *out_2) {
+
+  double omega = kernel_params->omega;
+  double omega_prime = kernel_params->omega_prime;
+
+  *out_1 = InelasticScattKernels(kernel_params, eos_params);
+
+  kernel_params->omega = omega_prime;
+  kernel_params->omega_prime = omega;
+
+  *out_2 = InelasticScattKernels(kernel_params, eos_params);
+
+  return;
 }

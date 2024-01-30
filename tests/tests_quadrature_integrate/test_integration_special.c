@@ -33,6 +33,7 @@ double ModifiedFermiDiracLegendre(double *x, void *p) {
 }
 
 MyKernelQuantity ModifiedFermiDiracLegendreSpecial(double *x, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params) {
+  (void)my_kernel_params;
   struct MyEOSParams *params = (struct MyEOSParams *) my_eos_params;
   int k = (params->nb);
   double eta = (params->mu_e);

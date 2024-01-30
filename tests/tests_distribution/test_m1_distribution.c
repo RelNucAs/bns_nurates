@@ -43,6 +43,7 @@ int main() {
     exit(1);
   }
 
+  __attribute__((unused))
   double energy_vals[] = {3.36092278, 4.28273982, 5.45738823, 6.9542133, 8.86158006, 11.2920898, 14.38922757, 18.33583276,
                           23.36489302, 29.77329872, 37.9393698, 48.34518991, 61.60506618, 78.50179483, 100.03287349, 127.46938843,
                           162.43105312, 206.98182789, 263.75176578, 336.09227757};
@@ -93,7 +94,7 @@ int main() {
     exit(1);
   }
   fputs(
-      "#w_t_nue temp_t_nue eta_t_nue w_f_nue temp_f_nue c_f_nue w_t_anue temp_t_anue eta_t_anue w_f_anue temp_f_anue c_f_anue w_t_nux temp_t_nux eta_t_nux w_f_nux temp_f_nux c_f_nux\n",
+      "#w_t_nue temp_t_nue eta_t_nue w_f_nue temp_f_nue c_f_nue beta_f_nue w_t_anue temp_t_anue eta_t_anue w_f_anue temp_f_anue c_f_anue beta_f_anue w_t_nux temp_t_nux eta_t_nux w_f_nux temp_f_nux c_f_nux beta_f_nux\n",
       fptr);
 
   for (i = 0; i < num_data; i++) {
@@ -110,16 +111,19 @@ int main() {
     my_grey_opacity_params.m1_pars.n[id_nux] = n_muon[i];
     my_grey_opacity_params.m1_pars.J[id_nux] = j_muon[i];
     my_grey_opacity_params.m1_pars.chi[id_nux] = chi_muon[i];
+    my_grey_opacity_params.m1_pars.n[id_anux] = n_muon[i];
+    my_grey_opacity_params.m1_pars.J[id_anux] = j_muon[i];
+    my_grey_opacity_params.m1_pars.chi[id_anux] = chi_muon[i];
 
     NuDistributionParams my_nudistributionparams = CalculateDistrParamsFromM1(&my_grey_opacity_params.m1_pars, &my_grey_opacity_params.eos_pars);
 
-    sprintf(fileline, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
+    sprintf(fileline, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
             my_nudistributionparams.w_t[id_nue], my_nudistributionparams.temp_t[id_nue], my_nudistributionparams.eta_t[id_nue], my_nudistributionparams.w_f[id_nue],
-            my_nudistributionparams.temp_f[id_nue], my_nudistributionparams.c_f[id_nue],
+            my_nudistributionparams.temp_f[id_nue], my_nudistributionparams.c_f[id_nue], my_nudistributionparams.beta_f[id_nue],
             my_nudistributionparams.w_t[id_anue], my_nudistributionparams.temp_t[id_anue], my_nudistributionparams.eta_t[id_anue], my_nudistributionparams.w_f[id_anue],
-            my_nudistributionparams.temp_f[id_anue], my_nudistributionparams.c_f[id_anue],
+            my_nudistributionparams.temp_f[id_anue], my_nudistributionparams.c_f[id_anue], my_nudistributionparams.beta_f[id_anue],
             my_nudistributionparams.w_t[id_nux], my_nudistributionparams.temp_t[id_nux], my_nudistributionparams.eta_t[id_nux], my_nudistributionparams.w_f[id_nux],
-            my_nudistributionparams.temp_f[id_nux], my_nudistributionparams.c_f[id_nux]);
+            my_nudistributionparams.temp_f[id_nux], my_nudistributionparams.c_f[id_nux], my_nudistributionparams.beta_f[id_nux]);
     fputs(fileline, fptr);
 
   }

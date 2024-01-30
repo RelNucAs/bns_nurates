@@ -11,6 +11,7 @@
 #include "../../include/integration.h"
 
 MyQuadratureIntegrand TestIntegrand(double *x, void *p) {
+  (void)p;
   MyQuadratureIntegrand result;
 
   result.integrand[0] = exp(-x[0]);
@@ -26,8 +27,6 @@ int main() {
   printf("==================================================\n");
   printf("Testing Multi-Function 1d integration routines ...\n");
   printf("==================================================\n");
-
-  double max_error = -42.;
 
   // function and parameters
   MyQuadratureIntegrand integrand_info = {.n = 4};

@@ -56,6 +56,7 @@ double FermiDiracLaguerreGSL(double x, void *p) {
 }
 
 double SimpleLaguerreFunc(double x, void *p) {
+  (void)p;
   return 1. / (x * x * exp(x));
 }
 

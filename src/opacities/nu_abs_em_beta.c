@@ -172,7 +172,9 @@ void AbsOpacitySingleLep(const double omega, OpacityParams *opacity_pars, MyEOSP
 
   // without detailed balance
   //out[0] = kAbsEmConst * etanp * (cap_term * (1. - fd_e) + dec_term * fd_p); // Neutrino absorptivity [s-1], Eq.(C13)
- 
+  //double mu_nue = (eos_pars->mu_e - eos_pars->mu_n + eos_pars->mu_p) / temp;
+  //out[0] = kAbsEmConst * etanp * cap_term / (1. + exp(eos_pars->mu_e / temp - FDI_p5(mu_nue)/FDI_p4(mu_nue)));
+
   cap_term = 0.;
   dec_term = 0.;
 
@@ -216,7 +218,7 @@ void AbsOpacitySingleLep(const double omega, OpacityParams *opacity_pars, MyEOSP
  * @TODO: add support for muons
  */
 MyOpacity AbsOpacity(const double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
-  MyOpacity MyOut = {0.0}; // initialize to zero
+  MyOpacity MyOut = {0}; // initialize to zero
 
   // Electron (anti)neutrino
   double el_out[4] = {0.0};
@@ -251,14 +253,43 @@ MyOpacity AbsOpacity(const double omega, OpacityParams *opacity_pars, MyEOSParam
  */
 MyOpacity StimAbsOpacity(const double omega, OpacityParams *opacity_pars, MyEOSParams *eos_pars) {
   MyOpacity abs_opacity = AbsOpacity(omega, opacity_pars, eos_pars);
-  MyOpacity stim_abs_opacity = {
-      .em[id_nue]  = abs_opacity.em[id_nue],
-      .abs[id_nue]  = abs_opacity.abs[id_nue] + abs_opacity.em[id_nue],
-      .em[id_anue] = abs_opacity.em[id_anue],
-      .abs[id_anue] = abs_opacity.abs[id_anue] + abs_opacity.em[id_anue],
-      .abs[id_nux] = 0.,
-      .em[id_nux] = 0.
-  };
+  
+  abs_opacity.abs[id_nue] = abs_opacity.abs[id_nue] + abs_opacity.em[id_nue];
+  abs_opacity.abs[id_anue] = abs_opacity.abs[id_anue] + abs_opacity.em[id_anue];
 
-  return stim_abs_opacity;
+  return abs_opacity;
+}
+
+
+void BetaOpacitiesTable(MyQuadrature *quad, MyEOSParams *eos_pars, OpacityParams *opacity_pars, double t, M1Matrix *out) {
+  const int n = quad->nx;
+
+  double nu;
+
+  MyOpacity beta_1, beta_2;
+
+  for (int idx = 0; idx < total_num_species; idx++) {
+    out->m1_mat_ab[idx] = (double **) malloc(sizeof(double *));
+    out->m1_mat_em[idx] = (double **) malloc(sizeof(double *));
+
+    out->m1_mat_ab[idx][0] = (double *) malloc(sizeof(double) * 2 * n);
+    out->m1_mat_em[idx][0] = (double *) malloc(sizeof(double) * 2 * n);
+  }
+
+  for (int i = 0; i < n; i++) {
+    
+    beta_1 = StimAbsOpacity(t * quad->points[i], opacity_pars, eos_pars);
+    beta_2 = StimAbsOpacity(t / quad->points[i], opacity_pars, eos_pars);
+
+    for (int idx = 0; idx < total_num_species; idx ++) {
+      out->m1_mat_ab[idx][0][i] = beta_1.abs[idx];
+      out->m1_mat_em[idx][0][i] = beta_1.em[idx];
+
+      out->m1_mat_ab[idx][0][n+i] = beta_2.abs[idx];
+      out->m1_mat_em[idx][0][n+i] = beta_2.em[idx];    
+    }
+      
+  }
+
+  return;
 }

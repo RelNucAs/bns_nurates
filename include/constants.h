@@ -35,7 +35,8 @@ static const double kPi = 3.1415926535898;         //  acos(static_cast<double>(
 
 // Physical constants
 static const double kHbar = 6.582119569e-22;       // [MeV s]
-static const double kH = 2. * kPi * kHbar;         // [MeV s]
+static const double kH = 4.1356943e-21;            // [MeV s]
+//static const double kH = 2. * kPi * kHbar;         // [MeV s]
 static const double kClight = 2.997924562e+10;     // [cm s^-1]
 static const double kHClight = kH * kClight;       // [MeV cm]
 static const double kHbarClight = kHbar * kClight; // [MeV cm]

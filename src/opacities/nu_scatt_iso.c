@@ -94,6 +94,7 @@ double IsoScattNucleon(const double omega, OpacityParams *opacity_pars, MyEOSPar
   }
 
   return etaNN * (leg_0 - leg_1 / 3.); // "Eq.(A41)" [MeV cm^3 s-1]
+  //return nb * yN * (leg_0 - leg_1 / 3.); // "Eq.(A41)" [MeV cm^3 s-1]
 }
 
 /**

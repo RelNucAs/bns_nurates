@@ -15,8 +15,9 @@
 #define id_nue  0
 #define id_anue 1
 #define id_nux  2
+#define id_anux 3
 
-#define total_num_species 3
+#define total_num_species 4
 
 // Define dimension of tabulated PairT function
 #define dim_pair_t 10000
@@ -67,6 +68,7 @@ struct MyQuadrature {
   double *w;              // weights for the quadrature scheme (store points in the points direction, then y and z in one flat array)
 };
 typedef struct MyQuadrature MyQuadrature;
+__attribute__((unused))
 static MyQuadrature quadrature_default = {.type=kGauleg, .dim=1, .nx=55, .ny=1, .nz=1, .alpha=0., .x1=0., .x2=1., .y1=-42., .y2=-42., .z1=-42., .z2=-42.};
 
 /* MyFunction struct
@@ -90,7 +92,7 @@ typedef struct MyFunction MyFunction;
  */
 struct MyQuadratureIntegrand {
   int n;                  // number of integrands/integrals
-  double integrand[12];   // values of integrands/integrals (max: 12)
+  double integrand[16];   // values of integrands/integrals (max: 16)
 };
 typedef struct MyQuadratureIntegrand MyQuadratureIntegrand;
 
@@ -242,7 +244,9 @@ struct OpacityParams {
   bool use_decay;   // flag for inclusion of nucleon decay rates
 };
 typedef struct OpacityParams OpacityParams;
+__attribute__((unused))
 static OpacityParams opacity_params_default_all = {.use_dU = true, .use_dm_eff = true, .use_WM_ab = true, .use_WM_sc = true};
+__attribute__((unused))
 static OpacityParams opacity_params_default_none = {.use_dU = false, .use_dm_eff = false, .use_WM_ab = false, .use_WM_sc = false};
 
 /* ==================================================================================
@@ -295,7 +299,9 @@ struct OpacityFlags {
   int use_iso;
 };
 typedef struct OpacityFlags OpacityFlags;
+__attribute__((unused))
 static OpacityFlags opacity_flags_default_all = {.use_abs_em = 1., .use_pair = 1., .use_brem = 1., .use_inelastic_scatt = 1., .use_iso = 1.};
+__attribute__((unused))
 static OpacityFlags opacity_flags_default_none = {.use_abs_em = 0., .use_pair = 0., .use_brem = 0., .use_inelastic_scatt = 0., .use_iso = 0.};
 
 /* GreyOpacityParams struct
@@ -330,6 +336,20 @@ struct M1Opacities {
   double kappa_s[total_num_species];     // scattering coefficient
 };
 typedef struct M1Opacities M1Opacities;
+
+
+/* M1Matrix struct
+ *
+ * Stores quantities related to the computation of M1 source
+ * coefficients in 2D matrix form
+ */
+
+struct M1Matrix {
+  double **m1_mat_em[total_num_species];
+  double **m1_mat_ab[total_num_species];
+};
+typedef struct M1Matrix M1Matrix;
+
 
 /* SpectralOpacities struct
  *

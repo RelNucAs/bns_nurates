@@ -62,4 +62,7 @@ MyQuadratureIntegrand NuNumber(NuDistributionParams *distr_pars);
 // Neutrino energy density
 MyQuadratureIntegrand NuEnergy(NuDistributionParams *distr_pars);
 
+// number and energy density for equilibrium
+MyQuadratureIntegrand ComputeM1DensitiesEq(MyEOSParams *eos_params, NuDistributionParams *nu_distribution_params);
+
 #endif //BNS_NURATES_SRC_DISTRIBUTION_DISTRIBUTION_H_

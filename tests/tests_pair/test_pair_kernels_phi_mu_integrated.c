@@ -39,7 +39,6 @@ int main() {
       {1, 8.4181299999999997, 50, 50, 0, 7.995294986861833e-37, 1.7610809154750178e-32}
   };
   double prefactor_correction = (kClight * pow(kH * kClight, 3.));
-  double pair_kernels[18][7];
 
   printf("=======================================================================================\n");
   printf("Pair process: Comparison of pair kernels, integrated pair kernels and old Python result\n");
