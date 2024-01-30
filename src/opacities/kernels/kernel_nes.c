@@ -18,14 +18,28 @@
 #include "functions.h"
 #include "constants.h"
 
-#define kSinWeinbergThetaSquared  0.2229
+//Numerical constants
+//---------------------------------------------------------------------------------------------------------------------
+static const double kTaylorSeriesEpsilon = 1e-3;
 
+
+//Physical constats
+//---------------------------------------------------------------------------------------------------------------------
+static const double kSinWeinbergThetaSquared = 0.2229;
 static const double kNes = 2. * kGf0 * kGf0 * kClight * kHbarClight * kHbarClight/ (3. * kPi);
+static const double kBPlus = (2. * kSinWeinbergThetaSquared + 1.) * (2. * kSinWeinbergThetaSquared + 1.);
+static const double kBMinus = (2. * kSinWeinbergThetaSquared - 1.) * (2. * kSinWeinbergThetaSquared - 1.);
+static const double kBZero = 4. * kSinWeinbergThetaSquared * kSinWeinbergThetaSquared;
 
-double kBPlus = (2. * kSinWeinbergThetaSquared + 1.) * (2. * kSinWeinbergThetaSquared + 1.);
-double kBMinus = (2. * kSinWeinbergThetaSquared - 1.) * (2. * kSinWeinbergThetaSquared - 1.);
-double kBZero = 4. * kSinWeinbergThetaSquared * kSinWeinbergThetaSquared;
+//Calculates in a safe way the exponential 
+double KernelExpFunc(double x){
+  const double exp_ = SafeExp(-fabs(x));
+  const int is_x_neg = signbit(x);
 
+  return (is_x_neg - !is_x_neg * exp_) / (1. - exp_ + (x == 0.));
+}
+
+//Saves the expression that are needed for the unapproximated integral 
 void ComputeFDIForInelastic(double w, double wp, double eta, double* fdi_diff_w, double* fdi_diff_abs){
   double abs_val = fabs(w - wp);
 
@@ -40,95 +54,194 @@ void ComputeFDIForInelastic(double w, double wp, double eta, double* fdi_diff_w,
   fdi_diff_abs[2] = FDI_p5(eta) - FDI_p5(eta - abs_val);
 }
 
-double MezzacappaIntOut(double w, double wp, double b1, double b2, double* fdi_diff_w, double* fdi_diff_abs)
+//Functions that calculates the kernel integral
+//=========================================================================================================================================
+
+//Not approximated out kernel integral
+double MezzacappaIntOut(double w, double wp, double x, double y, int sign, double b1, double b2, double* fdi_diff_w, double* fdi_diff_abs)
 {
-    const int sign = 2 * signbit(wp - w) - 1;
-        
-    const double x = fmax(w, wp), y = fmin(w, wp);
+  return (
+    (
+      (b1 + b2) * ( sign * fdi_diff_abs[2] - fdi_diff_w[4] ) * 0.2 // All G5 terms
 
-    return
-        (
-            (b1 + b2) * (sign * fdi_diff_abs[2] - fdi_diff_w[4]) * 0.2 // All G5 terms
+      - b1 * (w + wp) * (
 
-            - b1 * (w + wp) * (fdi_diff_w[3] + 2. * (w + wp) * fdi_diff_w[2]) // G4(eta - wp) + G3(eta - wp) term
+        fdi_diff_w[3]
 
-            - 6. * b1 * w * wp * ((w + wp) * fdi_diff_w[1] + w * wp * fdi_diff_w[0]) // G2(eta - wp) + G1(eta - wp) term
+        + 2. * ( (w + wp) * fdi_diff_w[2] + 3. * w * wp * fdi_diff_w[1] )
+                  
+      ) // G4(eta - wp) + G3(eta - wp) term
 
-            + sign * ((b1 * x - b2 * y) * fdi_diff_abs[1] + 2. * (b1 * x * x + b2 * y * y) * fdi_diff_abs[0]) // G4(eta) + G3(eta) terms
-            ) / ((1 - SafeExp(wp - w)) * w * w * wp * wp + (wp == w));
+      + sign * (
+        (b1 * x - b2 * y) * fdi_diff_abs[1] + 2. * (b1 * x * x + b2 * y * y) * fdi_diff_abs[0]
+      )
+    ) / (w * w * wp * wp)
+
+    - 6. * b1 * fdi_diff_w[0]
+    );
 }
 
-double MezzacappaIntIn(double w, double wp, double b1, double b2, double* fdi_diff_w, double* fdi_diff_abs)
+//Taylor expansion in the lowest energy of the function MezzacappaIntOut and MezzacappaIntIn
+double MezzacappaIntOneEnergy(double w, double wp, double x, double y, int sign, double b1, double b2, double* fdis)
 {
-    const int sign = 2 * signbit(w - wp) - 1;
-        
-    const double x = fmax(w, wp), y = fmin(w, wp);
+  return - sign * y * (
+            2. * (b1 + b2) * fdis[0]
 
-    //printf("lib: %.10e %.10e %.10e %.10e %.10e\n", w, wp, b1, b2, eta);
+            + (b1 * (y + 4. * x) + 3. * b2 * y) * fdis[1]
+            
+            + (b1 * (3. * y - 4. * x) + b2 * y) * fdis[2]
 
-    return
-        (
-            (b1 + b2) * (sign * fdi_diff_abs[2] + fdi_diff_w[4]) * 0.2 // All G5 terms
+            + ((b1 + 6. * b2) * y * y * 0.2 + b1 * x * y + 2. * b1 * x * x) * fdis[3]
 
-            + b1 * (w + wp) * (fdi_diff_w[3] + 2. * (w + wp) * fdi_diff_w[2]) // G4(eta - wp) + G3(eta - wp) term
-
-            + 6. * b1 * w * wp * ((w + wp) * fdi_diff_w[1] + w * wp * fdi_diff_w[0]) // G2(eta - wp) + G1(eta - wp) term
-
-            + sign * ((b1 * x - b2 * y) * fdi_diff_abs[1] + 2. * (b1 * x * x + b2 * y * y) * fdi_diff_abs[0]) // G4(eta) + G3(eta) terms
-            ) / ((1 - SafeExp(w - wp)) * w * w * wp * wp + (wp == w));
+            - ((6. * b1 + b2) * y * y * 0.2 - 3. * b1 * x * y + 2. * b1 * x * x) * fdis[4]
+        ) / (x * x);
 }
 
+//Taylor expansion in both energies of the function MezzacappaIntOut and MezzacappaIntIn
+double MezzacappaIntTwoEnergies(double w, double wp, double x, double y, double b1, double b2, double* fdis)
+{
+  return y * (w - wp) * (
+            (b1 + b2) * (
+                4. * fdis[2]
+                
+                + fdis[0] * (11. * y * y - 25. * x * y + 20. * x * x) / 30.
+            )
+
+            + (b1 - b2) * (2. * x - y) * fdis[1]
+        ) / (x * x);
+}
+
+//Functions for kernel calculation
+//===================================================================================================
+
+//Calculates and saves the neutrino electron scattering in and out kernel for every neutrino species
 MyKernelOutput NESKernels(InelasticScattKernelParams *kernel_params, MyEOSParams *eos_params)
 {
   const double t = eos_params -> temp, w = kernel_params -> omega / t,
-    wp = kernel_params -> omega_prime / t;
-
-  const double eta_e = eos_params -> mu_e / t;
+    wp = kernel_params -> omega_prime / t,
+    x = fmax(w, wp),
+    y = fmin(w, wp),
+    eta_e = eos_params -> mu_e / t,
+    exp_factor = KernelExpFunc(wp - w),
+    exp_factor_exchanged = KernelExpFunc(w - wp);
 
   MyKernelOutput output;
 
-  double fdi_diff_abs[3], fdi_diff_w[5];
+  if(y > eta_e * kTaylorSeriesEpsilon){
+    double fdi_diff_abs[3], fdi_diff_w[5];
 
-  ComputeFDIForInelastic(w, wp, eta_e, fdi_diff_w, fdi_diff_abs);
+    const int sign = 2 * signbit(wp - w) - 1;
 
-  output.abs[id_nue] = kNes * t * t * MezzacappaIntOut(w, wp, kBPlus, kBZero, fdi_diff_w, fdi_diff_abs);
-  output.abs[id_anue] = kNes * t * t * MezzacappaIntOut(w, wp, kBZero, kBPlus, fdi_diff_w, fdi_diff_abs);
-  output.abs[id_nux] = kNes * t * t * MezzacappaIntOut(w, wp, kBMinus, kBZero, fdi_diff_w, fdi_diff_abs);
-  //output.abs[id_anux] = kNes * MezzacappaIntOut(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs); @TODO: extend library for including anux
+    ComputeFDIForInelastic(w, wp, eta_e, fdi_diff_w, fdi_diff_abs);
 
-  output.em[id_nue] = kNes * t * t * MezzacappaIntIn(w, wp, kBPlus, kBZero, fdi_diff_w, fdi_diff_abs);
-  output.em[id_anue] = kNes * t * t * MezzacappaIntIn(w, wp, kBZero, kBPlus, fdi_diff_w, fdi_diff_abs);
-  output.em[id_nux] = kNes * t * t * MezzacappaIntIn(w, wp, kBMinus, kBZero, fdi_diff_w, fdi_diff_abs);
-  //output.em[id_anux] = kNes * MezzacappaIntIn(wp, w, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs); @TODO: extend library for including anux
+    output.abs[id_nue] = kNes * t * t * MezzacappaIntOut(w, wp, x, y, sign, kBPlus, kBZero, fdi_diff_w, fdi_diff_abs);
+    output.abs[id_anue] = kNes * t * t * MezzacappaIntOut(w, wp, x, y, sign, kBZero, kBPlus, fdi_diff_w, fdi_diff_abs);
+    output.abs[id_nux] = kNes * t * t * MezzacappaIntOut(w, wp, x, y, sign, kBMinus, kBZero, fdi_diff_w, fdi_diff_abs);
+    //output.abs[id_anux] = kNes * MezzacappaIntOut(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs); @TODO: extend library for including anux
+  }
+  else if (x > eta_e * kTaylorSeriesEpsilon){
+    const int sign = 2 * signbit(wp - w) - 1;
+
+    const double fdis[5] = {
+      FDI_p2(eta_e - x) - FDI_p2(eta_e),
+      FDI_p1(eta_e - x),
+      FDI_p1(eta_e),
+      FDI_0(eta_e - x) + y * FermiDistr(0.,1.,eta_e - x) / 6.,
+      FDI_0(eta_e) - y * FermiDistr(0.,1.,eta_e) / 6.
+    };
+
+    output.abs[id_nue] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBPlus, kBZero, fdis);
+    output.abs[id_anue] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBZero, kBPlus, fdis);
+    output.abs[id_nux] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBMinus, kBZero, fdis);
+    //output.abs[id_anux] = kNes * MezzacappaIntOut(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs); @TODO: extend library for including anux
+  } 
+  else{
+    const double fdis[3] = {
+      FermiDistr(0., 1., eta_e),
+      FDI_0(eta_e),
+      FDI_p1(eta_e)
+    };
+
+    output.abs[id_nue] = kNes * t * t * MezzacappaIntTwoEnergies(w, wp, x, y, kBPlus, kBZero, fdis);
+    output.abs[id_anue] = kNes * t * t * MezzacappaIntTwoEnergies(w, wp, x, y, kBZero, kBPlus, fdis);
+    output.abs[id_nux] = kNes * t * t * MezzacappaIntTwoEnergies(w, wp, x, y, kBMinus, kBZero, fdis);
+    //output.abs[id_anux] = kNes * MezzacappaIntOut(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs); @TODO: extend library for including anux
+  }
+
+  for(int idx=0; idx<total_num_species; ++idx)
+  {
+    output.em[idx] = output.abs[idx];
+    output.abs[idx] = output.abs[idx] * exp_factor;
+    output.em[idx] = -output.em[idx] * exp_factor_exchanged;
+  }
 
   return output;
 }
 
+//Calculates and saves the neutrino positron scattering in and out kernel for every neutrino species
 MyKernelOutput NPSKernels(InelasticScattKernelParams *kernel_params, MyEOSParams *eos_params) {
   const double t = eos_params -> temp, w = kernel_params -> omega / t,
-    wp = kernel_params -> omega_prime / t;
-
-  const double eta_p = - eos_params -> mu_e / t;
+    wp = kernel_params -> omega_prime / t,
+    x = fmax(w, wp),
+    y = fmin(w, wp),
+    eta_p = -eos_params -> mu_e / t,
+    exp_factor = KernelExpFunc(wp - w),
+    exp_factor_exchanged = KernelExpFunc(w - wp);
 
   MyKernelOutput output;
 
-  double fdi_diff_abs[3], fdi_diff_w[5];
+  if(y > eta_p * kTaylorSeriesEpsilon){
+    double fdi_diff_abs[3], fdi_diff_w[5];
 
-  ComputeFDIForInelastic(w, wp, eta_p, fdi_diff_w, fdi_diff_abs);
+    const int sign = 2 * signbit(wp - w) - 1;
 
-  output.abs[id_nue] = kNes * t * t * MezzacappaIntOut(w, wp, kBZero, kBPlus, fdi_diff_w, fdi_diff_abs);
-  output.abs[id_anue] = kNes * t * t * MezzacappaIntOut(w, wp, kBPlus, kBZero, fdi_diff_w, fdi_diff_abs);
-  output.abs[id_nux] = kNes * t * t * MezzacappaIntOut(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs);
-  //output.abs[id_anux] = kNes * MezzacappaIntOut(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs); @TODO: extend library for including anux
+    ComputeFDIForInelastic(w, wp, eta_p, fdi_diff_w, fdi_diff_abs);
 
-  output.em[id_nue] = kNes * t * t * MezzacappaIntIn(w, wp, kBZero, kBPlus, fdi_diff_w, fdi_diff_abs);
-  output.em[id_anue] = kNes * t * t * MezzacappaIntIn(w, wp, kBPlus, kBZero, fdi_diff_w, fdi_diff_abs);
-  output.em[id_nux] = kNes * t * t * MezzacappaIntIn(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs);
-  //output.em[id_anux] = kNes * MezzacappaIntIn(wp, w, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs); @TODO: extend library for including anux
+    output.abs[id_nue] = kNes * t * t * MezzacappaIntOut(w, wp, x, y, sign, kBZero, kBPlus, fdi_diff_w, fdi_diff_abs);
+    output.abs[id_anue] = kNes * t * t * MezzacappaIntOut(w, wp, x, y, sign, kBPlus, kBZero, fdi_diff_w, fdi_diff_abs);
+    output.abs[id_nux] = kNes * t * t * MezzacappaIntOut(w, wp, x, y, sign, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs);
+    //output.abs[id_anux] = kNes * MezzacappaIntOut(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs); @TODO: extend library for including anux
+  }
+  else if (x > eta_p * kTaylorSeriesEpsilon){
+    const int sign = 2 * signbit(wp - w) - 1;
+
+    const double fdis[5] = {
+      FDI_p2(eta_p - x) - FDI_p2(eta_p),
+      FDI_p1(eta_p - x),
+      FDI_p1(eta_p),
+      FDI_0(eta_p - x) + y * FermiDistr(0.,1.,eta_p - x) / 6.,
+      FDI_0(eta_p) - y * FermiDistr(0.,1.,eta_p) / 6.
+    };
+
+    output.abs[id_nue] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBZero, kBPlus, fdis);
+    output.abs[id_anue] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBPlus, kBZero, fdis);
+    output.abs[id_nux] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBZero, kBMinus, fdis);
+    //output.abs[id_anux] = kNes * MezzacappaIntOut(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs); @TODO: extend library for including anux
+  } 
+  else{
+    const double fdis[3] = {
+      FermiDistr(0., 1., eta_p),
+      FDI_0(eta_p),
+      FDI_p1(eta_p)
+    };
+
+    output.abs[id_nue] = kNes * t * t * MezzacappaIntTwoEnergies(w, wp, x, y,  kBZero, kBPlus, fdis);
+    output.abs[id_anue] = kNes * t * t * MezzacappaIntTwoEnergies(w, wp, x, y, kBPlus,  kBZero, fdis);
+    output.abs[id_nux] = kNes * t * t * MezzacappaIntTwoEnergies(w, wp, x, y,  kBZero, kBMinus, fdis);
+    //output.abs[id_anux] = kNes * MezzacappaIntOut(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs); @TODO: extend library for including anux
+  }
+
+  for(int idx=0; idx<total_num_species; ++idx)
+  {
+    output.em[idx] = output.abs[idx];
+    output.abs[idx] = output.abs[idx] * exp_factor;
+    output.em[idx] = -output.em[idx] * exp_factor_exchanged;
+  }
 
   return output;
 }
 
+//Calculates the full in and out kernels
 MyKernelOutput InelasticScattKernels(InelasticScattKernelParams *kernel_params, MyEOSParams *eos_params) {
   MyKernelOutput nes_kernel = NESKernels(kernel_params, eos_params);
   MyKernelOutput nps_kernel = NPSKernels(kernel_params, eos_params);
