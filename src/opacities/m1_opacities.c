@@ -542,14 +542,14 @@ MyQuadratureIntegrand SpectralIntegrand(double *var, void *p) {
   pro_term[id_nue] = (pair_kernels_m1.em_e + brem_kernels_m1.em[id_nue]) * (1. - g_nu[id_anue]) + inelastic_kernels_m1.em[id_nue] * g_nu[id_nue];
   pro_term[id_anue] = (pair_kernels_m1.em_e + brem_kernels_m1.em[id_anue]) * (1. - g_nu[id_nue]) + inelastic_kernels_m1.em[id_anue] * g_nu[id_anue];
   pro_term[id_nux] = (pair_kernels_m1.em_x + brem_kernels_m1.em[id_nux]) * (1. - g_nu[id_anux]) + inelastic_kernels_m1.em[id_nux] * g_nu[id_nux];
-  pro_term[id_anux] = (pair_kernels_m1.em_x + brem_kernels_m1.em[id_anux]) * (1. - g_nu[id_nux]) + inelastic_kernels_m1.em[id_nux] * g_nu[id_anux];
+  pro_term[id_anux] = (pair_kernels_m1.em_x + brem_kernels_m1.em[id_anux]) * (1. - g_nu[id_nux]) + inelastic_kernels_m1.em[id_anux] * g_nu[id_anux];
 
   double ann_term[total_num_species];
 
   ann_term[id_nue] = (pair_kernels_m1.abs_e + brem_kernels_m1.abs[id_nue]) * g_nu[id_anue] + inelastic_kernels_m1.abs[id_nue] * (1. - g_nu[id_nue]);
   ann_term[id_anue] = (pair_kernels_m1.abs_e + brem_kernels_m1.abs[id_anue]) * g_nu[id_nue] + inelastic_kernels_m1.abs[id_anue] * (1. - g_nu[id_anue]);
   ann_term[id_nux] = (pair_kernels_m1.abs_x + brem_kernels_m1.abs[id_nux]) * g_nu[id_anux] + inelastic_kernels_m1.abs[id_nux] * (1. - g_nu[id_nux]);
-  ann_term[id_anux] = (pair_kernels_m1.abs_x + brem_kernels_m1.abs[id_anux]) * g_nu[id_nux] + inelastic_kernels_m1.abs[id_nux] * (1. - g_nu[id_anux]);
+  ann_term[id_anux] = (pair_kernels_m1.abs_x + brem_kernels_m1.abs[id_anux]) * g_nu[id_nux] + inelastic_kernels_m1.abs[id_anux] * (1. - g_nu[id_anux]);
 
   double integrand_1[total_num_species], integrand_2[total_num_species];
 
@@ -594,7 +594,7 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulated(const double nu, MyQuadr
 
   double s[8];
   for (int i = 0; i < 8; i++) {
-    s[i] = 1.5 * my_grey_opacity_params->eos_pars.temp;
+    s[i] = nu;
   }
 
   my_grey_opacity_params->kernel_pars.pair_kernel_params.omega = nu;

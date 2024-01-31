@@ -137,7 +137,7 @@ MyKernelOutput NESKernels(InelasticScattKernelParams *kernel_params, MyEOSParams
     output.abs[id_nue] = kNes * t * t * MezzacappaIntOut(w, wp, x, y, sign, kBPlus, kBZero, fdi_diff_w, fdi_diff_abs);
     output.abs[id_anue] = kNes * t * t * MezzacappaIntOut(w, wp, x, y, sign, kBZero, kBPlus, fdi_diff_w, fdi_diff_abs);
     output.abs[id_nux] = kNes * t * t * MezzacappaIntOut(w, wp, x, y, sign, kBMinus, kBZero, fdi_diff_w, fdi_diff_abs);
-    //output.abs[id_anux] = kNes * MezzacappaIntOut(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs); @TODO: extend library for including anux
+    output.abs[id_anux] = kNes * t * t * MezzacappaIntOut(w, wp, x, y, sign, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs);
   }
   else if (x > eta_e * kTaylorSeriesEpsilon){
     const int sign = 2 * signbit(wp - w) - 1;
@@ -153,7 +153,7 @@ MyKernelOutput NESKernels(InelasticScattKernelParams *kernel_params, MyEOSParams
     output.abs[id_nue] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBPlus, kBZero, fdis);
     output.abs[id_anue] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBZero, kBPlus, fdis);
     output.abs[id_nux] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBMinus, kBZero, fdis);
-    //output.abs[id_anux] = kNes * MezzacappaIntOut(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs); @TODO: extend library for including anux
+    output.abs[id_anux] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBZero, kBMinus, fdis);
   } 
   else{
     const double fdis[3] = {
@@ -165,7 +165,7 @@ MyKernelOutput NESKernels(InelasticScattKernelParams *kernel_params, MyEOSParams
     output.abs[id_nue] = kNes * t * t * MezzacappaIntTwoEnergies(w, wp, x, y, kBPlus, kBZero, fdis);
     output.abs[id_anue] = kNes * t * t * MezzacappaIntTwoEnergies(w, wp, x, y, kBZero, kBPlus, fdis);
     output.abs[id_nux] = kNes * t * t * MezzacappaIntTwoEnergies(w, wp, x, y, kBMinus, kBZero, fdis);
-    //output.abs[id_anux] = kNes * MezzacappaIntOut(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs); @TODO: extend library for including anux
+    output.abs[id_anux] = kNes * t * t * MezzacappaIntTwoEnergies(w, wp, x, y, kBZero, kBMinus, fdis);
   }
 
   for(int idx=0; idx<total_num_species; ++idx)
@@ -200,7 +200,7 @@ MyKernelOutput NPSKernels(InelasticScattKernelParams *kernel_params, MyEOSParams
     output.abs[id_nue] = kNes * t * t * MezzacappaIntOut(w, wp, x, y, sign, kBZero, kBPlus, fdi_diff_w, fdi_diff_abs);
     output.abs[id_anue] = kNes * t * t * MezzacappaIntOut(w, wp, x, y, sign, kBPlus, kBZero, fdi_diff_w, fdi_diff_abs);
     output.abs[id_nux] = kNes * t * t * MezzacappaIntOut(w, wp, x, y, sign, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs);
-    //output.abs[id_anux] = kNes * MezzacappaIntOut(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs); @TODO: extend library for including anux
+    output.abs[id_anux] = kNes * t * t * MezzacappaIntOut(w, wp, x, y, sign, kBMinus, kBZero, fdi_diff_w, fdi_diff_abs);
   }
   else if (x > eta_p * kTaylorSeriesEpsilon){
     const int sign = 2 * signbit(wp - w) - 1;
@@ -216,7 +216,7 @@ MyKernelOutput NPSKernels(InelasticScattKernelParams *kernel_params, MyEOSParams
     output.abs[id_nue] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBZero, kBPlus, fdis);
     output.abs[id_anue] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBPlus, kBZero, fdis);
     output.abs[id_nux] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBZero, kBMinus, fdis);
-    //output.abs[id_anux] = kNes * MezzacappaIntOut(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs); @TODO: extend library for including anux
+    output.abs[id_anux] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBMinus, kBZero, fdis);
   } 
   else{
     const double fdis[3] = {
@@ -228,7 +228,7 @@ MyKernelOutput NPSKernels(InelasticScattKernelParams *kernel_params, MyEOSParams
     output.abs[id_nue] = kNes * t * t * MezzacappaIntTwoEnergies(w, wp, x, y,  kBZero, kBPlus, fdis);
     output.abs[id_anue] = kNes * t * t * MezzacappaIntTwoEnergies(w, wp, x, y, kBPlus,  kBZero, fdis);
     output.abs[id_nux] = kNes * t * t * MezzacappaIntTwoEnergies(w, wp, x, y,  kBZero, kBMinus, fdis);
-    //output.abs[id_anux] = kNes * MezzacappaIntOut(w, wp, kBZero, kBMinus, fdi_diff_w, fdi_diff_abs); @TODO: extend library for including anux
+    output.abs[id_anux] = kNes * t * t * MezzacappaIntTwoEnergies(w, wp, x, y, kBMinus, kBZero, fdis);
   }
 
   for(int idx=0; idx<total_num_species; ++idx)
@@ -237,6 +237,8 @@ MyKernelOutput NPSKernels(InelasticScattKernelParams *kernel_params, MyEOSParams
     output.abs[idx] = output.abs[idx] * exp_factor;
     output.em[idx] = -output.em[idx] * exp_factor_exchanged;
   }
+
+  return output;
 }
 
 //Calculates the full in and out kernels
