@@ -36,13 +36,14 @@ void PairTInterpolated(PairKernelParams *kernel_pars, double alpha, double *out)
 double PairTFitted(int l, double alpha);
 double PairT(int l, double alpha, double tolerance);
 double PairF(int k, double eta, double x1);
+double PairFBackup(int k, double eta, double x1);
 double PairG(int n, double a, double b, double eta, double y, double z);
 double PairPsi(int l, double y, double z, double eta);
 double PairPhi(int l, double omega, double omega_prime, double eta, double temp, int e_x);
 MyKernelQuantity PairKernels(MyEOSParams *eos_pars, PairKernelParams *kernel_pars);
 MyKernelQuantity PairKernelsM1(MyEOSParams *eos_pars, PairKernelParams *kernel_pars);
-MyKernelQuantity PairKernelsM1Optimized(MyEOSParams *eos_pars, PairKernelParams *kernel_pars);
-void PairKernelsM1Test(MyEOSParams *eos_pars, PairKernelParams *kernel_pars, MyKernelQuantity *out_for, MyKernelQuantity *out_inv);
+MyKernelOutput PairKernelsOptimized(MyEOSParams *eos_pars, PairKernelParams *kernel_pars);
+void PairKernelsM1Test(MyEOSParams *eos_pars, PairKernelParams *kernel_pars, MyKernelOutput *out_for, MyKernelOutput *out_inv);
 MyKernelQuantity PairKernelsPhiMuIntegrated(MyEOSParams *eos_pars, PairKernelParams *kernel_pars);
 
 // End of pair process kernel

@@ -69,7 +69,7 @@ struct MyQuadrature {
 };
 typedef struct MyQuadrature MyQuadrature;
 __attribute__((unused))
-static MyQuadrature quadrature_default = {.type=kGauleg, .dim=1, .nx=55, .ny=1, .nz=1, .alpha=0., .x1=0., .x2=1., .y1=-42., .y2=-42., .z1=-42., .z2=-42.};
+static MyQuadrature quadrature_default = {.type=kGauleg, .dim=1, .nx=20, .ny=1, .nz=1, .alpha=0., .x1=0., .x2=1., .y1=-42., .y2=-42., .z1=-42., .z2=-42.};
 
 /* MyFunction struct
  *
@@ -242,12 +242,13 @@ struct OpacityParams {
   bool use_WM_ab;   // flag for WM correction (and related) on absorption rates
   bool use_WM_sc;   // flag for WM correction (and related) on scattering rates
   bool use_decay;   // flag for inclusion of nucleon decay rates
+  bool neglect_blocking; // flag for neglecting blocking factor of antineutrino in pair (nu + anu) processes
 };
 typedef struct OpacityParams OpacityParams;
 __attribute__((unused))
 static OpacityParams opacity_params_default_all = {.use_dU = true, .use_dm_eff = true, .use_WM_ab = true, .use_WM_sc = true};
 __attribute__((unused))
-static OpacityParams opacity_params_default_none = {.use_dU = false, .use_dm_eff = false, .use_WM_ab = false, .use_WM_sc = false};
+static OpacityParams opacity_params_default_none = {.use_dU = false, .use_dm_eff = false, .use_WM_ab = false, .use_WM_sc = false, .neglect_blocking = false};
 
 /* ==================================================================================
  * M1 structures

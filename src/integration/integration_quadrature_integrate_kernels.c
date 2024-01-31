@@ -203,62 +203,47 @@ MyQuadratureIntegrand GaussLegendreIntegrateFixedSplit1D(MyQuadrature *quad, MyF
 }
 
 
-MyQuadratureIntegrand GaussLegendreIntegrateTest2D(MyQuadrature *quad, GreyOpacityParams *my_grey_opacity_params, double t) {
+MyQuadratureIntegrand GaussLegendreIntegrate2DMatrix(MyQuadrature *quad, M1Matrix *mat, double t) {
   const int n = quad->nx;
+  const int num_integrands = 2 * total_num_species;
 
-  double w_i, w_j;
+  const double t_sqr = t * t;
+  
+  double w_i, w_j, w_ij;
   double x_i, x_j;
   double x2_i, x2_j, x2_ij;
 
-  M1Matrix out_n, out_j;
-
-  ComputeM1OpacitiesTest(quad, my_grey_opacity_params, t, &out_n, &out_j);
-
-  int num_integrands = 4 * total_num_species;
-
   MyQuadratureIntegrand result = {0};
 
-  for (int i = 0; i < n; i++) {
+  for (int idx = 0; idx < total_num_species; idx++) {
 
-    x_i = quad->points[i];
-    w_i = quad->w[i];
-    x2_i = x_i * x_i;
+    for (int i = 0; i < n; i++) {
 
-    for (int j = 0; j < n; j++) {
+      x_i = quad->points[i];
+      w_i = quad->w[i];
+      x2_i = x_i * x_i;
+ 
+      for (int j = 0; j < n; j++) {
       
-      x_j = quad->points[j];
-      w_j = quad->w[j];
-      x2_j = x_j * x_j;
+        x_j = quad->points[j];
+        w_j = quad->w[j];
+      
+        w_ij = w_i * w_j;
+        x2_j = x_j * x_j;
+        x2_ij = x2_i * x2_j;
 
-      x2_ij = x2_i * x2_j;
+        result.integrand[0 + idx] += w_ij * (mat->m1_mat_em[idx][i][j] + mat->m1_mat_em[idx][n+i][j] / x2_i + mat->m1_mat_em[idx][i][n+j] / x2_j + mat->m1_mat_em[idx][n+i][n+j] / x2_ij);
 
-      for (int idx = 0; idx < total_num_species; idx++) {
-        /*
-        result.integrand[0 + idx] += w_i * w_j * (out_n.m1_mat_em[idx][i][j] + out_n.m1_mat_em[idx][n+i][j] / x2_i + out_n.m1_mat_em[idx][i][n+j] / x2_j + out_n.m1_mat_em[idx][n+i][n+j] / x2_ij);
-
-        result.integrand[total_num_species + idx] += w_i * w_j * (out_n.m1_mat_ab[idx][i][j] + out_n.m1_mat_ab[idx][n+i][j] / x2_i + out_n.m1_mat_ab[idx][i][n+j] / x2_j + out_n.m1_mat_ab[idx][n+i][n+j] / x2_ij);
-
-        result.integrand[2 * total_num_species + idx] += w_i * w_j * (out_j.m1_mat_em[idx][i][j] + out_j.m1_mat_em[idx][n+i][j] / x2_i + out_j.m1_mat_em[idx][i][n+j] / x2_j + out_j.m1_mat_em[idx][n+i][n+j] / x2_ij);
-
-        result.integrand[3 * total_num_species + idx] += w_i * w_j * (out_j.m1_mat_ab[idx][i][j] + out_j.m1_mat_ab[idx][n+i][j] / x2_i + out_j.m1_mat_ab[idx][i][n+j] / x2_j + out_j.m1_mat_ab[idx][n+i][n+j] / x2_ij);
-        */
-
-        // /*
-        result.integrand[0 + idx] += w_i * w_j * (out_n.m1_mat_em[idx][i][j] + out_n.m1_mat_em[idx][n+i][j] / x2_i + out_n.m1_mat_em[idx][i][n+j] + out_n.m1_mat_em[idx][n+i][n+j] / x2_i);
-
-        result.integrand[total_num_species + idx] += w_i * w_j * (out_n.m1_mat_ab[idx][i][j] + out_n.m1_mat_ab[idx][n+i][j] / x2_i + out_n.m1_mat_ab[idx][i][n+j] + out_n.m1_mat_ab[idx][n+i][n+j] / x2_i);
-
-        result.integrand[2 * total_num_species + idx] += w_i * w_j * (out_j.m1_mat_em[idx][i][j] + out_j.m1_mat_em[idx][n+i][j] / x2_i + out_j.m1_mat_em[idx][i][n+j] + out_j.m1_mat_em[idx][n+i][n+j] / x2_i);
-
-        result.integrand[3 * total_num_species + idx] += w_i * w_j * (out_j.m1_mat_ab[idx][i][j] + out_j.m1_mat_ab[idx][n+i][j] / x2_i + out_j.m1_mat_ab[idx][i][n+j] + out_j.m1_mat_ab[idx][n+i][n+j] / x2_i);
-        // */
-
+        result.integrand[total_num_species + idx] += w_ij * (mat->m1_mat_ab[idx][i][j] + mat->m1_mat_ab[idx][n+i][j] / x2_i + mat->m1_mat_ab[idx][i][n+j] / x2_j + mat->m1_mat_ab[idx][n+i][n+j] / x2_ij);
+        
       }
     }
   }
   
+  FreeM1Matrix(mat, n);
+  
   for (int idx = 0; idx < num_integrands; idx++) {
-    result.integrand[idx] = t * t * result.integrand[idx];
+    result.integrand[idx] = t_sqr * result.integrand[idx];
   }
 
   return result;

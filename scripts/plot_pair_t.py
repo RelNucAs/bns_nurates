@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
 
 ###############################################
 # Plot PairT function from Pons et al. (1998) #
@@ -12,7 +13,7 @@ def find_index(array, value):
     return np.argmin(abs(array - value))
 
 ## Read data
-filename = "../inputs/pair_t_tabulated.txt"
+filename = "../inputs/pair_t_tabulated_more_digits_log.txt"
 data = np.loadtxt(filename, unpack=True)
 
 alpha  = data[0]
@@ -26,71 +27,52 @@ pair_t = pair_t[:,:id_max+1]
 
 nt = pair_t.shape[0] # 6
 
-def fit_function_pol(alpha_fix, n):
+def fit_function(alpha_fix, n):
     id_fix = find_index(alpha, alpha_fix)
 
     fit_array = []
 
     for idx in range(nt):
-        #print("idx = %d" %idx)
+        #z1 = np.polyfit(alpha[id_fix+1:], np.log(pair_t[idx,id_fix+1:]), 1)
+        #tmp_1 = np.exp(np.poly1d(z1)(alpha))
+        
+        tmp_1 = np.exp(-alpha) 
 
-        z1 = np.polyfit(alpha[id_fix+1:], np.log(pair_t[idx,id_fix+1:]), 1)
+        ratio = pair_t[idx] / tmp_1
 
-        #print(z1)
- 
-        tmp = np.exp(np.poly1d(z1)(alpha))
-        #print(tmp)
+        #z2 = np.polyfit(alpha[:id_fix+1], ratio[:id_fix+1], n)
+        z2 = np.polyfit(np.exp(-alpha[:id_fix+1]), ratio[:id_fix+1], n)
+        print(z2)
+        #z2 = np.flip([(-1)**(nn+1) / nn**(idx+1) for nn in range(1,n+2)])
 
-        ratio = pair_t[idx] / tmp
+        print(z2)
+        print("")
 
-        z2 = np.polyfit(alpha[:id_fix+1], ratio[:id_fix+1], n)
+        #tmp_2 = np.poly1d(z2)(alpha) * tmp_1
+        tmp_2 = np.poly1d(z2)(np.exp(-alpha)) * tmp_1
+
         #print("{", end="")
         #for z in z2:
         #    print(str(z) +", ",end="")
         #print("},")
 
-        fit = tmp
-        
-        for i in range(id_fix+1):
-            fit[i] = fit[i] * np.poly1d(z2)(alpha[i])
+        fit = np.zeros(alpha.shape)
 
+        fit[:id_fix+1] = tmp_2[:id_fix+1]
+        fit[id_fix+1:] = tmp_1[id_fix+1:]
+   
         fit_array.append(fit)
-        
-        #print("%.5e" %np.exp(np.poly1d(z1)(750.)))
-    return np.array(fit_array)
 
-def fit_function_exp(alpha_fix, n):
-    id_fix = find_index(alpha, alpha_fix)
-
-    fit_array = []
-
-    for idx in range(nt):
-        z1 = np.polyfit(alpha[id_fix+1:], np.log(pair_t[idx,id_fix+1:]), 1)
-
-        tmp = np.exp(np.poly1d(z1)(alpha))
-
-        #z2 = np.polyfit(alpha[:id_fix+1], np.log(1. - ratio[:id_fix+1]), 1)
-        z2 = np.polyfit(alpha[:id_fix+1], np.log(pair_t[idx][:id_fix+1]), n)
-
-        fit = tmp
-        
-        for i in range(id_fix+1):
-            #fit[i] = fit[i] * (1. - np.exp(np.poly1d(z2)(alpha[i])))
-            fit[i] = np.exp(np.poly1d(z2)(alpha[i])) #/ tmp[i]
-
-        fit_array.append(fit)
-    
     return np.array(fit_array)
 
 def residuals(fit):
     #return np.sqrt( np.sum( ((fit - pair_t) / pair_t)**2. ) )
     return np.sum( abs((fit - pair_t) / pair_t) )
 
-alpha_fix = 15.
+alpha_fix = 25.
 n = 12
 
-fit = fit_function_pol(alpha_fix, n)
-#fit = fit_function_exp(alpha_fix, n)
+fit = fit_function(alpha_fix, n)
 
 print(residuals(fit))
 
@@ -128,7 +110,9 @@ ylim_max = np.amax(pair_t[:,:find_index(alpha, xlim_max)+1])
 axs[0].set_xlim((xlim_min, xlim_max))
 axs[0].set_ylim((ylim_min, ylim_max))
 
-#plt.xscale("log")
+axs[0].set_xscale("log")
+axs[0].set_xlim((1.0E-05, 7.0E+02))
+
 axs[0].set_yscale("log")
 axs[1].set_yscale("log")
 

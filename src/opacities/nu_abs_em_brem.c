@@ -35,23 +35,15 @@ MyKernelQuantity BremOpacitiesFermi(MyQuadrature *quad, MyEOSParams *my_eos_para
   return opacities;
 }
 
-void BremOpacitiesTable(MyQuadrature *quad, MyEOSParams *eos_pars, MyKernelParams *kernel_pars, double t, M1Matrix *out) {
+void BremOpacitiesTable(MyQuadrature *quad, GreyOpacityParams *grey_pars, double t, M1Matrix *out) {
   double nu, nu_bar;
 
   const int n = quad->nx;
 
   MyKernelOutput brem_ker;
 
-  kernel_pars->brem_kernel_params.l = 0;
+  grey_pars->kernel_pars.brem_kernel_params.l = 0;
 
-  out->m1_mat_ab[0] = (double **) malloc(sizeof(double *) * 2 * quad->nx);
-  out->m1_mat_em[0] = (double **) malloc(sizeof(double *) * 2 * quad->nx);
-
-  for (int i = 0; i < 2 * quad->nx; i++) {
-    out->m1_mat_ab[0][i] = (double *) malloc(sizeof(double) * 2 * quad->nx);
-    out->m1_mat_em[0][i] = (double *) malloc(sizeof(double) * 2 * quad->nx);
-  }
-  
   for (int i = 0; i < quad->nx; i++) {
 
     for (int j = i; j < quad->nx; j++) {
@@ -61,10 +53,10 @@ void BremOpacitiesTable(MyQuadrature *quad, MyEOSParams *eos_pars, MyKernelParam
       nu_bar = t * quad->points[j];
      
       // compute the brem kernels
-      kernel_pars->brem_kernel_params.omega = nu;
-      kernel_pars->brem_kernel_params.omega_prime = nu_bar;
+      grey_pars->kernel_pars.brem_kernel_params.omega = nu;
+      grey_pars->kernel_pars.brem_kernel_params.omega_prime = nu_bar;
 
-      brem_ker = BremKernelsLegCoeff(&kernel_pars->brem_kernel_params, eos_pars);
+      brem_ker = BremKernelsLegCoeff(&grey_pars->kernel_pars.brem_kernel_params, &grey_pars->eos_pars);
       
       out->m1_mat_em[0][i][j] = brem_ker.em[0];
       out->m1_mat_em[0][j][i] = brem_ker.em[0];
@@ -78,10 +70,10 @@ void BremOpacitiesTable(MyQuadrature *quad, MyEOSParams *eos_pars, MyKernelParam
       nu_bar = t / quad->points[j];
 
       // compute the brem kernels
-      kernel_pars->brem_kernel_params.omega = nu;
-      kernel_pars->brem_kernel_params.omega_prime = nu_bar;
+      grey_pars->kernel_pars.brem_kernel_params.omega = nu;
+      grey_pars->kernel_pars.brem_kernel_params.omega_prime = nu_bar;
       
-      brem_ker = BremKernelsLegCoeff(&kernel_pars->brem_kernel_params, eos_pars);
+      brem_ker = BremKernelsLegCoeff(&grey_pars->kernel_pars.brem_kernel_params, &grey_pars->eos_pars);
       
       out->m1_mat_em[0][n+i][n+j] = brem_ker.em[0];
       out->m1_mat_em[0][n+j][n+i] = brem_ker.em[0];
@@ -98,10 +90,10 @@ void BremOpacitiesTable(MyQuadrature *quad, MyEOSParams *eos_pars, MyKernelParam
       nu_bar = t / quad->points[j];
 
       // compute the brem kernels
-      kernel_pars->brem_kernel_params.omega = nu;
-      kernel_pars->brem_kernel_params.omega_prime = nu_bar;
+      grey_pars->kernel_pars.brem_kernel_params.omega = nu;
+      grey_pars->kernel_pars.brem_kernel_params.omega_prime = nu_bar;
       
-      brem_ker = BremKernelsLegCoeff(&kernel_pars->brem_kernel_params, eos_pars);
+      brem_ker = BremKernelsLegCoeff(&grey_pars->kernel_pars.brem_kernel_params, &grey_pars->eos_pars);
       
       out->m1_mat_em[0][i][n+j] = brem_ker.em[0];
       out->m1_mat_em[0][n+j][i] = brem_ker.em[0];

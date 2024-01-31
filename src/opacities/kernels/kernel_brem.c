@@ -232,7 +232,7 @@ double BremAllChannelsAbsKernel(BremKernelParams *kernel_params, MyEOSParams *eo
 /* Compute a specific Legendre coefficient in the expansion of production and absorption kernels for the Bremsstrahlung reactions */
 MyKernelOutput BremKernelsLegCoeff(BremKernelParams *kernel_params, MyEOSParams *eos_params) {
   // kernel parameters
-  const double l = kernel_params->l; // order of Legendre coefficient
+  const int l = kernel_params->l; // order of Legendre coefficient
   const double omega = kernel_params->omega; // neutrino energy [MeV]
   const double omega_prime = kernel_params->omega_prime; // primed neutrino energy [MeV]
 
@@ -247,10 +247,15 @@ MyKernelOutput BremKernelsLegCoeff(BremKernelParams *kernel_params, MyEOSParams 
   // angular independent part of absorption kernel
   double s_abs = BremAllChannelsAbsKernel(kernel_params, eos_params);
 
-  if (l == 0) {
-    s_abs =  3. * s_abs; // zeroth Legedre coefficient
-  } else {
-    s_abs = -1. * s_abs; // first Legedre coefficient
+  switch(l) {
+    case 0:
+      s_abs = 3. * s_abs; // zeroth Legedre coefficient
+      break;
+    case 1:
+      s_abs = -1. * s_abs; // first Legedre coefficient
+    default:
+      printf("BremKernelsLegCoeff (kernel_brem.c): l = %d must be either 0 or 1\n", l);
+      exit(EXIT_FAILURE);
   }
 
   // production kernel from detailed balance

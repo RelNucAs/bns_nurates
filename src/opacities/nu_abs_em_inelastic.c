@@ -12,22 +12,12 @@
 #include "functions.h"
 #include "integration.h"
 
-void InelasticOpacitiesTable(MyQuadrature *quad, MyEOSParams *eos_pars, MyKernelParams *kernel_pars, double t, M1Matrix *out) {
+void InelasticOpacitiesTable(MyQuadrature *quad, GreyOpacityParams *grey_pars, double t, M1Matrix *out) {
   double nu, nu_bar;
 
   const int n = quad->nx;
 
   MyKernelOutput inel_1, inel_2;
-
-  for (int idx = 0; idx < total_num_species; idx++) {
-    out->m1_mat_ab[idx] = (double **) malloc(sizeof(double *) * 2 * n);
-    out->m1_mat_em[idx] = (double **) malloc(sizeof(double *) * 2 * n);
-
-    for (int i = 0; i < 2 * n; i++) {
-      out->m1_mat_ab[idx][i] = (double *) malloc(sizeof(double) * 2 * n);
-      out->m1_mat_em[idx][i] = (double *) malloc(sizeof(double) * 2 * n);
-    }
-  }
 
   for (int i = 0; i < n; i++) {
 
@@ -38,10 +28,10 @@ void InelasticOpacitiesTable(MyQuadrature *quad, MyEOSParams *eos_pars, MyKernel
       nu_bar = t * quad->points[j];
      
       // compute the pair kernels
-      kernel_pars->inelastic_kernel_params.omega = nu;
-      kernel_pars->inelastic_kernel_params.omega_prime = nu_bar;
+      grey_pars->kernel_pars.inelastic_kernel_params.omega = nu;
+      grey_pars->kernel_pars.inelastic_kernel_params.omega_prime = nu_bar;
 
-      CrossedInelasticScattKernels(&kernel_pars->inelastic_kernel_params, eos_pars, &inel_1, &inel_2);
+      CrossedInelasticScattKernels(&grey_pars->kernel_pars.inelastic_kernel_params, &grey_pars->eos_pars, &inel_1, &inel_2);
 
       for (int idx = 0; idx < total_num_species; idx++) {
         out->m1_mat_em[idx][i][j] = inel_1.em[idx];
@@ -56,10 +46,10 @@ void InelasticOpacitiesTable(MyQuadrature *quad, MyEOSParams *eos_pars, MyKernel
       nu_bar = t / quad->points[j];
 
       // compute the pair kernels
-      kernel_pars->inelastic_kernel_params.omega = nu;
-      kernel_pars->inelastic_kernel_params.omega_prime = nu_bar;
+      grey_pars->kernel_pars.inelastic_kernel_params.omega = nu;
+      grey_pars->kernel_pars.inelastic_kernel_params.omega_prime = nu_bar;
       
-      CrossedInelasticScattKernels(&kernel_pars->inelastic_kernel_params, eos_pars, &inel_1, &inel_2);
+      CrossedInelasticScattKernels(&grey_pars->kernel_pars.inelastic_kernel_params, &grey_pars->eos_pars, &inel_1, &inel_2);
 
       for (int idx = 0; idx < total_num_species; idx++) {
         out->m1_mat_em[idx][n+i][n+j] = inel_1.em[idx];
@@ -78,10 +68,10 @@ void InelasticOpacitiesTable(MyQuadrature *quad, MyEOSParams *eos_pars, MyKernel
       nu_bar = t / quad->points[j];
 
       // compute the pair kernels
-      kernel_pars->inelastic_kernel_params.omega = nu;
-      kernel_pars->inelastic_kernel_params.omega_prime = nu_bar;
+      grey_pars->kernel_pars.inelastic_kernel_params.omega = nu;
+      grey_pars->kernel_pars.inelastic_kernel_params.omega_prime = nu_bar;
       
-      CrossedInelasticScattKernels(&kernel_pars->inelastic_kernel_params, eos_pars, &inel_1, &inel_2);
+      CrossedInelasticScattKernels(&grey_pars->kernel_pars.inelastic_kernel_params, &grey_pars->eos_pars, &inel_1, &inel_2);
 
       for (int idx = 0; idx < total_num_species; idx++) {
         out->m1_mat_em[idx][i][n+j] = inel_1.em[idx];
