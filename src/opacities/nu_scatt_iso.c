@@ -45,6 +45,7 @@ double EtaNNSc(const double nb, const double temp, const double yN) {
   const double eFN = eF_const * kThreePiSquared2TwoThird * pow(nN, 2. / 3.); // Fermi energy computation [MeV]
   const double aux = 1.5 * temp / eFN;
   return nN * aux / sqrt(1. + aux * aux); // [cm-3]
+  //return nN;
 
 }
 

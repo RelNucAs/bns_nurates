@@ -210,4 +210,12 @@ double HeavisideTanhApprox(const double x);
 
 /*===========================================================================*/
 
+// m1matrix.c
+
+/* M1Matrix related functions */
+void InitializeM1MatrixSingleFlavor(M1Matrix *mat, const int n, const int idx);
+void InitializeM1Matrix(M1Matrix *mat, const int n);
+void FreeM1MatrixSingleFlavor(M1Matrix *mat, const int n, const int idx);
+void FreeM1Matrix(M1Matrix *mat, const int n);
+
 #endif //BNS_NURATES_SRC_FUNCTIONS_FUNCTIONS_H_

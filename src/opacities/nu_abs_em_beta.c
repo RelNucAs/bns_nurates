@@ -264,8 +264,6 @@ MyOpacity StimAbsOpacity(const double omega, OpacityParams *opacity_pars, MyEOSP
 void BetaOpacitiesTable(MyQuadrature *quad, MyEOSParams *eos_pars, OpacityParams *opacity_pars, double t, M1Matrix *out) {
   const int n = quad->nx;
 
-  double nu;
-
   MyOpacity beta_1, beta_2;
 
   for (int idx = 0; idx < total_num_species; idx++) {

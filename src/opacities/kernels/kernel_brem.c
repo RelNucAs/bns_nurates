@@ -253,6 +253,7 @@ MyKernelOutput BremKernelsLegCoeff(BremKernelParams *kernel_params, MyEOSParams 
       break;
     case 1:
       s_abs = -1. * s_abs; // first Legedre coefficient
+      break;
     default:
       printf("BremKernelsLegCoeff (kernel_brem.c): l = %d must be either 0 or 1\n", l);
       exit(EXIT_FAILURE);
@@ -270,4 +271,32 @@ MyKernelOutput BremKernelsLegCoeff(BremKernelParams *kernel_params, MyEOSParams 
 
   return brem_kernel;
   
+}
+
+
+void BremKernelsTable(const int n, double *nu_array, GreyOpacityParams *grey_pars, M1Matrix *out) {
+  MyKernelOutput brem_ker;
+
+  grey_pars->kernel_pars.brem_kernel_params.l = 0;
+
+  for (int i = 0; i < n; i++) {
+
+    for (int j = i; j < n; j++) {
+
+      // compute the brem kernels
+      grey_pars->kernel_pars.brem_kernel_params.omega = nu_array[i];
+      grey_pars->kernel_pars.brem_kernel_params.omega_prime = nu_array[j];
+
+      brem_ker = BremKernelsLegCoeff(&grey_pars->kernel_pars.brem_kernel_params, &grey_pars->eos_pars);
+      
+      out->m1_mat_em[0][i][j] = brem_ker.em[0];
+      out->m1_mat_em[0][j][i] = brem_ker.em[0];
+
+      out->m1_mat_ab[0][i][j] = brem_ker.abs[0];
+      out->m1_mat_ab[0][j][i] = brem_ker.abs[0];
+    }
+
+  }
+
+  return;
 }

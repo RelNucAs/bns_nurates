@@ -12,6 +12,7 @@
 #include "integration.h"
 #include "bns_nurates.h"
 #include "opacities.h"
+#include "functions.h"
 
 /* Compute 4 different integration results at once (emission & absorption for e & points neutrinos)
  * Use this function for integrating over kernel quantities

@@ -558,6 +558,37 @@ void PairKernelsM1Test(MyEOSParams *eos_pars, PairKernelParams *kernel_pars, MyK
 
 }
 
+void PairKernelsTable(const int n, double *nu_array, GreyOpacityParams *grey_pars, M1Matrix *out) {
+  MyKernelOutput pair_1, pair_2;
+  
+  grey_pars->kernel_pars.pair_kernel_params.cos_theta = 1.;
+  grey_pars->kernel_pars.pair_kernel_params.filter = 0.;
+  grey_pars->kernel_pars.pair_kernel_params.lmax = 0;
+  grey_pars->kernel_pars.pair_kernel_params.mu = 1.;
+  grey_pars->kernel_pars.pair_kernel_params.mu_prime = 1.;
+  
+  for (int i = 0; i < n; i++) {
+    grey_pars->kernel_pars.pair_kernel_params.omega = nu_array[i];
+    
+    for (int j = i; j < n; j++) {      
+      grey_pars->kernel_pars.pair_kernel_params.omega_prime = nu_array[j];
+
+      PairKernelsM1Test(&grey_pars->eos_pars, &grey_pars->kernel_pars.pair_kernel_params, &pair_1, &pair_2);
+      
+      for (int idx = 0; idx < total_num_species; idx ++) {
+        out->m1_mat_em[idx][i][j] = pair_1.em[idx];
+        out->m1_mat_em[idx][j][i] = pair_2.em[idx];
+
+        out->m1_mat_ab[idx][i][j] = pair_1.abs[idx];
+        out->m1_mat_ab[idx][j][i] = pair_2.abs[idx];
+      }
+    
+    }
+  }
+
+  return;
+}
+
 //=====================================
 // Tested, but not optimized functions
 //=====================================
@@ -655,7 +686,7 @@ double PairFBackup(int k, double eta, double x1) {
 double PairF(int k, double eta, double x1) {
 
   double result = 0.;
-  double tol = 1e-6;
+  //double tol = 1e-6;
 
   if (eta < 0.) {
     double sum = 0.;

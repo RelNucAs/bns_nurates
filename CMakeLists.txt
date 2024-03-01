@@ -23,6 +23,7 @@ add_executable(bns_nurates
         src/functions/mnewt.c
         src/functions/safe_exp.c
         src/functions/theta.c
+        src/functions/m1matrix.c
         include/integration.h
         include/kernels.h
         include/weak_magnetism.h
@@ -44,7 +45,6 @@ add_executable(bns_nurates
         src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
-        src/opacities/nu_abs_em_inelastic.c
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c)
 
@@ -68,6 +68,7 @@ add_library(nurates SHARED
         src/functions/mnewt.c
         src/functions/safe_exp.c
         src/functions/theta.c
+        src/functions/m1matrix.c
         src/opacities/weak_magnetism/weak_magnetism.c
         src/opacities/weak_magnetism/nucfrmfac.c
         src/opacities/nu_abs_em_beta.c
@@ -83,7 +84,6 @@ add_library(nurates SHARED
         src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
-        src/opacities/nu_abs_em_inelastic.c
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c)
 
@@ -189,19 +189,21 @@ add_executable(test_pair_opacities
         include/constants.h
         include/bns_nurates.h
         include/functions.h
+        include/opacities.h
         src/functions/digamma.c
         src/functions/fermi_distr.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
         src/functions/theta.c
+        src/functions/fermi_integrals.c
+        src/functions/m1matrix.c
         include/integration.h
         include/kernels.h
-        include/opacities.h
+        src/opacities/kernels/kernel_pair.c
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
         src/integration/integration_quadrature_integrate.c
-        src/opacities/kernels/kernel_pair.c
         src/opacities/nu_abs_em_pair.c
         src/integration/integration_quadrature_integrate_kernels.c
 )
@@ -221,6 +223,7 @@ add_executable(test_beta
         src/functions/mnewt.c
         src/functions/safe_exp.c
         src/functions/theta.c
+        src/functions/m1matrix.c
         include/integration.h
         include/kernels.h
         include/opacities.h
@@ -251,6 +254,7 @@ add_executable(test_iso
         src/functions/mnewt.c
         src/functions/safe_exp.c
         src/functions/theta.c
+        src/functions/m1matrix.c
         include/integration.h
         include/kernels.h
         include/opacities.h
@@ -281,6 +285,7 @@ add_executable(test_brem
         src/functions/mnewt.c
         src/functions/safe_exp.c
         src/functions/theta.c
+        src/functions/m1matrix.c
         include/integration.h
         include/kernels.h
         include/opacities.h
@@ -488,6 +493,7 @@ add_executable(test_integration_special
         src/functions/mnewt.c
         src/functions/safe_exp.c
         src/functions/theta.c
+        src/functions/m1matrix.c
         include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
@@ -512,6 +518,7 @@ add_executable(test_integration_multi_func_1d
         src/functions/mnewt.c
         src/functions/safe_exp.c
         src/functions/theta.c
+        src/functions/m1matrix.c
         include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
@@ -536,6 +543,7 @@ add_executable(test_integration_multi_func_2d
         src/functions/mnewt.c
         src/functions/safe_exp.c
         src/functions/theta.c
+        src/functions/m1matrix.c
         include/integration.h
         src/integration/integration_quadrature_schemes.c
         src/integration/integration_quadrature_io.c
@@ -563,6 +571,7 @@ add_executable(test_opacities_electron_capture
         src/functions/mnewt.c
         src/functions/safe_exp.c
         src/functions/theta.c
+        src/functions/m1matrix.c
         include/integration.h
         include/kernels.h
         include/weak_magnetism.h
@@ -584,7 +593,6 @@ add_executable(test_opacities_electron_capture
         src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
-        src/opacities/nu_abs_em_inelastic.c
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
         tests/tests_opacities_m1/test_opacities_electron_capture.c
@@ -612,6 +620,7 @@ add_executable(test_opacities_pair
         src/functions/mnewt.c
         src/functions/safe_exp.c
         src/functions/theta.c
+        src/functions/m1matrix.c
         include/integration.h
         include/kernels.h
         include/weak_magnetism.h
@@ -633,7 +642,6 @@ add_executable(test_opacities_pair
         src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
-        src/opacities/nu_abs_em_inelastic.c
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
         tests/tests_opacities_m1/test_opacities_pair.c
@@ -661,6 +669,7 @@ add_executable(test_opacities_brem
         src/functions/mnewt.c
         src/functions/safe_exp.c
         src/functions/theta.c
+        src/functions/m1matrix.c
         include/integration.h
         include/kernels.h
         include/weak_magnetism.h
@@ -682,7 +691,6 @@ add_executable(test_opacities_brem
         src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
-        src/opacities/nu_abs_em_inelastic.c
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
         tests/tests_opacities_m1/test_opacities_brem.c
@@ -710,6 +718,7 @@ add_executable(test_opacities_inelastic_scatt
         src/functions/mnewt.c
         src/functions/safe_exp.c
         src/functions/theta.c
+        src/functions/m1matrix.c
         include/integration.h
         include/kernels.h
         include/weak_magnetism.h
@@ -731,7 +740,6 @@ add_executable(test_opacities_inelastic_scatt
         src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
-        src/opacities/nu_abs_em_inelastic.c
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
         tests/tests_opacities_m1/test_opacities_inelastic_scatt.c
@@ -759,6 +767,7 @@ add_executable(test_opacities_isoscatt
         src/functions/mnewt.c
         src/functions/safe_exp.c
         src/functions/theta.c
+        src/functions/m1matrix.c
         include/integration.h
         include/kernels.h
         include/weak_magnetism.h
@@ -780,7 +789,6 @@ add_executable(test_opacities_isoscatt
         src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
-        src/opacities/nu_abs_em_inelastic.c
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
         tests/tests_opacities_m1/test_opacities_isoscatt.c
@@ -808,6 +816,7 @@ add_executable(test_opacities_all_reactions
         src/functions/mnewt.c
         src/functions/safe_exp.c
         src/functions/theta.c
+        src/functions/m1matrix.c
         include/integration.h
         include/kernels.h
         include/weak_magnetism.h
@@ -826,7 +835,6 @@ add_executable(test_opacities_all_reactions
         src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
-        src/opacities/nu_abs_em_inelastic.c
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
         tests/tests_opacities_m1/test_opacities_all_reactions.c
@@ -855,6 +863,7 @@ add_executable(test_opacities_thc
         src/functions/mnewt.c
         src/functions/safe_exp.c
         src/functions/theta.c
+        src/functions/m1matrix.c
         include/integration.h
         include/kernels.h
         include/weak_magnetism.h
@@ -902,6 +911,7 @@ add_executable(test_m1_distribution
         src/functions/mnewt.c
         src/functions/safe_exp.c
         src/functions/theta.c
+        src/functions/m1matrix.c
         include/integration.h
         include/kernels.h
         include/weak_magnetism.h
@@ -923,7 +933,6 @@ add_executable(test_m1_distribution
         src/opacities/kernels/kernel_nes.c
         src/opacities/nu_abs_em_pair.c
         src/opacities/nu_abs_em_brem.c
-        src/opacities/nu_abs_em_inelastic.c
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
         tests/tests_distribution/test_m1_distribution.c
@@ -931,6 +940,96 @@ add_executable(test_m1_distribution
 
 target_link_libraries(test_m1_distribution GSL::gsl GSL::gslcblas)
 target_link_libraries(test_m1_distribution m)
+
+# test quadrature convergence spectral
+add_executable(test_quadrature_convergence_spectral
+        include/constants.h
+        include/bns_nurates.h
+        include/distribution.h
+        src/distribution/distribution_opt_thick.c
+        src/distribution/distribution_opt_thin.c
+        src/distribution/distribution_total.c
+        include/functions.h
+        src/functions/digamma.c
+        src/functions/fermi_integrals.c
+        src/functions/fermi_distr.c
+        src/functions/gamma.c
+        src/functions/lambert.c
+        src/functions/mnewt.c
+        src/functions/safe_exp.c
+        src/functions/theta.c
+        src/functions/m1matrix.c
+        include/integration.h
+        include/kernels.h
+        include/weak_magnetism.h
+        src/opacities/weak_magnetism/weak_magnetism.c
+        src/opacities/weak_magnetism/nucfrmfac.c
+        include/opacities.h
+        src/opacities/nu_abs_em_beta.c
+        src/opacities/nu_scatt_iso.c
+        src/output/outputs.h
+        include/eos.h
+        src/integration/integration_quadrature_schemes.c
+        src/integration/integration_quadrature_io.c
+        src/integration/integration_quadrature_integrate.c
+        src/opacities/kernels/kernel_brem.c
+        src/opacities/kernels/kernel_pair.c
+        src/opacities/kernels/kernel_nes.c
+        src/opacities/nu_abs_em_pair.c
+        src/opacities/nu_abs_em_brem.c
+        src/integration/integration_quadrature_integrate_kernels.c
+        src/opacities/m1_opacities.c
+        tests/tests_quadrature_convergence/test_quadrature_convergence_spectral.c
+        tests/tests.h 
+)
+
+target_link_libraries(test_quadrature_convergence_spectral m)
+target_link_libraries(test_quadrature_convergence_spectral GSL::gsl GSL::gslcblas)
+
+# test quadrature convergence integrated
+add_executable(test_quadrature_convergence_integrated
+        include/constants.h
+        include/bns_nurates.h
+        include/distribution.h
+        src/distribution/distribution_opt_thick.c
+        src/distribution/distribution_opt_thin.c
+        src/distribution/distribution_total.c
+        include/functions.h
+        src/functions/digamma.c
+        src/functions/fermi_integrals.c
+        src/functions/fermi_distr.c
+        src/functions/gamma.c
+        src/functions/lambert.c
+        src/functions/mnewt.c
+        src/functions/safe_exp.c
+        src/functions/theta.c
+        src/functions/m1matrix.c
+        include/integration.h
+        include/kernels.h
+        include/weak_magnetism.h
+        src/opacities/weak_magnetism/weak_magnetism.c
+        src/opacities/weak_magnetism/nucfrmfac.c
+        include/opacities.h
+        src/opacities/nu_abs_em_beta.c
+        src/opacities/nu_scatt_iso.c
+        src/output/outputs.h
+        include/eos.h
+        src/integration/integration_quadrature_schemes.c
+        src/integration/integration_quadrature_io.c
+        src/integration/integration_quadrature_integrate.c
+        src/opacities/kernels/kernel_brem.c
+        src/opacities/kernels/kernel_pair.c
+        src/opacities/kernels/kernel_nes.c
+        src/opacities/nu_abs_em_pair.c
+        src/opacities/nu_abs_em_brem.c
+        src/integration/integration_quadrature_integrate_kernels.c
+        src/opacities/m1_opacities.c
+        tests/tests_quadrature_convergence/test_quadrature_convergence_integrated.c
+        tests/tests.h 
+)
+
+target_link_libraries(test_quadrature_convergence_integrated m)
+target_link_libraries(test_quadrature_convergence_integrated GSL::gsl GSL::gslcblas)
 
 enable_testing()
 

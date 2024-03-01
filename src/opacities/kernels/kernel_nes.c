@@ -82,7 +82,7 @@ double MezzacappaIntOut(double w, double wp, double x, double y, int sign, doubl
 }
 
 //Taylor expansion in the lowest energy of the function MezzacappaIntOut and MezzacappaIntIn
-double MezzacappaIntOneEnergy(double w, double wp, double x, double y, int sign, double b1, double b2, double* fdis)
+double MezzacappaIntOneEnergy(double x, double y, int sign, double b1, double b2, const double* fdis)
 {
   return - sign * y * (
             2. * (b1 + b2) * fdis[0]
@@ -98,7 +98,7 @@ double MezzacappaIntOneEnergy(double w, double wp, double x, double y, int sign,
 }
 
 //Taylor expansion in both energies of the function MezzacappaIntOut and MezzacappaIntIn
-double MezzacappaIntTwoEnergies(double w, double wp, double x, double y, double b1, double b2, double* fdis)
+double MezzacappaIntTwoEnergies(double w, double wp, double x, double y, double b1, double b2, const double* fdis)
 {
   return y * (w - wp) * (
             (b1 + b2) * (
@@ -150,10 +150,10 @@ MyKernelOutput NESKernels(InelasticScattKernelParams *kernel_params, MyEOSParams
       FDI_0(eta_e) - y * FermiDistr(0.,1.,eta_e) / 6.
     };
 
-    output.abs[id_nue] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBPlus, kBZero, fdis);
-    output.abs[id_anue] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBZero, kBPlus, fdis);
-    output.abs[id_nux] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBMinus, kBZero, fdis);
-    output.abs[id_anux] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBZero, kBMinus, fdis);
+    output.abs[id_nue] = kNes * t * t * MezzacappaIntOneEnergy(x, y, sign, kBPlus, kBZero, fdis);
+    output.abs[id_anue] = kNes * t * t * MezzacappaIntOneEnergy(x, y, sign, kBZero, kBPlus, fdis);
+    output.abs[id_nux] = kNes * t * t * MezzacappaIntOneEnergy(x, y, sign, kBMinus, kBZero, fdis);
+    output.abs[id_anux] = kNes * t * t * MezzacappaIntOneEnergy(x, y, sign, kBZero, kBMinus, fdis);
   } 
   else{
     const double fdis[3] = {
@@ -213,10 +213,10 @@ MyKernelOutput NPSKernels(InelasticScattKernelParams *kernel_params, MyEOSParams
       FDI_0(eta_p) - y * FermiDistr(0.,1.,eta_p) / 6.
     };
 
-    output.abs[id_nue] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBZero, kBPlus, fdis);
-    output.abs[id_anue] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBPlus, kBZero, fdis);
-    output.abs[id_nux] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBZero, kBMinus, fdis);
-    output.abs[id_anux] = kNes * t * t * MezzacappaIntOneEnergy(w, wp, x, y, sign, kBMinus, kBZero, fdis);
+    output.abs[id_nue] = kNes * t * t * MezzacappaIntOneEnergy(x, y, sign, kBZero, kBPlus, fdis);
+    output.abs[id_anue] = kNes * t * t * MezzacappaIntOneEnergy(x, y, sign, kBPlus, kBZero, fdis);
+    output.abs[id_nux] = kNes * t * t * MezzacappaIntOneEnergy(x, y, sign, kBZero, kBMinus, fdis);
+    output.abs[id_anux] = kNes * t * t * MezzacappaIntOneEnergy(x, y, sign, kBMinus, kBZero, fdis);
   } 
   else{
     const double fdis[3] = {
@@ -256,17 +256,34 @@ MyKernelOutput InelasticScattKernels(InelasticScattKernelParams *kernel_params, 
   return tot_kernel;
 }
 
-void CrossedInelasticScattKernels(InelasticScattKernelParams *kernel_params, MyEOSParams *eos_params, MyKernelOutput *out_1, MyKernelOutput *out_2) {
+void InelasticKernelsTable(const int n, double *nu_array, GreyOpacityParams *grey_pars, M1Matrix *out) {
+  MyKernelOutput inel_1, inel_2;
 
-  double omega = kernel_params->omega;
-  double omega_prime = kernel_params->omega_prime;
+  InelasticScattKernelParams inelastic_pars = grey_pars->kernel_pars.inelastic_kernel_params;
+  for (int i = 0; i < n; i++) {
 
-  *out_1 = InelasticScattKernels(kernel_params, eos_params);
+    for (int j = i; j < n; j++) {
+         
+      // compute the pair kernels
+      inelastic_pars.omega = nu_array[i];
+      inelastic_pars.omega_prime = nu_array[j];
+      inel_1 = InelasticScattKernels(&inelastic_pars, &grey_pars->eos_pars);
 
-  kernel_params->omega = omega_prime;
-  kernel_params->omega_prime = omega;
+      inelastic_pars.omega = nu_array[j];
+      inelastic_pars.omega_prime = nu_array[i];
+      inel_2 = InelasticScattKernels(&inelastic_pars, &grey_pars->eos_pars);
+  
 
-  *out_2 = InelasticScattKernels(kernel_params, eos_params);
+      for (int idx = 0; idx < total_num_species; idx++) {
+        out->m1_mat_em[idx][i][j] = inel_1.em[idx];
+        out->m1_mat_em[idx][j][i] = inel_2.em[idx];
+      
+        out->m1_mat_ab[idx][i][j] = inel_1.abs[idx];
+        out->m1_mat_ab[idx][j][i] = inel_2.abs[idx];
+      }
+    }
+    
+  }
 
   return;
 }

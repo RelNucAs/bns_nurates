@@ -21,6 +21,7 @@
 double BremKernelS(double x, double y, double eta_star);
 double BremKernelG(double y, double eta_star);
 MyKernelOutput BremKernelsLegCoeff(BremKernelParams *kernel_params, MyEOSParams *eos_params);
+void BremKernelsTable(const int n, double *nu_array, GreyOpacityParams *grey_pars, M1Matrix *out);
 
 // End of Bremsstrahlung kernel
 // ===============================================================================
@@ -45,6 +46,7 @@ MyKernelQuantity PairKernelsM1(MyEOSParams *eos_pars, PairKernelParams *kernel_p
 MyKernelOutput PairKernelsOptimized(MyEOSParams *eos_pars, PairKernelParams *kernel_pars);
 void PairKernelsM1Test(MyEOSParams *eos_pars, PairKernelParams *kernel_pars, MyKernelOutput *out_for, MyKernelOutput *out_inv);
 MyKernelQuantity PairKernelsPhiMuIntegrated(MyEOSParams *eos_pars, PairKernelParams *kernel_pars);
+void PairKernelsTable(const int n, double *nu_array, GreyOpacityParams *grey_pars, M1Matrix *out);
 
 // End of pair process kernel
 // ===============================================================================
@@ -58,7 +60,7 @@ MyKernelQuantity PairKernelsPhiMuIntegrated(MyEOSParams *eos_pars, PairKernelPar
 MyKernelOutput NESKernels(InelasticScattKernelParams *kernel_params, MyEOSParams *eos_params);
 MyKernelOutput NPSKernels(InelasticScattKernelParams *kernel_params, MyEOSParams *eos_params);
 MyKernelOutput InelasticScattKernels(InelasticScattKernelParams *kernel_params, MyEOSParams *eos_params);
-void CrossedInelasticScattKernels(InelasticScattKernelParams *kernel_params, MyEOSParams *eos_params, MyKernelOutput *out_1, MyKernelOutput *out_2);
+void InelasticKernelsTable(const int n, double *nu_array, GreyOpacityParams *grey_pars, M1Matrix *out);
 
 // End of pair process kernel
 // ===============================================================================

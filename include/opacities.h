@@ -12,6 +12,7 @@
 
 #include "bns_nurates.h"
 
+#define kirchoff_flag false
 
 /*===========================================================================*/
 
@@ -47,21 +48,12 @@ double IsoScattLegCoeff(const double omega, OpacityParams *opacity_pars, MyEOSPa
 // pair opacities
 MyKernelQuantity PairEmissivityAbsorptivityIntegrand(double var, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);
 MyKernelQuantity PairOpacitiesFermi(MyQuadrature *quad, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);
-void PairOpacitiesTable(MyQuadrature *quad, GreyOpacityParams *grey_pars, double t, M1Matrix *out);
 
 // bremsstrahlung opacities
 MyKernelQuantity BremEmissivityAbsorptivityIntegrandFermi(double omega_prime, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);
 MyKernelQuantity BremOpacitiesFermi(MyQuadrature *quad, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);
-void BremOpacitiesTable(MyQuadrature *quad, GreyOpacityParams *grey_pars, double t, M1Matrix *out);
-
-// inelastic scattering opacities
-void InelasticOpacitiesTable(MyQuadrature *quad, GreyOpacityParams *grey_pars, double t, M1Matrix *out);
 
 // M1 opacities
-void InitializeM1MatrixSingleFlavor(M1Matrix *mat, const int n, const int idx);
-void InitializeM1Matrix(M1Matrix *mat, const int n);
-void FreeM1MatrixSingleFlavor(M1Matrix *mat, const int n, const int idx);
-void FreeM1Matrix(M1Matrix *mat, const int n);
 MyQuadratureIntegrand M1CoeffsDoubleIntegrand(double *var, void *p);
 MyQuadratureIntegrand M1CoeffsSingleIntegrand(double *var, void *p);
 M1Opacities ComputeM1OpacitiesNotStimulated(MyQuadrature *quad_1d, MyQuadrature *quad_2d, GreyOpacityParams *my_grey_opacity_params);
