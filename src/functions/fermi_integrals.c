@@ -1,5 +1,5 @@
 #include <math.h>
-#include <functions.h>
+#include "functions.h"
 
 /* double precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = -9/2 */
