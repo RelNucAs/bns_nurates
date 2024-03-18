@@ -177,6 +177,7 @@ if (${GSL_FOUND})
 endif()
 target_link_libraries(test_pair_phi m)
 
+if (${GSL_FOUND})
 # test pair kernel Kernels
 add_executable(test_pair_kernels
         tests/tests_pair/test_pair_kernels.c
@@ -186,11 +187,13 @@ add_executable(test_pair_kernels
         src/opacities/kernels/kernel_pair.c
 )
 
-if (${GSL_FOUND})
-	target_link_libraries(test_pair_kernels GSL::gsl GSL::gslcblas)
-endif()
-target_link_libraries(test_pair_kernels m)
 
+target_link_libraries(test_pair_kernels GSL::gsl GSL::gslcblas)
+target_link_libraries(test_pair_kernels m)
+endif()
+
+
+if (${GSL_FOUND})
 # test pair kernel Kernels phi integrated
 add_executable(test_pair_kernels_phi_mu_integrated
         tests/tests_pair/test_pair_kernels_phi_mu_integrated.c
@@ -200,10 +203,10 @@ add_executable(test_pair_kernels_phi_mu_integrated
         src/opacities/kernels/kernel_pair.c
 )
 
-if (${GSL_FOUND})
-	target_link_libraries(test_pair_kernels_phi_mu_integrated GSL::gsl GSL::gslcblas)
-endif()
+target_link_libraries(test_pair_kernels_phi_mu_integrated GSL::gsl GSL::gslcblas)
 target_link_libraries(test_pair_kernels_phi_mu_integrated m)
+endif()
+
 
 # test pair kernel opacities
 add_executable(test_pair_opacities
@@ -1158,10 +1161,12 @@ add_test(NAME test_pair_psi
         COMMAND $<TARGET_FILE:test_pair_psi>)
 add_test(NAME test_pair_phi
         COMMAND $<TARGET_FILE:test_pair_phi>)
-add_test(NAME test_pair_kernels
-        COMMAND $<TARGET_FILE:test_pair_kernels>)
-add_test(NAME test_pair_kernels_phi_mu_integrated
-        COMMAND $<TARGET_FILE:test_pair_kernels_phi_mu_integrated>)
+if (${GSL_FOUND})
+	add_test(NAME test_pair_kernels
+        	COMMAND $<TARGET_FILE:test_pair_kernels>)
+	add_test(NAME test_pair_kernels_phi_mu_integrated
+        	COMMAND $<TARGET_FILE:test_pair_kernels_phi_mu_integrated>)
+endif()
 add_test(NAME test_pair_opacities
         COMMAND $<TARGET_FILE:test_pair_opacities>)
 add_test(NAME test_gauss_legendre_1d
