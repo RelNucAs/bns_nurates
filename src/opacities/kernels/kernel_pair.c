@@ -8,13 +8,14 @@
 #include <math.h>
 #include <assert.h>
 #include <stddef.h>
-#include <gsl/gsl_sf_legendre.h>
-#include <gsl/gsl_sf_zeta.h>
 #include "kernels.h"
 #include "functions.h"
 #include "constants.h"
 
-
+#ifdef GSL_INCLUDES_H_
+#include <gsl/gsl_sf_legendre.h>
+#include <gsl/gsl_sf_zeta.h>
+#endif //GSL_INCLUDES_H_
 
 //===========================================
 // Optimized functions to speed the code up
@@ -323,7 +324,7 @@ void PairGOptimized(int n, double eta, double y, double z, double *g_out) {
   const double pair_f_z_2 = PairFBackup(n, eta + y + z, z);
   */
 
-  // /*
+  
   const double eta_y_z = eta + y + z;
 
   const double pair_f_y_z_1 = PairFOptimized(n, eta, y + z);
@@ -335,7 +336,6 @@ void PairGOptimized(int n, double eta, double y, double z, double *g_out) {
   const double pair_f_z_1 = PairFOptimized(n, eta, z);
   const double pair_f_z_2 = PairFOptimized(n, eta_y_z, z);
   
-  // */
 
   double pair_f_min_1 = (y > z) ? pair_f_z_1 : pair_f_y_1;
   double pair_f_max_1 = (y > z) ? pair_f_y_1 : pair_f_z_1;
@@ -593,6 +593,7 @@ void PairKernelsTable(const int n, double *nu_array, GreyOpacityParams *grey_par
 // Tested, but not optimized functions
 //=====================================
 
+#ifdef GSL_INCLUDES_H_
 double PairT(int l, double alpha, double tolerance) {
 
   assert(alpha >= 0 && l >= 1);
@@ -615,6 +616,7 @@ double PairT(int l, double alpha, double tolerance) {
     return result;
   }
 }
+#endif //GSL_INCLUDES_H_
 
 /* Compute F_k(eta,x1) as defined in Appendix B of Pons et. al. (1998)
  *
@@ -638,7 +640,7 @@ double PairT(int l, double alpha, double tolerance) {
 double PairFBackup(int k, double eta, double x1) {
 
   double result = 0.;
-  double tol = 1.0E-15;
+  double tol = 1.0E-10;
 
   if (eta < 0.) {
     double sum = 0.;
@@ -758,6 +760,7 @@ double PairG(int n, double a, double b, double eta, double y, double z) {
  *
  * l is an integer.
  */
+#ifdef GSL_INCLUDES_H_
 MyKernelQuantity PairKernelsPhiIntegrated(MyEOSParams *eos_pars, PairKernelParams *kernel_pars) {
 
   // kernel specific parameters
@@ -800,6 +803,7 @@ MyKernelQuantity PairKernelsPhiIntegrated(MyEOSParams *eos_pars, PairKernelParam
   return pair_kernel;
 
 }
+#endif //GSL_INCLUDES_H_
 
 MyKernelQuantity PairKernelsPhiMuIntegrated(MyEOSParams *eos_pars, PairKernelParams *kernel_pars) {
 
@@ -959,6 +963,7 @@ double PairPhi(int l, double omega, double omega_prime, double eta, double temp,
  *
  * l is an integer.
  */
+#ifdef GSL_INCLUDES_H_
 MyKernelQuantity PairKernels(MyEOSParams *eos_pars, PairKernelParams *kernel_pars) {
 
   // kernel specific parameters
@@ -999,6 +1004,7 @@ MyKernelQuantity PairKernels(MyEOSParams *eos_pars, PairKernelParams *kernel_par
   return pair_kernel;
 
 }
+#endif //GSL_INCLUDES_H_
 
 /* Calculates the production and absorption kernels for the pair process for M1 (l = 0)
  *

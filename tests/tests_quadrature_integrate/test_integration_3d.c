@@ -5,6 +5,8 @@
 //! \file  test_integration_3d.c
 //  \brief test 3d integration routine
 
+#ifdef GSL_INCLUDES_H_
+
 #include <stdio.h>
 #include <math.h>
 #include <gsl/gsl_math.h>
@@ -90,3 +92,5 @@ int main() {
   }
 
 }
+
+#endif //GSL_INCLUDES_H_

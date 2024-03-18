@@ -12,12 +12,12 @@
 int main() {
   double pair_f[6];
 
-  pair_f[0] = PairF(0, 2.2, 5.0);
-  pair_f[1] = PairF(1, 2.2, 5.0);
-  pair_f[2] = PairF(0, -2.2, 5.0);
-  pair_f[3] = PairF(1, -2.2, 5.0);
-  pair_f[4] = PairF(0, 6.2, 5.0);
-  pair_f[5] = PairF(5, 6.2, 5.0);
+  pair_f[0] = PairFOptimized(0, 2.2, 5.0);
+  pair_f[1] = PairFOptimized(1, 2.2, 5.0);
+  pair_f[2] = PairFOptimized(0, -2.2, 5.0);
+  pair_f[3] = PairFOptimized(1, -2.2, 5.0);
+  pair_f[4] = PairFOptimized(0, 6.2, 5.0);
+  pair_f[5] = PairFOptimized(5, 6.2, 5.0);
 
   double pair_f_python[6] = {
       2.246050458762737,

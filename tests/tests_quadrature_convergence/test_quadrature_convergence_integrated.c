@@ -76,7 +76,7 @@ void ComputeM1CoeffsGivenQuadrature(const int n_leg, const char *reac_type, Opac
   char write_path[300] = {'\0'};
   char write_file[200];
 
-  sprintf(write_file, "/tests/tests_quadrature_convergence/output/integrated/bns_nurates_data_%s_quad_%d.txt", reac_type, 2 * n_leg);
+  sprintf(write_file, "/tests/tests_quadrature_convergence/output/integrated/bns_nurates_data_%s_quad_%d_3.txt", reac_type, 2 * n_leg);
   printf("%s\n", write_file);
 
   strcpy(write_path, SOURCE_DIR); 
@@ -174,8 +174,8 @@ int main() {
   int n_leg[6] = {5, 10, 20, 30, 40, 50};
 
   // Opacity flags
-  OpacityFlags opacity_flags = {.use_abs_em = 0, .use_iso = 0, .use_brem = 1, .use_pair = 0, .use_inelastic_scatt = 0};
-  const char* reac_type = "brem";
+  OpacityFlags opacity_flags = {.use_abs_em = 0, .use_iso = 0, .use_brem = 0, .use_pair = 1, .use_inelastic_scatt = 0};
+  const char* reac_type = "pair";
  
   for (int i = 0; i < 6; i++) {
     ComputeM1CoeffsGivenQuadrature(n_leg[i], reac_type, &opacity_flags);

@@ -1,3 +1,5 @@
+#ifdef GSL_INCLUDES_H_
+
 #include <gsl/gsl_roots.h>
 #include <gsl/gsl_multiroots.h>
 
@@ -145,5 +147,7 @@ int MNewt2dGSL_fd(double *xi, double *xf, gsl_multiroot_function * f) {
   
   return GSL_SUCCESS;
 }
+
+#endif //GSL_INCLUDES_H_
 
 /*===========================================================================*/

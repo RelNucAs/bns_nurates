@@ -638,20 +638,25 @@ M1Opacities ComputeM1Opacities(MyQuadrature *quad_1d, MyQuadrature *quad_2d, Gre
   const double eta_e = my_grey_opacity_params->eos_pars.mu_e / temp;
 
   //const double s = 1.5 * temp;
-  //const double s = 0.5 * 4.364 * temp;
-  const double s = 0.5 * temp * (FDI_p4(eta_e) / FDI_p3(eta_e) + FDI_p4(-eta_e) / FDI_p3(-eta_e));
+  const double s = 0.5 * 4.364 * temp;
+  //const double s = 0.5 * temp * (FDI_p4(eta_e) / FDI_p3(eta_e) + FDI_p4(-eta_e) / FDI_p3(-eta_e));
 
   double s_array[12] = {0};
   for (int j = 0; j < 12; j++) {
     s_array[j] = 1.5 * temp;
   }
+
+  for (int idx = 0; idx < total_num_species; idx++){
+    s_array[idx + 8] = my_grey_opacity_params->m1_pars.J[idx] / my_grey_opacity_params->m1_pars.n[idx];
+  }
   
-  
+  /*
   s_array[0] = temp * FDI_p5(eta_e) / FDI_p4(eta_e);
   s_array[1] = temp * FDI_p5(-eta_e) / FDI_p4(-eta_e);
   s_array[4] = temp * FDI_p5(eta_e) / FDI_p4(eta_e);
   s_array[5] = temp * FDI_p5(-eta_e) / FDI_p4(-eta_e);
-  
+  */
+
   /*
   s_array[0] = temp * fmax(eta_e, 4.) - kQ;
   s_array[1] = temp * fmax(-eta_e, 4.) + kQ;
@@ -840,10 +845,15 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(const double nu, MyQu
     g_nu[idx] = TotalNuF(nu, &my_grey_opacity_params->distr_pars, idx);
   }
 
+  const double eta_e = my_grey_opacity_params->eos_pars.mu_e / my_grey_opacity_params->eos_pars.temp;
+
   double s[8];
   for (int i = 0; i < 8; i++) {
-    s[i] = 1.5 * my_grey_opacity_params->eos_pars.temp;
-    //s[i] = nu;
+    //s[i] = 1.5 * my_grey_opacity_params->eos_pars.temp;
+    //s[i] = 0.5 * 4.364 * my_grey_opacity_params->eos_pars.temp;
+    s[i] = 0.5 * my_grey_opacity_params->eos_pars.temp * (FDI_p4(eta_e) / FDI_p3(eta_e) + FDI_p4(-eta_e) / FDI_p3(-eta_e));
+    //s[i] = my_grey_opacity_params->eos_pars.temp;
+    //s[i] = 2.425E-03 * my_grey_opacity_params->eos_pars.temp;
   }
 
   MyQuadratureIntegrand integrals_1d = GaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s);

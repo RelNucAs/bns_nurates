@@ -37,6 +37,7 @@ void PairTInterpolated(PairKernelParams *kernel_pars, double alpha, double *out)
 double PairTFitted(int l, double alpha);
 double PairT(int l, double alpha, double tolerance);
 double PairF(int k, double eta, double x1);
+double PairFOptimized(int k, double eta, double x1);
 double PairFBackup(int k, double eta, double x1);
 double PairG(int n, double a, double b, double eta, double y, double z);
 double PairPsi(int l, double y, double z, double eta);

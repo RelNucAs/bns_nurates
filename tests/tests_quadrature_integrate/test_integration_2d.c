@@ -5,12 +5,14 @@
 //! \file  test_integration_2d.c
 //  \brief test 2d integration routine
 
+#ifdef GSL_INCLUDES_H_
 #include <stdio.h>
 #include <math.h>
-#include <gsl/gsl_math.h>
-#include "gsl_routines/integration_gsl.h"
 #include "../../include/bns_nurates.h"
 #include "../../include/integration.h"
+#include <gsl/gsl_math.h>
+#include "gsl_routines/integration_gsl.h"
+
 
 // parameters for test functions
 struct FermiDiracParams {
@@ -88,3 +90,5 @@ int main() {
   }
 
 }
+
+#endif //GSL_INCLUDES_H_

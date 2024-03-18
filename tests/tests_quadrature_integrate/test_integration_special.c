@@ -5,6 +5,8 @@
 //! \file  test_integration_special.c
 //  \brief test integration routine with special integration routine ('multiple kernel integrator')
 
+#ifdef GSL_INCLUDES_H_
+
 #include <stdio.h>
 #include <math.h>
 #include <gsl/gsl_math.h>
@@ -114,3 +116,5 @@ int main() {
   }
 
 }
+
+#endif //GSL_INCLUDES_H_

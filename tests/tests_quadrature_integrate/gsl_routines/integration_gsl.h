@@ -5,6 +5,8 @@
 #ifndef BNS_NURATES_TESTS_TESTS_QUADRATURE_INTEGRATE_GSL_CODE_INTEGRATION_GSL_H_
 #define BNS_NURATES_TESTS_TESTS_QUADRATURE_INTEGRATE_GSL_CODE_INTEGRATION_GSL_H_
 
+#ifdef GSL_INCLUDES_H_
+
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_roots.h>
 #include <gsl/gsl_multiroots.h>
@@ -53,5 +55,7 @@ int MNewt2dGSL(double *xi, double *xf, gsl_multiroot_function_fdf *fdf);
 int MNewt2dGSL_fd(double *xi, double *xf, gsl_multiroot_function *f);
 
 // ===================================================================
+
+#endif //GSL_INCLUDES_H_
 
 #endif //BNS_NURATES_TESTS_TESTS_QUADRATURE_INTEGRATE_GSL_CODE_INTEGRATION_GSL_H_
