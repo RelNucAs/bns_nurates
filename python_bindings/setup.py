@@ -20,5 +20,6 @@ setup(
       ext_list,
     libraries=["gsl", "gslcblas"])],
     requires = ["numpy"],
+    py_modules=['bns_nurates']
     #url = "https://bitbucket.org/dradice/pyspinsph"
 )
