@@ -616,7 +616,6 @@ double PairT(int l, double alpha, double tolerance) {
     return result;
   }
 }
-#endif //GSL_INCLUDES_H_
 
 /* Compute F_k(eta,x1) as defined in Appendix B of Pons et. al. (1998)
  *
@@ -760,7 +759,6 @@ double PairG(int n, double a, double b, double eta, double y, double z) {
  *
  * l is an integer.
  */
-#ifdef GSL_INCLUDES_H_
 MyKernelQuantity PairKernelsPhiIntegrated(MyEOSParams *eos_pars, PairKernelParams *kernel_pars) {
 
   // kernel specific parameters
@@ -803,7 +801,6 @@ MyKernelQuantity PairKernelsPhiIntegrated(MyEOSParams *eos_pars, PairKernelParam
   return pair_kernel;
 
 }
-#endif //GSL_INCLUDES_H_
 
 MyKernelQuantity PairKernelsPhiMuIntegrated(MyEOSParams *eos_pars, PairKernelParams *kernel_pars) {
 
@@ -963,7 +960,6 @@ double PairPhi(int l, double omega, double omega_prime, double eta, double temp,
  *
  * l is an integer.
  */
-#ifdef GSL_INCLUDES_H_
 MyKernelQuantity PairKernels(MyEOSParams *eos_pars, PairKernelParams *kernel_pars) {
 
   // kernel specific parameters
@@ -1004,7 +1000,6 @@ MyKernelQuantity PairKernels(MyEOSParams *eos_pars, PairKernelParams *kernel_par
   return pair_kernel;
 
 }
-#endif //GSL_INCLUDES_H_
 
 /* Calculates the production and absorption kernels for the pair process for M1 (l = 0)
  *
@@ -1137,3 +1132,4 @@ double PairFInterpolated(PairKernelParams *kernel_pars, int k, double eta, doubl
 
   return result;
 }
+#endif //GSL_INCLUDES_H_

@@ -12,6 +12,7 @@
 #include "functions.h"
 #include "integration.h"
 
+#ifdef GSL_INCLUDES_H_
 MyKernelQuantity BremEmissivityAbsorptivityIntegrandFermi(double *omega_prime, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params) {
   (void)omega_prime;
   (void)my_eos_params;
@@ -34,4 +35,4 @@ MyKernelQuantity BremOpacitiesFermi(MyQuadrature *quad, MyEOSParams *my_eos_para
 
   return opacities;
 }
-
+#endif //GSL_INCLUDES_H_

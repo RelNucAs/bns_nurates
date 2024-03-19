@@ -46,12 +46,16 @@ double IsoScattLegCoeff(const double omega, OpacityParams *opacity_pars, MyEOSPa
 /*===========================================================================*/
 
 // pair opacities
+#ifdef GSL_INCLUDES_H_
 MyKernelQuantity PairEmissivityAbsorptivityIntegrandFermi(double var, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);
 MyKernelQuantity PairOpacitiesFermi(MyQuadrature *quad, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);
+#endif //GSL_INCLUDES_H
 
 // bremsstrahlung opacities
+#ifdef GSL_INCLUDES_H_
 MyKernelQuantity BremEmissivityAbsorptivityIntegrandFermi(double omega_prime, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);
 MyKernelQuantity BremOpacitiesFermi(MyQuadrature *quad, MyEOSParams *my_eos_params, MyKernelParams *my_kernel_params);
+#endif //GSL_INCLUDES_H
 
 // M1 opacities
 MyQuadratureIntegrand M1CoeffsDoubleIntegrand(double *var, void *p);

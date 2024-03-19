@@ -30,26 +30,29 @@ void BremKernelsTable(const int n, double *nu_array, GreyOpacityParams *grey_par
 // ===============================================================================
 // (2) Pair process kernel
 
-void TabulatePairTFunction(double xi, double xf, double x[dim_pair_t], double t[6][dim_pair_t]);
+
 
 // pair helper functions and kernels
-void PairTInterpolated(PairKernelParams *kernel_pars, double alpha, double *out);
-double PairTFitted(int l, double alpha);
 
+
+MyKernelOutput PairKernelsOptimized(MyEOSParams *eos_pars, PairKernelParams *kernel_pars);
+void PairKernelsTable(const int n, double *nu_array, GreyOpacityParams *grey_pars, M1Matrix *out);
+
+#ifdef GSL_INCLUDES_H_
+void PairTInterpolated(PairKernelParams *kernel_pars, double alpha, double *out);
+MyKernelQuantity PairKernelsPhiMuIntegrated(MyEOSParams *eos_pars, PairKernelParams *kernel_pars);
+void PairKernelsM1Test(MyEOSParams *eos_pars, PairKernelParams *kernel_pars, MyKernelOutput *out_for, MyKernelOutput *out_inv);
+double PairPhi(int l, double omega, double omega_prime, double eta, double temp, int e_x);
+MyKernelQuantity PairKernelsM1(MyEOSParams *eos_pars, PairKernelParams *kernel_pars);
+MyKernelQuantity PairKernels(MyEOSParams *eos_pars, PairKernelParams *kernel_pars);
+double PairT(int l, double alpha, double tolerance);
+void TabulatePairTFunction(double xi, double xf, double x[dim_pair_t], double t[6][dim_pair_t]);
+double PairTFitted(int l, double alpha);
 double PairF(int k, double eta, double x1);
 double PairFOptimized(int k, double eta, double x1);
 double PairFBackup(int k, double eta, double x1);
 double PairG(int n, double a, double b, double eta, double y, double z);
 double PairPsi(int l, double y, double z, double eta);
-double PairPhi(int l, double omega, double omega_prime, double eta, double temp, int e_x);
-MyKernelQuantity PairKernelsM1(MyEOSParams *eos_pars, PairKernelParams *kernel_pars);
-MyKernelOutput PairKernelsOptimized(MyEOSParams *eos_pars, PairKernelParams *kernel_pars);
-void PairKernelsM1Test(MyEOSParams *eos_pars, PairKernelParams *kernel_pars, MyKernelOutput *out_for, MyKernelOutput *out_inv);
-MyKernelQuantity PairKernelsPhiMuIntegrated(MyEOSParams *eos_pars, PairKernelParams *kernel_pars);
-void PairKernelsTable(const int n, double *nu_array, GreyOpacityParams *grey_pars, M1Matrix *out);
-#ifdef GSL_INCLUDES_H_
-MyKernelQuantity PairKernels(MyEOSParams *eos_pars, PairKernelParams *kernel_pars);
-double PairT(int l, double alpha, double tolerance);
 #endif //GSL_INCLUDES_H_
 
 // End of pair process kernel
