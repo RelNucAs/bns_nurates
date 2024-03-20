@@ -1,4 +1,3 @@
-from ctypes import *
 import bns_nurates
 
 c = 2.997924562E10
@@ -70,16 +69,13 @@ grey_pars.m1_pars = m1_pars
 
 
 spec_opacities = bns_nurates.ComputeSpectralOpacitiesNotStimulatedAbs(e_nu, quad_1d, grey_pars)
+m1_opacities = bns_nurates.ComputeM1Opacities(quad_1d, quad_1d, grey_pars)
+print(m1_opacities.eta)
 
-#a = new_doubleArray(10) # Create an array
-#for i in range(0, 10):
-f = bns_nurates.total_num_species
-
-c = spec_opacities.j
-out = (c_double * bns_nurates.total_num_species).from_address(int(c))
-print(out[:])
-#doubleArray_setitem(spec_opacities.j) # Set a value
-#print_array(a) # Pass to C
-#delete_doubleArray(a) # Destroy array
-#print(spec_opacities.j(0))
-
+print(dir(m1_opacities))
+print(spec_opacities.j)
+print(spec_opacities.j_s)
+print(spec_opacities.kappa)
+print(spec_opacities.kappa_s)
+spec_opacities.j = [0.,1.,2.,3.]
+print(spec_opacities.j)
