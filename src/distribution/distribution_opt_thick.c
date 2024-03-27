@@ -114,6 +114,8 @@ void CalculateThickParamsFromM1(M1Quantities* M1_pars, MyEOSParams* eos_pars,
             out_distr_pars->eta_t[species] = 20.;
         }
 
+        out_distr_pars->eta_t[species] = min(out_distr_pars->eta_t[species], 20.);
+
         out_distr_pars->temp_t[species] =
             FDI_p2(out_distr_pars->eta_t[species]) * j /
             (FDI_p3(out_distr_pars->eta_t[species]) * n);
