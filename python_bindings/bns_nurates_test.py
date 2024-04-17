@@ -1,3 +1,4 @@
+import numpy as np
 import bns_nurates
 
 c = 2.997924562E10
@@ -69,9 +70,11 @@ grey_pars.m1_pars = m1_pars
 
 
 spec_opacities = bns_nurates.ComputeSpectralOpacitiesNotStimulatedAbs(e_nu, quad_1d, grey_pars)
+spec_opacities_2 = bns_nurates.PySpectralOpacities(e_nu, quad_1d, grey_pars)
 m1_opacities = bns_nurates.ComputeM1Opacities(quad_1d, quad_1d, grey_pars)
 print(m1_opacities.eta)
 
+print(np.array(spec_opacities.j) - np.array(spec_opacities_2.j))
 print(dir(m1_opacities))
 print(spec_opacities.j)
 print(spec_opacities.j_s)

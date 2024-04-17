@@ -17,8 +17,8 @@ setup(
     #author = "Sebastiano Bernuzzi, David Radice",
     #author_email = "sebastiano.bernuzzi@unipr.it, dradice@caltech.edu",
     ext_modules = [Extension("_bns_nurates",
-      ext_list,
-    libraries=["gsl", "gslcblas"])],
+      ext_list)],
+#    libraries=["gsl", "gslcblas"])],
     requires = ["numpy"],
     py_modules=['bns_nurates']
     #url = "https://bitbucket.org/dradice/pyspinsph"
