@@ -14,6 +14,7 @@
 #include "constants.h"
 #include "functions.h"
 
+#define MIN(x,y) (((x)<(y))?(x):(y))
 #define POW2(X) ((X) * (X))
 #define POW3(X) ((X) * (X) * (X))
 #define POW4(X) ((X) * (X) * (X) * (X))
@@ -113,6 +114,8 @@ void CalculateThickParamsFromM1(M1Quantities* M1_pars, MyEOSParams* eos_pars,
         {
             out_distr_pars->eta_t[species] = 20.;
         }
+
+        out_distr_pars->eta_t[species] = MIN(out_distr_pars->eta_t[species], 20.);
 
         out_distr_pars->temp_t[species] =
             FDI_p2(out_distr_pars->eta_t[species]) * j /
