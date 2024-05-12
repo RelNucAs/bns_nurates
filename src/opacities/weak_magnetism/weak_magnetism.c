@@ -4,6 +4,10 @@
 #include "weak_magnetism.h"
 #include <stdio.h>
 
+#define POW2(X) ((X) * (X))
+#define POW3(X) ((X) * (X) * (X))
+#define POW4(X) ((X) * (X) * (X) * (X))
+
 // !\file weak_magnetism.c
 // \brief Evaluation of phase space/recoil/weak magnetism correction for
 // (anti)neutrino
@@ -24,12 +28,12 @@ void WMAbsEm(const double omega, double* R, double* Rbar)
 
     const double ehor = omega * kMeV / (kMb * kClight * kClight); // Eq.(4)
     const double tmp1 = cv * cv * (1. + 4. * ehor + 16. / 3. * ehor * ehor) +
-                        3. * ca * ca * pow(1. + 4. / 3. * ehor, 2.) +
+                        3. * ca * ca * POW2(1. + 4. / 3. * ehor) +
                         8. / 3. * cv * F2 * ehor * ehor +
                         5. / 3. * ehor * ehor * (1. + 2. / 5. * ehor) * F2 * F2;
     const double tmp2 = 4. * (cv + F2) * ca * ehor * (1. + 4. / 3. * ehor);
-    // const double tmp3 = (cv*cv+3.0*ca*ca)*pow(1.+2.*ehor,3.);
-    const double tmp3 = (kGv * kGv + 3.0 * kGa * kGa) * pow(1. + 2. * ehor, 3.);
+    // const double tmp3 = (cv*cv+3.0*ca*ca)*POW3(1.+2.*ehor);
+    const double tmp3 = (kGv * kGv + 3.0 * kGa * kGa) * POW3(1. + 2. * ehor);
 
     *R    = (tmp1 + tmp2) / tmp3; // Eq.(22)
     *Rbar = (tmp1 - tmp2) / tmp3; // Eq.(22)

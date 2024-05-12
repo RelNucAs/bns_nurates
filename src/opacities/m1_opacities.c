@@ -1277,10 +1277,14 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
     sp_opacities.j_s[id_nux]  = 4. * kPi * nu * nu * g_nu[id_nux] * iso_scatt;
     sp_opacities.j_s[id_anux] = 4. * kPi * nu * nu * g_nu[id_anux] * iso_scatt;
 
-    sp_opacities.kappa_s[id_nue]  = 4. * kPi * nu * nu * (1. - g_nu[id_nue]) * iso_scatt / kClight;
-    sp_opacities.kappa_s[id_anue] = 4. * kPi * nu * nu * (1. - g_nu[id_anue]) * iso_scatt / kClight;
-    sp_opacities.kappa_s[id_nux]  = 4. * kPi * nu * nu * (1. - g_nu[id_nux]) * iso_scatt / kClight;
-    sp_opacities.kappa_s[id_anux] = 4. * kPi * nu * nu * (1. - g_nu[id_anux]) * iso_scatt / kClight;
+    sp_opacities.kappa_s[id_nue] =
+        4. * kPi * nu * nu * (1. - g_nu[id_nue]) * iso_scatt / kClight;
+    sp_opacities.kappa_s[id_anue] =
+        4. * kPi * nu * nu * (1. - g_nu[id_anue]) * iso_scatt / kClight;
+    sp_opacities.kappa_s[id_nux] =
+        4. * kPi * nu * nu * (1. - g_nu[id_nux]) * iso_scatt / kClight;
+    sp_opacities.kappa_s[id_anux] =
+        4. * kPi * nu * nu * (1. - g_nu[id_anux]) * iso_scatt / kClight;
 
     return sp_opacities;
 }
@@ -1298,8 +1302,8 @@ ComputeSpectralOpacitiesStimulatedAbs(const double nu, MyQuadrature* quad_1d,
     {
         spec_opacs.kappa[idx] =
             spec_opacs.j[idx] / kClight + spec_opacs.kappa[idx];
-        spec_opacs.kappa_s[idx] = 
-            spec_opacs.j_s[idx] / kClight + spec_opacs.kappa_s[idx]; 
+        spec_opacs.kappa_s[idx] =
+            spec_opacs.j_s[idx] / kClight + spec_opacs.kappa_s[idx];
     }
 
     return spec_opacs;
