@@ -15,7 +15,6 @@
 #include "kernels.h"
 #include "bns_nurates.h"
 #include "functions.h"
-#include "functions.h"
 #include "constants.h"
 
 // Numerical constants

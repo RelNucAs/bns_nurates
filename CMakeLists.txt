@@ -116,6 +116,7 @@ add_executable(test_pair_t
         tests/tests_pair/test_pair_t.c
         include/constants.h
         src/functions/safe_exp.c
+        src/functions/fermi_integrals.c
         include/kernels.h
         src/opacities/kernels/kernel_pair.c)
 
@@ -129,6 +130,7 @@ add_executable(test_pair_f
         tests/tests_pair/test_pair_f.c
         include/constants.h
         src/functions/safe_exp.c
+        src/functions/fermi_integrals.c
         include/kernels.h
         src/opacities/kernels/kernel_pair.c)
 
@@ -142,6 +144,7 @@ add_executable(test_pair_g
         tests/tests_pair/test_pair_g.c
         include/constants.h
         src/functions/safe_exp.c
+        src/functions/fermi_integrals.c
         include/kernels.h
         src/opacities/kernels/kernel_pair.c)
 
@@ -155,6 +158,7 @@ add_executable(test_pair_psi
         tests/tests_pair/test_pair_psi.c
         include/constants.h
         src/functions/safe_exp.c
+        src/functions/fermi_integrals.c
         include/kernels.h
         src/opacities/kernels/kernel_pair.c)
 
@@ -168,6 +172,7 @@ add_executable(test_pair_phi
         tests/tests_pair/test_pair_phi.c
         include/constants.h
         src/functions/safe_exp.c
+        src/functions/fermi_integrals.c
         include/kernels.h
         src/opacities/kernels/kernel_pair.c
 )
@@ -183,6 +188,7 @@ add_executable(test_pair_kernels
         tests/tests_pair/test_pair_kernels.c
         include/constants.h
         src/functions/safe_exp.c
+        src/functions/fermi_integrals.c
         include/kernels.h
         src/opacities/kernels/kernel_pair.c
 )
@@ -199,6 +205,7 @@ add_executable(test_pair_kernels_phi_mu_integrated
         tests/tests_pair/test_pair_kernels_phi_mu_integrated.c
         include/constants.h
         src/functions/safe_exp.c
+        src/functions/fermi_integrals.c
         include/kernels.h
         src/opacities/kernels/kernel_pair.c
 )
@@ -246,6 +253,7 @@ add_executable(test_beta
         include/functions.h
         src/functions/digamma.c
         src/functions/fermi_distr.c
+        src/functions/fermi_integrals.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -279,6 +287,7 @@ add_executable(test_iso
         include/functions.h
         src/functions/digamma.c
         src/functions/fermi_distr.c
+        src/functions/fermi_integrals.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
@@ -312,6 +321,7 @@ add_executable(test_brem
         include/functions.h
         src/functions/digamma.c
         src/functions/fermi_distr.c
+        src/functions/fermi_integrals.c
         src/functions/gamma.c
         src/functions/mnewt.c
         src/functions/safe_exp.c
