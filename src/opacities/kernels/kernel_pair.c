@@ -511,192 +511,192 @@ double PairFOptimized(int k, double eta, double x1)
 /*     return; */
 /* } */
 
-void F_for_G(double eta, double y, double z, double* F_out)
-{
-    F_out[0 + 0 * 8] = FDI_0(eta);
-    F_out[1 + 0 * 8] = FDI_0(eta - y);
-    F_out[2 + 0 * 8] = FDI_0(eta - z);
-    F_out[3 + 0 * 8] = FDI_0(eta + y);
-    F_out[4 + 0 * 8] = FDI_0(eta + z);
-    F_out[5 + 0 * 8] = FDI_0(eta - y - z);
-    F_out[6 + 0 * 8] = (y <= z) ? F_out[1] : F_out[2];
-    F_out[7 + 0 * 8] = (y <= z) ? F_out[4] : F_out[3];
+/* void F_for_G(double eta, double y, double z, double* F_out) */
+/* { */
+/*     F_out[0 + 0 * 8] = FDI_0(eta); */
+/*     F_out[1 + 0 * 8] = FDI_0(eta - y); */
+/*     F_out[2 + 0 * 8] = FDI_0(eta - z); */
+/*     F_out[3 + 0 * 8] = FDI_0(eta + y); */
+/*     F_out[4 + 0 * 8] = FDI_0(eta + z); */
+/*     F_out[5 + 0 * 8] = FDI_0(eta - y - z); */
+/*     F_out[6 + 0 * 8] = (y <= z) ? F_out[1] : F_out[2]; */
+/*     F_out[7 + 0 * 8] = (y <= z) ? F_out[4] : F_out[3]; */
 
-    F_out[0 + 1 * 8] = FDI_p1(eta);
-    F_out[1 + 1 * 8] = FDI_p1(eta - y);
-    F_out[2 + 1 * 8] = FDI_p1(eta - z);
-    F_out[3 + 1 * 8] = FDI_p1(eta + y);
-    F_out[4 + 1 * 8] = FDI_p1(eta + z);
-    F_out[5 + 1 * 8] = FDI_p1(eta - y - z);
-    F_out[6 + 1 * 8] = (y <= z) ? F_out[1 + 1 * 8] : F_out[2 + 1 * 8];
-    F_out[7 + 1 * 8] = (y <= z) ? F_out[4 + 1 * 8] : F_out[3 + 1 * 8];
+/*     F_out[0 + 1 * 8] = FDI_p1(eta); */
+/*     F_out[1 + 1 * 8] = FDI_p1(eta - y); */
+/*     F_out[2 + 1 * 8] = FDI_p1(eta - z); */
+/*     F_out[3 + 1 * 8] = FDI_p1(eta + y); */
+/*     F_out[4 + 1 * 8] = FDI_p1(eta + z); */
+/*     F_out[5 + 1 * 8] = FDI_p1(eta - y - z); */
+/*     F_out[6 + 1 * 8] = (y <= z) ? F_out[1 + 1 * 8] : F_out[2 + 1 * 8]; */
+/*     F_out[7 + 1 * 8] = (y <= z) ? F_out[4 + 1 * 8] : F_out[3 + 1 * 8]; */
 
-    F_out[0 + 2 * 8] = FDI_p2(eta);
-    F_out[1 + 2 * 8] = FDI_p2(eta - y);
-    F_out[2 + 2 * 8] = FDI_p2(eta - z);
-    F_out[3 + 2 * 8] = FDI_p2(eta + y);
-    F_out[4 + 2 * 8] = FDI_p2(eta + z);
-    F_out[5 + 2 * 8] = FDI_p2(eta - y - z);
-    F_out[6 + 2 * 8] = (y <= z) ? F_out[1 + 2 * 8] : F_out[2 + 2 * 8];
-    F_out[7 + 2 * 8] = (y <= z) ? F_out[4 + 2 * 8] : F_out[3 + 2 * 8];
+/*     F_out[0 + 2 * 8] = FDI_p2(eta); */
+/*     F_out[1 + 2 * 8] = FDI_p2(eta - y); */
+/*     F_out[2 + 2 * 8] = FDI_p2(eta - z); */
+/*     F_out[3 + 2 * 8] = FDI_p2(eta + y); */
+/*     F_out[4 + 2 * 8] = FDI_p2(eta + z); */
+/*     F_out[5 + 2 * 8] = FDI_p2(eta - y - z); */
+/*     F_out[6 + 2 * 8] = (y <= z) ? F_out[1 + 2 * 8] : F_out[2 + 2 * 8]; */
+/*     F_out[7 + 2 * 8] = (y <= z) ? F_out[4 + 2 * 8] : F_out[3 + 2 * 8]; */
 
-    F_out[0 + 3 * 8] = FDI_p3(eta);
-    F_out[1 + 3 * 8] = FDI_p3(eta - y);
-    F_out[2 + 3 * 8] = FDI_p3(eta - z);
-    F_out[3 + 3 * 8] = FDI_p3(eta + y);
-    F_out[4 + 3 * 8] = FDI_p3(eta + z);
-    F_out[5 + 3 * 8] = FDI_p3(eta - y - z);
-    F_out[6 + 3 * 8] = (y <= z) ? F_out[1 + 3 * 8] : F_out[2 + 3 * 8];
-    F_out[7 + 3 * 8] = (y <= z) ? F_out[4 + 3 * 8] : F_out[3 + 3 * 8];
+/*     F_out[0 + 3 * 8] = FDI_p3(eta); */
+/*     F_out[1 + 3 * 8] = FDI_p3(eta - y); */
+/*     F_out[2 + 3 * 8] = FDI_p3(eta - z); */
+/*     F_out[3 + 3 * 8] = FDI_p3(eta + y); */
+/*     F_out[4 + 3 * 8] = FDI_p3(eta + z); */
+/*     F_out[5 + 3 * 8] = FDI_p3(eta - y - z); */
+/*     F_out[6 + 3 * 8] = (y <= z) ? F_out[1 + 3 * 8] : F_out[2 + 3 * 8]; */
+/*     F_out[7 + 3 * 8] = (y <= z) ? F_out[4 + 3 * 8] : F_out[3 + 3 * 8]; */
 
-    F_out[0 + 4 * 8] = FDI_p4(eta);
-    F_out[1 + 4 * 8] = FDI_p4(eta - y);
-    F_out[2 + 4 * 8] = FDI_p4(eta - z);
-    F_out[3 + 4 * 8] = FDI_p4(eta + y);
-    F_out[4 + 4 * 8] = FDI_p4(eta + z);
-    F_out[5 + 4 * 8] = FDI_p4(eta - y - z);
-    F_out[6 + 4 * 8] = (y <= z) ? F_out[1 + 4 * 8] : F_out[2 + 4 * 8];
-    F_out[7 + 4 * 8] = (y <= z) ? F_out[4 + 4 * 8] : F_out[3 + 4 * 8];
+/*     F_out[0 + 4 * 8] = FDI_p4(eta); */
+/*     F_out[1 + 4 * 8] = FDI_p4(eta - y); */
+/*     F_out[2 + 4 * 8] = FDI_p4(eta - z); */
+/*     F_out[3 + 4 * 8] = FDI_p4(eta + y); */
+/*     F_out[4 + 4 * 8] = FDI_p4(eta + z); */
+/*     F_out[5 + 4 * 8] = FDI_p4(eta - y - z); */
+/*     F_out[6 + 4 * 8] = (y <= z) ? F_out[1 + 4 * 8] : F_out[2 + 4 * 8]; */
+/*     F_out[7 + 4 * 8] = (y <= z) ? F_out[4 + 4 * 8] : F_out[3 + 4 * 8]; */
 
-    F_out[0 + 5 * 8] = FDI_p5(eta);
-    F_out[1 + 5 * 8] = FDI_p5(eta - y);
-    F_out[2 + 5 * 8] = FDI_p5(eta - z);
-    F_out[3 + 5 * 8] = FDI_p5(eta + y);
-    F_out[4 + 5 * 8] = FDI_p5(eta + z);
-    F_out[5 + 5 * 8] = FDI_p5(eta - y - z);
-    F_out[6 + 5 * 8] = (y <= z) ? F_out[1 + 5 * 8] : F_out[2 + 5 * 8];
-    F_out[7 + 5 * 8] = (y <= z) ? F_out[4 + 5 * 8] : F_out[3 + 5 * 8];
+/*     F_out[0 + 5 * 8] = FDI_p5(eta); */
+/*     F_out[1 + 5 * 8] = FDI_p5(eta - y); */
+/*     F_out[2 + 5 * 8] = FDI_p5(eta - z); */
+/*     F_out[3 + 5 * 8] = FDI_p5(eta + y); */
+/*     F_out[4 + 5 * 8] = FDI_p5(eta + z); */
+/*     F_out[5 + 5 * 8] = FDI_p5(eta - y - z); */
+/*     F_out[6 + 5 * 8] = (y <= z) ? F_out[1 + 5 * 8] : F_out[2 + 5 * 8]; */
+/*     F_out[7 + 5 * 8] = (y <= z) ? F_out[4 + 5 * 8] : F_out[3 + 5 * 8]; */
 
-    return;
-}
+/*     return; */
+/* } */
 
-void PairGOptimized(double eta, double y, double z, double* g_out)
-{
-    double m = MIN(y, z);
+/* void PairGOptimized(double eta, double y, double z, double* g_out) */
+/* { */
+/*     double m = MIN(y, z); */
 
-    double F[48];
+/*     double F[48]; */
 
-    F_for_G(eta, y, z, F);
+/*     F_for_G(eta, y, z, F); */
 
-    g_out[0] = (1 * (POW0(y) * (F[1 + 0 * 8] - F[4 + 0 * 8]) -
-                     POW0(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8])));
-    g_out[1] = (1 * (POW0(z) * (F[2 + 0 * 8] - F[3 + 0 * 8]) -
-                     POW0(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8])));
-    g_out[2] = (y <= z) ? g_out[1] : g_out[0];
-    g_out[3] = (-1 * (POW0(m) * (F[6 + 0 * 8] - F[7 + 0 * 8])));
+/*     g_out[0] = (1 * (POW0(y) * (F[1 + 0 * 8] - F[4 + 0 * 8]) - */
+/*                      POW0(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))); */
+/*     g_out[1] = (1 * (POW0(z) * (F[2 + 0 * 8] - F[3 + 0 * 8]) - */
+/*                      POW0(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))); */
+/*     g_out[2] = (y <= z) ? g_out[1] : g_out[0]; */
+/*     g_out[3] = (-1 * (POW0(m) * (F[6 + 0 * 8] - F[7 + 0 * 8]))); */
 
-    g_out[4] = (1 * (POW1(y) * (F[1 + 0 * 8] - F[4 + 0 * 8]) -
-                     POW1(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))) +
-               (1 * (POW0(y) * (F[1 + 1 * 8] - F[4 + 1 * 8]) -
-                     POW0(y + z) * (F[5 + 1 * 8] - F[0 + 1 * 8])));
-    g_out[5] = (1 * (POW1(z) * (F[2 + 0 * 8] - F[3 + 0 * 8]) -
-                     POW1(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))) +
-               (1 * (POW0(z) * (F[2 + 1 * 8] - F[3 + 1 * 8]) -
-                     POW0(y + z) * (F[5 + 1 * 8] - F[0 + 1 * 8])));
-    g_out[6] = (y <= z) ? g_out[5] : g_out[4];
-    g_out[7] = (-1 * (POW1(m) * (F[6 + 0 * 8] - F[7 + 0 * 8]))) +
-               (-1 * (POW0(m) * (F[6 + 1 * 8] - F[7 + 1 * 8])));
+/*     g_out[4] = (1 * (POW1(y) * (F[1 + 0 * 8] - F[4 + 0 * 8]) - */
+/*                      POW1(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))) + */
+/*                (1 * (POW0(y) * (F[1 + 1 * 8] - F[4 + 1 * 8]) - */
+/*                      POW0(y + z) * (F[5 + 1 * 8] - F[0 + 1 * 8]))); */
+/*     g_out[5] = (1 * (POW1(z) * (F[2 + 0 * 8] - F[3 + 0 * 8]) - */
+/*                      POW1(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))) + */
+/*                (1 * (POW0(z) * (F[2 + 1 * 8] - F[3 + 1 * 8]) - */
+/*                      POW0(y + z) * (F[5 + 1 * 8] - F[0 + 1 * 8]))); */
+/*     g_out[6] = (y <= z) ? g_out[5] : g_out[4]; */
+/*     g_out[7] = (-1 * (POW1(m) * (F[6 + 0 * 8] - F[7 + 0 * 8]))) + */
+/*                (-1 * (POW0(m) * (F[6 + 1 * 8] - F[7 + 1 * 8]))); */
 
-    g_out[8] = (1 * (POW2(y) * (F[1 + 0 * 8] - F[4 + 0 * 8]) -
-                     POW2(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))) +
-               (2 * (POW1(y) * (F[1 + 1 * 8] - F[4 + 1 * 8]) -
-                     POW1(y + z) * (F[5 + 1 * 8] - F[0 + 1 * 8]))) +
-               (1 * (POW0(y) * (F[1 + 2 * 8] - F[4 + 2 * 8]) -
-                     POW0(y + z) * (F[5 + 2 * 8] - F[0 + 2 * 8])));
-    g_out[9] = (1 * (POW2(z) * (F[2 + 0 * 8] - F[3 + 0 * 8]) -
-                     POW2(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))) +
-               (2 * (POW1(z) * (F[2 + 1 * 8] - F[3 + 1 * 8]) -
-                     POW1(y + z) * (F[5 + 1 * 8] - F[0 + 1 * 8]))) +
-               (1 * (POW0(z) * (F[2 + 2 * 8] - F[3 + 2 * 8]) -
-                     POW0(y + z) * (F[5 + 2 * 8] - F[0 + 2 * 8])));
-    g_out[10] = (y <= z) ? g_out[9] : g_out[8];
-    g_out[11] = (-1 * (POW2(m) * (F[6 + 0 * 8] - F[7 + 0 * 8]))) +
-                (-2 * (POW1(m) * (F[6 + 1 * 8] - F[7 + 1 * 8]))) +
-                (-1 * (POW0(m) * (F[6 + 2 * 8] - F[7 + 2 * 8])));
+/*     g_out[8] = (1 * (POW2(y) * (F[1 + 0 * 8] - F[4 + 0 * 8]) - */
+/*                      POW2(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))) + */
+/*                (2 * (POW1(y) * (F[1 + 1 * 8] - F[4 + 1 * 8]) - */
+/*                      POW1(y + z) * (F[5 + 1 * 8] - F[0 + 1 * 8]))) + */
+/*                (1 * (POW0(y) * (F[1 + 2 * 8] - F[4 + 2 * 8]) - */
+/*                      POW0(y + z) * (F[5 + 2 * 8] - F[0 + 2 * 8]))); */
+/*     g_out[9] = (1 * (POW2(z) * (F[2 + 0 * 8] - F[3 + 0 * 8]) - */
+/*                      POW2(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))) + */
+/*                (2 * (POW1(z) * (F[2 + 1 * 8] - F[3 + 1 * 8]) - */
+/*                      POW1(y + z) * (F[5 + 1 * 8] - F[0 + 1 * 8]))) + */
+/*                (1 * (POW0(z) * (F[2 + 2 * 8] - F[3 + 2 * 8]) - */
+/*                      POW0(y + z) * (F[5 + 2 * 8] - F[0 + 2 * 8]))); */
+/*     g_out[10] = (y <= z) ? g_out[9] : g_out[8]; */
+/*     g_out[11] = (-1 * (POW2(m) * (F[6 + 0 * 8] - F[7 + 0 * 8]))) + */
+/*                 (-2 * (POW1(m) * (F[6 + 1 * 8] - F[7 + 1 * 8]))) + */
+/*                 (-1 * (POW0(m) * (F[6 + 2 * 8] - F[7 + 2 * 8]))); */
 
-    g_out[12] = (1 * (POW3(y) * (F[1 + 0 * 8] - F[4 + 0 * 8]) -
-                      POW3(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))) +
-                (3 * (POW2(y) * (F[1 + 1 * 8] - F[4 + 1 * 8]) -
-                      POW2(y + z) * (F[5 + 1 * 8] - F[0 + 1 * 8]))) +
-                (3 * (POW1(y) * (F[1 + 2 * 8] - F[4 + 2 * 8]) -
-                      POW1(y + z) * (F[5 + 2 * 8] - F[0 + 2 * 8]))) +
-                (1 * (POW0(y) * (F[1 + 3 * 8] - F[4 + 3 * 8]) -
-                      POW0(y + z) * (F[5 + 3 * 8] - F[0 + 3 * 8])));
-    g_out[13] = (1 * (POW3(z) * (F[2 + 0 * 8] - F[3 + 0 * 8]) -
-                      POW3(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))) +
-                (3 * (POW2(z) * (F[2 + 1 * 8] - F[3 + 1 * 8]) -
-                      POW2(y + z) * (F[5 + 1 * 8] - F[0 + 1 * 8]))) +
-                (3 * (POW1(z) * (F[2 + 2 * 8] - F[3 + 2 * 8]) -
-                      POW1(y + z) * (F[5 + 2 * 8] - F[0 + 2 * 8]))) +
-                (1 * (POW0(z) * (F[2 + 3 * 8] - F[3 + 3 * 8]) -
-                      POW0(y + z) * (F[5 + 3 * 8] - F[0 + 3 * 8])));
-    g_out[14] = (y <= z) ? g_out[13] : g_out[12];
-    g_out[15] = (-1 * (POW3(m) * (F[6 + 0 * 8] - F[7 + 0 * 8]))) +
-                (-3 * (POW2(m) * (F[6 + 1 * 8] - F[7 + 1 * 8]))) +
-                (-3 * (POW1(m) * (F[6 + 2 * 8] - F[7 + 2 * 8]))) +
-                (-1 * (POW0(m) * (F[6 + 3 * 8] - F[7 + 3 * 8])));
+/*     g_out[12] = (1 * (POW3(y) * (F[1 + 0 * 8] - F[4 + 0 * 8]) - */
+/*                       POW3(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))) + */
+/*                 (3 * (POW2(y) * (F[1 + 1 * 8] - F[4 + 1 * 8]) - */
+/*                       POW2(y + z) * (F[5 + 1 * 8] - F[0 + 1 * 8]))) + */
+/*                 (3 * (POW1(y) * (F[1 + 2 * 8] - F[4 + 2 * 8]) - */
+/*                       POW1(y + z) * (F[5 + 2 * 8] - F[0 + 2 * 8]))) + */
+/*                 (1 * (POW0(y) * (F[1 + 3 * 8] - F[4 + 3 * 8]) - */
+/*                       POW0(y + z) * (F[5 + 3 * 8] - F[0 + 3 * 8]))); */
+/*     g_out[13] = (1 * (POW3(z) * (F[2 + 0 * 8] - F[3 + 0 * 8]) - */
+/*                       POW3(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))) + */
+/*                 (3 * (POW2(z) * (F[2 + 1 * 8] - F[3 + 1 * 8]) - */
+/*                       POW2(y + z) * (F[5 + 1 * 8] - F[0 + 1 * 8]))) + */
+/*                 (3 * (POW1(z) * (F[2 + 2 * 8] - F[3 + 2 * 8]) - */
+/*                       POW1(y + z) * (F[5 + 2 * 8] - F[0 + 2 * 8]))) + */
+/*                 (1 * (POW0(z) * (F[2 + 3 * 8] - F[3 + 3 * 8]) - */
+/*                       POW0(y + z) * (F[5 + 3 * 8] - F[0 + 3 * 8]))); */
+/*     g_out[14] = (y <= z) ? g_out[13] : g_out[12]; */
+/*     g_out[15] = (-1 * (POW3(m) * (F[6 + 0 * 8] - F[7 + 0 * 8]))) + */
+/*                 (-3 * (POW2(m) * (F[6 + 1 * 8] - F[7 + 1 * 8]))) + */
+/*                 (-3 * (POW1(m) * (F[6 + 2 * 8] - F[7 + 2 * 8]))) + */
+/*                 (-1 * (POW0(m) * (F[6 + 3 * 8] - F[7 + 3 * 8]))); */
 
-    g_out[16] = (1 * (POW4(y) * (F[1 + 0 * 8] - F[4 + 0 * 8]) -
-                      POW4(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))) +
-                (4 * (POW3(y) * (F[1 + 1 * 8] - F[4 + 1 * 8]) -
-                      POW3(y + z) * (F[5 + 1 * 8] - F[0 + 1 * 8]))) +
-                (6 * (POW2(y) * (F[1 + 2 * 8] - F[4 + 2 * 8]) -
-                      POW2(y + z) * (F[5 + 2 * 8] - F[0 + 2 * 8]))) +
-                (4 * (POW1(y) * (F[1 + 3 * 8] - F[4 + 3 * 8]) -
-                      POW1(y + z) * (F[5 + 3 * 8] - F[0 + 3 * 8]))) +
-                (1 * (POW0(y) * (F[1 + 4 * 8] - F[4 + 4 * 8]) -
-                      POW0(y + z) * (F[5 + 4 * 8] - F[0 + 4 * 8])));
-    g_out[17] = (1 * (POW4(z) * (F[2 + 0 * 8] - F[3 + 0 * 8]) -
-                      POW4(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))) +
-                (4 * (POW3(z) * (F[2 + 1 * 8] - F[3 + 1 * 8]) -
-                      POW3(y + z) * (F[5 + 1 * 8] - F[0 + 1 * 8]))) +
-                (6 * (POW2(z) * (F[2 + 2 * 8] - F[3 + 2 * 8]) -
-                      POW2(y + z) * (F[5 + 2 * 8] - F[0 + 2 * 8]))) +
-                (4 * (POW1(z) * (F[2 + 3 * 8] - F[3 + 3 * 8]) -
-                      POW1(y + z) * (F[5 + 3 * 8] - F[0 + 3 * 8]))) +
-                (1 * (POW0(z) * (F[2 + 4 * 8] - F[3 + 4 * 8]) -
-                      POW0(y + z) * (F[5 + 4 * 8] - F[0 + 4 * 8])));
-    g_out[18] = (y <= z) ? g_out[17] : g_out[16];
-    g_out[19] = (-1 * (POW4(m) * (F[6 + 0 * 8] - F[7 + 0 * 8]))) +
-                (-4 * (POW3(m) * (F[6 + 1 * 8] - F[7 + 1 * 8]))) +
-                (-6 * (POW2(m) * (F[6 + 2 * 8] - F[7 + 2 * 8]))) +
-                (-4 * (POW1(m) * (F[6 + 3 * 8] - F[7 + 3 * 8]))) +
-                (-1 * (POW0(m) * (F[6 + 4 * 8] - F[7 + 4 * 8])));
+/*     g_out[16] = (1 * (POW4(y) * (F[1 + 0 * 8] - F[4 + 0 * 8]) - */
+/*                       POW4(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))) + */
+/*                 (4 * (POW3(y) * (F[1 + 1 * 8] - F[4 + 1 * 8]) - */
+/*                       POW3(y + z) * (F[5 + 1 * 8] - F[0 + 1 * 8]))) + */
+/*                 (6 * (POW2(y) * (F[1 + 2 * 8] - F[4 + 2 * 8]) - */
+/*                       POW2(y + z) * (F[5 + 2 * 8] - F[0 + 2 * 8]))) + */
+/*                 (4 * (POW1(y) * (F[1 + 3 * 8] - F[4 + 3 * 8]) - */
+/*                       POW1(y + z) * (F[5 + 3 * 8] - F[0 + 3 * 8]))) + */
+/*                 (1 * (POW0(y) * (F[1 + 4 * 8] - F[4 + 4 * 8]) - */
+/*                       POW0(y + z) * (F[5 + 4 * 8] - F[0 + 4 * 8]))); */
+/*     g_out[17] = (1 * (POW4(z) * (F[2 + 0 * 8] - F[3 + 0 * 8]) - */
+/*                       POW4(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))) + */
+/*                 (4 * (POW3(z) * (F[2 + 1 * 8] - F[3 + 1 * 8]) - */
+/*                       POW3(y + z) * (F[5 + 1 * 8] - F[0 + 1 * 8]))) + */
+/*                 (6 * (POW2(z) * (F[2 + 2 * 8] - F[3 + 2 * 8]) - */
+/*                       POW2(y + z) * (F[5 + 2 * 8] - F[0 + 2 * 8]))) + */
+/*                 (4 * (POW1(z) * (F[2 + 3 * 8] - F[3 + 3 * 8]) - */
+/*                       POW1(y + z) * (F[5 + 3 * 8] - F[0 + 3 * 8]))) + */
+/*                 (1 * (POW0(z) * (F[2 + 4 * 8] - F[3 + 4 * 8]) - */
+/*                       POW0(y + z) * (F[5 + 4 * 8] - F[0 + 4 * 8]))); */
+/*     g_out[18] = (y <= z) ? g_out[17] : g_out[16]; */
+/*     g_out[19] = (-1 * (POW4(m) * (F[6 + 0 * 8] - F[7 + 0 * 8]))) + */
+/*                 (-4 * (POW3(m) * (F[6 + 1 * 8] - F[7 + 1 * 8]))) + */
+/*                 (-6 * (POW2(m) * (F[6 + 2 * 8] - F[7 + 2 * 8]))) + */
+/*                 (-4 * (POW1(m) * (F[6 + 3 * 8] - F[7 + 3 * 8]))) + */
+/*                 (-1 * (POW0(m) * (F[6 + 4 * 8] - F[7 + 4 * 8]))); */
 
-    g_out[20] = (1 * (POW5(y) * (F[1 + 0 * 8] - F[4 + 0 * 8]) -
-                      POW5(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))) +
-                (5 * (POW4(y) * (F[1 + 1 * 8] - F[4 + 1 * 8]) -
-                      POW4(y + z) * (F[5 + 1 * 8] - F[0 + 1 * 8]))) +
-                (10 * (POW3(y) * (F[1 + 2 * 8] - F[4 + 2 * 8]) -
-                       POW3(y + z) * (F[5 + 2 * 8] - F[0 + 2 * 8]))) +
-                (10 * (POW2(y) * (F[1 + 3 * 8] - F[4 + 3 * 8]) -
-                       POW2(y + z) * (F[5 + 3 * 8] - F[0 + 3 * 8]))) +
-                (5 * (POW1(y) * (F[1 + 4 * 8] - F[4 + 4 * 8]) -
-                      POW1(y + z) * (F[5 + 4 * 8] - F[0 + 4 * 8]))) +
-                (1 * (POW0(y) * (F[1 + 5 * 8] - F[4 + 5 * 8]) -
-                      POW0(y + z) * (F[5 + 5 * 8] - F[0 + 5 * 8])));
-    g_out[21] = (1 * (POW5(z) * (F[2 + 0 * 8] - F[3 + 0 * 8]) -
-                      POW5(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))) +
-                (5 * (POW4(z) * (F[2 + 1 * 8] - F[3 + 1 * 8]) -
-                      POW4(y + z) * (F[5 + 1 * 8] - F[0 + 1 * 8]))) +
-                (10 * (POW3(z) * (F[2 + 2 * 8] - F[3 + 2 * 8]) -
-                       POW3(y + z) * (F[5 + 2 * 8] - F[0 + 2 * 8]))) +
-                (10 * (POW2(z) * (F[2 + 3 * 8] - F[3 + 3 * 8]) -
-                       POW2(y + z) * (F[5 + 3 * 8] - F[0 + 3 * 8]))) +
-                (5 * (POW1(z) * (F[2 + 4 * 8] - F[3 + 4 * 8]) -
-                      POW1(y + z) * (F[5 + 4 * 8] - F[0 + 4 * 8]))) +
-                (1 * (POW0(z) * (F[2 + 5 * 8] - F[3 + 5 * 8]) -
-                      POW0(y + z) * (F[5 + 5 * 8] - F[0 + 5 * 8])));
-    g_out[22] = (y <= z) ? g_out[21] : g_out[20];
-    g_out[23] = (-1 * (POW5(m) * (F[6 + 0 * 8] - F[7 + 0 * 8]))) +
-                (-5 * (POW4(m) * (F[6 + 1 * 8] - F[7 + 1 * 8]))) +
-                (-10 * (POW3(m) * (F[6 + 2 * 8] - F[7 + 2 * 8]))) +
-                (-10 * (POW2(m) * (F[6 + 3 * 8] - F[7 + 3 * 8]))) +
-                (-5 * (POW1(m) * (F[6 + 4 * 8] - F[7 + 4 * 8]))) +
-                (-1 * (POW0(m) * (F[6 + 5 * 8] - F[7 + 5 * 8])));
+/*     g_out[20] = (1 * (POW5(y) * (F[1 + 0 * 8] - F[4 + 0 * 8]) - */
+/*                       POW5(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))) + */
+/*                 (5 * (POW4(y) * (F[1 + 1 * 8] - F[4 + 1 * 8]) - */
+/*                       POW4(y + z) * (F[5 + 1 * 8] - F[0 + 1 * 8]))) + */
+/*                 (10 * (POW3(y) * (F[1 + 2 * 8] - F[4 + 2 * 8]) - */
+/*                        POW3(y + z) * (F[5 + 2 * 8] - F[0 + 2 * 8]))) + */
+/*                 (10 * (POW2(y) * (F[1 + 3 * 8] - F[4 + 3 * 8]) - */
+/*                        POW2(y + z) * (F[5 + 3 * 8] - F[0 + 3 * 8]))) + */
+/*                 (5 * (POW1(y) * (F[1 + 4 * 8] - F[4 + 4 * 8]) - */
+/*                       POW1(y + z) * (F[5 + 4 * 8] - F[0 + 4 * 8]))) + */
+/*                 (1 * (POW0(y) * (F[1 + 5 * 8] - F[4 + 5 * 8]) - */
+/*                       POW0(y + z) * (F[5 + 5 * 8] - F[0 + 5 * 8]))); */
+/*     g_out[21] = (1 * (POW5(z) * (F[2 + 0 * 8] - F[3 + 0 * 8]) - */
+/*                       POW5(y + z) * (F[5 + 0 * 8] - F[0 + 0 * 8]))) + */
+/*                 (5 * (POW4(z) * (F[2 + 1 * 8] - F[3 + 1 * 8]) - */
+/*                       POW4(y + z) * (F[5 + 1 * 8] - F[0 + 1 * 8]))) + */
+/*                 (10 * (POW3(z) * (F[2 + 2 * 8] - F[3 + 2 * 8]) - */
+/*                        POW3(y + z) * (F[5 + 2 * 8] - F[0 + 2 * 8]))) + */
+/*                 (10 * (POW2(z) * (F[2 + 3 * 8] - F[3 + 3 * 8]) - */
+/*                        POW2(y + z) * (F[5 + 3 * 8] - F[0 + 3 * 8]))) + */
+/*                 (5 * (POW1(z) * (F[2 + 4 * 8] - F[3 + 4 * 8]) - */
+/*                       POW1(y + z) * (F[5 + 4 * 8] - F[0 + 4 * 8]))) + */
+/*                 (1 * (POW0(z) * (F[2 + 5 * 8] - F[3 + 5 * 8]) - */
+/*                       POW0(y + z) * (F[5 + 5 * 8] - F[0 + 5 * 8]))); */
+/*     g_out[22] = (y <= z) ? g_out[21] : g_out[20]; */
+/*     g_out[23] = (-1 * (POW5(m) * (F[6 + 0 * 8] - F[7 + 0 * 8]))) + */
+/*                 (-5 * (POW4(m) * (F[6 + 1 * 8] - F[7 + 1 * 8]))) + */
+/*                 (-10 * (POW3(m) * (F[6 + 2 * 8] - F[7 + 2 * 8]))) + */
+/*                 (-10 * (POW2(m) * (F[6 + 3 * 8] - F[7 + 3 * 8]))) + */
+/*                 (-5 * (POW1(m) * (F[6 + 4 * 8] - F[7 + 4 * 8]))) + */
+/*                 (-1 * (POW0(m) * (F[6 + 5 * 8] - F[7 + 5 * 8]))); */
 
-    return;
-}
+/*     return; */
+/* } */
 
 /* Calculate Psi_l(y,z) from Eqn. (11) of Pons et. al.
  *
@@ -809,23 +809,71 @@ void PairPsiOptimized(int l, double y, double z, double eta, double* psi_out)
 {
     assert(l == 0);
 
-    double G[24];
-    double a_yz[4][12], c_yz[4][3], d_yz[4][3];
-    double a_zy[4][12], c_zy[4][3], d_zy[4][3];
+    const double FDI_p1_emy  = FDI_p1(eta - y);
+    const double FDI_p1_emz  = FDI_p1(eta - z);
+    const double FDI_p1_epy  = FDI_p1(eta + y);
+    const double FDI_p1_epz  = FDI_p1(eta + z);
+    const double FDI_p2_emy  = FDI_p2(eta - y);
+    const double FDI_p2_emz  = FDI_p2(eta - z);
+    const double FDI_p2_epy  = FDI_p2(eta + y);
+    const double FDI_p2_epz  = FDI_p2(eta + z);
+    const double FDI_p3_e    = FDI_p3(eta);
+    const double FDI_p3_emy  = FDI_p3(eta - y);
+    const double FDI_p3_emz  = FDI_p3(eta - z);
+    const double FDI_p3_epy  = FDI_p3(eta + y);
+    const double FDI_p3_epz  = FDI_p3(eta + z);
+    const double FDI_p3_emyz = FDI_p3(eta - y - z);
+    const double FDI_p3_epyz = FDI_p3(eta + y + z);
+    const double FDI_p4_e    = FDI_p4(eta);
+    const double FDI_p4_emy  = FDI_p4(eta - y);
+    const double FDI_p4_emz  = FDI_p4(eta - z);
+    const double FDI_p4_epy  = FDI_p4(eta + y);
+    const double FDI_p4_epz  = FDI_p4(eta + z);
+    const double FDI_p4_emyz = FDI_p4(eta - y - z);
+    const double FDI_p4_epyz = FDI_p4(eta + y + z);
+    const double FDI_p5_emy  = FDI_p5(eta - y);
+    const double FDI_p5_emz  = FDI_p5(eta - z);
+    const double FDI_p5_epy  = FDI_p5(eta + y);
+    const double FDI_p5_epz  = FDI_p5(eta + z);
+    const double FDI_p5_emyz = FDI_p5(eta - y - z);
+    const double FDI_p5_epyz = FDI_p5(eta + y + z);
 
-    PairPsiCoeffs(y, z, a_yz, c_yz, d_yz);
-    PairPsiCoeffs(z, y, a_zy, c_zy, d_zy);
+    const double x0  = 20 * FDI_p4_emy;
+    const double x1  = 20 * FDI_p4_epz;
+    const double x2  = 120 * FDI_p2_emy - 120 * FDI_p2_epz;
+    const double x3  = -40 * FDI_p3_emy + 40 * FDI_p3_epz;
+    const double x4  = 40 * FDI_p3_e;
+    const double x5  = 40 * FDI_p3_emyz - x4;
+    const double x6  = -20 * FDI_p4_e;
+    const double x7  = 20 * FDI_p4_emyz + x6;
+    const double x8  = -40 * FDI_p3_epyz + x4;
+    const double x9  = 20 * FDI_p4_epyz + x6;
+    const double x10 = -4 * FDI_p5_emy + 4 * FDI_p5_emyz - 4 * FDI_p5_emz +
+                       4 * FDI_p5_epy - 4 * FDI_p5_epyz + 4 * FDI_p5_epz;
+    const double x11 = 20 * FDI_p4_epy;
+    const double x12 = 20 * FDI_p4_emz;
+    const double x13 = -40 * FDI_p3_emz + 40 * FDI_p3_epy;
+    const double x14 = 120 * FDI_p2_emz - 120 * FDI_p2_epy;
 
-    PairGOptimized(eta, y, z, G);
+    const double aux = (15 * POW2(y) * POW2(z));
 
-    psi_out[0] = c_yz[0][0] * G[0] + d_yz[0][0] * G[1] + c_yz[0][1] * G[4] +
-                 d_yz[0][1] * G[5] + c_yz[0][2] * G[8] + d_yz[0][2] * G[9] +
-                 a_yz[0][3] * (G[15] - G[14]) + a_yz[0][4] * (G[19] - G[18]) +
-                 a_yz[0][5] * (G[23] - G[22]); // Psi(y,z)
-    psi_out[1] = c_zy[0][0] * G[1] + d_zy[0][0] * G[0] + c_zy[0][1] * G[5] +
-                 d_zy[0][1] * G[4] + c_zy[0][2] * G[9] + d_zy[0][2] * G[8] +
-                 a_zy[0][3] * (G[15] - G[14]) + a_zy[0][4] * (G[19] - G[18]) +
-                 a_zy[0][5] * (G[23] - G[22]); // Psi(z,y)
+    psi_out[0] =
+        x10 +
+        y * (-x0 + x1 + x7 +
+             y * (x3 + x5 +
+                  z * (x2 + z * (-120 * FDI_p1_emy + 120 * FDI_p1_epz))) +
+             z * (80 * FDI_p3_emy - 80 * FDI_p3_epz - x2 * z)) +
+        z * (x0 - x1 + x9 + z * (x3 + x8));
+
+    psi_out[1] =
+        x10 + y * (-x11 + x12 + x9 + y * (x13 + x8)) +
+        z * (x11 - x12 + x7 +
+             y * (80 * FDI_p3_emz - 80 * FDI_p3_epy - x14 * y) +
+             z * (x13 + x5 +
+                  y * (x14 + y * (-120 * FDI_p1_emz + 120 * FDI_p1_epy))));
+
+    psi_out[0] /= aux;
+    psi_out[1] /= aux;
 
     return;
 }
@@ -851,29 +899,29 @@ void PairPhiOptimized(const double omega, const double omega_prime, int l,
     const double y = omega / temp;
     const double z = omega_prime / temp;
 
-    const double phi_prefactor = kPairPhi * temp * temp;
+    const double phi_prefactor = kPairPhi * POW2(temp);
     const double phi_denom     = 1. - exp(y + z);
 
     double pair_psi[2] = {0.};
 
     PairPsiOptimized(l, y, z, eta, pair_psi);
 
-    phi_out[0] = phi_prefactor *
-                 (kAlpha1[0] * kAlpha1[0] * pair_psi[0] +
-                  kAlpha2[0] * kAlpha2[0] * pair_psi[1]) /
-                 phi_denom;
-    phi_out[1] = phi_prefactor *
-                 (kAlpha1[0] * kAlpha1[0] * pair_psi[1] +
-                  kAlpha2[0] * kAlpha2[0] * pair_psi[0]) /
-                 phi_denom;
-    phi_out[2] = phi_prefactor *
-                 (kAlpha1[1] * kAlpha1[1] * pair_psi[0] +
-                  kAlpha2[1] * kAlpha2[1] * pair_psi[1]) /
-                 phi_denom;
-    phi_out[3] = phi_prefactor *
-                 (kAlpha1[1] * kAlpha1[1] * pair_psi[1] +
-                  kAlpha2[1] * kAlpha2[1] * pair_psi[0]) /
-                 phi_denom;
+    phi_out[0] =
+        phi_prefactor *
+        (POW2(kAlpha1[0]) * pair_psi[0] + POW2(kAlpha2[0]) * pair_psi[1]) /
+        phi_denom;
+    phi_out[1] =
+        phi_prefactor *
+        (POW2(kAlpha1[0]) * pair_psi[1] + POW2(kAlpha2[0]) * pair_psi[0]) /
+        phi_denom;
+    phi_out[2] =
+        phi_prefactor *
+        (POW2(kAlpha1[1]) * pair_psi[0] + POW2(kAlpha2[1]) * pair_psi[1]) /
+        phi_denom;
+    phi_out[3] =
+        phi_prefactor *
+        (POW2(kAlpha1[1]) * pair_psi[1] + POW2(kAlpha2[1]) * pair_psi[0]) /
+        phi_denom;
 
     return;
 }
