@@ -2,12 +2,23 @@ import numpy as np
 import sympy as sp
 import sys
 
-eta = sp.symbols("eta", real=True)
-y = sp.symbols("y", real=True, positive=True)
-z = sp.symbols("z", real=True, positive=True)
+print("Script used to generate the expressions for the optimized pair process"
+      "kernel functions, from:")
+print("  Pons et al., Legendre expansion of the nu nubar <--> eplus eminus kernel: Influence of high order terms, Astron. Astrophys. Suppl. Ser. 129, 343-351 (1998)")
+print("Run it twice, once with argument y (meaning neutrino energy < antineutrino energy),")
+print("once with argument z (meaning neutrino energy > antineutrino energy)")
+print("")
 
+
+# Sympy variables
+eta = sp.symbols("eta", real=True) # Electron degeneracy
+y = sp.symbols("y", real=True, positive=True) # Neutrino energy rescaled with temperature
+z = sp.symbols("z", real=True, positive=True) # Antieutrino energy rescaled with temperature
+
+# A generic (from sympy point of view) function, representing a complete Fermi-Dirac integral
 F = sp.Function("F")
 
+# Get from the user which energy is the smaller/greater
 if sys.argv[1] == "y":
     m = y
     M = z
@@ -15,8 +26,9 @@ elif sys.argv[1] == "z":
     m = z
     M = y
 else:
-    exit("Either y or z")
+    exit("Pass either y or z")
 
+# A dictionary useful to manipulate the way the Fermi-Dirac integrals are handled and printed to screen
 FDI_names = {}
 for i in range(6):
     for arg in (eta, eta - y, eta - z, eta + y, eta + z, eta - y - z, eta + y + z):
@@ -36,6 +48,9 @@ for i in range(6):
         FDI_names[F(i, arg)] = sp.symbols(name, real=True, positive=True)
 
 
+# Incomplete Fermi-Dirac integral, with integration endpoints called u and v.
+# This function expresses the incomplete Fermi integrals in terms of the
+# complete ones. Note: only makes sense when n is an integer!
 def F_inc(n, eta, u, v):
 
     k = sp.symbols("k", integer=True)
@@ -48,11 +63,13 @@ def F_inc(n, eta, u, v):
     return sp.Sum(sp.binomial(n, k) * expr, (k, 0, n)).doit().subs(FDI_names)
 
 
+# G function defined in eq. 12 of Pons et al.
 def G(n, eta, u, v):
 
     return F_inc(n, eta, u, v) - F_inc(n, eta + y + z, u, v)
 
 
+# Coefficients a, c and d, only for l=1, defined in appendix A of Pons et al.
 def a(n, u, v):
     if n == 3:
         return 8/(3*u**2)
@@ -80,6 +97,7 @@ def d(n, u, v):
         return 8*v/(3*u**2)
 
 
+# Function Psi defined in eq. 11 of Pons et al. (only for l=0)
 def Psi(eta, u, v):
 
     r = 0
@@ -91,21 +109,21 @@ def Psi(eta, u, v):
     return r
 
 
-for n in range(6):
-    print(f"G_{n:d}(y, y + z):  ", sp.horner(sp.simplify(sp.expand(G(n, eta, y, y + z))), wrt=y))
-    print(f"G_{n:d}(z, y + z):  ", sp.horner(sp.simplify(sp.expand(G(n, eta, z, y + z))), wrt=z))
-    print(f"G_{n:d}(0, min(y, z)):  ", sp.horner(sp.simplify(sp.expand(G(n, eta, 0, m))), wrt=m))
-    print("")
+# for n in range(6):
+    # print(f"G_{n:d}(y, y + z):  ", sp.horner(sp.simplify(sp.expand(G(n, eta, y, y + z))), wrt=y))
+    # print(f"G_{n:d}(z, y + z):  ", sp.horner(sp.simplify(sp.expand(G(n, eta, z, y + z))), wrt=z))
+    # print(f"G_{n:d}(0, min(y, z)):  ", sp.horner(sp.simplify(sp.expand(G(n, eta, 0, m))), wrt=m))
+    # print("")
 
 psiyz = sp.horner(sp.simplify(sp.expand(Psi(eta, y, z) * (15*y**2*z**2))), wrt=y)
 psizy = sp.horner(sp.simplify(sp.expand(Psi(eta, z, y) * (15*y**2*z**2))), wrt=z)
 
-print("Psi(y, z) * (15*y**2*z**2):  ", psiyz)
+print("Psi(y, z) * (15*y**2*z**2):\n", psiyz)
 print("")
-print("Psi(z, y) * (15*y**2*z**2):  ", psizy)
+print("Psi(z, y) * (15*y**2*z**2):\n", psizy)
 print("")
 
-print("Necessary Fermi integrals:  ")
+print("Fermi integrals actually appearing in the expressions for Psi(y,z) and Psi(z,y):  ")
 i = 0
 for fn, f in FDI_names.items():
 
@@ -121,10 +139,13 @@ print("")
 
 replacements, reduced_exprs = sp.cse([psiyz, psizy])
 
+print("Shorthands suggested by common subexpression elimination algorithm:")
 for r in replacements:
-    print("   ", r[0], r[1])
+    print("   ", r[0], "=", r[1])
 print("")
-print("Psi(y, z) * (15*y**2*z**2):  ", reduced_exprs[0])
+
+
+print("Psi(y, z) * (15*y**2*z**2) (but now as a function of the shorthands):\n", reduced_exprs[0])
 print("")
-print("Psi(z, y) * (15*y**2*z**2):  ", reduced_exprs[1])
+print("Psi(z, y) * (15*y**2*z**2) (but now as a function of the shorthands):\n", reduced_exprs[1])
 print("")
