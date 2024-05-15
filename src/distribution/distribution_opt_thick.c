@@ -19,8 +19,6 @@
 #define POW3(X) ((X) * (X) * (X))
 #define POW4(X) ((X) * (X) * (X) * (X))
 
-#define M_PI_VAL 3.14159265358979323846264338328 /* pi */
-
 
 /* Neutrino distribution function in optically thick regime: Fermi-Dirac
 distribution
@@ -58,7 +56,7 @@ void CalculateThickParamsFromM1(M1Quantities* M1_pars, MyEOSParams* eos_pars,
 
         out_distr_pars->w_t[species] = 1.5 * (1. - chi);
 
-        const double y = POW4(n) * POW3(kHClight) / (4. * M_PI_VAL * POW3(j));
+        const double y = POW4(n) * POW3(kHClight) / (4. * kPi * POW3(j));
 
         if (y < 0.005)
         {

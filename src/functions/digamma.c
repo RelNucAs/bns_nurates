@@ -1,7 +1,9 @@
 #include <math.h>
 #include <stdio.h>
+#include <float.h>
 
 #include "functions.h"
+#include "constants.h"
 
 /*
  * Computation of Psi (Digamma) function
@@ -23,10 +25,6 @@
                                    decimal places required  16.86
 
 */
-
-#define EPSILON 2.2204460492503131e-16
-#define M_PI_VAL 3.14159265358979323846264338328 /* pi */
-#define SQRT_DBL_MIN 1.4916681462400413e-154
 
 typedef struct
 {
@@ -98,7 +96,7 @@ void ChebEvalE(const ChebSeries* cs, const double x, SFResult* result)
     }
 
     result->val = d;
-    result->err = EPSILON * e + fabs(cs->c[cs->order]);
+    result->err = DBL_EPSILON * e + fabs(cs->c[cs->order]);
 
     return; // GSL_SUCCESS;
 }
@@ -127,9 +125,9 @@ void SFPsiOutput(const double x, SFResult* result)
         ChebEvalE(&apsi_cs, t, &result_c);
         if (x < 0.0)
         {
-            const double s = sin(M_PI_VAL * x);
-            const double c = cos(M_PI_VAL * x);
-            if (fabs(s) < 2.0 * SQRT_DBL_MIN)
+            const double s = sin(kPi * x);
+            const double c = cos(kPi * x);
+            if (fabs(s) < 2.0 * sqrt(DBL_MIN))
             {
                 // result->val = std::nan;
                 // result->err = std::nan;
@@ -138,11 +136,10 @@ void SFPsiOutput(const double x, SFResult* result)
             }
             else
             {
-                result->val =
-                    log(y) - 0.5 / x + result_c.val - M_PI_VAL * c / s;
-                result->err = M_PI_VAL * fabs(x) * EPSILON / (s * s);
+                result->val = log(y) - 0.5 / x + result_c.val - kPi * c / s;
+                result->err = kPi * fabs(x) * DBL_EPSILON / (s * s);
                 result->err += result_c.err;
-                result->err += EPSILON * fabs(result->val);
+                result->err += DBL_EPSILON * fabs(result->val);
                 return; // GSL_SUCCESS;
             }
         }
@@ -150,7 +147,7 @@ void SFPsiOutput(const double x, SFResult* result)
         {
             result->val = log(y) - 0.5 / x + result_c.val;
             result->err = result_c.err;
-            result->err += EPSILON * fabs(result->val);
+            result->err += DBL_EPSILON * fabs(result->val);
             return; // GSL_SUCCESS;
         }
     }
@@ -167,10 +164,10 @@ void SFPsiOutput(const double x, SFResult* result)
             ChebEvalE(&psi_cs, 2.0 * v - 1.0, &result_c);
 
             result->val = -(t1 + t2 + t3) + result_c.val;
-            result->err = EPSILON * (fabs(t1) + fabs(x / (t2 * t2)) +
-                                     fabs(x / (t3 * t3)));
+            result->err = DBL_EPSILON * (fabs(t1) + fabs(x / (t2 * t2)) +
+                                         fabs(x / (t3 * t3)));
             result->err += result_c.err;
-            result->err += EPSILON * fabs(result->val);
+            result->err += DBL_EPSILON * fabs(result->val);
             return; // GSL_SUCCESS;
         }
         else if (x < 0.0)
@@ -181,9 +178,9 @@ void SFPsiOutput(const double x, SFResult* result)
             ChebEvalE(&psi_cs, 2.0 * v - 1.0, &result_c);
 
             result->val = -(t1 + t2) + result_c.val;
-            result->err = EPSILON * (fabs(t1) + fabs(x / (t2 * t2)));
+            result->err = DBL_EPSILON * (fabs(t1) + fabs(x / (t2 * t2)));
             result->err += result_c.err;
-            result->err += EPSILON * fabs(result->val);
+            result->err += DBL_EPSILON * fabs(result->val);
             return; // GSL_SUCCESS;
         }
         else if (x < 1.0)
@@ -192,9 +189,9 @@ void SFPsiOutput(const double x, SFResult* result)
             ChebEvalE(&psi_cs, 2.0 * x - 1.0, &result_c);
 
             result->val = -t1 + result_c.val;
-            result->err = EPSILON * t1;
+            result->err = DBL_EPSILON * t1;
             result->err += result_c.err;
-            result->err += EPSILON * fabs(result->val);
+            result->err += DBL_EPSILON * fabs(result->val);
             return; // GSL_SUCCESS;
         }
         else

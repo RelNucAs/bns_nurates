@@ -31,7 +31,7 @@ static const double kQ  = 1.2935;      // [MeV]
 static const double kMb = 1.674e-24;   // [g]
 static const double kMu = 1.66054e-24; // [g]
 
-static const double kPi = 3.1415926535898; //  acos(static_cast<double>(-1.));
+static const double kPi = 3.14159265358979323846264338328; // pi
 
 // Physical constants
 static const double kHbar = 6.582119569e-22; // [MeV s]
