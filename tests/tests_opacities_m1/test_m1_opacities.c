@@ -10,6 +10,7 @@
 #include <string.h>
 #include <math.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "../tests.h"
 #include "opacities.h"
@@ -98,7 +99,7 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
   printf("Test for distribution function implementation:\n");
 
   printf("Generating quadratures ...\n");
-  MyQuadrature my_quadrature_1d = {.nx = 20, .dim = 1, .type = kGauleg, .x1 = 0., .x2 = 1.};
+  MyQuadrature my_quadrature_1d = {.nx = 10, .dim = 1, .type = kGauleg, .x1 = 0., .x2 = 1.};
   GaussLegendreMultiD(&my_quadrature_1d);
   MyQuadrature my_quadrature_2d = {.nx = 20, .ny = 20, .dim = 2, .type = kGauleg, .x1 = 0., .x2 = 1., .y1 = 0., .y2 = 1.};
   GaussLegendreMultiD(&my_quadrature_2d);
@@ -118,6 +119,11 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
   fprintf(file, "#  diff_distr j0-nue j0-anue j0-nux j0-anux j-nue j-anue j-nux j-anux kappa0-a-nue kappa0-a-anue kappa0-a-nux kappa0-a-anux kappa-a-nue kappa-a-anue kappa-a-nux kappa-a-anux kappa-s-nue kappa-s-anue kappa-s-nux kappa-s-anux\n");
   // printf("r: [cm], diff_distr [should be zero, checks Fermi Dirac with NuFTotal], j-nue, ");
 
+  clock_t start, end;
+  double cpu_time_used;
+  
+  start = clock();
+  
   for (int i = 0; i < 102; i++) {
 
     // populate EOS parameters from table
@@ -166,6 +172,13 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
             coeffs.kappa_s[id_nue], coeffs.kappa_s[id_anue], coeffs.kappa_s[id_nux], coeffs.kappa_s[id_anux]);
   
   }
+  
+  end = clock();
+
+  cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+  
+  printf("Elapsed time: %.3lf sec\n", cpu_time_used);
+
   fclose(file);
 
   return;

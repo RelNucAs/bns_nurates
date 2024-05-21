@@ -10,16 +10,10 @@
 #include <string.h>
 #include <math.h>
 #include <unistd.h>
-#include <time.h>
 
 #include "../tests.h"
 
 int main() {
-  clock_t start, end;
-  time_t start_t, end_t;
-  double cpu_time_used, cpu_time_used_t;
-
-
   printf("=================================================== \n");
   printf("Testing opacities for all reactions ... \n");
   printf("=================================================== \n");
@@ -32,19 +26,7 @@ int main() {
   // Opacity parameters (corrections all switched off)
   OpacityParams opacity_pars = opacity_params_default_none;
 
-  start = clock();
-  start_t = time(NULL);
-
   TestM1Opacities(filename, &opacity_flags, &opacity_pars);
-  
-  end_t = time(NULL);
-  end = clock();
-
-  cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-  cpu_time_used_t = ((double) (end_t - start_t));
-
-  printf("Elapsed time: %.3lf sec\n", cpu_time_used);
-  printf("Elapsed time: %.3lf sec\n", cpu_time_used_t);
 
   return 0;
 }
