@@ -16,8 +16,6 @@
 #define POW3(X) ((X) * (X) * (X))
 #define POW4(X) ((X) * (X) * (X) * (X))
 
-#define M_PI_VAL 3.14159265358979323846264338328 /* pi */
-
 #define CONST_C_F 0.6
 
 
@@ -60,7 +58,7 @@ void CalculateThinParamsFromM1(M1Quantities* M1_pars,
 
         out_distr_pars->beta_f[species] =
             n * POW3(kHClight) /
-            (4. * M_PI_VAL * GammaStirling(CONST_C_F + 3.) *
+            (4. * kPi * GammaStirling(CONST_C_F + 3.) *
              pow(out_distr_pars->temp_f[species], CONST_C_F + 3.));
     }
 }

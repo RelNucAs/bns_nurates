@@ -17,8 +17,6 @@
 #define POW3(X) ((X) * (X) * (X))
 #define POW4(X) ((X) * (X) * (X) * (X))
 
-#define M_PI_VAL 3.14159265358979323846264338328 /* pi */
-
 
 /* Function for evaluating parameters of neutrino distribution function at
  * equilibrium
@@ -199,7 +197,7 @@ ComputeM1DensitiesEq(MyEOSParams* eos_params,
     MyQuadratureIntegrand result;
     result.n = 6;
 
-    double four_pi_hc3 = 4. * M_PI_VAL / POW3(kHClight);
+    double four_pi_hc3 = 4. * kPi / POW3(kHClight);
 
     result.integrand[0] =
         four_pi_hc3 * POW3(eos_params->temp) *
