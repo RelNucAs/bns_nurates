@@ -127,7 +127,8 @@ MyQuadratureIntegrand NuNumber(NuDistributionParams* distr_pars)
     integrand.function = &NuNumberIntegrand;
     MyQuadratureIntegrand result =
         GaussLegendreIntegrate1D(&quad, &integrand, s);
-    const double result_factor = 4. * kPi / POW3(kH * kClight);
+    const double result_factor = 4. * kPi / POW3(kHClight);
+    /* const double result_factor = 4. * kPi / POW3(kHClight * KMeV);
 
     for (int species = 0; species < total_num_species; ++species)
     {
@@ -179,7 +180,8 @@ MyQuadratureIntegrand NuEnergy(NuDistributionParams* distr_pars)
     integrand.function = &NuEnergyIntegrand;
     MyQuadratureIntegrand result =
         GaussLegendreIntegrate1D(&quad, &integrand, s);
-    const double result_factor = 4. * kPi / POW3(kH * kClight);
+    /* const double result_factor = 4. * kPi / POW3(kHClight); */
+    const double result_factor = 4. * kPi / POW3(kHClight * KMeV);
 
     for (int species = 0; species < total_num_species; ++species)
     {
@@ -197,7 +199,7 @@ ComputeM1DensitiesEq(MyEOSParams* eos_params,
     MyQuadratureIntegrand result;
     result.n = 6;
 
-    double four_pi_hc3 = 4. * kPi / POW3(kHClight);
+    double four_pi_hc3 = 4. * kPi / POW3(kHClight * kMeV);
 
     result.integrand[0] =
         four_pi_hc3 * POW3(eos_params->temp) *
