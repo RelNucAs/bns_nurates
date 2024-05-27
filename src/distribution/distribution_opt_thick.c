@@ -56,7 +56,7 @@ void CalculateThickParamsFromM1(M1Quantities* M1_pars, MyEOSParams* eos_pars,
 
         out_distr_pars->w_t[species] = 1.5 * (1. - chi);
 
-        const double y = POW4(n) * POW3(kHClight * KMeV) / (4. * kPi * POW3(j));
+        const double y = POW4(n) * POW3(kHClight * kMeV) / (4. * kPi * POW3(j));
 
         if (y < 0.005)
         {

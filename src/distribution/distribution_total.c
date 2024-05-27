@@ -128,7 +128,7 @@ MyQuadratureIntegrand NuNumber(NuDistributionParams* distr_pars)
     MyQuadratureIntegrand result =
         GaussLegendreIntegrate1D(&quad, &integrand, s);
     const double result_factor = 4. * kPi / POW3(kHClight);
-    /* const double result_factor = 4. * kPi / POW3(kHClight * KMeV);
+    /* const double result_factor = 4. * kPi / POW3(kHClight * kMeV); */
 
     for (int species = 0; species < total_num_species; ++species)
     {
@@ -181,7 +181,7 @@ MyQuadratureIntegrand NuEnergy(NuDistributionParams* distr_pars)
     MyQuadratureIntegrand result =
         GaussLegendreIntegrate1D(&quad, &integrand, s);
     /* const double result_factor = 4. * kPi / POW3(kHClight); */
-    const double result_factor = 4. * kPi / POW3(kHClight * KMeV);
+    const double result_factor = 4. * kPi / POW3(kHClight * kMeV);
 
     for (int species = 0; species < total_num_species; ++species)
     {
