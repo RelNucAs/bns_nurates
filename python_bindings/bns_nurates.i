@@ -39,6 +39,26 @@
         }
 }
 
+%typemap(out) double n[ANY], double J[ANY], double chi[ANY] {
+        int i;
+        $result = PyList_New($1_dim0);
+        for (i = 0; i < $1_dim0; i++) {
+                PyObject *o = PyFloat_FromDouble((double) $1[i]);
+                PyList_SetItem($result, i, o);
+        }
+}
+
+%typemap(out) double points[ANY], double w[ANY] {
+        int i;
+        $result = PyList_New($1_dim0);
+        for (i = 0; i < $1_dim0; i++) {
+                PyObject *o = PyFloat_FromDouble((double) $1[i]);
+                PyList_SetItem($result, i, o);
+        }
+}
+
+
+
 %typemap(in) double j[ANY] (double temp[$1_dim0]) {
         int i;
         if (!PySequence_Check($input)) {
