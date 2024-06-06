@@ -248,6 +248,9 @@ MyQuadratureIntegrand M1CoeffsSingleIntegrandNotStimulated(double* var, void* p)
             n_integrand_2[idx] =
                 nu * nu * g_nu[idx] *
                 abs_em_beta.abs[idx]; // ab = ab (NOT stimulated absorption)
+            if (idx == 0) {
+                double tmp = my_grey_opacity_params->eos_pars.mu_n - my_grey_opacity_params->eos_pars.mu_p - my_grey_opacity_params->eos_pars.mu_e;                         
+            }
             e_integrand_2[idx] = nu * n_integrand_2[idx];
         }
     }
@@ -804,9 +807,31 @@ ComputeM1OpacitiesNotStimulated(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
         J[idx] = my_grey_opacity_params->m1_pars.J[idx];
     }
 
-    const double s = 1.5 * my_grey_opacity_params->eos_pars.temp;
+    const double temp = my_grey_opacity_params->eos_pars.temp;
+    const double eta_e = my_grey_opacity_params->eos_pars.mu_e / temp;
+    
+    const double s = 1.5 * temp;
+    double s_array[12] = {0};
+
+    s_array[0] = temp * FDI_p5(eta_e) / FDI_p4(eta_e);
+    s_array[1] = temp * FDI_p5(-eta_e) / FDI_p4(-eta_e);
+    s_array[2] = s;
+    s_array[3] = s;
+    s_array[4] = temp * FDI_p5(eta_e) / FDI_p4(eta_e);
+    s_array[5] = temp * FDI_p5(-eta_e) / FDI_p4(-eta_e);
+    s_array[6] = s;
+    s_array[7] = s;
+    
+    for (int idx = 0; idx < total_num_species; idx++)
+    {
+        s_array[idx + 8] = my_grey_opacity_params->m1_pars.J[idx] /
+                           my_grey_opacity_params->m1_pars.n[idx];
+    }
+
+    // MyQuadratureIntegrand integrals_1d =
+    // GaussLegendreIntegrateFixedSplit1D(quad_1d, &integrand_m1_1d, s);
     MyQuadratureIntegrand integrals_1d =
-        GaussLegendreIntegrateFixedSplit1D(quad_1d, &integrand_m1_1d, s);
+        GaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s_array);
 
     M1Matrix out_n, out_j;
     ComputeM1DoubleIntegrandNotStimulated(quad_1d, my_grey_opacity_params, s,
@@ -967,8 +992,6 @@ M1Opacities ComputeM1Opacities(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
         GaussLegendreIntegrate2DMatrix(quad_1d, &out_n, s);
     MyQuadratureIntegrand e_integrals_2d =
         GaussLegendreIntegrate2DMatrix(quad_1d, &out_j, s);
-
-    // printf("%.5e\n", integrals_2d.integrand[0]);
 
     M1Opacities m1_opacities;
 
