@@ -294,7 +294,14 @@ struct OpacityParams
 };
 typedef struct OpacityParams OpacityParams;
 __attribute__((unused)) static OpacityParams opacity_params_default_all = {
-    .use_dU = true, .use_dm_eff = true, .use_WM_ab = true, .use_WM_sc = true, .use_BRT_brem = true, .use_NN_medium_corr, .use_decay = true, .neglect_blocking = true};
+    .use_dU = true,
+    .use_dm_eff = true,
+    .use_WM_ab = true,
+    .use_WM_sc = true,
+    .use_decay = true,
+    .use_BRT_brem = true, 
+    .use_NN_medium_corr = true,
+    .neglect_blocking = true};
 __attribute__((unused)) static OpacityParams opacity_params_default_none = {
     .use_dU           = false,
     .use_dm_eff       = false,
