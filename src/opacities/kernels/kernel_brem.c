@@ -18,6 +18,8 @@
 #include "bns_nurates.h"
 #include "functions.h"
 
+#define POW3(X) ((X) * (X) * (X))
+
 // Constants for the bremsstrahlung reaction
 #define kBremXmin 1.0E-10
 #define kBremYmin 1.0E-10
@@ -28,6 +30,7 @@
 #define kFourPiSquared 39.47841760435743       // 4. * kPiSquared
 #define kPi2OneEighth 1.1538350678499893       // pow(kPi, 1. / 8.)
 #define kPiHalfToFiveHalves 3.0924286813991433 // pow(0.5 * kPi, 2.5)
+#define kC4BRT06 0.1409912109375               // (3*5*7*11)/2^{11} / 4 (C in BRT06 Eq.143 divided by four)
 // #define kGfBrem 1.1663787E-11 // [MeV^-2]
 
 /* Compute the analytical fit for the s-component of the kernel for
@@ -343,6 +346,77 @@ void BremKernelsTable(const int n, double* nu_array,
 
             brem_ker =
                 BremKernelsLegCoeff(&grey_pars->kernel_pars.brem_kernel_params,
+                                    &grey_pars->eos_pars);
+
+            out->m1_mat_em[0][i][j] = brem_ker.em[0];
+            out->m1_mat_em[0][j][i] = brem_ker.em[0];
+
+            out->m1_mat_ab[0][i][j] = brem_ker.abs[0];
+            out->m1_mat_ab[0][j][i] = brem_ker.abs[0];
+        }
+    }
+
+    return;
+}
+
+
+/* NN bremsstrahlung rates from BRT06 */
+
+
+// Bremsstrahlung fitting formula described in
+// A. Burrows et al. Nuclear Physics A 777 (2006) 356-394
+// * The factor 2.0778 is different from the paper 1.04 to account
+//   for the nuclear matrix element for one-pion exchange
+//   (Adam Burrows, private comm)
+double QBrem_BRT06(const double nb, const double temp, const double xn, const double xp) {
+    const double rho = nb * kMb; // mass density [g cm-3]
+    return 2.0778E+02 * 0.5 * kMeV * (xn * xn + xp * xp + 28./3. * xn * xp) * rho * rho * pow(temp, 5.5); // [Mev cm-3 s-1]
+} 
+
+// Bremsstrahlung kernel from BRT06 Eq.(143) rewritten consistently
+// to fit within the framework of the present library
+MyKernelOutput BremKernelsBRT06(BremKernelParams* kernel_params,
+                                   MyEOSParams* eos_pars)
+{
+    static const double kHClight6FourPiSquared = kHClight * kHClight * kHClight * kHClight * kHClight * kHClight / (16. * kPi * kPi);
+    const double omega = kernel_params->omega;
+    const double omega_prime = kernel_params->omega_prime;
+    const double temp = eos_pars->temp;
+    
+    const double x = 0.5 * (omega + omega_prime) / temp; 
+    const double q_nb = QBrem_BRT06(eos_pars->nb, temp, eos_pars->yn, eos_pars->yp); 
+
+    const double tmp = kHClight6FourPiSquared * kC4BRT06 * (q_nb / pow(temp, 7.)) * bessk1(x) / x;
+    const double s_em = tmp * SafeExp(-x);
+    const double s_abs = tmp * SafeExp(x);
+
+    MyKernelOutput brem_kernel;
+    for (int idx = 0; idx < total_num_species; idx++)
+    {
+        brem_kernel.abs[idx] = s_abs;
+        brem_kernel.em[idx]  = s_em;
+    } 
+
+    return brem_kernel;
+}
+
+void BremKernelsTableBRT06(const int n, double* nu_array,
+                      GreyOpacityParams* grey_pars, M1Matrix* out)
+{
+    MyKernelOutput brem_ker;
+
+    for (int i = 0; i < n; i++)
+    {
+
+        for (int j = i; j < n; j++)
+        {
+
+            // compute the brem kernels
+            grey_pars->kernel_pars.brem_kernel_params.omega       = nu_array[i];
+            grey_pars->kernel_pars.brem_kernel_params.omega_prime = nu_array[j];
+
+            brem_ker =
+                BremKernelsBRT06(&grey_pars->kernel_pars.brem_kernel_params,
                                     &grey_pars->eos_pars);
 
             out->m1_mat_em[0][i][j] = brem_ker.em[0];

@@ -24,7 +24,11 @@ MyKernelOutput BremKernelsLegCoeff(BremKernelParams* kernel_params,
                                    MyEOSParams* eos_params);
 void BremKernelsTable(const int n, double* nu_array,
                       GreyOpacityParams* grey_pars, M1Matrix* out);
-
+MyKernelOutput BremKernelsBRT06(BremKernelParams* kernel_params,
+                                   MyEOSParams* eos_pars);
+void BremKernelsTableBRT06(const int n, double* nu_array,
+                      GreyOpacityParams* grey_pars, M1Matrix* out);
+                      
 // End of Bremsstrahlung kernel
 // ===============================================================================
 

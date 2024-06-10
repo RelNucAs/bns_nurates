@@ -40,6 +40,15 @@ void NRcatch(NRerror err)
 }
 #endif
 
+/*===========================================================================*/
+
+// bessel.c
+
+// Evaluate modified Bessel function In(x) and n=1
+double bessi1(const double x);
+
+// Evaluate modified Bessel function Kn(x) and n=1
+double bessk1(const double x);
 
 /*===========================================================================*/
 

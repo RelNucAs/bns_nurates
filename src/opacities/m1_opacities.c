@@ -401,7 +401,11 @@ void ComputeM1DoubleIntegrandNotStimulated(MyQuadrature* quad_1d,
     InitializeM1MatrixSingleFlavor(&brem, n, 0);
     if (grey_pars->opacity_flags.use_brem == 1)
     {
-        BremKernelsTable(2 * n, nu_array, grey_pars, &brem);
+        if (grey_pars->opacity_pars.use_BRT_brem == true) {
+            BremKernelsTableBRT06(2 * n, nu_array, grey_pars, &brem);
+        } else {
+            BremKernelsTable(2 * n, nu_array, grey_pars, &brem);
+        }
     }
 
     InitializeM1Matrix(&inel, n);
@@ -608,7 +612,11 @@ void ComputeM1DoubleIntegrand(MyQuadrature* quad_1d,
     InitializeM1MatrixSingleFlavor(&brem, n, 0);
     if (grey_pars->opacity_flags.use_brem == 1)
     {
-        BremKernelsTable(2 * n, nu_array, grey_pars, &brem);
+        if (grey_pars->opacity_pars.use_BRT_brem == true) {
+            BremKernelsTableBRT06(2 * n, nu_array, grey_pars, &brem);
+        } else {
+            BremKernelsTable(2 * n, nu_array, grey_pars, &brem);
+        }
     }
 
     InitializeM1Matrix(&inel, n);
@@ -1073,12 +1081,20 @@ MyQuadratureIntegrand SpectralIntegrand(double* var, void* p)
     MyKernelOutput brem_kernels_m1 = {0};
     if (opacity_flags.use_brem)
     {
-        my_grey_opacity_params->kernel_pars.brem_kernel_params.omega_prime =
-            nu_bar;
-        my_grey_opacity_params->kernel_pars.brem_kernel_params.l = 0;
-        brem_kernels_m1 = BremKernelsLegCoeff(
-            &my_grey_opacity_params->kernel_pars.brem_kernel_params,
-            &my_eos_params);
+        my_grey_opacity_params->kernel_pars.brem_kernel_params.omega_prime = nu_bar;
+        if (opacity_pars.use_BRT_brem == true)
+        {
+            brem_kernels_m1 = BremKernelsBRT06(
+                &my_grey_opacity_params->kernel_pars.brem_kernel_params,
+             &my_eos_params);
+        }
+        else
+        {
+            my_grey_opacity_params->kernel_pars.brem_kernel_params.l = 0;
+            brem_kernels_m1 = BremKernelsLegCoeff(
+               &my_grey_opacity_params->kernel_pars.brem_kernel_params,
+             &my_eos_params);
+        }
     }
 
     // compute the inelastic NES/NPS kernels
