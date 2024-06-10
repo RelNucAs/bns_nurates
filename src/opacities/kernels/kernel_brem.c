@@ -271,8 +271,13 @@ double BremAllChannelsAbsKernel(BremKernelParams* kernel_params,
         n_mean, kMAvgGrams, kernel_params, eos_params); // neutron-proton
 
     // total absorption kernel
-    return kBremConst * (nn * s_abs_nn + np * s_abs_pp +
+    double s_abs_tot = kBremConst * (nn * s_abs_nn + np * s_abs_pp +
                          kTwentyeightThirds * n_mean * s_abs_np);
+
+    // kernel correction due to medium dependence as in Fischer2016
+    if (kernel_params->use_NN_medium_corr == true) s_abs_tot = s_abs_tot / (1. + pow(nb / 0.15E+39, 0.3333333333333333) / 3.);
+
+    return s_abs_tot;
 }
 
 /* Compute a specific Legendre coefficient in the expansion of production and
@@ -333,6 +338,7 @@ void BremKernelsTable(const int n, double* nu_array,
     MyKernelOutput brem_ker;
 
     grey_pars->kernel_pars.brem_kernel_params.l = 0;
+    grey_pars->kernel_pars.brem_kernel_params.use_NN_medium_corr = grey_pars->opacity_pars.use_NN_medium_corr;
 
     for (int i = 0; i < n; i++)
     {
@@ -370,7 +376,7 @@ void BremKernelsTable(const int n, double* nu_array,
 //   (Adam Burrows, private comm)
 double QBrem_BRT06(const double nb, const double temp, const double xn, const double xp) {
     const double rho = nb * kMb; // mass density [g cm-3]
-    return 2.0778E+02 * 0.5 * kMeV * (xn * xn + xp * xp + 28./3. * xn * xp) * rho * rho * pow(temp, 5.5); // [Mev cm-3 s-1]
+    return 2.0778E+02 * 0.5 * kMeV * (xn * xn + xp * xp + 28./3. * xn * xp) * rho * rho * pow(temp, 5.5); // [MeV cm-3 s-1]
 } 
 
 // Bremsstrahlung kernel from BRT06 Eq.(143) rewritten consistently

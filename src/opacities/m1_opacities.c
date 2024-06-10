@@ -1114,6 +1114,7 @@ MyQuadratureIntegrand SpectralIntegrand(double* var, void* p)
         else
         {
             my_grey_opacity_params->kernel_pars.brem_kernel_params.l = 0;
+            my_grey_opacity_params->kernel_pars.brem_kernel_params.use_NN_medium_corr = my_grey_opacity_params->opacity_pars.use_NN_medium_corr;
             brem_kernels_m1 = BremKernelsLegCoeff(
                &my_grey_opacity_params->kernel_pars.brem_kernel_params,
              &my_eos_params);

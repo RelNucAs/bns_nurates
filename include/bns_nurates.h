@@ -152,6 +152,7 @@ struct BremKernelParams
     double omega;       // neutrino energy before interaction
     double omega_prime; // neutrino energy after interaction
     int l;              // order of Legendre coefficient
+    bool use_NN_medium_corr; // flag for inclusion of medium correction to HR98 NN brem kernel as in Fischer16
 };
 typedef struct BremKernelParams BremKernelParams;
 
