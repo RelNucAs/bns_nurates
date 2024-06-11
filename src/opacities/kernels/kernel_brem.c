@@ -275,7 +275,7 @@ double BremAllChannelsAbsKernel(BremKernelParams* kernel_params,
                          kTwentyeightThirds * n_mean * s_abs_np);
 
     // kernel correction due to medium dependence as in Fischer2016
-    if (kernel_params->use_NN_medium_corr == true) s_abs_tot = s_abs_tot / (1. + pow(nb / 0.15E+39, 0.3333333333333333) / 3.);
+    if (kernel_params->use_NN_medium_corr == true) s_abs_tot = s_abs_tot / pow((1. + pow(nb / 0.15E+39, 0.3333333333333333) / 3.), 6.);
 
     return s_abs_tot;
 }

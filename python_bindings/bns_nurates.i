@@ -146,16 +146,20 @@
         }
         $1 = temp;
 }
-
+/*
 %typemap(in) OpacityParams * (OpacityParams tmp) {
+        tmp.use_dU = PyDict_GetItemString($input, "use_dU");
 	tmp.use_dm_eff = PyDict_GetItemString($input, "use_dm_eff");
 	tmp.use_WM_ab = PyDict_GetItemString($input, "use_WM_ab");
 	tmp.use_WM_sc = PyDict_GetItemString($input, "use_WM_sc");
 	tmp.use_decay = PyDict_GetItemString($input, "use_decay");
+	tmp.use_BRT_brem = PyDict_GetItemString($input, "use_BRT_brem");
+        tmp.use_NN_medium_corr = PyDict_GetItemString($input, "use_NN_medium_corr");
 	tmp.neglect_blocking = PyDict_GetItemString($input, "neglect_blocking");
-	
+
 	$1 = &tmp;
 }
+*/
 
 %typemap(in) OpacityFlags * (OpacityFlags tmp) {
 	tmp.use_abs_em = (int) PyInt_AsLong(PyDict_GetItemString($input, "use_abs_em"));
@@ -185,8 +189,10 @@
         tmp.use_WM_ab = PyInt_AsLong(PyDict_GetItemString($input, "use_WM_ab"));
         tmp.use_WM_sc = PyInt_AsLong(PyDict_GetItemString($input, "use_WM_sc"));
         tmp.use_decay = PyInt_AsLong(PyDict_GetItemString($input, "use_decay"));
+        tmp.use_BRT_brem = PyInt_AsLong(PyDict_GetItemString($input, "use_BRT_brem"));
+        tmp.use_NN_medium_corr = PyInt_AsLong(PyDict_GetItemString($input, "use_NN_medium_corr"));
         tmp.neglect_blocking = PyInt_AsLong(PyDict_GetItemString($input, "neglect_blocking"));
-        
+
         $1 = &tmp;
 }
 
@@ -198,6 +204,8 @@
         PyDict_SetItemString(out_dict, "use_WM_ab", PyInt_FromLong(in_var->use_WM_ab)); 
         PyDict_SetItemString(out_dict, "use_WM_sc", PyInt_FromLong(in_var->use_WM_sc)); 
         PyDict_SetItemString(out_dict, "use_decay", PyInt_FromLong(in_var->use_decay)); 
+        PyDict_SetItemString(out_dict, "use_BRT_brem", PyInt_FromLong(in_var->use_BRT_brem)); 
+        PyDict_SetItemString(out_dict, "use_NN_medium_corr", PyInt_FromLong(in_var->use_NN_medium_corr)); 
         PyDict_SetItemString(out_dict, "neglect_blocking", PyInt_FromLong(in_var->neglect_blocking)); 
         
         $result = out_dict;
