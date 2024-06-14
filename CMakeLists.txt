@@ -67,6 +67,7 @@ add_library(nurates SHARED
         src/distribution/distribution_opt_thick.c
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
+        src/functions/bessel.c
         src/functions/digamma.c
         src/functions/fermi_distr.c
         src/functions/fermi_integrals.c
