@@ -19,6 +19,7 @@ add_executable(bns_nurates
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
         include/functions.h
+        src/functions/bessel.c
         src/functions/digamma.c
         src/functions/fermi_integrals.c
         src/functions/fermi_distr.c
@@ -319,6 +320,7 @@ add_executable(test_brem
         include/constants.h
         include/bns_nurates.h
         include/functions.h
+        src/functions/bessel.c
         src/functions/digamma.c
         src/functions/fermi_distr.c
         src/functions/fermi_integrals.c
@@ -628,6 +630,7 @@ add_executable(test_opacities_electron_capture
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
         include/functions.h
+        src/functions/bessel.c
         src/functions/digamma.c
         src/functions/fermi_integrals.c
         src/functions/fermi_distr.c
@@ -679,6 +682,7 @@ add_executable(test_opacities_pair
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
         include/functions.h
+        src/functions/bessel.c
         src/functions/digamma.c
         src/functions/fermi_integrals.c
         src/functions/fermi_distr.c
@@ -730,6 +734,7 @@ add_executable(test_opacities_brem
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
         include/functions.h
+        src/functions/bessel.c
         src/functions/digamma.c
         src/functions/fermi_integrals.c
         src/functions/fermi_distr.c
@@ -781,6 +786,7 @@ add_executable(test_opacities_inelastic_scatt
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
         include/functions.h
+        src/functions/bessel.c
         src/functions/digamma.c
         src/functions/fermi_integrals.c
         src/functions/fermi_distr.c
@@ -832,6 +838,7 @@ add_executable(test_opacities_isoscatt
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
         include/functions.h
+        src/functions/bessel.c
         src/functions/digamma.c
         src/functions/fermi_integrals.c
         src/functions/fermi_distr.c
@@ -883,6 +890,7 @@ add_executable(test_opacities_all_reactions
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
         include/functions.h
+        src/functions/bessel.c
         src/functions/digamma.c
         src/functions/fermi_integrals.c
         src/functions/fermi_distr.c
@@ -929,6 +937,7 @@ add_executable(test_opacities_thc
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
         include/functions.h
+        src/functions/bessel.c
         src/functions/digamma.c
         src/functions/fermi_integrals.c
         src/functions/fermi_distr.c
@@ -976,6 +985,7 @@ add_executable(test_m1_distribution
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
         include/functions.h
+        src/functions/bessel.c
         src/functions/digamma.c
         src/functions/fermi_integrals.c
         src/functions/fermi_distr.c
@@ -1025,6 +1035,7 @@ add_executable(test_quadrature_convergence_spectral
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
         include/functions.h
+        src/functions/bessel.c
         src/functions/digamma.c
         src/functions/fermi_integrals.c
         src/functions/fermi_distr.c
@@ -1072,6 +1083,7 @@ add_executable(test_quadrature_convergence_integrated
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
         include/functions.h
+        src/functions/bessel.c
         src/functions/digamma.c
         src/functions/fermi_integrals.c
         src/functions/fermi_distr.c
@@ -1119,6 +1131,7 @@ add_executable(test_quadrature_convergence_find_max
         src/distribution/distribution_opt_thin.c
         src/distribution/distribution_total.c
         include/functions.h
+        src/functions/bessel.c
         src/functions/digamma.c
         src/functions/fermi_integrals.c
         src/functions/fermi_distr.c
