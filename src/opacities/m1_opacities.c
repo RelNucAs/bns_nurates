@@ -811,8 +811,11 @@ ComputeM1OpacitiesNotStimulated(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
 
     for (int idx = 0; idx < total_num_species; idx++)
     {
+        // m1_pars.n and m1_pars.J are assumed to be parsed in cgs
         n[idx] = my_grey_opacity_params->m1_pars.n[idx];
         J[idx] = my_grey_opacity_params->m1_pars.J[idx];
+
+        J[idx] = J[idx] / kMeV; // erg cm-3 -> MeV cm-3 conversion
     }
 
     const double temp = my_grey_opacity_params->eos_pars.temp;
@@ -832,8 +835,7 @@ ComputeM1OpacitiesNotStimulated(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
     
     for (int idx = 0; idx < total_num_species; idx++)
     {
-        s_array[idx + 8] = my_grey_opacity_params->m1_pars.J[idx] /
-                           my_grey_opacity_params->m1_pars.n[idx];
+        s_array[idx + 8] = J[idx] / n[idx];
     }
 
     // MyQuadratureIntegrand integrals_1d =
@@ -935,8 +937,11 @@ M1Opacities ComputeM1Opacities(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
 
     for (int idx = 0; idx < total_num_species; idx++)
     {
+        // m1_pars.n and m1_pars.J are assumed to be parsed in cgs
         n[idx] = my_grey_opacity_params->m1_pars.n[idx];
         J[idx] = my_grey_opacity_params->m1_pars.J[idx];
+
+        J[idx] = J[idx] / kMeV; // erg cm-3 -> MeV cm-3 conversion
     }
 
     // double s_2d_x[12];
@@ -968,8 +973,7 @@ M1Opacities ComputeM1Opacities(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
 
     for (int idx = 0; idx < total_num_species; idx++)
     {
-        s_array[idx + 8] = my_grey_opacity_params->m1_pars.J[idx] /
-                           my_grey_opacity_params->m1_pars.n[idx];
+        s_array[idx + 8] = J[idx] / n[idx];
     }
 
     /*

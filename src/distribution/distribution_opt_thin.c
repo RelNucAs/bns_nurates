@@ -56,9 +56,10 @@ void CalculateThinParamsFromM1(M1Quantities* M1_pars,
 
         out_distr_pars->temp_f[species] = j / (n * (CONST_C_F + 3.));
 
+        // n and J are assumed to be in cgs units
         out_distr_pars->beta_f[species] =
-            n * POW3(kHClight * kMeV) /
+            n * POW3(kHClight) /
             (4. * kPi * GammaStirling(CONST_C_F + 3.) *
-             pow(out_distr_pars->temp_f[species], CONST_C_F + 3.));
+             pow(out_distr_pars->temp_f[species] / kMeV, CONST_C_F + 3.));
     }
 }

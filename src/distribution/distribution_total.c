@@ -128,7 +128,6 @@ MyQuadratureIntegrand NuNumber(NuDistributionParams* distr_pars)
     MyQuadratureIntegrand result =
         GaussLegendreIntegrate1D(&quad, &integrand, s);
     const double result_factor = 4. * kPi / POW3(kHClight);
-    /* const double result_factor = 4. * kPi / POW3(kHClight * kMeV); */
 
     for (int species = 0; species < total_num_species; ++species)
     {
@@ -180,8 +179,7 @@ MyQuadratureIntegrand NuEnergy(NuDistributionParams* distr_pars)
     integrand.function = &NuEnergyIntegrand;
     MyQuadratureIntegrand result =
         GaussLegendreIntegrate1D(&quad, &integrand, s);
-    /* const double result_factor = 4. * kPi / POW3(kHClight); */
-    const double result_factor = 4. * kPi / POW3(kHClight * kMeV);
+    const double result_factor = 4. * kPi / POW3(kHClight);
 
     for (int species = 0; species < total_num_species; ++species)
     {
@@ -191,36 +189,20 @@ MyQuadratureIntegrand NuEnergy(NuDistributionParams* distr_pars)
     return result;
 }
 
-MyQuadratureIntegrand
+void
 ComputeM1DensitiesEq(MyEOSParams* eos_params,
-                     NuDistributionParams* nu_distribution_params)
+                     NuDistributionParams* nu_distribution_params,
+                     M1Quantities* m1_pars)
 {
 
-    MyQuadratureIntegrand result;
-    result.n = 6;
+    const double four_pi_hc3 = 4. * kPi / POW3(kHClight);
+    const double n_prefactor = four_pi_hc3 * POW3(eos_params->temp);
+    const double j_prefactor = n_prefactor * eos_params->temp;
 
-    double four_pi_hc3 = 4. * kPi / POW3(kHClight * kMeV);
+    for (int idx = 0; idx < total_num_species; idx ++) {
+        m1_pars->n[idx] = n_prefactor * FDI_p2(nu_distribution_params->eta_t[idx]);
+        m1_pars->J[idx] = j_prefactor * FDI_p3(nu_distribution_params->eta_t[idx]);
+    }
 
-    result.integrand[0] =
-        four_pi_hc3 * POW3(eos_params->temp) *
-        FDI_p2(nu_distribution_params->eta_t[id_nue]); // n_nue
-    result.integrand[1] =
-        four_pi_hc3 * POW4(eos_params->temp) *
-        FDI_p3(nu_distribution_params->eta_t[id_nue]); // en_nue
-
-    result.integrand[2] =
-        four_pi_hc3 * POW3(eos_params->temp) *
-        FDI_p2(nu_distribution_params->eta_t[id_anue]); // n_anue
-    result.integrand[3] =
-        four_pi_hc3 * POW4(eos_params->temp) *
-        FDI_p3(nu_distribution_params->eta_t[id_anue]); // en_anue
-
-    result.integrand[4] =
-        four_pi_hc3 * POW3(eos_params->temp) *
-        FDI_p2(nu_distribution_params->eta_t[id_nux]); // n_nux
-    result.integrand[5] =
-        four_pi_hc3 * POW4(eos_params->temp) *
-        FDI_p3(nu_distribution_params->eta_t[id_nux]); // n_nux
-
-    return result;
+    return;
 }

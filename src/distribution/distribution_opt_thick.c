@@ -50,6 +50,7 @@ void CalculateThickParamsFromM1(M1Quantities* M1_pars, MyEOSParams* eos_pars,
 
     for (int species = 0; species < total_num_species; ++species)
     {
+        // n and J are assumed to be in cgs units
         const double n   = M1_pars->n[species];
         const double j   = M1_pars->J[species];
         const double chi = M1_pars->chi[species];
