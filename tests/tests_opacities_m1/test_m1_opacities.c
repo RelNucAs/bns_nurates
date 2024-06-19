@@ -142,11 +142,11 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
     my_grey_opacity_params.distr_pars = NuEquilibriumParams(&my_grey_opacity_params.eos_pars); // consider neutrino distribution function at equilibrium
 
     // M1 parameters
-    MyQuadratureIntegrand Jvals = NuEnergy(&my_grey_opacity_params.distr_pars);
-    MyQuadratureIntegrand nvals = NuNumber(&my_grey_opacity_params.distr_pars);
+    ComputeM1DensitiesEq(&my_grey_opacity_params.eos_pars, &my_grey_opacity_params.distr_pars, &my_grey_opacity_params.m1_pars);
+  
     for (int idx = 0; idx < total_num_species; idx++) {
-      my_grey_opacity_params.m1_pars.n[idx] = nvals.integrand[idx];
-      my_grey_opacity_params.m1_pars.J[idx] = Jvals.integrand[idx];
+      my_grey_opacity_params.m1_pars.chi[idx] = 1. / 3.;
+      my_grey_opacity_params.m1_pars.J[idx] = my_grey_opacity_params.m1_pars.J[idx] * kMeV;
     }
 
     double distr_fermi =

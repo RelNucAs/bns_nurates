@@ -47,7 +47,7 @@ void CalculateThinParamsFromM1(M1Quantities* M1_pars,
     for (int species = 0; species < total_num_species; species++)
     {
         const double n   = M1_pars->n[species];
-        const double j   = M1_pars->J[species];
+        const double j   = M1_pars->J[species] / kMeV; // conversion from erg cm-3 to MeV cm-3
         const double chi = M1_pars->chi[species];
 
         out_distr_pars->w_f[species] = 0.5 * (3. * chi - 1.);
@@ -60,6 +60,6 @@ void CalculateThinParamsFromM1(M1Quantities* M1_pars,
         out_distr_pars->beta_f[species] =
             n * POW3(kHClight) /
             (4. * kPi * GammaStirling(CONST_C_F + 3.) *
-             pow(out_distr_pars->temp_f[species] / kMeV, CONST_C_F + 3.));
+             pow(out_distr_pars->temp_f[species], CONST_C_F + 3.));
     }
 }

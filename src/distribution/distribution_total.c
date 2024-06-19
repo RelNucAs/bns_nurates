@@ -38,6 +38,7 @@ NuDistributionParams NuEquilibriumParams(MyEOSParams* eos_pars)
         out_distr.w_f[idx]    = 0.;
         out_distr.c_f[idx]    = 1.; //
         out_distr.temp_f[idx] = temp;
+        out_distr.beta_f[idx] = 1.;
     }
 
     out_distr.eta_t[id_nue]  = (mu_e - mu_n + mu_p) / temp;
