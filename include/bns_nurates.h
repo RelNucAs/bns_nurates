@@ -149,10 +149,11 @@ typedef struct MyFunctionMultiD MyFunctionMultiD;
  */
 struct BremKernelParams
 {
-    double omega;       // neutrino energy before interaction
-    double omega_prime; // neutrino energy after interaction
-    int l;              // order of Legendre coefficient
-    bool use_NN_medium_corr; // flag for inclusion of medium correction to HR98 NN brem kernel as in Fischer16
+    double omega;            // neutrino energy before interaction
+    double omega_prime;      // neutrino energy after interaction
+    int l;                   // order of Legendre coefficient
+    bool use_NN_medium_corr; // flag for inclusion of medium correction to HR98
+                             // NN brem kernel as in Fischer16
 };
 typedef struct BremKernelParams BremKernelParams;
 
@@ -283,33 +284,35 @@ typedef struct MyOpacity MyOpacity;
  */
 struct OpacityParams
 {
-    bool use_dU;        // flag for dU correction
-    bool use_dm_eff;    // flag for dm_eff correction
-    bool use_WM_ab;     // flag for WM correction (and related) on absorption rates
-    bool use_WM_sc;     // flag for WM correction (and related) on scattering rates
-    bool use_decay;     // flag for inclusion of nucleon decay rates
-    bool use_BRT_brem;  // flag for computing NN brem rates using BRT06 instead of HR98 
-    bool use_NN_medium_corr; // flag for inclusion of medium correction to HR98 NN brem kernel as in Fischer16
+    bool use_dU;     // flag for dU correction
+    bool use_dm_eff; // flag for dm_eff correction
+    bool use_WM_ab;  // flag for WM correction (and related) on absorption rates
+    bool use_WM_sc;  // flag for WM correction (and related) on scattering rates
+    bool use_decay;  // flag for inclusion of nucleon decay rates
+    bool use_BRT_brem; // flag for computing NN brem rates using BRT06 instead
+                       // of HR98
+    bool use_NN_medium_corr; // flag for inclusion of medium correction to HR98
+                             // NN brem kernel as in Fischer16
     bool neglect_blocking;   // flag for neglecting blocking factor of
                              // antineutrino in pair (nu + anu) processes
 };
 typedef struct OpacityParams OpacityParams;
 __attribute__((unused)) static OpacityParams opacity_params_default_all = {
-    .use_dU = true,
-    .use_dm_eff = true,
-    .use_WM_ab = true,
-    .use_WM_sc = true,
-    .use_decay = true,
-    .use_BRT_brem = true, 
+    .use_dU             = true,
+    .use_dm_eff         = true,
+    .use_WM_ab          = true,
+    .use_WM_sc          = true,
+    .use_decay          = true,
+    .use_BRT_brem       = true,
     .use_NN_medium_corr = true,
-    .neglect_blocking = true};
+    .neglect_blocking   = true};
 __attribute__((unused)) static OpacityParams opacity_params_default_none = {
-    .use_dU           = false,
-    .use_dm_eff       = false,
-    .use_WM_ab        = false,
-    .use_WM_sc        = false,
-    .use_decay        = false,
-    .use_BRT_brem     = false,
+    .use_dU             = false,
+    .use_dm_eff         = false,
+    .use_WM_ab          = false,
+    .use_WM_sc          = false,
+    .use_decay          = false,
+    .use_BRT_brem       = false,
     .use_NN_medium_corr = false,
     .neglect_blocking   = false};
 

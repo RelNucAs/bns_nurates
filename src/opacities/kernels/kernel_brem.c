@@ -30,7 +30,8 @@
 #define kFourPiSquared 39.47841760435743       // 4. * kPiSquared
 #define kPi2OneEighth 1.1538350678499893       // pow(kPi, 1. / 8.)
 #define kPiHalfToFiveHalves 3.0924286813991433 // pow(0.5 * kPi, 2.5)
-#define kC4BRT06 0.1409912109375               // (3*5*7*11)/2^{11} / 4 (C in BRT06 Eq.143 divided by four)
+#define kC4BRT06                                                               \
+    0.1409912109375 // (3*5*7*11)/2^{11} / 4 (C in BRT06 Eq.143 divided by four)
 // #define kGfBrem 1.1663787E-11 // [MeV^-2]
 
 /* Compute the analytical fit for the s-component of the kernel for
@@ -272,10 +273,12 @@ double BremAllChannelsAbsKernel(BremKernelParams* kernel_params,
 
     // total absorption kernel
     double s_abs_tot = kBremConst * (nn * s_abs_nn + np * s_abs_pp +
-                         kTwentyeightThirds * n_mean * s_abs_np);
+                                     kTwentyeightThirds * n_mean * s_abs_np);
 
     // kernel correction due to medium dependence as in Fischer2016
-    if (kernel_params->use_NN_medium_corr == true) s_abs_tot = s_abs_tot / pow((1. + pow(nb / 0.15E+39, 0.3333333333333333) / 3.), 6.);
+    if (kernel_params->use_NN_medium_corr == true)
+        s_abs_tot = s_abs_tot /
+                    pow((1. + pow(nb / 0.15E+39, 0.3333333333333333) / 3.), 6.);
 
     return s_abs_tot;
 }
@@ -338,7 +341,8 @@ void BremKernelsTable(const int n, double* nu_array,
     MyKernelOutput brem_ker;
 
     grey_pars->kernel_pars.brem_kernel_params.l = 0;
-    grey_pars->kernel_pars.brem_kernel_params.use_NN_medium_corr = grey_pars->opacity_pars.use_NN_medium_corr;
+    grey_pars->kernel_pars.brem_kernel_params.use_NN_medium_corr =
+        grey_pars->opacity_pars.use_NN_medium_corr;
 
     for (int i = 0; i < n; i++)
     {
@@ -374,26 +378,33 @@ void BremKernelsTable(const int n, double* nu_array,
 // * The factor 2.0778 is different from the paper 1.04 to account
 //   for the nuclear matrix element for one-pion exchange
 //   (Adam Burrows, private comm)
-double QBrem_BRT06(const double nb, const double temp, const double xn, const double xp) {
+double QBrem_BRT06(const double nb, const double temp, const double xn,
+                   const double xp)
+{
     const double rho = nb * kMb; // mass density [g cm-3]
-    return 2.0778E+02 * 0.5 * kMeV * (xn * xn + xp * xp + 28./3. * xn * xp) * rho * rho * pow(temp, 5.5); // [MeV cm-3 s-1]
-} 
+    return 2.0778E+02 * 0.5 * kMeV * (xn * xn + xp * xp + 28. / 3. * xn * xp) *
+           rho * rho * pow(temp, 5.5); // [MeV cm-3 s-1]
+}
 
 // Bremsstrahlung kernel from BRT06 Eq.(143) rewritten consistently
 // to fit within the framework of the present library
 MyKernelOutput BremKernelsBRT06(BremKernelParams* kernel_params,
-                                   MyEOSParams* eos_pars)
+                                MyEOSParams* eos_pars)
 {
-    static const double kHClight6FourPiSquared = kHClight * kHClight * kHClight * kHClight * kHClight * kHClight / (16. * kPi * kPi);
-    const double omega = kernel_params->omega;
+    static const double kHClight6FourPiSquared =
+        kHClight * kHClight * kHClight * kHClight * kHClight * kHClight /
+        (16. * kPi * kPi);
+    const double omega       = kernel_params->omega;
     const double omega_prime = kernel_params->omega_prime;
-    const double temp = eos_pars->temp;
-    
-    const double x = 0.5 * (omega + omega_prime) / temp; 
-    const double q_nb = QBrem_BRT06(eos_pars->nb, temp, eos_pars->yn, eos_pars->yp); 
+    const double temp        = eos_pars->temp;
 
-    const double tmp = kHClight6FourPiSquared * kC4BRT06 * (q_nb / pow(temp, 7.)) * bessk1(x) / x;
-    const double s_em = tmp * SafeExp(-x);
+    const double x = 0.5 * (omega + omega_prime) / temp;
+    const double q_nb =
+        QBrem_BRT06(eos_pars->nb, temp, eos_pars->yn, eos_pars->yp);
+
+    const double tmp = kHClight6FourPiSquared * kC4BRT06 *
+                       (q_nb / pow(temp, 7.)) * bessk1(x) / x;
+    const double s_em  = tmp * SafeExp(-x);
     const double s_abs = tmp * SafeExp(x);
 
     MyKernelOutput brem_kernel;
@@ -401,13 +412,13 @@ MyKernelOutput BremKernelsBRT06(BremKernelParams* kernel_params,
     {
         brem_kernel.abs[idx] = s_abs;
         brem_kernel.em[idx]  = s_em;
-    } 
+    }
 
     return brem_kernel;
 }
 
 void BremKernelsTableBRT06(const int n, double* nu_array,
-                      GreyOpacityParams* grey_pars, M1Matrix* out)
+                           GreyOpacityParams* grey_pars, M1Matrix* out)
 {
     MyKernelOutput brem_ker;
 
@@ -423,7 +434,7 @@ void BremKernelsTableBRT06(const int n, double* nu_array,
 
             brem_ker =
                 BremKernelsBRT06(&grey_pars->kernel_pars.brem_kernel_params,
-                                    &grey_pars->eos_pars);
+                                 &grey_pars->eos_pars);
 
             out->m1_mat_em[0][i][j] = brem_ker.em[0];
             out->m1_mat_em[0][j][i] = brem_ker.em[0];

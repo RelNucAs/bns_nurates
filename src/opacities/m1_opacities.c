@@ -248,8 +248,11 @@ MyQuadratureIntegrand M1CoeffsSingleIntegrandNotStimulated(double* var, void* p)
             n_integrand_2[idx] =
                 nu * nu * g_nu[idx] *
                 abs_em_beta.abs[idx]; // ab = ab (NOT stimulated absorption)
-            if (idx == 0) {
-                double tmp = my_grey_opacity_params->eos_pars.mu_n - my_grey_opacity_params->eos_pars.mu_p - my_grey_opacity_params->eos_pars.mu_e;                         
+            if (idx == 0)
+            {
+                double tmp = my_grey_opacity_params->eos_pars.mu_n -
+                             my_grey_opacity_params->eos_pars.mu_p -
+                             my_grey_opacity_params->eos_pars.mu_e;
             }
             e_integrand_2[idx] = nu * n_integrand_2[idx];
         }
@@ -404,9 +407,12 @@ void ComputeM1DoubleIntegrandNotStimulated(MyQuadrature* quad_1d,
     InitializeM1MatrixSingleFlavor(&brem, n, 0);
     if (grey_pars->opacity_flags.use_brem == 1)
     {
-        if (grey_pars->opacity_pars.use_BRT_brem == true) {
+        if (grey_pars->opacity_pars.use_BRT_brem == true)
+        {
             BremKernelsTableBRT06(2 * n, nu_array, grey_pars, &brem);
-        } else {
+        }
+        else
+        {
             BremKernelsTable(2 * n, nu_array, grey_pars, &brem);
         }
     }
@@ -615,9 +621,12 @@ void ComputeM1DoubleIntegrand(MyQuadrature* quad_1d,
     InitializeM1MatrixSingleFlavor(&brem, n, 0);
     if (grey_pars->opacity_flags.use_brem == 1)
     {
-        if (grey_pars->opacity_pars.use_BRT_brem == true) {
+        if (grey_pars->opacity_pars.use_BRT_brem == true)
+        {
             BremKernelsTableBRT06(2 * n, nu_array, grey_pars, &brem);
-        } else {
+        }
+        else
+        {
             BremKernelsTable(2 * n, nu_array, grey_pars, &brem);
         }
     }
@@ -818,10 +827,10 @@ ComputeM1OpacitiesNotStimulated(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
         J[idx] = J[idx] / kMeV; // erg cm-3 -> MeV cm-3 conversion
     }
 
-    const double temp = my_grey_opacity_params->eos_pars.temp;
+    const double temp  = my_grey_opacity_params->eos_pars.temp;
     const double eta_e = my_grey_opacity_params->eos_pars.mu_e / temp;
-    
-    const double s = 1.5 * temp;
+
+    const double s     = 1.5 * temp;
     double s_array[12] = {0};
 
     s_array[0] = temp * FDI_p5(eta_e) / FDI_p4(eta_e);
@@ -832,7 +841,7 @@ ComputeM1OpacitiesNotStimulated(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
     s_array[5] = temp * FDI_p5(-eta_e) / FDI_p4(-eta_e);
     s_array[6] = s;
     s_array[7] = s;
-    
+
     for (int idx = 0; idx < total_num_species; idx++)
     {
         s_array[idx + 8] = J[idx] / n[idx];
@@ -1108,20 +1117,23 @@ MyQuadratureIntegrand SpectralIntegrand(double* var, void* p)
     MyKernelOutput brem_kernels_m1 = {0};
     if (opacity_flags.use_brem)
     {
-        my_grey_opacity_params->kernel_pars.brem_kernel_params.omega_prime = nu_bar;
+        my_grey_opacity_params->kernel_pars.brem_kernel_params.omega_prime =
+            nu_bar;
         if (opacity_pars.use_BRT_brem == true)
         {
             brem_kernels_m1 = BremKernelsBRT06(
                 &my_grey_opacity_params->kernel_pars.brem_kernel_params,
-             &my_eos_params);
+                &my_eos_params);
         }
         else
         {
             my_grey_opacity_params->kernel_pars.brem_kernel_params.l = 0;
-            my_grey_opacity_params->kernel_pars.brem_kernel_params.use_NN_medium_corr = my_grey_opacity_params->opacity_pars.use_NN_medium_corr;
+            my_grey_opacity_params->kernel_pars.brem_kernel_params
+                .use_NN_medium_corr =
+                my_grey_opacity_params->opacity_pars.use_NN_medium_corr;
             brem_kernels_m1 = BremKernelsLegCoeff(
-               &my_grey_opacity_params->kernel_pars.brem_kernel_params,
-             &my_eos_params);
+                &my_grey_opacity_params->kernel_pars.brem_kernel_params,
+                &my_eos_params);
         }
     }
 

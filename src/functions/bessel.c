@@ -4,71 +4,93 @@
 
 /*
 Evaluate modified Bessel functions of order v = 1
-Description:                
-              The differential equation 
+Description:
+              The differential equation
 
                        2
                    2  d w       dw      2   2
                   x . --- + x . --- - (x + v ).w = 0
                         2       dx
                       dx
-                      
+
               has two solutions called modified Bessel functions
               Iv(x) and Kv(x).
-              The routines bessi1 and bessk1 return the I and K for 
+              The routines bessi1 and bessk1 return the I and K for
               v = 1.
 */
 
-//static
+// static
 double bessi1(const double x)
 /*------------------------------------------------------------*/
 /* PURPOSE: Evaluate modified Bessel function In(x) and n=1.  */
 /*------------------------------------------------------------*/
 {
-   double ax,ans;
-   double y;
+    double ax, ans;
+    double y;
 
 
-   if ((ax=fabs(x)) < 3.75) {
-      y=x/3.75,y=y*y;
-      ans=ax*(0.5+y*(0.87890594+y*(0.51498869+y*(0.15084934
-         +y*(0.2658733e-1+y*(0.301532e-2+y*0.32411e-3))))));
-   } else {
-      y=3.75/ax;
-      ans=0.2282967e-1+y*(-0.2895312e-1+y*(0.1787654e-1
-         -y*0.420059e-2));
-      ans=0.39894228+y*(-0.3988024e-1+y*(-0.362018e-2
-         +y*(0.163801e-2+y*(-0.1031555e-1+y*ans))));
-      ans *= (exp(ax)/sqrt(ax));
-   }
-   return x < 0.0 ? -ans : ans;
+    if ((ax = fabs(x)) < 3.75)
+    {
+        y = x / 3.75, y = y * y;
+        ans = ax * (0.5 +
+                    y * (0.87890594 +
+                         y * (0.51498869 +
+                              y * (0.15084934 +
+                                   y * (0.2658733e-1 +
+                                        y * (0.301532e-2 + y * 0.32411e-3))))));
+    }
+    else
+    {
+        y   = 3.75 / ax;
+        ans = 0.2282967e-1 +
+              y * (-0.2895312e-1 + y * (0.1787654e-1 - y * 0.420059e-2));
+        ans = 0.39894228 +
+              y * (-0.3988024e-1 +
+                   y * (-0.362018e-2 +
+                        y * (0.163801e-2 + y * (-0.1031555e-1 + y * ans))));
+        ans *= (exp(ax) / sqrt(ax));
+    }
+    return x < 0.0 ? -ans : ans;
 }
 
 
-//static
+// static
 double bessk1(const double x)
 /*------------------------------------------------------------*/
 /* PURPOSE: Evaluate modified Bessel function Kn(x) and n=1.  */
 /*------------------------------------------------------------*/
 {
-   double y,ans;
+    double y, ans;
 
-   if (x <= 2.0) {
-      y=x*x/4.0;
-      ans=(log(x/2.0)*bessi1(x))+(1.0/x)*(1.0+y*(0.15443144
-         +y*(-0.67278579+y*(-0.18156897+y*(-0.1919402e-1
-         +y*(-0.110404e-2+y*(-0.4686e-4)))))));
-   } else {
-      y=2.0/x;
-      ans=(exp(-x)/sqrt(x))*(1.25331414+y*(0.23498619
-         +y*(-0.3655620e-1+y*(0.1504268e-1+y*(-0.780353e-2
-         +y*(0.325614e-2+y*(-0.68245e-3)))))));
-   }
-   return ans;
+    if (x <= 2.0)
+    {
+        y = x * x / 4.0;
+        ans =
+            (log(x / 2.0) * bessi1(x)) +
+            (1.0 / x) *
+                (1.0 +
+                 y * (0.15443144 +
+                      y * (-0.67278579 +
+                           y * (-0.18156897 +
+                                y * (-0.1919402e-1 +
+                                     y * (-0.110404e-2 + y * (-0.4686e-4)))))));
+    }
+    else
+    {
+        y   = 2.0 / x;
+        ans = (exp(-x) / sqrt(x)) *
+              (1.25331414 +
+               y * (0.23498619 +
+                    y * (-0.3655620e-1 +
+                         y * (0.1504268e-1 +
+                              y * (-0.780353e-2 +
+                                   y * (0.325614e-2 + y * (-0.68245e-3)))))));
+    }
+    return ans;
 }
 
 /* Numerical recipes code
- 
+
 const double k1pi[]={0.5,5.598072040178741e-2,1.818666382168295e-3,
 2.397509908859959e-5,1.239567816344855e-7};
 const double k1qi[]={9.870202601341150e-1,1.292092053534579e-2,

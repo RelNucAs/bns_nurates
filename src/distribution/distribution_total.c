@@ -190,19 +190,21 @@ MyQuadratureIntegrand NuEnergy(NuDistributionParams* distr_pars)
     return result;
 }
 
-void
-ComputeM1DensitiesEq(MyEOSParams* eos_params,
-                     NuDistributionParams* nu_distribution_params,
-                     M1Quantities* m1_pars)
+void ComputeM1DensitiesEq(MyEOSParams* eos_params,
+                          NuDistributionParams* nu_distribution_params,
+                          M1Quantities* m1_pars)
 {
 
     const double four_pi_hc3 = 4. * kPi / POW3(kHClight);
     const double n_prefactor = four_pi_hc3 * POW3(eos_params->temp);
     const double j_prefactor = n_prefactor * eos_params->temp;
 
-    for (int idx = 0; idx < total_num_species; idx ++) {
-        m1_pars->n[idx] = n_prefactor * FDI_p2(nu_distribution_params->eta_t[idx]);
-        m1_pars->J[idx] = j_prefactor * FDI_p3(nu_distribution_params->eta_t[idx]);
+    for (int idx = 0; idx < total_num_species; idx++)
+    {
+        m1_pars->n[idx] =
+            n_prefactor * FDI_p2(nu_distribution_params->eta_t[idx]);
+        m1_pars->J[idx] =
+            j_prefactor * FDI_p3(nu_distribution_params->eta_t[idx]);
     }
 
     return;

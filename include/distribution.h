@@ -70,7 +70,7 @@ MyQuadratureIntegrand NuEnergy(NuDistributionParams* distr_pars);
 
 // number and energy density for equilibrium
 void ComputeM1DensitiesEq(MyEOSParams* eos_params,
-                     NuDistributionParams* nu_distribution_params,
-                     M1Quantities* m1_pars);
+                          NuDistributionParams* nu_distribution_params,
+                          M1Quantities* m1_pars);
 
 #endif // BNS_NURATES_SRC_DISTRIBUTION_DISTRIBUTION_H_

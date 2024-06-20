@@ -51,8 +51,9 @@ void CalculateThickParamsFromM1(M1Quantities* M1_pars, MyEOSParams* eos_pars,
     for (int species = 0; species < total_num_species; ++species)
     {
         // n and J are assumed to be in cgs units
-        const double n   = M1_pars->n[species];
-        const double j   = M1_pars->J[species] / kMeV; // conversion from erg cm-3 to MeV cm-3
+        const double n = M1_pars->n[species];
+        const double j =
+            M1_pars->J[species] / kMeV; // conversion from erg cm-3 to MeV cm-3
         const double chi = M1_pars->chi[species];
 
         out_distr_pars->w_t[species] = 1.5 * (1. - chi);
