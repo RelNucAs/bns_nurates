@@ -3,8 +3,10 @@
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
 //! \file distribution.h
-//  \brief header file for distribution function reconstruction from M1 parameters
-//         supports three different species: electron neutrino, electron anti-neutrino and mu/tau neutrino/antineutrino
+//  \brief header file for distribution function reconstruction from M1
+//  parameters
+//         supports three different species: electron neutrino, electron
+//         anti-neutrino and mu/tau neutrino/antineutrino
 
 #ifndef BNS_NURATES_SRC_DISTRIBUTION_DISTRIBUTION_H_
 #define BNS_NURATES_SRC_DISTRIBUTION_DISTRIBUTION_H_
@@ -17,10 +19,11 @@
  */
 
 // Neutrino distribution function for the optically thick regime
-double NuFThick(double omega, NuDistributionParams *distr_pars, int species);
+double NuFThick(double omega, NuDistributionParams* distr_pars, int species);
 
 // Recover parameters of thick distribution function from M1 quantities
-void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, NuDistributionParams *out_distr_pars);
+void CalculateThickParamsFromM1(M1Quantities* M1_pars, MyEOSParams* eos_pars,
+                                NuDistributionParams* out_distr_pars);
 
 /* ===========================================================================
  * Functions for the optically thin distribution function
@@ -28,10 +31,11 @@ void CalculateThickParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars, Nu
  */
 
 // Neutrino distribution function in optically thin regime
-double NuFThin(double omega, NuDistributionParams *distr_pars, int species);
+double NuFThin(double omega, NuDistributionParams* distr_pars, int species);
 
 // Recover parameters of thin distribution function from M1 quantities
-void CalculateThinParamsFromM1(M1Quantities *M1_pars, NuDistributionParams *out_distr_pars);
+void CalculateThinParamsFromM1(M1Quantities* M1_pars,
+                               NuDistributionParams* out_distr_pars);
 
 /* ===========================================================================
  * Functions for constructing the total distribution function
@@ -39,17 +43,19 @@ void CalculateThinParamsFromM1(M1Quantities *M1_pars, NuDistributionParams *out_
  */
 
 // Total neutrino distribution combining optically thick and thin regimes
-double TotalNuF(double omega, NuDistributionParams *distr_pars, int species);
+double TotalNuF(double omega, NuDistributionParams* distr_pars, int species);
 
 // Recover parameters of thick and thin distribution function from M1 quantities
-NuDistributionParams CalculateDistrParamsFromM1(M1Quantities *M1_pars, MyEOSParams *eos_pars);
+NuDistributionParams CalculateDistrParamsFromM1(M1Quantities* M1_pars,
+                                                MyEOSParams* eos_pars);
 
 /* ===========================================================================
- * Function for evaluating parameters of neutrino distribution function at equilibrium
+ * Function for evaluating parameters of neutrino distribution function at
+ * equilibrium
  * ===========================================================================
  */
 
-NuDistributionParams NuEquilibriumParams(MyEOSParams *eos_pars);
+NuDistributionParams NuEquilibriumParams(MyEOSParams* eos_pars);
 
 /* ===========================================================================
  * Functions for computing neutrino number and energy density
@@ -57,12 +63,14 @@ NuDistributionParams NuEquilibriumParams(MyEOSParams *eos_pars);
  */
 
 // Neutrino number density
-MyQuadratureIntegrand NuNumber(NuDistributionParams *distr_pars);
+MyQuadratureIntegrand NuNumber(NuDistributionParams* distr_pars);
 
 // Neutrino energy density
-MyQuadratureIntegrand NuEnergy(NuDistributionParams *distr_pars);
+MyQuadratureIntegrand NuEnergy(NuDistributionParams* distr_pars);
 
 // number and energy density for equilibrium
-MyQuadratureIntegrand ComputeM1DensitiesEq(MyEOSParams *eos_params, NuDistributionParams *nu_distribution_params);
+void ComputeM1DensitiesEq(MyEOSParams* eos_params,
+                          NuDistributionParams* nu_distribution_params,
+                          M1Quantities* m1_pars);
 
-#endif //BNS_NURATES_SRC_DISTRIBUTION_DISTRIBUTION_H_
+#endif // BNS_NURATES_SRC_DISTRIBUTION_DISTRIBUTION_H_

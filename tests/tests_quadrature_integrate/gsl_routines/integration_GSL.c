@@ -1,3 +1,5 @@
+#ifdef GSL_INCLUDES_H_
+
 #include <gsl/gsl_integration.h>
 
 // GSL implementation of numerical fixed-point quadrature integration routines
@@ -82,3 +84,4 @@ double GslLegInfSplit(const int n, const gsl_function *f, const double s) {
   return s * result;
 } 
 
+#endif //GSL_INCLUDES_H_

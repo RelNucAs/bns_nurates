@@ -5,6 +5,8 @@
 //! \file  test_integration_1d.c
 //  \brief test 1d integration routine
 
+#ifdef GSL_INCLUDES_H_
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -132,7 +134,7 @@ int main() {
   }
 
   // Gauss-Legendre integration from 0 to inf (integral split at s)
-  double s = 10.;
+  double s = fmax(fd_p.k,fd_p.eta); //10.;
   double gauleg_inf_gsl = GslLegInfSplit(n, &f, s);
   double gauleg_inf = GaussLegendreIntegrateZeroInf(&quad, &fermi, s);
   printf("\n");
@@ -151,3 +153,5 @@ int main() {
   }
 
 }
+
+#endif //GSL_INCLUDES_H_

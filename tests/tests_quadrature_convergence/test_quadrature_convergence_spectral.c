@@ -152,17 +152,18 @@
 
 void ComputeSpectralRatesGivenQuadrature(const int n_leg, const int id_point, const char *reac_type, MyEOSParams *eos_pars, OpacityFlags *opacity_flags) {
 
-  const char folder[300] = "/home/leonardo/Desktop/PhD_work/BNS_muons/bns_refactor/bns_nurates/tests/tests_quadrature_convergence/output/spectral/";
-  char filename[100], full_path[300];
+  char write_path[300] = {'\0'};
+  char write_file[200];
 
-  sprintf(filename, "bns_nurates_data_%s_point_%d_quad_%d.txt", reac_type, id_point, 2 * n_leg);
-  printf("%s\n",filename);
-  strcpy(full_path, folder); 
-  strcat(full_path, filename);
-  
-  FILE *fp = fopen(full_path, "w");
+  sprintf(write_file, "/tests/tests_quadrature_convergence/output/spectral/bns_nurates_data_%s_point_%d_quad_%d_4.txt", reac_type, id_point, 2 * n_leg);
+  printf("%s\n", write_file);
+
+  strcpy(write_path, SOURCE_DIR); 
+  strcat(write_path, write_file);
+
+  FILE *fp = fopen(write_path, "w");
   if (fp == NULL) {
-    printf("Error opening the file %s\n", filename);
+    printf("Error opening the file %s\n", write_file);
     return;
   }
 
@@ -262,8 +263,8 @@ int main() {
   int n_leg[6] = {5, 10, 20, 30, 40, 50};
 
   // Opacity flags
-  OpacityFlags opacity_flags = {.use_abs_em = 1, .use_iso = 1, .use_brem = 1, .use_pair = 1, .use_inelastic_scatt = 0};
-  const char* reac_type = "noinel";
+  OpacityFlags opacity_flags = {.use_abs_em = 0, .use_iso = 0, .use_brem = 1, .use_pair = 0, .use_inelastic_scatt = 0};
+  const char* reac_type = "brem";
  
   for (int id_p = 1; id_p <= 4; id_p++){
 

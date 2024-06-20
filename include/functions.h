@@ -15,25 +15,40 @@
 // @TODO: decide how to handle errors in the code
 
 #ifndef _USENRERRORCLASS_
-#define throw(message) { \
-  printf("ERROR: %s\n     in file %s at line %d\n", message,__FILE__,__LINE__); \
-  exit(1); \
-}
+#define throw(message)                                                         \
+    {                                                                          \
+        printf("ERROR: %s\n     in file %s at line %d\n", message, __FILE__,   \
+               __LINE__);                                                      \
+        exit(1);                                                               \
+    }
 #else
-struct NRerror {
-  char *message;
-  char *file;
-  int line;
-  NRerror(char *m, char *f, int l) : message(m), file(f), line(l) {}
+struct NRerror
+{
+    char* message;
+    char* file;
+    int line;
+    NRerror(char* m, char* f, int l) : message(m), file(f), line(l)
+    {
+    }
 };
-#define throw(message) throw(NRerror(message,__FILE__,__LINE__));
-void NRcatch(NRerror err) {
-  printf("ERROR: %s\n     in file %s at line %d\n",
-          err.message, err.file, err.line);
-  exit(1);
+#define throw(message) throw(NRerror(message, __FILE__, __LINE__));
+void NRcatch(NRerror err)
+{
+    printf("ERROR: %s\n     in file %s at line %d\n", err.message, err.file,
+           err.line);
+    exit(1);
 }
 #endif
 
+/*===========================================================================*/
+
+// bessel.c
+
+// Evaluate modified Bessel function In(x) and n=1
+double bessi1(const double x);
+
+// Evaluate modified Bessel function Kn(x) and n=1
+double bessk1(const double x);
 
 /*===========================================================================*/
 
@@ -183,13 +198,12 @@ double W0(double x);
 // mnewt.c
 
 // Implementation of 1D Newton-Raphson root finding
-double MNewt1d(double guess, double x1, double x2, double f0,
-               MyFunction *func, MyFunction *dfunc);
+double MNewt1d(double guess, double x1, double x2, double f0, MyFunction* func,
+               MyFunction* dfunc);
 
 // Implementation of 2D Newton-Raphson root finding
-void MNewt2d(double *x,
-             double C[2],
-             void (*fdf)(double *, double *, double *, double *));
+void MNewt2d(double* x, double C[2],
+             void (*fdf)(double*, double*, double*, double*));
 
 /*===========================================================================*/
 
@@ -213,9 +227,9 @@ double HeavisideTanhApprox(const double x);
 // m1matrix.c
 
 /* M1Matrix related functions */
-void InitializeM1MatrixSingleFlavor(M1Matrix *mat, const int n, const int idx);
-void InitializeM1Matrix(M1Matrix *mat, const int n);
-void FreeM1MatrixSingleFlavor(M1Matrix *mat, const int n, const int idx);
-void FreeM1Matrix(M1Matrix *mat, const int n);
+void InitializeM1MatrixSingleFlavor(M1Matrix* mat, const int n, const int idx);
+void InitializeM1Matrix(M1Matrix* mat, const int n);
+void FreeM1MatrixSingleFlavor(M1Matrix* mat, const int n, const int idx);
+void FreeM1Matrix(M1Matrix* mat, const int n);
 
-#endif //BNS_NURATES_SRC_FUNCTIONS_FUNCTIONS_H_
+#endif // BNS_NURATES_SRC_FUNCTIONS_FUNCTIONS_H_

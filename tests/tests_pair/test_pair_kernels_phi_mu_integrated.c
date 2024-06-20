@@ -13,6 +13,12 @@
 #include "opacities.h"
 #include "../../include/kernels.h"
 
+#define POW2(X) ((X) * (X))
+#define POW3(X) ((X) * (X) * (X))
+#define POW4(X) ((X) * (X) * (X) * (X))
+
+#define M_PI_VAL 3.14159265358979323846264338328 /* pi */
+
 int main() {
   double max_percentage_error = -42.;
 
@@ -38,7 +44,7 @@ int main() {
       {1, 8.4181299999999997, 50, 5, 0, 1.0588883354811727e-36, 2.5910143286093217e-34},
       {1, 8.4181299999999997, 50, 50, 0, 7.995294986861833e-37, 1.7610809154750178e-32}
   };
-  double prefactor_correction = (kClight * pow(kH * kClight, 3.));
+  double prefactor_correction = (kClight * POW3(kH * kClight));
 
   printf("=======================================================================================\n");
   printf("Pair process: Comparison of pair kernels, integrated pair kernels and old Python result\n");
@@ -60,22 +66,22 @@ int main() {
     result_phi_mu_integrated.abs_x = result_phi_mu_integrated.abs_x * prefactor_correction;
 
     printf("%0.6e %0.6e %0.6e | %0.6e %0.6e %0.6e | %0.6e %0.6e %0.6e | %0.6e %0.6e %0.6e\n",
-           result.em_e, pair_kernels_python[i][5], result_phi_mu_integrated.em_e / (4. * M_PI),
-           result.abs_e, pair_kernels_python[i][6], result_phi_mu_integrated.abs_e / (4. * M_PI),
-           result.em_x, pair_kernels_python[i + 9][5], result_phi_mu_integrated.em_x / (4. * M_PI),
-           result.abs_x, pair_kernels_python[i + 9][6], result_phi_mu_integrated.abs_x / (4. * M_PI));
+           result.em_e, pair_kernels_python[i][5], result_phi_mu_integrated.em_e / (4. * M_PI_VAL),
+           result.abs_e, pair_kernels_python[i][6], result_phi_mu_integrated.abs_e / (4. * M_PI_VAL),
+           result.em_x, pair_kernels_python[i + 9][5], result_phi_mu_integrated.em_x / (4. * M_PI_VAL),
+           result.abs_x, pair_kernels_python[i + 9][6], result_phi_mu_integrated.abs_x / (4. * M_PI_VAL));
 
-    if (fabs((result_phi_mu_integrated.em_e / (4. * M_PI) - result.em_e) / result.em_e) * 100. > max_percentage_error) {
-      max_percentage_error = fabs((result_phi_mu_integrated.em_e / (4. * M_PI) - result.em_e) / result.em_e) * 100.;
+    if (fabs((result_phi_mu_integrated.em_e / (4. * M_PI_VAL) - result.em_e) / result.em_e) * 100. > max_percentage_error) {
+      max_percentage_error = fabs((result_phi_mu_integrated.em_e / (4. * M_PI_VAL) - result.em_e) / result.em_e) * 100.;
     }
-    if (fabs((result_phi_mu_integrated.abs_e / (4. * M_PI) - result.abs_e) / result.abs_e) * 100 > max_percentage_error) {
-      max_percentage_error = fabs((result_phi_mu_integrated.abs_e / (4. * M_PI) - result.abs_e) / result.abs_e) * 100;
+    if (fabs((result_phi_mu_integrated.abs_e / (4. * M_PI_VAL) - result.abs_e) / result.abs_e) * 100 > max_percentage_error) {
+      max_percentage_error = fabs((result_phi_mu_integrated.abs_e / (4. * M_PI_VAL) - result.abs_e) / result.abs_e) * 100;
     }
-    if (fabs((result_phi_mu_integrated.em_x / (4. * M_PI) - result.em_x) / result.em_x) * 100. > max_percentage_error) {
-      max_percentage_error = fabs((result_phi_mu_integrated.em_x / (4. * M_PI) - result.em_x) / result.em_x) * 100.;
+    if (fabs((result_phi_mu_integrated.em_x / (4. * M_PI_VAL) - result.em_x) / result.em_x) * 100. > max_percentage_error) {
+      max_percentage_error = fabs((result_phi_mu_integrated.em_x / (4. * M_PI_VAL) - result.em_x) / result.em_x) * 100.;
     }
-    if (fabs((result_phi_mu_integrated.abs_x / (4. * M_PI) - result.abs_x) / result.abs_x) * 100. > max_percentage_error) {
-      max_percentage_error = fabs((result_phi_mu_integrated.abs_x / (4. * M_PI) - result.abs_x) / result.abs_x) * 100.;
+    if (fabs((result_phi_mu_integrated.abs_x / (4. * M_PI_VAL) - result.abs_x) / result.abs_x) * 100. > max_percentage_error) {
+      max_percentage_error = fabs((result_phi_mu_integrated.abs_x / (4. * M_PI_VAL) - result.abs_x) / result.abs_x) * 100.;
     }
   }
 

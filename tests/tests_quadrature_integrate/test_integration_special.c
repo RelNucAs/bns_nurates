@@ -5,12 +5,16 @@
 //! \file  test_integration_special.c
 //  \brief test integration routine with special integration routine ('multiple kernel integrator')
 
+#ifdef GSL_INCLUDES_H_
+
 #include <stdio.h>
 #include <math.h>
 #include <gsl/gsl_math.h>
 #include "gsl_routines/integration_gsl.h"
 #include "../../include/bns_nurates.h"
 #include "../../include/integration.h"
+
+#define M_PI_VAL 3.14159265358979323846264338328 /* pi */
 
 // parameters for test functions
 struct FermiDiracParams {
@@ -79,7 +83,7 @@ int main() {
   quad.y2 = 1.;
   quad.ny = 45;
   quad.z1 = 0.;
-  quad.z2 = 5. * M_PI;
+  quad.z2 = 5. * M_PI_VAL;
   quad.nz = 45;
   GaussLegendreMultiD(&quad);
 
@@ -114,3 +118,5 @@ int main() {
   }
 
 }
+
+#endif //GSL_INCLUDES_H_
