@@ -56,6 +56,15 @@ void CalculateThickParamsFromM1(M1Quantities* M1_pars, MyEOSParams* eos_pars,
             M1_pars->J[species] / kMeV; // conversion from erg cm-3 to MeV cm-3
         const double chi = M1_pars->chi[species];
 
+        if (n == 0.)
+        {
+            out_distr_pars->w_t[species] = 0.;
+            out_distr_pars->eta_t[species] = 1.;
+            out_distr_pars->temp_t[species] = 1.;
+
+            continue;
+        }
+
         out_distr_pars->w_t[species] = 1.5 * (1. - chi);
 
         const double y = POW4(n) * POW3(kHClight) / (4. * kPi * POW3(j));
