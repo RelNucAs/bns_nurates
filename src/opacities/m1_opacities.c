@@ -1025,16 +1025,24 @@ M1Opacities ComputeM1Opacities(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
     m1_opacities.eta_0[id_nux]  = four_pi_hc3_sqr * n_integrals_2d.integrand[2];
     m1_opacities.eta_0[id_anux] = four_pi_hc3_sqr * n_integrals_2d.integrand[3];
 
-    m1_opacities.kappa_0_a[id_nue] = n[id_nue] == 0. ? 0. :
-        four_pi_hc3 / (kClight * n[id_nue]) *
-        (four_pi_hc3 * n_integrals_2d.integrand[4] + integrals_1d.integrand[2]);
-    m1_opacities.kappa_0_a[id_anue] = n[id_anue] == 0. ? 0. :
-        four_pi_hc3 / (kClight * n[id_anue]) *
-        (four_pi_hc3 * n_integrals_2d.integrand[5] + integrals_1d.integrand[3]);
-    m1_opacities.kappa_0_a[id_nux] = n[id_nux] == 0. ? 0. :
-        four_pi_hc3_sqr / (kClight * n[id_nux]) * n_integrals_2d.integrand[6];
-    m1_opacities.kappa_0_a[id_anux] = n[id_anux] == 0. ? 0. :
-        four_pi_hc3_sqr / (kClight * n[id_anux]) * n_integrals_2d.integrand[7];
+    m1_opacities.kappa_0_a[id_nue] =
+        n[id_nue] == 0. ? 0. :
+                          four_pi_hc3 / (kClight * n[id_nue]) *
+                              (four_pi_hc3 * n_integrals_2d.integrand[4] +
+                               integrals_1d.integrand[2]);
+    m1_opacities.kappa_0_a[id_anue] =
+        n[id_anue] == 0. ? 0. :
+                           four_pi_hc3 / (kClight * n[id_anue]) *
+                               (four_pi_hc3 * n_integrals_2d.integrand[5] +
+                                integrals_1d.integrand[3]);
+    m1_opacities.kappa_0_a[id_nux] =
+        n[id_nux] == 0. ? 0. :
+                          four_pi_hc3_sqr / (kClight * n[id_nux]) *
+                              n_integrals_2d.integrand[6];
+    m1_opacities.kappa_0_a[id_anux] =
+        n[id_anux] == 0. ? 0. :
+                           four_pi_hc3_sqr / (kClight * n[id_anux]) *
+                               n_integrals_2d.integrand[7];
 
     m1_opacities.eta[id_nue] =
         four_pi_hc3 *
@@ -1045,25 +1053,41 @@ M1Opacities ComputeM1Opacities(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
     m1_opacities.eta[id_nux]  = four_pi_hc3_sqr * e_integrals_2d.integrand[2];
     m1_opacities.eta[id_anux] = four_pi_hc3_sqr * e_integrals_2d.integrand[3];
 
-    m1_opacities.kappa_a[id_nue] = n[id_nue] == 0. ? 0. :
-        four_pi_hc3 / (kClight * J[id_nue]) *
-        (four_pi_hc3 * e_integrals_2d.integrand[4] + integrals_1d.integrand[6]);
-    m1_opacities.kappa_a[id_anue] = n[id_anue] == 0. ? 0. :
-        four_pi_hc3 / (kClight * J[id_anue]) *
-        (four_pi_hc3 * e_integrals_2d.integrand[5] + integrals_1d.integrand[7]);
-    m1_opacities.kappa_a[id_nux] = n[id_nux] == 0. ? 0. :
-        four_pi_hc3_sqr / (kClight * J[id_nux]) * e_integrals_2d.integrand[6];
-    m1_opacities.kappa_a[id_anux] = n[id_anux] == 0. ? 0. :
-        four_pi_hc3_sqr / (kClight * J[id_anux]) * e_integrals_2d.integrand[7];
+    m1_opacities.kappa_a[id_nue] =
+        n[id_nue] == 0. ? 0. :
+                          four_pi_hc3 / (kClight * J[id_nue]) *
+                              (four_pi_hc3 * e_integrals_2d.integrand[4] +
+                               integrals_1d.integrand[6]);
+    m1_opacities.kappa_a[id_anue] =
+        n[id_anue] == 0. ? 0. :
+                           four_pi_hc3 / (kClight * J[id_anue]) *
+                               (four_pi_hc3 * e_integrals_2d.integrand[5] +
+                                integrals_1d.integrand[7]);
+    m1_opacities.kappa_a[id_nux] = n[id_nux] == 0. ?
+                                       0. :
+                                       four_pi_hc3_sqr / (kClight * J[id_nux]) *
+                                           e_integrals_2d.integrand[6];
+    m1_opacities.kappa_a[id_anux] =
+        n[id_anux] == 0. ? 0. :
+                           four_pi_hc3_sqr / (kClight * J[id_anux]) *
+                               e_integrals_2d.integrand[7];
 
-    m1_opacities.kappa_s[id_nue] = n[id_nue] == 0. ? 0. :
-        four_pi_hc3 / (kClight * J[id_nue]) * integrals_1d.integrand[8];
-    m1_opacities.kappa_s[id_anue] = n[id_anue] == 0. ? 0. :
-        four_pi_hc3 / (kClight * J[id_anue]) * integrals_1d.integrand[9];
-    m1_opacities.kappa_s[id_nux] = n[id_nux] == 0. ? 0. :
-        four_pi_hc3 / (kClight * J[id_nux]) * integrals_1d.integrand[10];
-    m1_opacities.kappa_s[id_anux] =n[id_anux] == 0. ? 0. :
-        four_pi_hc3 / (kClight * J[id_anux]) * integrals_1d.integrand[11];
+    m1_opacities.kappa_s[id_nue] =
+        n[id_nue] == 0. ?
+            0. :
+            four_pi_hc3 / (kClight * J[id_nue]) * integrals_1d.integrand[8];
+    m1_opacities.kappa_s[id_anue] =
+        n[id_anue] == 0. ?
+            0. :
+            four_pi_hc3 / (kClight * J[id_anue]) * integrals_1d.integrand[9];
+    m1_opacities.kappa_s[id_nux] =
+        n[id_nux] == 0. ?
+            0. :
+            four_pi_hc3 / (kClight * J[id_nux]) * integrals_1d.integrand[10];
+    m1_opacities.kappa_s[id_anux] =
+        n[id_anux] == 0. ?
+            0. :
+            four_pi_hc3 / (kClight * J[id_anux]) * integrals_1d.integrand[11];
 
     return m1_opacities;
 }

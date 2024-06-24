@@ -53,9 +53,9 @@ void CalculateThinParamsFromM1(M1Quantities* M1_pars,
 
         if (n == 0.)
         {
-            out_distr_pars->w_f[species] = 0.;
+            out_distr_pars->w_f[species]    = 0.;
             out_distr_pars->beta_f[species] = 0.;
-            out_distr_pars->c_f[species] = CONST_C_F;
+            out_distr_pars->c_f[species]    = CONST_C_F;
             out_distr_pars->temp_f[species] = 1.;
 
             continue;

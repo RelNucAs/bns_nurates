@@ -58,8 +58,8 @@ void CalculateThickParamsFromM1(M1Quantities* M1_pars, MyEOSParams* eos_pars,
 
         if (n == 0.)
         {
-            out_distr_pars->w_t[species] = 0.;
-            out_distr_pars->eta_t[species] = 1.;
+            out_distr_pars->w_t[species]    = 0.;
+            out_distr_pars->eta_t[species]  = 1.;
             out_distr_pars->temp_t[species] = 1.;
 
             continue;
