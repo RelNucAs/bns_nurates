@@ -15,8 +15,6 @@
 #include "integration.h"
 #include "distribution.h"
 
-
-
 void ComputeM1CoeffsGivenQuadrature(const int n_leg, const char *reac_type, OpacityFlags *opacity_flags) {
 
   char read_path[300] = {'\0'};
@@ -76,7 +74,7 @@ void ComputeM1CoeffsGivenQuadrature(const int n_leg, const char *reac_type, Opac
   char write_path[300] = {'\0'};
   char write_file[200];
 
-  sprintf(write_file, "/tests/tests_quadrature_convergence/output/integrated/bns_nurates_data_%s_quad_%d_3.txt", reac_type, 2 * n_leg);
+  sprintf(write_file, "/tests/tests_quadrature_convergence/output/integrated/bns_nurates_data_%s_quad_%d_new.txt", reac_type, 2 * n_leg);
   printf("%s\n", write_file);
 
   strcpy(write_path, SOURCE_DIR); 
@@ -125,8 +123,8 @@ void ComputeM1CoeffsGivenQuadrature(const int n_leg, const char *reac_type, Opac
 
     // M1 quantities
     M1Quantities m1_pars;
-     MyQuadratureIntegrand Jvals = NuEnergy(&distr_pars);
-     MyQuadratureIntegrand nvals = NuNumber(&distr_pars);
+    MyQuadratureIntegrand Jvals = NuEnergy(&distr_pars);
+    MyQuadratureIntegrand nvals = NuNumber(&distr_pars);
     for (int idx = 0; idx < total_num_species; idx++) {
       m1_pars.n[idx] = nvals.integrand[idx];
       m1_pars.J[idx] = Jvals.integrand[idx];
@@ -171,16 +169,75 @@ void ComputeM1CoeffsGivenQuadrature(const int n_leg, const char *reac_type, Opac
 int main() {
 
   // Number of quadrature points
-  int n_leg[6] = {5, 10, 20, 30, 40, 50};
+  int n_leg[7] = {5, 10, 20, 30, 40, 50, 60};
 
-  // Opacity flags
-  OpacityFlags opacity_flags = {.use_abs_em = 0, .use_iso = 0, .use_brem = 0, .use_pair = 1, .use_inelastic_scatt = 0};
-  const char* reac_type = "pair";
+  // Opacity flags (to switch on/off reactions)
+  OpacityFlags opacity_flags;
+  char *reac_type;
+
+  /* Select the reaction */
+
+  // Beta processes 
+  opacity_flags = opacity_flags_default_none;
+  opacity_flags.use_abs_em = 1;
+  reac_type = "beta";
  
   for (int i = 0; i < 6; i++) {
     ComputeM1CoeffsGivenQuadrature(n_leg[i], reac_type, &opacity_flags);
   }
-    
+  
+  // Pair process 
+  opacity_flags = opacity_flags_default_none;
+  opacity_flags.use_pair = 1;
+  reac_type = "pair";
+ 
+  for (int i = 0; i < 6; i++) {
+    ComputeM1CoeffsGivenQuadrature(n_leg[i], reac_type, &opacity_flags);
+  }
+  
+  // NN bremsstrahlung
+  opacity_flags = opacity_flags_default_none;
+  opacity_flags.use_brem = 1;
+  reac_type = "brem";
+ 
+  for (int i = 0; i < 6; i++) {
+    ComputeM1CoeffsGivenQuadrature(n_leg[i], reac_type, &opacity_flags);
+  }
+
+  // Inelastic scattering 
+  opacity_flags = opacity_flags_default_none;
+  opacity_flags.use_inelastic_scatt = 1;
+  reac_type = "inel";
+ 
+  for (int i = 0; i < 6; i++) {
+    ComputeM1CoeffsGivenQuadrature(n_leg[i], reac_type, &opacity_flags);
+  }
+  
+  // Isoenergetic scattering 
+  opacity_flags = opacity_flags_default_none;
+  opacity_flags.use_iso = 1;
+  reac_type = "iso";
+ 
+  for (int i = 0; i < 6; i++) {
+    ComputeM1CoeffsGivenQuadrature(n_leg[i], reac_type, &opacity_flags);
+  }
+  
+  // All reactions except inelastic scattering 
+  opacity_flags = opacity_flags_default_all;
+  opacity_flags.use_inelastic_scatt = 0;
+  reac_type = "noinel";
+ 
+  for (int i = 0; i < 6; i++) {
+    ComputeM1CoeffsGivenQuadrature(n_leg[i], reac_type, &opacity_flags);
+  }
+  
+  // All reactions 
+  opacity_flags = opacity_flags_default_all;
+  reac_type = "all";
+ 
+  for (int i = 0; i < 6; i++) {
+    ComputeM1CoeffsGivenQuadrature(n_leg[i], reac_type, &opacity_flags);
+  }
 
   return 0;
 }
