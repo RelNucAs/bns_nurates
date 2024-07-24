@@ -38,46 +38,46 @@ add_definitions(-DSOURCE_DIR="${CMAKE_SOURCE_DIR}")
 
 add_executable(bns_nurates
         main.c
-        include/constants.h
-        include/bns_nurates.h
-        include/distribution.h
-        src/distribution/distribution_opt_thick.c
-        src/distribution/distribution_opt_thin.c
-        src/distribution/distribution_total.c
-        include/functions.h
-        src/functions/bessel.c
-        src/functions/digamma.c
-        src/functions/fermi_integrals.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/lambert.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        src/functions/m1matrix.c
-        include/integration.h
-        include/kernels.h
-        include/weak_magnetism.h
-        src/opacities/weak_magnetism/weak_magnetism.c
-        src/opacities/weak_magnetism/nucfrmfac.c
-        include/opacities.h
-        src/opacities/nu_abs_em_beta.c
-        src/opacities/nu_scatt_iso.c
-        src/output/outputs.h
-        include/eos.h
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.c
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
-        src/opacities/kernels/kernel_brem.c
-        src/opacities/kernels/kernel_pair.c
-        src/opacities/kernels/kernel_nes.c
-        src/opacities/nu_abs_em_pair.c
-        src/opacities/nu_abs_em_brem.c
-        src/integration/integration_quadrature_integrate_kernels.c
-        src/opacities/m1_opacities.c)
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/distribution.hpp
+		src/distribution/distribution_opt_thick.cpp
+		src/distribution/distribution_opt_thin.cpp
+		src/distribution/distribution_total.cpp
+		include/functions.hpp
+		src/functions/bessel.cpp
+		src/functions/digamma.cpp
+		src/functions/fermi_integrals.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/lambert.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		src/functions/m1matrix.cpp
+		include/integration.hpp
+		include/kernels.hpp
+		include/weak_magnetism.hpp
+		src/opacities/weak_magnetism/weak_magnetism.cpp
+		src/opacities/weak_magnetism/nucfrmfac.cpp
+		include/opacities.hpp
+		src/opacities/nu_abs_em_beta.cpp
+		src/opacities/nu_scatt_iso.cpp
+		src/output/outputs.hpp
+		include/eos.hpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.cpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
+		src/opacities/kernels/kernel_brem.cpp
+		src/opacities/kernels/kernel_pair.cpp
+		src/opacities/kernels/kernel_nes.cpp
+		src/opacities/nu_abs_em_pair.cpp
+		src/opacities/nu_abs_em_brem.cpp
+		src/integration/integration_quadrature_integrate_kernels.cpp
+		src/opacities/m1_opacities.cpp)
 
 add_subdirectory(kokkos)
 include_directories(${Kokkos_INCLUDE_DIRS_RET})
@@ -94,36 +94,36 @@ target_link_libraries(bns_nurates m)
 
 # create shared library for THC
 add_library(nurates SHARED
-        src/distribution/distribution_opt_thick.c
-        src/distribution/distribution_opt_thin.c
-        src/distribution/distribution_total.c
-        src/functions/bessel.c
-        src/functions/digamma.c
-        src/functions/fermi_distr.c
-        src/functions/fermi_integrals.c
-        src/functions/gamma.c
-        src/functions/lambert.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        src/functions/m1matrix.c
-        src/opacities/weak_magnetism/weak_magnetism.c
-        src/opacities/weak_magnetism/nucfrmfac.c
-        src/opacities/nu_abs_em_beta.c
-        src/opacities/nu_scatt_iso.c
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.c
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
-        src/opacities/kernels/kernel_brem.c
-        src/opacities/kernels/kernel_pair.c
-        src/opacities/kernels/kernel_nes.c
-        src/opacities/nu_abs_em_pair.c
-        src/opacities/nu_abs_em_brem.c
-        src/integration/integration_quadrature_integrate_kernels.c
-        src/opacities/m1_opacities.c)
+		src/distribution/distribution_opt_thick.cpp
+		src/distribution/distribution_opt_thin.cpp
+		src/distribution/distribution_total.cpp
+		src/functions/bessel.cpp
+		src/functions/digamma.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/fermi_integrals.cpp
+		src/functions/gamma.cpp
+		src/functions/lambert.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		src/functions/m1matrix.cpp
+		src/opacities/weak_magnetism/weak_magnetism.cpp
+		src/opacities/weak_magnetism/nucfrmfac.cpp
+		src/opacities/nu_abs_em_beta.cpp
+		src/opacities/nu_scatt_iso.cpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.cpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
+		src/opacities/kernels/kernel_brem.cpp
+		src/opacities/kernels/kernel_pair.cpp
+		src/opacities/kernels/kernel_nes.cpp
+		src/opacities/nu_abs_em_pair.cpp
+		src/opacities/nu_abs_em_brem.cpp
+		src/integration/integration_quadrature_integrate_kernels.cpp
+		src/opacities/m1_opacities.cpp)
 
 #set_target_properties(nurates PROPERTIES PUBLIC_HEADER include/*.h)
 include_directories(include)
@@ -145,12 +145,12 @@ install(TARGETS nurates LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PUBLIC_HEADE
 
 # test pair kernel T
 add_executable(test_pair_t
-        tests/tests_pair/test_pair_t.c
-        include/constants.h
-        src/functions/safe_exp.c
-        src/functions/fermi_integrals.c
-        include/kernels.h
-        src/opacities/kernels/kernel_pair.c)
+		tests/tests_pair/test_pair_t.cpp
+		include/constants.hpp
+		src/functions/safe_exp.cpp
+		src/functions/fermi_integrals.cpp
+		include/kernels.hpp
+		src/opacities/kernels/kernel_pair.cpp)
 
 if (${GSL_FOUND})
 	target_link_libraries(test_pair_t GSL::gsl GSL::gslcblas)
@@ -159,12 +159,12 @@ target_link_libraries(test_pair_t m)
 
 # test pair kernel F
 add_executable(test_pair_f
-        tests/tests_pair/test_pair_f.c
-        include/constants.h
-        src/functions/safe_exp.c
-        src/functions/fermi_integrals.c
-        include/kernels.h
-        src/opacities/kernels/kernel_pair.c)
+		tests/tests_pair/test_pair_f.cpp
+		include/constants.hpp
+		src/functions/safe_exp.cpp
+		src/functions/fermi_integrals.cpp
+		include/kernels.hpp
+		src/opacities/kernels/kernel_pair.cpp)
 
 if (${GSL_FOUND})
 	target_link_libraries(test_pair_f GSL::gsl GSL::gslcblas)
@@ -173,12 +173,12 @@ target_link_libraries(test_pair_f m)
 
 # test pair kernel F
 add_executable(test_pair_g
-        tests/tests_pair/test_pair_g.c
-        include/constants.h
-        src/functions/safe_exp.c
-        src/functions/fermi_integrals.c
-        include/kernels.h
-        src/opacities/kernels/kernel_pair.c)
+		tests/tests_pair/test_pair_g.cpp
+		include/constants.hpp
+		src/functions/safe_exp.cpp
+		src/functions/fermi_integrals.cpp
+		include/kernels.hpp
+		src/opacities/kernels/kernel_pair.cpp)
 
 if (${GSL_FOUND})
 	target_link_libraries(test_pair_g GSL::gsl GSL::gslcblas)
@@ -187,12 +187,12 @@ target_link_libraries(test_pair_g m)
 
 # test pair kernel Psi
 add_executable(test_pair_psi
-        tests/tests_pair/test_pair_psi.c
-        include/constants.h
-        src/functions/safe_exp.c
-        src/functions/fermi_integrals.c
-        include/kernels.h
-        src/opacities/kernels/kernel_pair.c)
+		tests/tests_pair/test_pair_psi.cpp
+		include/constants.hpp
+		src/functions/safe_exp.cpp
+		src/functions/fermi_integrals.cpp
+		include/kernels.hpp
+		src/opacities/kernels/kernel_pair.cpp)
 
 if (${GSL_FOUND})
 	target_link_libraries(test_pair_psi GSL::gsl GSL::gslcblas)
@@ -201,12 +201,12 @@ target_link_libraries(test_pair_psi m)
 
 # test pair kernel Phi
 add_executable(test_pair_phi
-        tests/tests_pair/test_pair_phi.c
-        include/constants.h
-        src/functions/safe_exp.c
-        src/functions/fermi_integrals.c
-        include/kernels.h
-        src/opacities/kernels/kernel_pair.c
+		tests/tests_pair/test_pair_phi.cpp
+		include/constants.hpp
+		src/functions/safe_exp.cpp
+		src/functions/fermi_integrals.cpp
+		include/kernels.hpp
+		src/opacities/kernels/kernel_pair.cpp
 )
 
 if (${GSL_FOUND})
@@ -217,12 +217,12 @@ target_link_libraries(test_pair_phi m)
 if (${GSL_FOUND})
 # test pair kernel Kernels
 add_executable(test_pair_kernels
-        tests/tests_pair/test_pair_kernels.c
-        include/constants.h
-        src/functions/safe_exp.c
-        src/functions/fermi_integrals.c
-        include/kernels.h
-        src/opacities/kernels/kernel_pair.c
+		tests/tests_pair/test_pair_kernels.cpp
+		include/constants.hpp
+		src/functions/safe_exp.cpp
+		src/functions/fermi_integrals.cpp
+		include/kernels.hpp
+		src/opacities/kernels/kernel_pair.cpp
 )
 
 
@@ -234,12 +234,12 @@ endif()
 if (${GSL_FOUND})
 # test pair kernel Kernels phi integrated
 add_executable(test_pair_kernels_phi_mu_integrated
-        tests/tests_pair/test_pair_kernels_phi_mu_integrated.c
-        include/constants.h
-        src/functions/safe_exp.c
-        src/functions/fermi_integrals.c
-        include/kernels.h
-        src/opacities/kernels/kernel_pair.c
+		tests/tests_pair/test_pair_kernels_phi_mu_integrated.cpp
+		include/constants.hpp
+		src/functions/safe_exp.cpp
+		src/functions/fermi_integrals.cpp
+		include/kernels.hpp
+		src/opacities/kernels/kernel_pair.cpp
 )
 
 target_link_libraries(test_pair_kernels_phi_mu_integrated GSL::gsl GSL::gslcblas)
@@ -249,27 +249,27 @@ endif()
 
 # test pair kernel opacities
 add_executable(test_pair_opacities
-        tests/tests_pair/test_pair_opacities.c
-        include/constants.h
-        include/bns_nurates.h
-        include/functions.h
-        include/opacities.h
-        src/functions/digamma.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        src/functions/fermi_integrals.c
-        src/functions/m1matrix.c
-        include/integration.h
-        include/kernels.h
-        src/opacities/kernels/kernel_pair.c
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
-        src/opacities/nu_abs_em_pair.c
-        src/integration/integration_quadrature_integrate_kernels.c
+		tests/tests_pair/test_pair_opacities.cpp
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/functions.hpp
+		include/opacities.hpp
+		src/functions/digamma.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		src/functions/fermi_integrals.cpp
+		src/functions/m1matrix.cpp
+		include/integration.hpp
+		include/kernels.hpp
+		src/opacities/kernels/kernel_pair.cpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
+		src/opacities/nu_abs_em_pair.cpp
+		src/integration/integration_quadrature_integrate_kernels.cpp
 )
 
 if (${GSL_FOUND})
@@ -279,31 +279,31 @@ target_link_libraries(test_pair_opacities m)
 
 # test beta processes spectral rates
 add_executable(test_beta
-        tests/tests_beta/test_beta.c
-        include/constants.h
-        include/bns_nurates.h
-        include/functions.h
-        src/functions/digamma.c
-        src/functions/fermi_distr.c
-        src/functions/fermi_integrals.c
-        src/functions/gamma.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        src/functions/m1matrix.c
-        include/integration.h
-        include/kernels.h
-        include/opacities.h
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
-        src/opacities/kernels/kernel_pair.c
-        src/opacities/nu_abs_em_pair.c
-        src/integration/integration_quadrature_integrate_kernels.c
-        include/weak_magnetism.h
-        src/opacities/weak_magnetism/weak_magnetism.c
-        src/opacities/weak_magnetism/nucfrmfac.c
-        src/opacities/nu_abs_em_beta.c
+		tests/tests_beta/test_beta.cpp
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/functions.hpp
+		src/functions/digamma.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/fermi_integrals.cpp
+		src/functions/gamma.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		src/functions/m1matrix.cpp
+		include/integration.hpp
+		include/kernels.hpp
+		include/opacities.hpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
+		src/opacities/kernels/kernel_pair.cpp
+		src/opacities/nu_abs_em_pair.cpp
+		src/integration/integration_quadrature_integrate_kernels.cpp
+		include/weak_magnetism.hpp
+		src/opacities/weak_magnetism/weak_magnetism.cpp
+		src/opacities/weak_magnetism/nucfrmfac.cpp
+		src/opacities/nu_abs_em_beta.cpp
 )
 
 if (${GSL_FOUND})
@@ -313,31 +313,31 @@ target_link_libraries(test_beta m)
 
 # test isoenergetic scattering kernel
 add_executable(test_iso
-        tests/tests_iso/test_iso.c
-        include/constants.h
-        include/bns_nurates.h
-        include/functions.h
-        src/functions/digamma.c
-        src/functions/fermi_distr.c
-        src/functions/fermi_integrals.c
-        src/functions/gamma.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        src/functions/m1matrix.c
-        include/integration.h
-        include/kernels.h
-        include/opacities.h
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
-        src/opacities/kernels/kernel_pair.c
-        src/opacities/nu_abs_em_pair.c
-        src/integration/integration_quadrature_integrate_kernels.c
-        include/weak_magnetism.h
-        src/opacities/weak_magnetism/weak_magnetism.c
-        src/opacities/weak_magnetism/nucfrmfac.c
-        src/opacities/nu_scatt_iso.c
+		tests/tests_iso/test_iso.cpp
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/functions.hpp
+		src/functions/digamma.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/fermi_integrals.cpp
+		src/functions/gamma.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		src/functions/m1matrix.cpp
+		include/integration.hpp
+		include/kernels.hpp
+		include/opacities.hpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
+		src/opacities/kernels/kernel_pair.cpp
+		src/opacities/nu_abs_em_pair.cpp
+		src/integration/integration_quadrature_integrate_kernels.cpp
+		include/weak_magnetism.hpp
+		src/opacities/weak_magnetism/weak_magnetism.cpp
+		src/opacities/weak_magnetism/nucfrmfac.cpp
+		src/opacities/nu_scatt_iso.cpp
 )
 
 if (${GSL_FOUND})
@@ -347,33 +347,33 @@ target_link_libraries(test_iso m)
 
 # test NN bremsstrahlung kernel
 add_executable(test_brem
-        tests/tests_brem/test_brem.c
-        include/constants.h
-        include/bns_nurates.h
-        include/functions.h
-        src/functions/bessel.c
-        src/functions/digamma.c
-        src/functions/fermi_distr.c
-        src/functions/fermi_integrals.c
-        src/functions/gamma.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        src/functions/m1matrix.c
-        include/integration.h
-        include/kernels.h
-        include/opacities.h
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
-        src/opacities/kernels/kernel_pair.c
-        src/opacities/nu_abs_em_pair.c
-        src/integration/integration_quadrature_integrate_kernels.c
-        include/weak_magnetism.h
-        src/opacities/weak_magnetism/weak_magnetism.c
-        src/opacities/weak_magnetism/nucfrmfac.c
-        src/opacities/nu_abs_em_brem.c
-        src/opacities/kernels/kernel_brem.c
+		tests/tests_brem/test_brem.cpp
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/functions.hpp
+		src/functions/bessel.cpp
+		src/functions/digamma.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/fermi_integrals.cpp
+		src/functions/gamma.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		src/functions/m1matrix.cpp
+		include/integration.hpp
+		include/kernels.hpp
+		include/opacities.hpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
+		src/opacities/kernels/kernel_pair.cpp
+		src/opacities/nu_abs_em_pair.cpp
+		src/integration/integration_quadrature_integrate_kernels.cpp
+		include/weak_magnetism.hpp
+		src/opacities/weak_magnetism/weak_magnetism.cpp
+		src/opacities/weak_magnetism/nucfrmfac.cpp
+		src/opacities/nu_abs_em_brem.cpp
+		src/opacities/kernels/kernel_brem.cpp
 )
 
 if (${GSL_FOUND})
@@ -383,20 +383,20 @@ target_link_libraries(test_brem m)
 
 # test gauss legendre quadrature 1d
 add_executable(test_gauss_legendre_1d
-        tests/tests_quadrature_integrate/test_gauss_legendre_1d.c
-        include/constants.h
-        include/bns_nurates.h
-        include/functions.h
-        src/functions/digamma.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        include/integration.h
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
+		tests/tests_quadrature_integrate/test_gauss_legendre_1d.cpp
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/functions.hpp
+		src/functions/digamma.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		include/integration.hpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
 )
 
 if (${GSL_FOUND})
@@ -406,20 +406,20 @@ target_link_libraries(test_gauss_legendre_1d m)
 
 # test gauss legendre quadrature 2d
 add_executable(test_gauss_legendre_2d
-        tests/tests_quadrature_integrate/test_gauss_legendre_2d.c
-        include/constants.h
-        include/bns_nurates.h
-        include/functions.h
-        src/functions/digamma.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        include/integration.h
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
+		tests/tests_quadrature_integrate/test_gauss_legendre_2d.cpp
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/functions.hpp
+		src/functions/digamma.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		include/integration.hpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
 )
 
 if (${GSL_FOUND})
@@ -429,20 +429,20 @@ target_link_libraries(test_gauss_legendre_2d m)
 
 # test gauss legendre quadrature 3d
 add_executable(test_gauss_legendre_3d
-        tests/tests_quadrature_integrate/test_gauss_legendre_3d.c
-        include/constants.h
-        include/bns_nurates.h
-        include/functions.h
-        src/functions/digamma.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        include/integration.h
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
+		tests/tests_quadrature_integrate/test_gauss_legendre_3d.cpp
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/functions.hpp
+		src/functions/digamma.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		include/integration.hpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
 )
 
 if (${GSL_FOUND})
@@ -452,20 +452,20 @@ target_link_libraries(test_gauss_legendre_3d m)
 
 # test gauss laguerre quadrature 1d
 add_executable(test_gauss_laguerre_1d
-        tests/tests_quadrature_integrate/test_gauss_laguerre_1d.c
-        include/constants.h
-        include/bns_nurates.h
-        include/functions.h
-        src/functions/digamma.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        include/integration.h
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
+		tests/tests_quadrature_integrate/test_gauss_laguerre_1d.cpp
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/functions.hpp
+		src/functions/digamma.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		include/integration.hpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
 )
 
 if (${GSL_FOUND})
@@ -475,20 +475,20 @@ target_link_libraries(test_gauss_laguerre_1d m)
 
 # test quadrature I/O
 add_executable(test_quadrature_io
-        tests/tests_quadrature_integrate/test_quadrature_io.c
-        include/constants.h
-        include/bns_nurates.h
-        include/functions.h
-        src/functions/digamma.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        include/integration.h
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
+		tests/tests_quadrature_integrate/test_quadrature_io.cpp
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/functions.hpp
+		src/functions/digamma.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		include/integration.hpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
 )
 
 if (${GSL_FOUND})
@@ -498,22 +498,22 @@ target_link_libraries(test_quadrature_io m)
 
 # test 1d integration
 add_executable(test_integration_1d
-        tests/tests_quadrature_integrate/test_integration_1d.c
-        tests/tests_quadrature_integrate/gsl_routines/integration_gsl.h
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        include/constants.h
-        include/bns_nurates.h
-        include/functions.h
-        src/functions/digamma.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        include/integration.h
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
+		tests/tests_quadrature_integrate/test_integration_1d.cpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_gsl.hpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/functions.hpp
+		src/functions/digamma.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		include/integration.hpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
 )
 
 if (${GSL_FOUND})
@@ -523,22 +523,22 @@ target_link_libraries(test_integration_1d m)
 
 # test 2d integration
 add_executable(test_integration_2d
-        tests/tests_quadrature_integrate/test_integration_2d.c
-        tests/tests_quadrature_integrate/gsl_routines/integration_gsl.h
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        include/constants.h
-        include/bns_nurates.h
-        include/functions.h
-        src/functions/digamma.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        include/integration.h
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
+		tests/tests_quadrature_integrate/test_integration_2d.cpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_gsl.hpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/functions.hpp
+		src/functions/digamma.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		include/integration.hpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
 )
 
 if (${GSL_FOUND})
@@ -548,22 +548,22 @@ target_link_libraries(test_integration_2d m)
 
 # test 2d integration
 add_executable(test_integration_3d
-        tests/tests_quadrature_integrate/test_integration_3d.c
-        tests/tests_quadrature_integrate/gsl_routines/integration_gsl.h
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        include/constants.h
-        include/bns_nurates.h
-        include/functions.h
-        src/functions/digamma.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        include/integration.h
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
+		tests/tests_quadrature_integrate/test_integration_3d.cpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_gsl.hpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/functions.hpp
+		src/functions/digamma.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		include/integration.hpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
 )
 
 if (${GSL_FOUND})
@@ -573,24 +573,24 @@ target_link_libraries(test_integration_3d m)
 
 # test integration special
 add_executable(test_integration_special
-        tests/tests_quadrature_integrate/test_integration_special.c
-        tests/tests_quadrature_integrate/gsl_routines/integration_gsl.h
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        include/constants.h
-        include/bns_nurates.h
-        include/functions.h
-        src/functions/digamma.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        src/functions/m1matrix.c
-        include/integration.h
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
-        src/integration/integration_quadrature_integrate_kernels.c
+		tests/tests_quadrature_integrate/test_integration_special.cpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_gsl.hpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/functions.hpp
+		src/functions/digamma.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		src/functions/m1matrix.cpp
+		include/integration.hpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
+		src/integration/integration_quadrature_integrate_kernels.cpp
 )
 
 if (${GSL_FOUND})
@@ -600,24 +600,24 @@ target_link_libraries(test_integration_special m)
 
 # test integration special 1d
 add_executable(test_integration_multi_func_1d
-        tests/tests_quadrature_integrate/test_integration_multi_func_1d.c
-        tests/tests_quadrature_integrate/gsl_routines/integration_gsl.h
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        include/constants.h
-        include/bns_nurates.h
-        include/functions.h
-        src/functions/digamma.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        src/functions/m1matrix.c
-        include/integration.h
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
-        src/integration/integration_quadrature_integrate_kernels.c
+		tests/tests_quadrature_integrate/test_integration_multi_func_1d.cpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_gsl.hpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/functions.hpp
+		src/functions/digamma.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		src/functions/m1matrix.cpp
+		include/integration.hpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
+		src/integration/integration_quadrature_integrate_kernels.cpp
 )
 
 if (${GSL_FOUND})
@@ -627,24 +627,24 @@ target_link_libraries(test_integration_multi_func_1d m)
 
 # test integration special 2d
 add_executable(test_integration_multi_func_2d
-        tests/tests_quadrature_integrate/test_integration_multi_func_2d.c
-        tests/tests_quadrature_integrate/gsl_routines/integration_gsl.h
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        include/constants.h
-        include/bns_nurates.h
-        include/functions.h
-        src/functions/digamma.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        src/functions/m1matrix.c
-        include/integration.h
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
-        src/integration/integration_quadrature_integrate_kernels.c
+		tests/tests_quadrature_integrate/test_integration_multi_func_2d.cpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_gsl.hpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/functions.hpp
+		src/functions/digamma.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		src/functions/m1matrix.cpp
+		include/integration.hpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
+		src/integration/integration_quadrature_integrate_kernels.cpp
 )
 
 if (${GSL_FOUND})
@@ -654,49 +654,49 @@ target_link_libraries(test_integration_multi_func_2d m)
 
 # test opacities electron capture
 add_executable(test_opacities_electron_capture
-        include/constants.h
-        include/bns_nurates.h
-        include/distribution.h
-        src/distribution/distribution_opt_thick.c
-        src/distribution/distribution_opt_thin.c
-        src/distribution/distribution_total.c
-        include/functions.h
-        src/functions/bessel.c
-        src/functions/digamma.c
-        src/functions/fermi_integrals.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/lambert.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        src/functions/m1matrix.c
-        include/integration.h
-        include/kernels.h
-        include/weak_magnetism.h
-        src/opacities/weak_magnetism/weak_magnetism.c
-        src/opacities/weak_magnetism/nucfrmfac.c
-        include/opacities.h
-        src/opacities/nu_abs_em_beta.c
-        src/opacities/nu_scatt_iso.c
-        src/output/outputs.h
-        include/eos.h
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.c
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
-        src/opacities/kernels/kernel_brem.c
-        src/opacities/kernels/kernel_pair.c
-        src/opacities/kernels/kernel_nes.c
-        src/opacities/nu_abs_em_pair.c
-        src/opacities/nu_abs_em_brem.c
-        src/integration/integration_quadrature_integrate_kernels.c
-        src/opacities/m1_opacities.c
-        tests/tests_opacities_m1/test_opacities_electron_capture.c
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/distribution.hpp
+		src/distribution/distribution_opt_thick.cpp
+		src/distribution/distribution_opt_thin.cpp
+		src/distribution/distribution_total.cpp
+		include/functions.hpp
+		src/functions/bessel.cpp
+		src/functions/digamma.cpp
+		src/functions/fermi_integrals.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/lambert.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		src/functions/m1matrix.cpp
+		include/integration.hpp
+		include/kernels.hpp
+		include/weak_magnetism.hpp
+		src/opacities/weak_magnetism/weak_magnetism.cpp
+		src/opacities/weak_magnetism/nucfrmfac.cpp
+		include/opacities.hpp
+		src/opacities/nu_abs_em_beta.cpp
+		src/opacities/nu_scatt_iso.cpp
+		src/output/outputs.hpp
+		include/eos.hpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.cpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
+		src/opacities/kernels/kernel_brem.cpp
+		src/opacities/kernels/kernel_pair.cpp
+		src/opacities/kernels/kernel_nes.cpp
+		src/opacities/nu_abs_em_pair.cpp
+		src/opacities/nu_abs_em_brem.cpp
+		src/integration/integration_quadrature_integrate_kernels.cpp
+		src/opacities/m1_opacities.cpp
+		tests/tests_opacities_m1/test_opacities_electron_capture.cpp
         tests/tests_opacities_m1/test_m1_opacities.cpp
-        tests/tests.h 
+		tests/tests.hpp
 )
 
 if (${GSL_FOUND})
@@ -706,49 +706,49 @@ target_link_libraries(test_opacities_electron_capture m)
 
 # test opacities pair
 add_executable(test_opacities_pair
-        include/constants.h
-        include/bns_nurates.h
-        include/distribution.h
-        src/distribution/distribution_opt_thick.c
-        src/distribution/distribution_opt_thin.c
-        src/distribution/distribution_total.c
-        include/functions.h
-        src/functions/bessel.c
-        src/functions/digamma.c
-        src/functions/fermi_integrals.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/lambert.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        src/functions/m1matrix.c
-        include/integration.h
-        include/kernels.h
-        include/weak_magnetism.h
-        src/opacities/weak_magnetism/weak_magnetism.c
-        src/opacities/weak_magnetism/nucfrmfac.c
-        include/opacities.h
-        src/opacities/nu_abs_em_beta.c
-        src/opacities/nu_scatt_iso.c
-        src/output/outputs.h
-        include/eos.h
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.c
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
-        src/opacities/kernels/kernel_brem.c
-        src/opacities/kernels/kernel_pair.c
-        src/opacities/kernels/kernel_nes.c
-        src/opacities/nu_abs_em_pair.c
-        src/opacities/nu_abs_em_brem.c
-        src/integration/integration_quadrature_integrate_kernels.c
-        src/opacities/m1_opacities.c
-        tests/tests_opacities_m1/test_opacities_pair.c
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/distribution.hpp
+		src/distribution/distribution_opt_thick.cpp
+		src/distribution/distribution_opt_thin.cpp
+		src/distribution/distribution_total.cpp
+		include/functions.hpp
+		src/functions/bessel.cpp
+		src/functions/digamma.cpp
+		src/functions/fermi_integrals.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/lambert.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		src/functions/m1matrix.cpp
+		include/integration.hpp
+		include/kernels.hpp
+		include/weak_magnetism.hpp
+		src/opacities/weak_magnetism/weak_magnetism.cpp
+		src/opacities/weak_magnetism/nucfrmfac.cpp
+		include/opacities.hpp
+		src/opacities/nu_abs_em_beta.cpp
+		src/opacities/nu_scatt_iso.cpp
+		src/output/outputs.hpp
+		include/eos.hpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.cpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
+		src/opacities/kernels/kernel_brem.cpp
+		src/opacities/kernels/kernel_pair.cpp
+		src/opacities/kernels/kernel_nes.cpp
+		src/opacities/nu_abs_em_pair.cpp
+		src/opacities/nu_abs_em_brem.cpp
+		src/integration/integration_quadrature_integrate_kernels.cpp
+		src/opacities/m1_opacities.cpp
+		tests/tests_opacities_m1/test_opacities_pair.cpp
         tests/tests_opacities_m1/test_m1_opacities.cpp
-        tests/tests.h 
+		tests/tests.hpp
 )
 
 if (${GSL_FOUND})
@@ -758,49 +758,49 @@ target_link_libraries(test_opacities_pair m)
 
 # test opacities bremsstrahlung
 add_executable(test_opacities_brem
-        include/constants.h
-        include/bns_nurates.h
-        include/distribution.h
-        src/distribution/distribution_opt_thick.c
-        src/distribution/distribution_opt_thin.c
-        src/distribution/distribution_total.c
-        include/functions.h
-        src/functions/bessel.c
-        src/functions/digamma.c
-        src/functions/fermi_integrals.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/lambert.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        src/functions/m1matrix.c
-        include/integration.h
-        include/kernels.h
-        include/weak_magnetism.h
-        src/opacities/weak_magnetism/weak_magnetism.c
-        src/opacities/weak_magnetism/nucfrmfac.c
-        include/opacities.h
-        src/opacities/nu_abs_em_beta.c
-        src/opacities/nu_scatt_iso.c
-        src/output/outputs.h
-        include/eos.h
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.c
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
-        src/opacities/kernels/kernel_brem.c
-        src/opacities/kernels/kernel_pair.c
-        src/opacities/kernels/kernel_nes.c
-        src/opacities/nu_abs_em_pair.c
-        src/opacities/nu_abs_em_brem.c
-        src/integration/integration_quadrature_integrate_kernels.c
-        src/opacities/m1_opacities.c
-        tests/tests_opacities_m1/test_opacities_brem.c
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/distribution.hpp
+		src/distribution/distribution_opt_thick.cpp
+		src/distribution/distribution_opt_thin.cpp
+		src/distribution/distribution_total.cpp
+		include/functions.hpp
+		src/functions/bessel.cpp
+		src/functions/digamma.cpp
+		src/functions/fermi_integrals.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/lambert.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		src/functions/m1matrix.cpp
+		include/integration.hpp
+		include/kernels.hpp
+		include/weak_magnetism.hpp
+		src/opacities/weak_magnetism/weak_magnetism.cpp
+		src/opacities/weak_magnetism/nucfrmfac.cpp
+		include/opacities.hpp
+		src/opacities/nu_abs_em_beta.cpp
+		src/opacities/nu_scatt_iso.cpp
+		src/output/outputs.hpp
+		include/eos.hpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.cpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
+		src/opacities/kernels/kernel_brem.cpp
+		src/opacities/kernels/kernel_pair.cpp
+		src/opacities/kernels/kernel_nes.cpp
+		src/opacities/nu_abs_em_pair.cpp
+		src/opacities/nu_abs_em_brem.cpp
+		src/integration/integration_quadrature_integrate_kernels.cpp
+		src/opacities/m1_opacities.cpp
+		tests/tests_opacities_m1/test_opacities_brem.cpp
         tests/tests_opacities_m1/test_m1_opacities.cpp
-        tests/tests.h
+		tests/tests.hpp
 )
 
 if (${GSL_FOUND})
@@ -810,49 +810,49 @@ target_link_libraries(test_opacities_brem m)
 
 # test opacities inelastic scattering
 add_executable(test_opacities_inelastic_scatt
-        include/constants.h
-        include/bns_nurates.h
-        include/distribution.h
-        src/distribution/distribution_opt_thick.c
-        src/distribution/distribution_opt_thin.c
-        src/distribution/distribution_total.c
-        include/functions.h
-        src/functions/bessel.c
-        src/functions/digamma.c
-        src/functions/fermi_integrals.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/lambert.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        src/functions/m1matrix.c
-        include/integration.h
-        include/kernels.h
-        include/weak_magnetism.h
-        src/opacities/weak_magnetism/weak_magnetism.c
-        src/opacities/weak_magnetism/nucfrmfac.c
-        include/opacities.h
-        src/opacities/nu_abs_em_beta.c
-        src/opacities/nu_scatt_iso.c
-        src/output/outputs.h
-        include/eos.h
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.c
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
-        src/opacities/kernels/kernel_brem.c
-        src/opacities/kernels/kernel_pair.c
-        src/opacities/kernels/kernel_nes.c
-        src/opacities/nu_abs_em_pair.c
-        src/opacities/nu_abs_em_brem.c
-        src/integration/integration_quadrature_integrate_kernels.c
-        src/opacities/m1_opacities.c
-        tests/tests_opacities_m1/test_opacities_inelastic_scatt.c
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/distribution.hpp
+		src/distribution/distribution_opt_thick.cpp
+		src/distribution/distribution_opt_thin.cpp
+		src/distribution/distribution_total.cpp
+		include/functions.hpp
+		src/functions/bessel.cpp
+		src/functions/digamma.cpp
+		src/functions/fermi_integrals.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/lambert.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		src/functions/m1matrix.cpp
+		include/integration.hpp
+		include/kernels.hpp
+		include/weak_magnetism.hpp
+		src/opacities/weak_magnetism/weak_magnetism.cpp
+		src/opacities/weak_magnetism/nucfrmfac.cpp
+		include/opacities.hpp
+		src/opacities/nu_abs_em_beta.cpp
+		src/opacities/nu_scatt_iso.cpp
+		src/output/outputs.hpp
+		include/eos.hpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.cpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
+		src/opacities/kernels/kernel_brem.cpp
+		src/opacities/kernels/kernel_pair.cpp
+		src/opacities/kernels/kernel_nes.cpp
+		src/opacities/nu_abs_em_pair.cpp
+		src/opacities/nu_abs_em_brem.cpp
+		src/integration/integration_quadrature_integrate_kernels.cpp
+		src/opacities/m1_opacities.cpp
+		tests/tests_opacities_m1/test_opacities_inelastic_scatt.cpp
         tests/tests_opacities_m1/test_m1_opacities.cpp
-        tests/tests.h 
+		tests/tests.hpp
 )
 
 if (${GSL_FOUND})
@@ -862,49 +862,49 @@ target_link_libraries(test_opacities_inelastic_scatt m)
 
 # test opacities isoscatt
 add_executable(test_opacities_isoscatt
-        include/constants.h
-        include/bns_nurates.h
-        include/distribution.h
-        src/distribution/distribution_opt_thick.c
-        src/distribution/distribution_opt_thin.c
-        src/distribution/distribution_total.c
-        include/functions.h
-        src/functions/bessel.c
-        src/functions/digamma.c
-        src/functions/fermi_integrals.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/lambert.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        src/functions/m1matrix.c
-        include/integration.h
-        include/kernels.h
-        include/weak_magnetism.h
-        src/opacities/weak_magnetism/weak_magnetism.c
-        src/opacities/weak_magnetism/nucfrmfac.c
-        include/opacities.h
-        src/opacities/nu_abs_em_beta.c
-        src/opacities/nu_scatt_iso.c
-        src/output/outputs.h
-        include/eos.h
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.c
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
-        src/opacities/kernels/kernel_brem.c
-        src/opacities/kernels/kernel_pair.c
-        src/opacities/kernels/kernel_nes.c
-        src/opacities/nu_abs_em_pair.c
-        src/opacities/nu_abs_em_brem.c
-        src/integration/integration_quadrature_integrate_kernels.c
-        src/opacities/m1_opacities.c
-        tests/tests_opacities_m1/test_opacities_isoscatt.c
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/distribution.hpp
+		src/distribution/distribution_opt_thick.cpp
+		src/distribution/distribution_opt_thin.cpp
+		src/distribution/distribution_total.cpp
+		include/functions.hpp
+		src/functions/bessel.cpp
+		src/functions/digamma.cpp
+		src/functions/fermi_integrals.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/lambert.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		src/functions/m1matrix.cpp
+		include/integration.hpp
+		include/kernels.hpp
+		include/weak_magnetism.hpp
+		src/opacities/weak_magnetism/weak_magnetism.cpp
+		src/opacities/weak_magnetism/nucfrmfac.cpp
+		include/opacities.hpp
+		src/opacities/nu_abs_em_beta.cpp
+		src/opacities/nu_scatt_iso.cpp
+		src/output/outputs.hpp
+		include/eos.hpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.cpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
+		src/opacities/kernels/kernel_brem.cpp
+		src/opacities/kernels/kernel_pair.cpp
+		src/opacities/kernels/kernel_nes.cpp
+		src/opacities/nu_abs_em_pair.cpp
+		src/opacities/nu_abs_em_brem.cpp
+		src/integration/integration_quadrature_integrate_kernels.cpp
+		src/opacities/m1_opacities.cpp
+		tests/tests_opacities_m1/test_opacities_isoscatt.cpp
         tests/tests_opacities_m1/test_m1_opacities.cpp
-        tests/tests.h
+		tests/tests.hpp
 )
 
 if (${GSL_FOUND})
@@ -914,46 +914,46 @@ target_link_libraries(test_opacities_isoscatt m)
 
 # test opacities all reactions
 add_executable(test_opacities_all_reactions
-        include/constants.h
-        include/bns_nurates.h
-        include/distribution.h
-        src/distribution/distribution_opt_thick.c
-        src/distribution/distribution_opt_thin.c
-        src/distribution/distribution_total.c
-        include/functions.h
-        src/functions/bessel.c
-        src/functions/digamma.c
-        src/functions/fermi_integrals.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/lambert.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        src/functions/m1matrix.c
-        include/integration.h
-        include/kernels.h
-        include/weak_magnetism.h
-        src/opacities/weak_magnetism/weak_magnetism.c
-        src/opacities/weak_magnetism/nucfrmfac.c
-        include/opacities.h
-        src/opacities/nu_abs_em_beta.c
-        src/opacities/nu_scatt_iso.c
-        src/output/outputs.h
-        include/eos.h
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
-        src/opacities/kernels/kernel_brem.c
-        src/opacities/kernels/kernel_pair.c
-        src/opacities/kernels/kernel_nes.c
-        src/opacities/nu_abs_em_pair.c
-        src/opacities/nu_abs_em_brem.c
-        src/integration/integration_quadrature_integrate_kernels.c
-        src/opacities/m1_opacities.c
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/distribution.hpp
+		src/distribution/distribution_opt_thick.cpp
+		src/distribution/distribution_opt_thin.cpp
+		src/distribution/distribution_total.cpp
+		include/functions.hpp
+		src/functions/bessel.cpp
+		src/functions/digamma.cpp
+		src/functions/fermi_integrals.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/lambert.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		src/functions/m1matrix.cpp
+		include/integration.hpp
+		include/kernels.hpp
+		include/weak_magnetism.hpp
+		src/opacities/weak_magnetism/weak_magnetism.cpp
+		src/opacities/weak_magnetism/nucfrmfac.cpp
+		include/opacities.hpp
+		src/opacities/nu_abs_em_beta.cpp
+		src/opacities/nu_scatt_iso.cpp
+		src/output/outputs.hpp
+		include/eos.hpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
+		src/opacities/kernels/kernel_brem.cpp
+		src/opacities/kernels/kernel_pair.cpp
+		src/opacities/kernels/kernel_nes.cpp
+		src/opacities/nu_abs_em_pair.cpp
+		src/opacities/nu_abs_em_brem.cpp
+		src/integration/integration_quadrature_integrate_kernels.cpp
+		src/opacities/m1_opacities.cpp
         tests/tests_opacities_m1/test_opacities_all_reactions.cpp
         tests/tests_opacities_m1/test_m1_opacities.cpp
-        tests/tests.h 
+		tests/tests.hpp
 )
 target_link_libraries(test_opacities_all_reactions Kokkos::kokkos)
 target_link_libraries(test_opacities_all_reactions OpenMP::OpenMP_CXX)
@@ -963,46 +963,46 @@ endif()
 target_link_libraries(test_opacities_all_reactions m)
 
 add_executable(test_opacities_thc
-        include/constants.h
-        include/bns_nurates.h
-        include/distribution.h
-        src/distribution/distribution_opt_thick.c
-        src/distribution/distribution_opt_thin.c
-        src/distribution/distribution_total.c
-        include/functions.h
-        src/functions/bessel.c
-        src/functions/digamma.c
-        src/functions/fermi_integrals.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/lambert.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        src/functions/m1matrix.c
-        include/integration.h
-        include/kernels.h
-        include/weak_magnetism.h
-        src/opacities/weak_magnetism/weak_magnetism.c
-        src/opacities/weak_magnetism/nucfrmfac.c
-        include/opacities.h
-        src/opacities/nu_abs_em_beta.c
-        src/opacities/nu_scatt_iso.c
-        src/output/outputs.h
-        include/eos.h
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
-        src/opacities/kernels/kernel_brem.c
-        src/opacities/kernels/kernel_pair.c
-        src/opacities/kernels/kernel_nes.c
-        src/opacities/nu_abs_em_pair.c
-        src/opacities/nu_abs_em_brem.c
-        src/integration/integration_quadrature_integrate_kernels.c
-        src/opacities/m1_opacities.c
-        tests/tests_opacities_m1/test_opacities_thc.c
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/distribution.hpp
+		src/distribution/distribution_opt_thick.cpp
+		src/distribution/distribution_opt_thin.cpp
+		src/distribution/distribution_total.cpp
+		include/functions.hpp
+		src/functions/bessel.cpp
+		src/functions/digamma.cpp
+		src/functions/fermi_integrals.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/lambert.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		src/functions/m1matrix.cpp
+		include/integration.hpp
+		include/kernels.hpp
+		include/weak_magnetism.hpp
+		src/opacities/weak_magnetism/weak_magnetism.cpp
+		src/opacities/weak_magnetism/nucfrmfac.cpp
+		include/opacities.hpp
+		src/opacities/nu_abs_em_beta.cpp
+		src/opacities/nu_scatt_iso.cpp
+		src/output/outputs.hpp
+		include/eos.hpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
+		src/opacities/kernels/kernel_brem.cpp
+		src/opacities/kernels/kernel_pair.cpp
+		src/opacities/kernels/kernel_nes.cpp
+		src/opacities/nu_abs_em_pair.cpp
+		src/opacities/nu_abs_em_brem.cpp
+		src/integration/integration_quadrature_integrate_kernels.cpp
+		src/opacities/m1_opacities.cpp
+		tests/tests_opacities_m1/test_opacities_thc.cpp
         tests/tests_opacities_m1/test_m1_opacities.cpp
-        tests/tests.h
+		tests/tests.hpp
 )
 if (${GSL_FOUND})
 	target_link_libraries(test_opacities_thc GSL::gsl GSL::gslcblas)
@@ -1011,47 +1011,47 @@ target_link_libraries(test_opacities_thc m)
 
 # test m1 distribution
 add_executable(test_m1_distribution
-        include/constants.h
-        include/bns_nurates.h
-        include/distribution.h
-        src/distribution/distribution_opt_thick.c
-        src/distribution/distribution_opt_thin.c
-        src/distribution/distribution_total.c
-        include/functions.h
-        src/functions/bessel.c
-        src/functions/digamma.c
-        src/functions/fermi_integrals.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/lambert.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        src/functions/m1matrix.c
-        include/integration.h
-        include/kernels.h
-        include/weak_magnetism.h
-        src/opacities/weak_magnetism/weak_magnetism.c
-        src/opacities/weak_magnetism/nucfrmfac.c
-        include/opacities.h
-        src/opacities/nu_abs_em_beta.c
-        src/opacities/nu_scatt_iso.c
-        src/output/outputs.h
-        include/eos.h
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.c
-        tests/tests_quadrature_integrate/gsl_routines/integration_GSL.c
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
-        src/opacities/kernels/kernel_brem.c
-        src/opacities/kernels/kernel_pair.c
-        src/opacities/kernels/kernel_nes.c
-        src/opacities/nu_abs_em_pair.c
-        src/opacities/nu_abs_em_brem.c
-        src/integration/integration_quadrature_integrate_kernels.c
-        src/opacities/m1_opacities.c
-        tests/tests_distribution/test_m1_distribution.c
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/distribution.hpp
+		src/distribution/distribution_opt_thick.cpp
+		src/distribution/distribution_opt_thin.cpp
+		src/distribution/distribution_total.cpp
+		include/functions.hpp
+		src/functions/bessel.cpp
+		src/functions/digamma.cpp
+		src/functions/fermi_integrals.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/lambert.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		src/functions/m1matrix.cpp
+		include/integration.hpp
+		include/kernels.hpp
+		include/weak_magnetism.hpp
+		src/opacities/weak_magnetism/weak_magnetism.cpp
+		src/opacities/weak_magnetism/nucfrmfac.cpp
+		include/opacities.hpp
+		src/opacities/nu_abs_em_beta.cpp
+		src/opacities/nu_scatt_iso.cpp
+		src/output/outputs.hpp
+		include/eos.hpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.cpp
+		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
+		src/opacities/kernels/kernel_brem.cpp
+		src/opacities/kernels/kernel_pair.cpp
+		src/opacities/kernels/kernel_nes.cpp
+		src/opacities/nu_abs_em_pair.cpp
+		src/opacities/nu_abs_em_brem.cpp
+		src/integration/integration_quadrature_integrate_kernels.cpp
+		src/opacities/m1_opacities.cpp
+		tests/tests_distribution/test_m1_distribution.cpp
 )
 
 if (${GSL_FOUND})
@@ -1061,45 +1061,45 @@ target_link_libraries(test_m1_distribution m)
 
 # test quadrature convergence spectral
 add_executable(test_quadrature_convergence_spectral
-        include/constants.h
-        include/bns_nurates.h
-        include/distribution.h
-        src/distribution/distribution_opt_thick.c
-        src/distribution/distribution_opt_thin.c
-        src/distribution/distribution_total.c
-        include/functions.h
-        src/functions/bessel.c
-        src/functions/digamma.c
-        src/functions/fermi_integrals.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/lambert.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        src/functions/m1matrix.c
-        include/integration.h
-        include/kernels.h
-        include/weak_magnetism.h
-        src/opacities/weak_magnetism/weak_magnetism.c
-        src/opacities/weak_magnetism/nucfrmfac.c
-        include/opacities.h
-        src/opacities/nu_abs_em_beta.c
-        src/opacities/nu_scatt_iso.c
-        src/output/outputs.h
-        include/eos.h
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
-        src/opacities/kernels/kernel_brem.c
-        src/opacities/kernels/kernel_pair.c
-        src/opacities/kernels/kernel_nes.c
-        src/opacities/nu_abs_em_pair.c
-        src/opacities/nu_abs_em_brem.c
-        src/integration/integration_quadrature_integrate_kernels.c
-        src/opacities/m1_opacities.c
-        tests/tests_quadrature_convergence/test_quadrature_convergence_spectral.c
-        tests/tests.h 
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/distribution.hpp
+		src/distribution/distribution_opt_thick.cpp
+		src/distribution/distribution_opt_thin.cpp
+		src/distribution/distribution_total.cpp
+		include/functions.hpp
+		src/functions/bessel.cpp
+		src/functions/digamma.cpp
+		src/functions/fermi_integrals.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/lambert.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		src/functions/m1matrix.cpp
+		include/integration.hpp
+		include/kernels.hpp
+		include/weak_magnetism.hpp
+		src/opacities/weak_magnetism/weak_magnetism.cpp
+		src/opacities/weak_magnetism/nucfrmfac.cpp
+		include/opacities.hpp
+		src/opacities/nu_abs_em_beta.cpp
+		src/opacities/nu_scatt_iso.cpp
+		src/output/outputs.hpp
+		include/eos.hpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
+		src/opacities/kernels/kernel_brem.cpp
+		src/opacities/kernels/kernel_pair.cpp
+		src/opacities/kernels/kernel_nes.cpp
+		src/opacities/nu_abs_em_pair.cpp
+		src/opacities/nu_abs_em_brem.cpp
+		src/integration/integration_quadrature_integrate_kernels.cpp
+		src/opacities/m1_opacities.cpp
+		tests/tests_quadrature_convergence/test_quadrature_convergence_spectral.cpp
+		tests/tests.hpp
 )
 
 if (${GSL_FOUND})
@@ -1109,45 +1109,45 @@ target_link_libraries(test_quadrature_convergence_spectral m)
 
 # test quadrature convergence integrated
 add_executable(test_quadrature_convergence_integrated
-        include/constants.h
-        include/bns_nurates.h
-        include/distribution.h
-        src/distribution/distribution_opt_thick.c
-        src/distribution/distribution_opt_thin.c
-        src/distribution/distribution_total.c
-        include/functions.h
-        src/functions/bessel.c
-        src/functions/digamma.c
-        src/functions/fermi_integrals.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/lambert.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        src/functions/m1matrix.c
-        include/integration.h
-        include/kernels.h
-        include/weak_magnetism.h
-        src/opacities/weak_magnetism/weak_magnetism.c
-        src/opacities/weak_magnetism/nucfrmfac.c
-        include/opacities.h
-        src/opacities/nu_abs_em_beta.c
-        src/opacities/nu_scatt_iso.c
-        src/output/outputs.h
-        include/eos.h
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
-        src/opacities/kernels/kernel_brem.c
-        src/opacities/kernels/kernel_pair.c
-        src/opacities/kernels/kernel_nes.c
-        src/opacities/nu_abs_em_pair.c
-        src/opacities/nu_abs_em_brem.c
-        src/integration/integration_quadrature_integrate_kernels.c
-        src/opacities/m1_opacities.c
-        tests/tests_quadrature_convergence/test_quadrature_convergence_integrated.c
-        tests/tests.h 
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/distribution.hpp
+		src/distribution/distribution_opt_thick.cpp
+		src/distribution/distribution_opt_thin.cpp
+		src/distribution/distribution_total.cpp
+		include/functions.hpp
+		src/functions/bessel.cpp
+		src/functions/digamma.cpp
+		src/functions/fermi_integrals.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/lambert.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		src/functions/m1matrix.cpp
+		include/integration.hpp
+		include/kernels.hpp
+		include/weak_magnetism.hpp
+		src/opacities/weak_magnetism/weak_magnetism.cpp
+		src/opacities/weak_magnetism/nucfrmfac.cpp
+		include/opacities.hpp
+		src/opacities/nu_abs_em_beta.cpp
+		src/opacities/nu_scatt_iso.cpp
+		src/output/outputs.hpp
+		include/eos.hpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
+		src/opacities/kernels/kernel_brem.cpp
+		src/opacities/kernels/kernel_pair.cpp
+		src/opacities/kernels/kernel_nes.cpp
+		src/opacities/nu_abs_em_pair.cpp
+		src/opacities/nu_abs_em_brem.cpp
+		src/integration/integration_quadrature_integrate_kernels.cpp
+		src/opacities/m1_opacities.cpp
+		tests/tests_quadrature_convergence/test_quadrature_convergence_integrated.cpp
+		tests/tests.hpp
 )
 
 if (${GSL_FOUND})
@@ -1157,45 +1157,45 @@ target_link_libraries(test_quadrature_convergence_integrated m)
 
 # test quadrature convergence find max
 add_executable(test_quadrature_convergence_find_max
-        include/constants.h
-        include/bns_nurates.h
-        include/distribution.h
-        src/distribution/distribution_opt_thick.c
-        src/distribution/distribution_opt_thin.c
-        src/distribution/distribution_total.c
-        include/functions.h
-        src/functions/bessel.c
-        src/functions/digamma.c
-        src/functions/fermi_integrals.c
-        src/functions/fermi_distr.c
-        src/functions/gamma.c
-        src/functions/lambert.c
-        src/functions/mnewt.c
-        src/functions/safe_exp.c
-        src/functions/theta.c
-        src/functions/m1matrix.c
-        include/integration.h
-        include/kernels.h
-        include/weak_magnetism.h
-        src/opacities/weak_magnetism/weak_magnetism.c
-        src/opacities/weak_magnetism/nucfrmfac.c
-        include/opacities.h
-        src/opacities/nu_abs_em_beta.c
-        src/opacities/nu_scatt_iso.c
-        src/output/outputs.h
-        include/eos.h
-        src/integration/integration_quadrature_schemes.c
-        src/integration/integration_quadrature_io.c
-        src/integration/integration_quadrature_integrate.c
-        src/opacities/kernels/kernel_brem.c
-        src/opacities/kernels/kernel_pair.c
-        src/opacities/kernels/kernel_nes.c
-        src/opacities/nu_abs_em_pair.c
-        src/opacities/nu_abs_em_brem.c
-        src/integration/integration_quadrature_integrate_kernels.c
-        src/opacities/m1_opacities.c
-        tests/tests_quadrature_convergence/test_quadrature_convergence_find_max.c
-        tests/tests.h 
+		include/constants.hpp
+		include/bns_nurates.hpp
+		include/distribution.hpp
+		src/distribution/distribution_opt_thick.cpp
+		src/distribution/distribution_opt_thin.cpp
+		src/distribution/distribution_total.cpp
+		include/functions.hpp
+		src/functions/bessel.cpp
+		src/functions/digamma.cpp
+		src/functions/fermi_integrals.cpp
+		src/functions/fermi_distr.cpp
+		src/functions/gamma.cpp
+		src/functions/lambert.cpp
+		src/functions/mnewt.cpp
+		src/functions/safe_exp.cpp
+		src/functions/theta.cpp
+		src/functions/m1matrix.cpp
+		include/integration.hpp
+		include/kernels.hpp
+		include/weak_magnetism.hpp
+		src/opacities/weak_magnetism/weak_magnetism.cpp
+		src/opacities/weak_magnetism/nucfrmfac.cpp
+		include/opacities.hpp
+		src/opacities/nu_abs_em_beta.cpp
+		src/opacities/nu_scatt_iso.cpp
+		src/output/outputs.hpp
+		include/eos.hpp
+		src/integration/integration_quadrature_schemes.cpp
+		src/integration/integration_quadrature_io.cpp
+		src/integration/integration_quadrature_integrate.cpp
+		src/opacities/kernels/kernel_brem.cpp
+		src/opacities/kernels/kernel_pair.cpp
+		src/opacities/kernels/kernel_nes.cpp
+		src/opacities/nu_abs_em_pair.cpp
+		src/opacities/nu_abs_em_brem.cpp
+		src/integration/integration_quadrature_integrate_kernels.cpp
+		src/opacities/m1_opacities.cpp
+		tests/tests_quadrature_convergence/test_quadrature_convergence_find_max.cpp
+		tests/tests.hpp
 )
 
 if (${GSL_FOUND})

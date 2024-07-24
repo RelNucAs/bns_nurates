@@ -1,14 +1,14 @@
 %module bns_nurates
 %{
 #define SWIG_FILE_WITH_INIT
-#include "../include/bns_nurates.h"
-#include "../include/constants.h"
-#include "../include/distribution.h"
-#include "../include/functions.h"
-#include "../include/integration.h"
-#include "../include/kernels.h"
-#include "../include/opacities.h"
-#include "../include/weak_magnetism.h"
+#include "../include/bns_nurates.hpp"
+#include "../include/constants.hpp"
+#include "../include/distribution.hpp"
+#include "../include/functions.hpp"
+#include "../include/integration.hpp"
+#include "../include/kernels.hpp"
+#include "../include/opacities.hpp"
+#include "../include/weak_magnetism.hpp"
 %}
 
 #define __attribute__(x) 

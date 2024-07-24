@@ -10,15 +10,15 @@
 //#include <hdf5_hl.h>
 #include <assert.h>
 
-#include "include/constants.h"
-#include "include/bns_nurates.h"
-#include "include/integration.h"
-#include "include/distribution.h"
-#include "include/constants.h"
-#include "include/functions.h"
-#include "include/kernels.h"
-#include "include/functions.h"
-#include "include/opacities.h"
+#include "include/constants.hpp"
+#include "include/bns_nurates.hpp"
+#include "include/integration.hpp"
+#include "include/distribution.hpp"
+#include "include/constants.hpp"
+#include "include/functions.hpp"
+#include "include/kernels.hpp"
+#include "include/functions.hpp"
+#include "include/opacities.hpp"
 
 #define n_points 4
 #define n_bins 128

@@ -12,12 +12,12 @@
 #include <unistd.h>
 #include <time.h>
 
-#include "../tests.h"
-#include "opacities.h"
-#include "../../include/integration.h"
-#include "../../include/distribution.h"
-#include "../../include/constants.h"
-#include "../../include/functions.h"
+#include "../tests.hpp"
+#include "opacities.hpp"
+#include "../../include/integration.hpp"
+#include "../../include/distribution.hpp"
+#include "../../include/constants.hpp"
+#include "../../include/functions.hpp"
 
 void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityParams *opacity_pars) {
 
