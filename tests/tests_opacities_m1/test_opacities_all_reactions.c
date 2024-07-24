@@ -7,9 +7,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <math.h>
 #include <unistd.h>
+
+#include <Kokkos_Core.hpp>
 
 #include "../tests.h"
 

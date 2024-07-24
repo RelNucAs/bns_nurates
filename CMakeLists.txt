@@ -11,7 +11,24 @@ set(CMAKE_CXX17_STANDARD_COMPILE_OPTION "-std=c++17")
 # Kokkos recommends NOT using default compiler extensions
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# following policy required to enable target_link_libraries() below
+cmake_policy(SET CMP0079 NEW)
+
 find_package(GSL)
+
+# set OpenMP macro (true/false)
+set(ENABLE_OPENMP ON)
+find_package(OpenMP COMPONENTS CXX)
+if (NOT OpenMP_FOUND)
+  message(FATAL_ERROR "OpenMP package is required but could not be found.")
+ endif()
+set(ENABLE_OPENMP ON)
+set(Kokkos_ENABLE_OPENMP ON CACHE BOOL "Compile Kokkos with OpenMP")
+if (ENABLE_OPENMP)
+  set(OPENMP_PARALLEL_ENABLED 1)
+else()
+  set(OPENMP_PARALLEL_ENABLED 0)
+endif()
 
 if (${GSL_FOUND})
 	add_compile_definitions(GSL_INCLUDES_H_)
@@ -61,6 +78,10 @@ add_executable(bns_nurates
         src/opacities/nu_abs_em_brem.c
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c)
+
+add_subdirectory(kokkos)
+include_directories(${Kokkos_INCLUDE_DIRS_RET})
+target_link_libraries(bns_nurates Kokkos::kokkos)
 
 target_compile_options(bns_nurates PRIVATE -Wall -Wextra -pedantic)
 target_include_directories(bns_nurates PRIVATE include)
@@ -934,6 +955,8 @@ add_executable(test_opacities_all_reactions
         tests/tests_opacities_m1/test_m1_opacities.c
         tests/tests.h 
 )
+target_link_libraries(test_opacities_all_reactions Kokkos::kokkos)
+target_link_libraries(test_opacities_all_reactions OpenMP::OpenMP_CXX)
 if (${GSL_FOUND})
 	target_link_libraries(test_opacities_all_reactions GSL::gsl GSL::gslcblas)
 endif()
