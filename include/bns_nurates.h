@@ -9,7 +9,7 @@
 #define BNS_NURATES_SRC_BNS_NURATES_H_
 
 #include <stdbool.h>
-
+#include <stddef.h>
 
 // Define indices of neutrino species
 #define id_nue 0
@@ -83,17 +83,19 @@ struct MyQuadrature
 typedef struct MyQuadrature MyQuadrature;
 __attribute__((unused)) static MyQuadrature quadrature_default = {.type =
                                                                       kGauleg,
+                                                                  .alpha = 0.,
                                                                   .dim   = 1,
                                                                   .nx    = 20,
                                                                   .ny    = 1,
                                                                   .nz    = 1,
-                                                                  .alpha = 0.,
                                                                   .x1    = 0.,
                                                                   .x2    = 1.,
                                                                   .y1    = -42.,
                                                                   .y2    = -42.,
                                                                   .z1    = -42.,
-                                                                  .z2 = -42.};
+                                                                  .z2 = -42.,
+                                                                  .points = NULL,
+                                                                  .w = NULL};
 
 /* MyFunction struct
  *
@@ -372,17 +374,17 @@ struct OpacityFlags
 };
 typedef struct OpacityFlags OpacityFlags;
 __attribute__((unused)) static OpacityFlags opacity_flags_default_all = {
-    .use_abs_em          = 1.,
-    .use_pair            = 1.,
-    .use_brem            = 1.,
-    .use_inelastic_scatt = 1.,
-    .use_iso             = 1.};
+    .use_abs_em          = 1,
+    .use_pair            = 1,
+    .use_brem            = 1,
+    .use_inelastic_scatt = 1,
+    .use_iso             = 1};
 __attribute__((unused)) static OpacityFlags opacity_flags_default_none = {
-    .use_abs_em          = 0.,
-    .use_pair            = 0.,
-    .use_brem            = 0.,
-    .use_inelastic_scatt = 0.,
-    .use_iso             = 0.};
+    .use_abs_em          = 0,
+    .use_pair            = 0,
+    .use_brem            = 0,
+    .use_inelastic_scatt = 0,
+    .use_iso             = 0};
 
 /* GreyOpacityParams struct
  *

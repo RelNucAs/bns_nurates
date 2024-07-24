@@ -83,7 +83,7 @@ add_subdirectory(kokkos)
 include_directories(${Kokkos_INCLUDE_DIRS_RET})
 target_link_libraries(bns_nurates Kokkos::kokkos)
 
-target_compile_options(bns_nurates PRIVATE -Wall -Wextra -pedantic)
+#target_compile_options(bns_nurates PRIVATE -Wall -Wextra)
 target_include_directories(bns_nurates PRIVATE include)
 target_include_directories(bns_nurates PRIVATE src)
 
@@ -695,7 +695,7 @@ add_executable(test_opacities_electron_capture
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
         tests/tests_opacities_m1/test_opacities_electron_capture.c
-        tests/tests_opacities_m1/test_m1_opacities.c
+        tests/tests_opacities_m1/test_m1_opacities.cpp
         tests/tests.h 
 )
 
@@ -747,7 +747,7 @@ add_executable(test_opacities_pair
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
         tests/tests_opacities_m1/test_opacities_pair.c
-        tests/tests_opacities_m1/test_m1_opacities.c
+        tests/tests_opacities_m1/test_m1_opacities.cpp
         tests/tests.h 
 )
 
@@ -799,7 +799,7 @@ add_executable(test_opacities_brem
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
         tests/tests_opacities_m1/test_opacities_brem.c
-        tests/tests_opacities_m1/test_m1_opacities.c
+        tests/tests_opacities_m1/test_m1_opacities.cpp
         tests/tests.h
 )
 
@@ -851,7 +851,7 @@ add_executable(test_opacities_inelastic_scatt
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
         tests/tests_opacities_m1/test_opacities_inelastic_scatt.c
-        tests/tests_opacities_m1/test_m1_opacities.c
+        tests/tests_opacities_m1/test_m1_opacities.cpp
         tests/tests.h 
 )
 
@@ -903,7 +903,7 @@ add_executable(test_opacities_isoscatt
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
         tests/tests_opacities_m1/test_opacities_isoscatt.c
-        tests/tests_opacities_m1/test_m1_opacities.c
+        tests/tests_opacities_m1/test_m1_opacities.cpp
         tests/tests.h
 )
 
@@ -951,8 +951,8 @@ add_executable(test_opacities_all_reactions
         src/opacities/nu_abs_em_brem.c
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
-        tests/tests_opacities_m1/test_opacities_all_reactions.c
-        tests/tests_opacities_m1/test_m1_opacities.c
+        tests/tests_opacities_m1/test_opacities_all_reactions.cpp
+        tests/tests_opacities_m1/test_m1_opacities.cpp
         tests/tests.h 
 )
 target_link_libraries(test_opacities_all_reactions Kokkos::kokkos)
@@ -1001,7 +1001,7 @@ add_executable(test_opacities_thc
         src/integration/integration_quadrature_integrate_kernels.c
         src/opacities/m1_opacities.c
         tests/tests_opacities_m1/test_opacities_thc.c
-        tests/tests_opacities_m1/test_m1_opacities.c
+        tests/tests_opacities_m1/test_m1_opacities.cpp
         tests/tests.h
 )
 if (${GSL_FOUND})

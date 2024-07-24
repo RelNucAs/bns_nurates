@@ -99,9 +99,9 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
   printf("Test for distribution function implementation:\n");
 
   printf("Generating quadratures ...\n");
-  MyQuadrature my_quadrature_1d = {.nx = 10, .dim = 1, .type = kGauleg, .x1 = 0., .x2 = 1.};
+  MyQuadrature my_quadrature_1d = {.type = kGauleg, .alpha = -42., .dim = 1, .nx = 10, .ny = 1, .nz = 1, .x1 = 0., .x2 = 1., .y1 = -42., .y2 = -42., .z1 = -42., .z2 = -42., .points = NULL, .w = NULL};
   GaussLegendreMultiD(&my_quadrature_1d);
-  MyQuadrature my_quadrature_2d = {.nx = 20, .ny = 20, .dim = 2, .type = kGauleg, .x1 = 0., .x2 = 1., .y1 = 0., .y2 = 1.};
+  MyQuadrature my_quadrature_2d = {.type = kGauleg, .alpha = -42., .dim = 1, .nx = 10, .ny = 1, .nz = 1, .x1 = 0., .x2 = 1., .y1 = -42., .y2 = -42., .z1 = -42., .z2 = -42., .points = NULL, .w = NULL};
   GaussLegendreMultiD(&my_quadrature_2d);
   printf("Quadratures generated.\n");
 
