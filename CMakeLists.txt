@@ -1,7 +1,16 @@
 cmake_minimum_required(VERSION 3.2)
-project(bns_nurates C)
+project(bns_nurates VERSION 0.1 LANGUAGES C CXX)
 
-set(CMAKE_C_STANDARD 11)
+# Kokkos require C++17 standard as minimum
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Force flag to denote C++ standard, as deprecated c++1z is not supported by nvcc.
+set(CMAKE_CXX17_STANDARD_COMPILE_OPTION "-std=c++17")
+
+# Kokkos recommends NOT using default compiler extensions
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 find_package(GSL)
 
 if (${GSL_FOUND})
