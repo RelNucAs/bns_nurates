@@ -15,6 +15,8 @@
 #include "../tests.hpp"
 
 int main() {
+  Kokkos::initialize();
+  
   printf("=================================================== \n");
   printf("Testing opacities for all reactions ... \n");
   printf("=================================================== \n");
@@ -28,6 +30,8 @@ int main() {
   OpacityParams opacity_pars = opacity_params_default_none;
 
   TestM1Opacities(filename, &opacity_flags, &opacity_pars);
+
+  Kokkos::finalize();
 
   return 0;
 }
