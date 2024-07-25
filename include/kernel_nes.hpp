@@ -2,7 +2,7 @@
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
-//! \file  kernel_nes.c
+//! \file  kernel_nes.hpp
 //  \brief contains kernels for inelastic neutrino scattering
 //         on electrons and positrons
 //
@@ -11,8 +11,8 @@
 // https://ui.adsabs.harvard.edu/abs/1993ApJ...410..740M/abstract
 
 #include "math.h"
+#include <Kokkos_Core.hpp>
 
-#include "kernels.hpp"
 #include "bns_nurates.hpp"
 #include "functions.hpp"
 #include "constants.hpp"
@@ -35,6 +35,7 @@ static const double kBZero =
     4. * kSinWeinbergThetaSquared * kSinWeinbergThetaSquared;
 
 // Calculates in a safe way the exponential
+KOKKOS_INLINE_FUNCTION
 double KernelExpFunc(double x)
 {
     const double exp_  = SafeExp(-fabs(x));
@@ -44,6 +45,7 @@ double KernelExpFunc(double x)
 }
 
 // Saves the expression that are needed for the unapproximated integral
+KOKKOS_INLINE_FUNCTION
 void ComputeFDIForInelastic(double w, double wp, double eta, double* fdi_diff_w,
                             double* fdi_diff_abs)
 {
@@ -64,6 +66,7 @@ void ComputeFDIForInelastic(double w, double wp, double eta, double* fdi_diff_w,
 //=========================================================================================================================================
 
 // Not approximated out kernel integral
+KOKKOS_INLINE_FUNCTION
 double MezzacappaIntOut(double w, double wp, double x, double y, int sign,
                         double b1, double b2, double* fdi_diff_w,
                         double* fdi_diff_abs)
@@ -90,6 +93,7 @@ double MezzacappaIntOut(double w, double wp, double x, double y, int sign,
 
 // Taylor expansion in the lowest energy of the function MezzacappaIntOut and
 // MezzacappaIntIn
+KOKKOS_INLINE_FUNCTION
 double MezzacappaIntOneEnergy(double x, double y, int sign, double b1,
                               double b2, const double* fdis)
 {
@@ -111,6 +115,7 @@ double MezzacappaIntOneEnergy(double x, double y, int sign, double b1,
 
 // Taylor expansion in both energies of the function MezzacappaIntOut and
 // MezzacappaIntIn
+KOKKOS_INLINE_FUNCTION
 double MezzacappaIntTwoEnergies(double w, double wp, double x, double y,
                                 double b1, double b2, const double* fdis)
 {
@@ -129,6 +134,7 @@ double MezzacappaIntTwoEnergies(double w, double wp, double x, double y,
 
 // Calculates and saves the neutrino electron scattering in and out kernel for
 // every neutrino species
+KOKKOS_INLINE_FUNCTION
 MyKernelOutput NESKernels(InelasticScattKernelParams* kernel_params,
                           MyEOSParams* eos_params)
 {
@@ -216,6 +222,7 @@ MyKernelOutput NESKernels(InelasticScattKernelParams* kernel_params,
 
 // Calculates and saves the neutrino positron scattering in and out kernel for
 // every neutrino species
+KOKKOS_INLINE_FUNCTION
 MyKernelOutput NPSKernels(InelasticScattKernelParams* kernel_params,
                           MyEOSParams* eos_params)
 {
@@ -303,6 +310,7 @@ MyKernelOutput NPSKernels(InelasticScattKernelParams* kernel_params,
 }
 
 // Calculates the full in and out kernels
+KOKKOS_INLINE_FUNCTION
 MyKernelOutput InelasticScattKernels(InelasticScattKernelParams* kernel_params,
                                      MyEOSParams* eos_params)
 {
@@ -320,6 +328,7 @@ MyKernelOutput InelasticScattKernels(InelasticScattKernelParams* kernel_params,
     return tot_kernel;
 }
 
+KOKKOS_INLINE_FUNCTION
 void InelasticKernelsTable(const int n, double* nu_array,
                            GreyOpacityParams* grey_pars, M1Matrix* out)
 {

@@ -72,7 +72,7 @@ add_executable(bns_nurates
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
 		src/opacities/kernels/kernel_pair.cpp
-		src/opacities/kernels/kernel_nes.cpp
+		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
 		src/integration/integration_quadrature_integrate_kernels.cpp
@@ -118,7 +118,7 @@ add_library(nurates SHARED
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
 		src/opacities/kernels/kernel_pair.cpp
-		src/opacities/kernels/kernel_nes.cpp
+		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
 		src/integration/integration_quadrature_integrate_kernels.cpp
@@ -686,7 +686,7 @@ add_executable(test_opacities_electron_capture
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
 		src/opacities/kernels/kernel_pair.cpp
-		src/opacities/kernels/kernel_nes.cpp
+		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
 		src/integration/integration_quadrature_integrate_kernels.cpp
@@ -738,7 +738,7 @@ add_executable(test_opacities_pair
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
 		src/opacities/kernels/kernel_pair.cpp
-		src/opacities/kernels/kernel_nes.cpp
+		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
 		src/integration/integration_quadrature_integrate_kernels.cpp
@@ -790,7 +790,7 @@ add_executable(test_opacities_brem
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
 		src/opacities/kernels/kernel_pair.cpp
-		src/opacities/kernels/kernel_nes.cpp
+		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
 		src/integration/integration_quadrature_integrate_kernels.cpp
@@ -844,7 +844,7 @@ add_executable(test_opacities_inelastic_scatt
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
 		src/opacities/kernels/kernel_pair.cpp
-		src/opacities/kernels/kernel_nes.cpp
+		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
 		src/integration/integration_quadrature_integrate_kernels.cpp
@@ -896,7 +896,7 @@ add_executable(test_opacities_isoscatt
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
 		src/opacities/kernels/kernel_pair.cpp
-		src/opacities/kernels/kernel_nes.cpp
+		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
 		src/integration/integration_quadrature_integrate_kernels.cpp
@@ -945,7 +945,7 @@ add_executable(test_opacities_all_reactions
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
 		src/opacities/kernels/kernel_pair.cpp
-		src/opacities/kernels/kernel_nes.cpp
+		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
 		src/integration/integration_quadrature_integrate_kernels.cpp
@@ -993,7 +993,7 @@ add_executable(test_opacities_thc
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
 		src/opacities/kernels/kernel_pair.cpp
-		src/opacities/kernels/kernel_nes.cpp
+		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
 		src/integration/integration_quadrature_integrate_kernels.cpp
@@ -1045,7 +1045,7 @@ add_executable(test_m1_distribution
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
 		src/opacities/kernels/kernel_pair.cpp
-		src/opacities/kernels/kernel_nes.cpp
+		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
 		src/integration/integration_quadrature_integrate_kernels.cpp
@@ -1091,7 +1091,7 @@ add_executable(test_quadrature_convergence_spectral
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
 		src/opacities/kernels/kernel_pair.cpp
-		src/opacities/kernels/kernel_nes.cpp
+		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
 		src/integration/integration_quadrature_integrate_kernels.cpp
@@ -1138,7 +1138,7 @@ add_executable(test_quadrature_convergence_integrated
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
 		src/opacities/kernels/kernel_pair.cpp
-		src/opacities/kernels/kernel_nes.cpp
+		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
 		src/integration/integration_quadrature_integrate_kernels.cpp
@@ -1185,7 +1185,7 @@ add_executable(test_quadrature_convergence_find_max
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
 		src/opacities/kernels/kernel_pair.cpp
-		src/opacities/kernels/kernel_nes.cpp
+		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
 		src/integration/integration_quadrature_integrate_kernels.cpp
