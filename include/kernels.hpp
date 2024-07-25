@@ -29,8 +29,8 @@
 
 
 // pair helper functions and kernels
-
-
+#include "kernel_pair.hpp"
+/*
 MyKernelOutput PairKernelsOptimized(MyEOSParams* eos_pars,
                                     PairKernelParams* kernel_pars);
 void PairKernelsTable(const int n, double* nu_array,
@@ -59,7 +59,7 @@ double PairFBackup(int k, double eta, double x1);
 double PairG(int n, double a, double b, double eta, double y, double z);
 double PairPsi(int l, double y, double z, double eta);
 #endif // GSL_INCLUDES_H_
-
+*/
 // End of pair process kernel
 // ===============================================================================
 /*===========================================================================*/

@@ -2,13 +2,12 @@
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
-//! \file  kernel_pair.c
+//! \file  kernel_pair.hpp
 //  \brief contains pair kernels and associated helper functions
 
 #include <math.h>
 #include <assert.h>
 #include <stddef.h>
-#include "kernels.hpp"
 #include "functions.hpp"
 #include "constants.hpp"
 
@@ -45,6 +44,7 @@
  * Output:
  *    T_l(alpha) = sum_{n=1..inf} (-1)^{n+1} e^{-n alpha} / n^l
  */
+KOKKOS_INLINE_FUNCTION
 double PairTWithAlpha0(int l)
 {
     switch (l)
@@ -83,6 +83,7 @@ double PairTWithAlpha0(int l)
     }
 }
 
+KOKKOS_INLINE_FUNCTION
 double PairTFittedOld(int l, double alpha)
 {
     double fit_poly = 1.;
@@ -284,6 +285,7 @@ double PairTFittedOld(int l, double alpha)
     return fit_poly * fit_exp;
 }
 
+KOKKOS_INLINE_FUNCTION
 double PairTFitted(int l, double alpha)
 {
     const double a[6][13] = {
@@ -374,6 +376,7 @@ double PairTFitted(int l, double alpha)
  *                                     - sum_{l=0..k} (-1)^{k-l}
  * T_{k+1-l}(eta-x1) x1^l / l!]
  */
+KOKKOS_INLINE_FUNCTION
 double PairFOptimized(int k, double eta, double x1)
 {
 
@@ -711,6 +714,7 @@ double PairFOptimized(int k, double eta, double x1)
  * sum_{n=3..(2l+5)} a_{ln} [G_n(0,min(y,z)) - G_n(max(y,z),y+z)]
  */
 // @TODO: compute only a coeffs needed for the specific l value
+KOKKOS_INLINE_FUNCTION
 void PairPsiCoeffs(double y, double z, double a[4][12], double c[4][3],
                    double d[4][3])
 {
@@ -805,6 +809,7 @@ void PairPsiCoeffs(double y, double z, double a[4][12], double c[4][3],
     return;
 }
 
+KOKKOS_INLINE_FUNCTION
 void PairPsiOptimized(int l, double y, double z, double eta, double* psi_out)
 {
     assert(l == 0);
@@ -891,6 +896,7 @@ void PairPsiOptimized(int l, double y, double z, double eta, double* psi_out)
  *      Phi_l(y,z) = (G^2 temp^2)/(pi (1 - e^{y+z})) [alpha1 Psi_l(y,z) + alpha2
  * Psi_l(z,y)]
  */
+KOKKOS_INLINE_FUNCTION
 void PairPhiOptimized(const double omega, const double omega_prime, int l,
                       double eta, double temp, double* phi_out)
 {
@@ -926,7 +932,7 @@ void PairPhiOptimized(const double omega, const double omega_prime, int l,
     return;
 }
 
-
+KOKKOS_INLINE_FUNCTION
 MyKernelOutput PairKernelsOptimized(MyEOSParams* eos_pars,
                                     PairKernelParams* kernel_pars)
 {
@@ -958,7 +964,7 @@ MyKernelOutput PairKernelsOptimized(MyEOSParams* eos_pars,
     return pair_kernel;
 }
 
-
+KOKKOS_INLINE_FUNCTION
 void PairKernelsM1Test(MyEOSParams* eos_pars, PairKernelParams* kernel_pars,
                        MyKernelOutput* out_for, MyKernelOutput* out_inv)
 {
@@ -977,6 +983,7 @@ void PairKernelsM1Test(MyEOSParams* eos_pars, PairKernelParams* kernel_pars,
     return;
 }
 
+KOKKOS_INLINE_FUNCTION
 void PairKernelsTable(const int n, double* nu_array,
                       GreyOpacityParams* grey_pars, M1Matrix* out)
 {
@@ -1019,6 +1026,7 @@ void PairKernelsTable(const int n, double* nu_array,
 //=====================================
 
 #ifdef GSL_INCLUDES_H_
+KOKKOS_INLINE_FUNCTION
 double PairT(int l, double alpha, double tolerance)
 {
 
@@ -1071,6 +1079,7 @@ double PairT(int l, double alpha, double tolerance)
  *                                     - sum_{l=0..k} (-1)^{k-l}
  * T_{k+1-l}(eta-x1) x1^l / l!]
  */
+KOKKOS_INLINE_FUNCTION
 double PairFBackup(int k, double eta, double x1)
 {
 
@@ -1135,6 +1144,7 @@ double PairFBackup(int k, double eta, double x1)
     return result;
 }
 
+KOKKOS_INLINE_FUNCTION
 double PairF(int k, double eta, double x1)
 {
 
@@ -1213,6 +1223,7 @@ double PairF(int k, double eta, double x1)
  *    G_n(a,b,eta,y,z) = F_n(eta,b) - F_n(eta,a) - F_n(eta+y+z,b) +
  * F_n(eta+y+z,a)
  * */
+KOKKOS_INLINE_FUNCTION
 double PairG(int n, double a, double b, double eta, double y, double z)
 {
 
@@ -1221,108 +1232,6 @@ double PairG(int n, double a, double b, double eta, double y, double z)
              PairF(n, eta + y + z, a);
 
     return result;
-}
-
-
-/* Calculates the production and absorption kernels for the pair process from
- * Eqns. (2) and (3) of Pons et. al. integrated over the phi variable
- *
- * R^p_{TP}(omega,omega',cos theta) = sum_{l} ((2l+1)/2) Phi_l(omega,omega')
- * P_l(mu) P_l(mu_prime) 2 pi R^a_{TP}(omega,omega',cos theta) =
- * e^{(omega+omega')/T} R^p_{TP}
- *
- * l is an integer.
- */
-MyKernelQuantity PairKernelsPhiIntegrated(MyEOSParams* eos_pars,
-                                          PairKernelParams* kernel_pars)
-{
-
-    // kernel specific parameters
-    double omega       = kernel_pars->omega;
-    double omega_prime = kernel_pars->omega_prime;
-    double mu          = kernel_pars->mu;
-    double mu_prime    = kernel_pars->mu_prime;
-    int lmax           = kernel_pars->lmax;
-    double filterpar   = kernel_pars->filter;
-
-    // EOS specific parameters
-    double eta  = eos_pars->mu_e / eos_pars->temp;
-    double temp = eos_pars->temp;
-
-    double pair_kernel_production_e = 0.;
-    double pair_kernel_absorption_e = 0.;
-    double pair_kernel_production_x = 0.;
-    double pair_kernel_absorption_x = 0.;
-    double pair_phi_e               = 0.;
-    double pair_phi_x               = 0.;
-
-    assert(lmax >= 0 && lmax <= 3);
-
-    for (int l = 0; l <= lmax; l++)
-    {
-        double legendre_l_mu       = gsl_sf_legendre_Pl(l, mu);
-        double legendre_l_mu_prime = gsl_sf_legendre_Pl(l, mu_prime);
-        pair_phi_e = PairPhi(l, omega, omega_prime, eta, temp, 0);
-        pair_phi_x = PairPhi(l, omega, omega_prime, eta, temp, 1);
-
-        pair_kernel_production_e +=
-            2. * kPi * (1. / (1. + filterpar * l * l * (l + 1) * (l + 1))) *
-            (2. * l + 1.) * pair_phi_e * legendre_l_mu * legendre_l_mu_prime /
-            2.;
-        pair_kernel_production_x +=
-            2. * kPi * (1. / (1. + filterpar * l * l * (l + 1) * (l + 1))) *
-            (2. * l + 1.) * pair_phi_x * legendre_l_mu * legendre_l_mu_prime /
-            2.;
-    }
-
-    pair_kernel_absorption_e =
-        exp((omega + omega_prime) / temp) * pair_kernel_production_e;
-    pair_kernel_absorption_x =
-        exp((omega + omega_prime) / temp) * pair_kernel_production_x;
-
-  MyKernelQuantity pair_kernel = {
-      .em_e  = pair_kernel_production_e, .abs_e = pair_kernel_absorption_e,
-      .em_x  = pair_kernel_production_x, .abs_x = pair_kernel_absorption_x};
-
-    return pair_kernel;
-}
-
-MyKernelQuantity PairKernelsPhiMuIntegrated(MyEOSParams* eos_pars,
-                                            PairKernelParams* kernel_pars)
-{
-
-    // kernel specific parameters
-    double omega       = kernel_pars->omega;
-    double omega_prime = kernel_pars->omega_prime;
-
-    // EOS specific parameters
-    double eta  = eos_pars->mu_e / eos_pars->temp;
-    double temp = eos_pars->temp;
-
-    int l = 0;
-
-    double pair_phi_e = PairPhi(l, omega, omega_prime, eta, temp, 0);
-    double pair_phi_x = PairPhi(l, omega, omega_prime, eta, temp, 1);
-
-    double pair_kernel_production_e = 2. * kPi * pair_phi_e;
-    double pair_kernel_production_x = 2. * kPi * pair_phi_x;
-
-    double pair_kernel_absorption_e =
-        SafeExp((omega + omega_prime) / temp) * pair_kernel_production_e;
-    double pair_kernel_absorption_x =
-        SafeExp((omega + omega_prime) / temp) * pair_kernel_production_x;
-
-    const double kPrefactor = 1. / (kClight * pow(kH * kClight, 3.));
-    // const double kPrefactor = 1.;
-
-    MyKernelQuantity pair_kernel = {
-        .em_e  = kPrefactor * pair_kernel_production_e,
-        .abs_e = kPrefactor * pair_kernel_absorption_e,
-        .em_x  = kPrefactor * pair_kernel_production_x,
-        .abs_x = kPrefactor * pair_kernel_absorption_x
-    };
-
-    return pair_kernel;
 }
 
 /* Calculate Psi_l(y,z) from Eqn. (11) of Pons et. al.
@@ -1337,6 +1246,7 @@ MyKernelQuantity PairKernelsPhiMuIntegrated(MyEOSParams* eos_pars,
  *      Psi_l(y,z) = sum_{n=0..2} [c_{ln} G_n(y,y+z) + d_{ln} G_n(z,y+z)] +
  * sum_{n=3..(2l+5)} a_{ln} [G_n(0,min(y,z)) - G_n(max(y,z),y+z)]
  */
+KOKKOS_INLINE_FUNCTION
 double PairPsi(int l, double y, double z, double eta)
 {
 
@@ -1465,19 +1375,7 @@ double PairPsi(int l, double y, double z, double eta)
     return result;
 }
 
-/* Calculate Phi_l(y,z) from Eqn. (10) of Pons et. al. (1998)
- *
- * Inputs:
- *      l:            mode number
- *      omega:        neutrino energy [MeV]
- *      omega_prime:  anti-neutrino energy [MeV]
- *      temp:         temperature [MeV]
- *      e_x:          neutrino species type (0: elentron, 1: mu/tau)
- *
- * Output:
- *      Phi_l(y,z) = (G^2 temp^2)/(pi (1 - e^{y+z})) [alpha1 Psi_l(y,z) + alpha2
- * Psi_l(z,y)]
- */
+KOKKOS_INLINE_FUNCTION
 double PairPhi(int l, double omega, double omega_prime, double eta, double temp,
                int e_x)
 {
@@ -1498,6 +1396,122 @@ double PairPhi(int l, double omega, double omega_prime, double eta, double temp,
     return result;
 }
 
+/* Calculates the production and absorption kernels for the pair process from
+ * Eqns. (2) and (3) of Pons et. al. integrated over the phi variable
+ *
+ * R^p_{TP}(omega,omega',cos theta) = sum_{l} ((2l+1)/2) Phi_l(omega,omega')
+ * P_l(mu) P_l(mu_prime) 2 pi R^a_{TP}(omega,omega',cos theta) =
+ * e^{(omega+omega')/T} R^p_{TP}
+ *
+ * l is an integer.
+ */
+KOKKOS_INLINE_FUNCTION
+MyKernelQuantity PairKernelsPhiIntegrated(MyEOSParams* eos_pars,
+                                          PairKernelParams* kernel_pars)
+{
+
+    // kernel specific parameters
+    double omega       = kernel_pars->omega;
+    double omega_prime = kernel_pars->omega_prime;
+    double mu          = kernel_pars->mu;
+    double mu_prime    = kernel_pars->mu_prime;
+    int lmax           = kernel_pars->lmax;
+    double filterpar   = kernel_pars->filter;
+
+    // EOS specific parameters
+    double eta  = eos_pars->mu_e / eos_pars->temp;
+    double temp = eos_pars->temp;
+
+    double pair_kernel_production_e = 0.;
+    double pair_kernel_absorption_e = 0.;
+    double pair_kernel_production_x = 0.;
+    double pair_kernel_absorption_x = 0.;
+    double pair_phi_e               = 0.;
+    double pair_phi_x               = 0.;
+
+    assert(lmax >= 0 && lmax <= 3);
+
+    for (int l = 0; l <= lmax; l++)
+    {
+        double legendre_l_mu       = gsl_sf_legendre_Pl(l, mu);
+        double legendre_l_mu_prime = gsl_sf_legendre_Pl(l, mu_prime);
+        pair_phi_e = PairPhi(l, omega, omega_prime, eta, temp, 0);
+        pair_phi_x = PairPhi(l, omega, omega_prime, eta, temp, 1);
+
+        pair_kernel_production_e +=
+            2. * kPi * (1. / (1. + filterpar * l * l * (l + 1) * (l + 1))) *
+            (2. * l + 1.) * pair_phi_e * legendre_l_mu * legendre_l_mu_prime /
+            2.;
+        pair_kernel_production_x +=
+            2. * kPi * (1. / (1. + filterpar * l * l * (l + 1) * (l + 1))) *
+            (2. * l + 1.) * pair_phi_x * legendre_l_mu * legendre_l_mu_prime /
+            2.;
+    }
+
+    pair_kernel_absorption_e =
+        exp((omega + omega_prime) / temp) * pair_kernel_production_e;
+    pair_kernel_absorption_x =
+        exp((omega + omega_prime) / temp) * pair_kernel_production_x;
+
+  MyKernelQuantity pair_kernel = {
+      .em_e  = pair_kernel_production_e, .abs_e = pair_kernel_absorption_e,
+      .em_x  = pair_kernel_production_x, .abs_x = pair_kernel_absorption_x};
+
+    return pair_kernel;
+}
+
+KOKKOS_INLINE_FUNCTION
+MyKernelQuantity PairKernelsPhiMuIntegrated(MyEOSParams* eos_pars,
+                                            PairKernelParams* kernel_pars)
+{
+
+    // kernel specific parameters
+    double omega       = kernel_pars->omega;
+    double omega_prime = kernel_pars->omega_prime;
+
+    // EOS specific parameters
+    double eta  = eos_pars->mu_e / eos_pars->temp;
+    double temp = eos_pars->temp;
+
+    int l = 0;
+
+    double pair_phi_e = PairPhi(l, omega, omega_prime, eta, temp, 0);
+    double pair_phi_x = PairPhi(l, omega, omega_prime, eta, temp, 1);
+
+    double pair_kernel_production_e = 2. * kPi * pair_phi_e;
+    double pair_kernel_production_x = 2. * kPi * pair_phi_x;
+
+    double pair_kernel_absorption_e =
+        SafeExp((omega + omega_prime) / temp) * pair_kernel_production_e;
+    double pair_kernel_absorption_x =
+        SafeExp((omega + omega_prime) / temp) * pair_kernel_production_x;
+
+    const double kPrefactor = 1. / (kClight * pow(kH * kClight, 3.));
+    // const double kPrefactor = 1.;
+
+    MyKernelQuantity pair_kernel = {
+        .em_e  = kPrefactor * pair_kernel_production_e,
+        .abs_e = kPrefactor * pair_kernel_absorption_e,
+        .em_x  = kPrefactor * pair_kernel_production_x,
+        .abs_x = kPrefactor * pair_kernel_absorption_x
+    };
+
+    return pair_kernel;
+}
+
+/* Calculate Phi_l(y,z) from Eqn. (10) of Pons et. al. (1998)
+ *
+ * Inputs:
+ *      l:            mode number
+ *      omega:        neutrino energy [MeV]
+ *      omega_prime:  anti-neutrino energy [MeV]
+ *      temp:         temperature [MeV]
+ *      e_x:          neutrino species type (0: elentron, 1: mu/tau)
+ *
+ * Output:
+ *      Phi_l(y,z) = (G^2 temp^2)/(pi (1 - e^{y+z})) [alpha1 Psi_l(y,z) + alpha2
+ * Psi_l(z,y)]
+ */
 
 /* Calculates the production and absorption kernels for the pair process from
  * Eqns. (2) and (3) of Pons et. al.
@@ -1508,6 +1522,7 @@ double PairPhi(int l, double omega, double omega_prime, double eta, double temp,
  *
  * l is an integer.
  */
+KOKKOS_INLINE_FUNCTION
 MyKernelQuantity PairKernels(MyEOSParams* eos_pars,
                              PairKernelParams* kernel_pars)
 {
@@ -1569,6 +1584,7 @@ MyKernelQuantity PairKernels(MyEOSParams* eos_pars,
  * R^p_{TP}(omega,omega',cos theta)
  *
  */
+KOKKOS_INLINE_FUNCTION
 MyKernelQuantity PairKernelsM1(MyEOSParams* eos_pars,
                                PairKernelParams* kernel_pars)
 {
@@ -1611,7 +1627,7 @@ MyKernelQuantity PairKernelsM1(MyEOSParams* eos_pars,
 //=======================
 // Deprecated functions
 //=======================
-
+KOKKOS_INLINE_FUNCTION
 void TabulatePairTFunction(double xi, double xf, double x[dim_pair_t],
                            double t[6][dim_pair_t])
 {
@@ -1629,6 +1645,7 @@ void TabulatePairTFunction(double xi, double xf, double x[dim_pair_t],
     return;
 }
 
+KOKKOS_INLINE_FUNCTION
 void PairTInterpolated(PairKernelParams* kernel_pars, double alpha, double* out)
 {
 
@@ -1655,6 +1672,7 @@ void PairTInterpolated(PairKernelParams* kernel_pars, double alpha, double* out)
     return;
 }
 
+KOKKOS_INLINE_FUNCTION
 double PairFInterpolated(PairKernelParams* kernel_pars, int k, double eta,
                          double x1)
 {

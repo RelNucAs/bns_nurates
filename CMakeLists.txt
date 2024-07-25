@@ -68,7 +68,7 @@ add_executable(bns_nurates
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
-		src/opacities/kernels/kernel_pair.cpp
+		include/kernel_pair.hpp
 		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
@@ -111,7 +111,7 @@ add_library(nurates SHARED
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
-		src/opacities/kernels/kernel_pair.cpp
+		include/kernel_pair.hpp
 		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
@@ -142,8 +142,9 @@ add_executable(test_pair_t
 		include/constants.hpp
 		src/functions/fermi_integrals.cpp
 		include/kernels.hpp
-		src/opacities/kernels/kernel_pair.cpp)
-
+		include/kernel_pair.hpp)
+target_link_libraries(test_pair_t Kokkos::kokkos)
+target_link_libraries(test_pair_t OpenMP::OpenMP_CXX)
 if (${GSL_FOUND})
 	target_link_libraries(test_pair_t GSL::gsl GSL::gslcblas)
 endif()
@@ -155,8 +156,10 @@ add_executable(test_pair_f
 		include/constants.hpp
 		src/functions/fermi_integrals.cpp
 		include/kernels.hpp
-		src/opacities/kernels/kernel_pair.cpp)
+		include/kernel_pair.hpp)
 
+target_link_libraries(test_pair_f Kokkos::kokkos)
+target_link_libraries(test_pair_f OpenMP::OpenMP_CXX)
 if (${GSL_FOUND})
 	target_link_libraries(test_pair_f GSL::gsl GSL::gslcblas)
 endif()
@@ -168,8 +171,9 @@ add_executable(test_pair_g
 		include/constants.hpp
 		src/functions/fermi_integrals.cpp
 		include/kernels.hpp
-		src/opacities/kernels/kernel_pair.cpp)
-
+		include/kernel_pair.hpp)
+target_link_libraries(test_pair_g Kokkos::kokkos)
+target_link_libraries(test_pair_g OpenMP::OpenMP_CXX)
 if (${GSL_FOUND})
 	target_link_libraries(test_pair_g GSL::gsl GSL::gslcblas)
 endif()
@@ -181,8 +185,9 @@ add_executable(test_pair_psi
 		include/constants.hpp
 		src/functions/fermi_integrals.cpp
 		include/kernels.hpp
-		src/opacities/kernels/kernel_pair.cpp)
-
+		include/kernel_pair.hpp)
+target_link_libraries(test_pair_psi Kokkos::kokkos)
+target_link_libraries(test_pair_psi OpenMP::OpenMP_CXX)
 if (${GSL_FOUND})
 	target_link_libraries(test_pair_psi GSL::gsl GSL::gslcblas)
 endif()
@@ -194,9 +199,10 @@ add_executable(test_pair_phi
 		include/constants.hpp
 		src/functions/fermi_integrals.cpp
 		include/kernels.hpp
-		src/opacities/kernels/kernel_pair.cpp
+		include/kernel_pair.hpp
 )
-
+target_link_libraries(test_pair_phi Kokkos::kokkos)
+target_link_libraries(test_pair_phi OpenMP::OpenMP_CXX)
 if (${GSL_FOUND})
 	target_link_libraries(test_pair_phi GSL::gsl GSL::gslcblas)
 endif()
@@ -209,10 +215,10 @@ add_executable(test_pair_kernels
 		include/constants.hpp
 		src/functions/fermi_integrals.cpp
 		include/kernels.hpp
-		src/opacities/kernels/kernel_pair.cpp
+		include/kernel_pair.hpp
 )
-
-
+target_link_libraries(test_pair_kernels Kokkos::kokkos)
+target_link_libraries(test_pair_kernels OpenMP::OpenMP_CXX)
 target_link_libraries(test_pair_kernels GSL::gsl GSL::gslcblas)
 target_link_libraries(test_pair_kernels m)
 endif()
@@ -225,9 +231,10 @@ add_executable(test_pair_kernels_phi_mu_integrated
 		include/constants.hpp
 		src/functions/fermi_integrals.cpp
 		include/kernels.hpp
-		src/opacities/kernels/kernel_pair.cpp
+		include/kernel_pair.hpp
 )
-
+target_link_libraries(test_pair_kernels_phi_mu_integrated Kokkos::kokkos)
+target_link_libraries(test_pair_kernels_phi_mu_integrated OpenMP::OpenMP_CXX)
 target_link_libraries(test_pair_kernels_phi_mu_integrated GSL::gsl GSL::gslcblas)
 target_link_libraries(test_pair_kernels_phi_mu_integrated m)
 endif()
@@ -249,14 +256,15 @@ add_executable(test_pair_opacities
 		src/functions/m1matrix.cpp
 		include/integration.hpp
 		include/kernels.hpp
-		src/opacities/kernels/kernel_pair.cpp
+		include/kernel_pair.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/integration/integration_quadrature_integrate_kernels.cpp
 )
-
+target_link_libraries(test_pair_opacities Kokkos::kokkos)
+target_link_libraries(test_pair_opacities OpenMP::OpenMP_CXX)
 if (${GSL_FOUND})
 	target_link_libraries(test_pair_opacities GSL::gsl GSL::gslcblas)
 endif()
@@ -281,7 +289,7 @@ add_executable(test_beta
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
-		src/opacities/kernels/kernel_pair.cpp
+		include/kernel_pair.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/integration/integration_quadrature_integrate_kernels.cpp
 		include/weak_magnetism.hpp
@@ -313,7 +321,7 @@ add_executable(test_iso
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
-		src/opacities/kernels/kernel_pair.cpp
+		include/kernel_pair.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/integration/integration_quadrature_integrate_kernels.cpp
 		include/weak_magnetism.hpp
@@ -346,7 +354,7 @@ add_executable(test_brem
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
-		src/opacities/kernels/kernel_pair.cpp
+		include/kernel_pair.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/integration/integration_quadrature_integrate_kernels.cpp
 		include/weak_magnetism.hpp
@@ -652,7 +660,7 @@ add_executable(test_opacities_electron_capture
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
-		src/opacities/kernels/kernel_pair.cpp
+		include/kernel_pair.hpp
 		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
@@ -701,7 +709,7 @@ add_executable(test_opacities_pair
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
-		src/opacities/kernels/kernel_pair.cpp
+		include/kernel_pair.hpp
 		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
@@ -750,7 +758,7 @@ add_executable(test_opacities_brem
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
-		src/opacities/kernels/kernel_pair.cpp
+		include/kernel_pair.hpp
 		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
@@ -801,7 +809,7 @@ add_executable(test_opacities_inelastic_scatt
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
-		src/opacities/kernels/kernel_pair.cpp
+		include/kernel_pair.hpp
 		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
@@ -850,7 +858,7 @@ add_executable(test_opacities_isoscatt
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
-		src/opacities/kernels/kernel_pair.cpp
+		include/kernel_pair.hpp
 		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
@@ -896,7 +904,7 @@ add_executable(test_opacities_all_reactions
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
-		src/opacities/kernels/kernel_pair.cpp
+		include/kernel_pair.hpp
 		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
@@ -941,7 +949,7 @@ add_executable(test_opacities_thc
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
-		src/opacities/kernels/kernel_pair.cpp
+		include/kernel_pair.hpp
 		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
@@ -990,7 +998,7 @@ add_executable(test_m1_distribution
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
-		src/opacities/kernels/kernel_pair.cpp
+		include/kernel_pair.hpp
 		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
@@ -1033,7 +1041,7 @@ add_executable(test_quadrature_convergence_spectral
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
-		src/opacities/kernels/kernel_pair.cpp
+		include/kernel_pair.hpp
 		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
@@ -1042,7 +1050,8 @@ add_executable(test_quadrature_convergence_spectral
 		tests/tests_quadrature_convergence/test_quadrature_convergence_spectral.cpp
 		tests/tests.hpp
 )
-
+target_link_libraries(test_quadrature_convergence_spectral Kokkos::kokkos)
+target_link_libraries(test_quadrature_convergence_spectral OpenMP::OpenMP_CXX)
 if (${GSL_FOUND})
 	target_link_libraries(test_quadrature_convergence_spectral GSL::gsl GSL::gslcblas)
 endif()
@@ -1077,7 +1086,7 @@ add_executable(test_quadrature_convergence_integrated
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
-		src/opacities/kernels/kernel_pair.cpp
+		include/kernel_pair.hpp
 		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
@@ -1086,7 +1095,8 @@ add_executable(test_quadrature_convergence_integrated
 		tests/tests_quadrature_convergence/test_quadrature_convergence_integrated.cpp
 		tests/tests.hpp
 )
-
+target_link_libraries(test_quadrature_convergence_integrated Kokkos::kokkos)
+target_link_libraries(test_quadrature_convergence_integrated OpenMP::OpenMP_CXX)
 if (${GSL_FOUND})
 	target_link_libraries(test_quadrature_convergence_integrated GSL::gsl GSL::gslcblas)
 endif()
@@ -1121,7 +1131,7 @@ add_executable(test_quadrature_convergence_find_max
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
-		src/opacities/kernels/kernel_pair.cpp
+		include/kernel_pair.hpp
 		include/kernel_nes.hpp
 		src/opacities/nu_abs_em_pair.cpp
 		src/opacities/nu_abs_em_brem.cpp
@@ -1130,7 +1140,8 @@ add_executable(test_quadrature_convergence_find_max
 		tests/tests_quadrature_convergence/test_quadrature_convergence_find_max.cpp
 		tests/tests.hpp
 )
-
+target_link_libraries(test_quadrature_convergence_find_max Kokkos::kokkos)
+target_link_libraries(test_quadrature_convergence_find_max OpenMP::OpenMP_CXX)
 if (${GSL_FOUND})
 	target_link_libraries(test_quadrature_convergence_find_max GSL::gsl GSL::gslcblas)
 endif()

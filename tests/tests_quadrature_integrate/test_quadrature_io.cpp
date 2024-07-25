@@ -27,8 +27,18 @@ int main() {
   }
 
   // cheking quadrature creating and saving to disk (Gauss-Legendre)
-  MyQuadrature quad = {.dim = 1, .type=kGauleg, .nx = 9, .x1 = -1., .x2 = 1.};
-  MyQuadrature load_quad = {.dim = 1, .type=kGauleg, .nx = 9, .x1 = -1., .x2 = 1.};
+  MyQuadrature quad = quadrature_default;
+  quad.dim = 1;
+  quad.type=kGauleg;
+  quad.nx = 9;
+  quad.x1 = -1.;
+  quad.x2 = 1.;
+  MyQuadrature load_quad = quadrature_default;
+  load_quad.dim = 1;
+  load_quad.type=kGauleg;
+  load_quad.nx = 9;
+  load_quad.x1 = -1.;
+  load_quad.x2 = 1.;
   printf("Saving quadrature information for Gauss-Legendre...\n");
   SaveQuadrature(filedir, &quad);
   printf("Loading saved quadrature ...\n");
