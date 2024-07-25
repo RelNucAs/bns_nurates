@@ -69,14 +69,7 @@ double PairPsi(int l, double y, double z, double eta);
 // (3) Neutrino-electron (positron) scattering kernel
 
 // @TODO: add here functions from src/opacities/kernels/kernel_nes.c
-MyKernelOutput NESKernels(InelasticScattKernelParams* kernel_params,
-                          MyEOSParams* eos_params);
-MyKernelOutput NPSKernels(InelasticScattKernelParams* kernel_params,
-                          MyEOSParams* eos_params);
-MyKernelOutput InelasticScattKernels(InelasticScattKernelParams* kernel_params,
-                                     MyEOSParams* eos_params);
-void InelasticKernelsTable(const int n, double* nu_array,
-                           GreyOpacityParams* grey_pars, M1Matrix* out);
+#include "kernel_nes.hpp"
 
 // End of pair process kernel
 // ===============================================================================
