@@ -5,6 +5,8 @@
 #ifndef BNS_NURATES_SRC_OPACITIES_WEAK_MAGNETISM_WEAK_MAGNETISM_H_
 #define BNS_NURATES_SRC_OPACITIES_WEAK_MAGNETISM_WEAK_MAGNETISM_H_
 
+#include <Kokkos_Core.hpp>
+
 #include "constants.hpp"
 
 #define POW2(X) ((X) * (X))
