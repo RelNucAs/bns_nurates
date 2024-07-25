@@ -9,13 +9,15 @@
 // fitting formula in Hannestad & Raffelt 1998, Apj, 507, 339
 // (https://iopscience.iop.org/article/10.1086/306303/pdf)
 
+#ifndef BNS_NURATES_INCLUDE_KERNEL_BREM_HPP_
+#define BNS_NURATES_INCLUDE_KERNEL_BREM_HPP_
 
 #include <math.h>
 #include <assert.h>
+#include <Kokkos_Core.hpp>
 
-#include "kernels.hpp"
-#include "constants.hpp"
 #include "bns_nurates.hpp"
+#include "constants.hpp"
 #include "functions.hpp"
 
 #define POW3(X) ((X) * (X) * (X))
@@ -47,6 +49,7 @@
  * Output:
  *      s:  a dimensionless quantity as defined in Eqn. (49)
  */
+KOKKOS_INLINE_FUNCTION
 double BremKernelS(double x, double y, double eta_star)
 {
     static const double kFiveThirds = 5. / 3.;
@@ -141,6 +144,7 @@ double BremKernelS(double x, double y, double eta_star)
  * Output:
  *    g: a dimensionless quantity as defined in Eqn. (52)
  */
+KOKKOS_INLINE_FUNCTION
 double BremKernelG(double y, double eta_star)
 {
     // check non negativity of input quantities
@@ -187,6 +191,7 @@ double BremKernelG(double y, double eta_star)
 }
 
 /* Compute the absorption kernels for a given NN Bremsstrahlung channel */
+KOKKOS_INLINE_FUNCTION
 double BremSingleChannelAbsKernel(const double n_nuc, const double m_nuc,
                                   BremKernelParams* kernel_params,
                                   MyEOSParams* eos_params)
@@ -234,6 +239,7 @@ double BremSingleChannelAbsKernel(const double n_nuc, const double m_nuc,
 
 /* Compute the angular independent part of the absorption kernels for the
  Bremsstrahlung reactions by summing the contributions of all NN channels */
+KOKKOS_INLINE_FUNCTION
 double BremAllChannelsAbsKernel(BremKernelParams* kernel_params,
                                 MyEOSParams* eos_params)
 {
@@ -285,6 +291,7 @@ double BremAllChannelsAbsKernel(BremKernelParams* kernel_params,
 
 /* Compute a specific Legendre coefficient in the expansion of production and
  * absorption kernels for the Bremsstrahlung reactions */
+KOKKOS_INLINE_FUNCTION
 MyKernelOutput BremKernelsLegCoeff(BremKernelParams* kernel_params,
                                    MyEOSParams* eos_params)
 {
@@ -334,7 +341,7 @@ MyKernelOutput BremKernelsLegCoeff(BremKernelParams* kernel_params,
     return brem_kernel;
 }
 
-
+KOKKOS_INLINE_FUNCTION
 void BremKernelsTable(const int n, double* nu_array,
                       GreyOpacityParams* grey_pars, M1Matrix* out)
 {
@@ -378,6 +385,7 @@ void BremKernelsTable(const int n, double* nu_array,
 // * The factor 2.0778 is different from the paper 1.04 to account
 //   for the nuclear matrix element for one-pion exchange
 //   (Adam Burrows, private comm)
+KOKKOS_INLINE_FUNCTION
 double QBrem_BRT06(const double nb, const double temp, const double xn,
                    const double xp)
 {
@@ -388,6 +396,7 @@ double QBrem_BRT06(const double nb, const double temp, const double xn,
 
 // Bremsstrahlung kernel from BRT06 Eq.(143) rewritten consistently
 // to fit within the framework of the present library
+KOKKOS_INLINE_FUNCTION
 MyKernelOutput BremKernelsBRT06(BremKernelParams* kernel_params,
                                 MyEOSParams* eos_pars)
 {
@@ -417,6 +426,7 @@ MyKernelOutput BremKernelsBRT06(BremKernelParams* kernel_params,
     return brem_kernel;
 }
 
+KOKKOS_INLINE_FUNCTION
 void BremKernelsTableBRT06(const int n, double* nu_array,
                            GreyOpacityParams* grey_pars, M1Matrix* out)
 {
@@ -446,3 +456,5 @@ void BremKernelsTableBRT06(const int n, double* nu_array,
 
     return;
 }
+
+#endif //BNS_NURATES_INCLUDE_KERNEL_BREM_HPP_
