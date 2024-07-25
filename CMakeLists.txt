@@ -698,7 +698,8 @@ add_executable(test_opacities_electron_capture
         tests/tests_opacities_m1/test_m1_opacities.cpp
 		tests/tests.hpp
 )
-
+target_link_libraries(test_opacities_electron_capture Kokkos::kokkos)
+target_link_libraries(test_opacities_electron_capture OpenMP::OpenMP_CXX)
 if (${GSL_FOUND})
 	target_link_libraries(test_opacities_electron_capture GSL::gsl GSL::gslcblas)
 endif()
@@ -750,7 +751,8 @@ add_executable(test_opacities_pair
         tests/tests_opacities_m1/test_m1_opacities.cpp
 		tests/tests.hpp
 )
-
+target_link_libraries(test_opacities_pair Kokkos::kokkos)
+target_link_libraries(test_opacities_pair OpenMP::OpenMP_CXX)
 if (${GSL_FOUND})
 	target_link_libraries(test_opacities_pair GSL::gsl GSL::gslcblas)
 endif()
@@ -803,6 +805,8 @@ add_executable(test_opacities_brem
 		tests/tests.hpp
 )
 
+target_link_libraries(test_opacities_brem Kokkos::kokkos)
+target_link_libraries(test_opacities_brem OpenMP::OpenMP_CXX)
 if (${GSL_FOUND})
 	target_link_libraries(test_opacities_brem GSL::gsl GSL::gslcblas)
 endif()
@@ -854,7 +858,8 @@ add_executable(test_opacities_inelastic_scatt
         tests/tests_opacities_m1/test_m1_opacities.cpp
 		tests/tests.hpp
 )
-
+target_link_libraries(test_opacities_inelastic_scatt Kokkos::kokkos)
+target_link_libraries(test_opacities_inelastic_scatt OpenMP::OpenMP_CXX)
 if (${GSL_FOUND})
 	target_link_libraries(test_opacities_inelastic_scatt GSL::gsl GSL::gslcblas)
 endif()
@@ -906,7 +911,8 @@ add_executable(test_opacities_isoscatt
         tests/tests_opacities_m1/test_m1_opacities.cpp
 		tests/tests.hpp
 )
-
+target_link_libraries(test_opacities_isoscatt Kokkos::kokkos)
+target_link_libraries(test_opacities_isoscatt OpenMP::OpenMP_CXX)
 if (${GSL_FOUND})
 	target_link_libraries(test_opacities_isoscatt GSL::gsl GSL::gslcblas)
 endif()
@@ -1004,6 +1010,8 @@ add_executable(test_opacities_thc
         tests/tests_opacities_m1/test_m1_opacities.cpp
 		tests/tests.hpp
 )
+target_link_libraries(test_opacities_thc Kokkos::kokkos)
+target_link_libraries(test_opacities_thc OpenMP::OpenMP_CXX)
 if (${GSL_FOUND})
 	target_link_libraries(test_opacities_thc GSL::gsl GSL::gslcblas)
 endif()

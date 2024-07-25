@@ -45,7 +45,9 @@ int main() {
   for (int i = 0; i < 9; i++) {
     MyEOSParams eos_params = {.temp = temp, .mu_e= mu_e};
     PairKernelParams pair_kernel_params =
-        {.omega_prime = pair_kernels_python[i][3], .omega = pair_kernels_python[i][2], .mu_prime = -42., .mu = -42., .cos_theta = pair_kernels_python[i][4], .lmax = 0, .filter = 0};
+        {.omega = pair_kernels_python[i][2], .omega_prime = pair_kernels_python[i][3],
+         .cos_theta = pair_kernels_python[i][4], .mu = -42., .mu_prime = -42.,
+         .lmax = 0, .filter = 0};
     MyKernelQuantity result = PairKernels(&eos_params, &pair_kernel_params);
 
     printf("%0.0e %0.0e %0.0e %0.10e %0.10e |%0.2f| %0.10e %0.10e |%0.2f| %0.10e %0.10e |%0.2f| %0.10e %0.10e |%0.2f|\n",

@@ -84,7 +84,7 @@ int main () {
   char line[1500];
 
   // Read in the neutrino energy
-  fgets(line, sizeof(line), fptr_in);
+  auto val = fgets(line, sizeof(line), fptr_in);
   sscanf(line + 14, "%lf\n", &omega);
   
   printf("Neutrino energy: %.5e MeV\n", omega);

@@ -89,7 +89,12 @@ void ComputeSpectralEmissivities(const int n_leg, const char *reac_type, Opacity
     return;
   }
 
-  MyQuadrature quad_1d = {.nx = n_leg, .dim = 1, .type = kGauleg, .x1 = 0., .x2 = 1.};
+  MyQuadrature quad_1d = quadrature_default;
+  quad_1d.nx = n_leg;
+  quad_1d.dim = 1;
+  quad_1d.type = kGauleg;
+  quad_1d.x1 = 0.;
+  quad_1d.x2 = 1.;
   GaussLegendreMultiD(&quad_1d);
 
   fprintf(fw, "# Computing spectral rates for reaction %s with number of quadrature points: n = 2 * %d\n", reac_type, n_leg);
@@ -138,8 +143,11 @@ void ComputeSpectralEmissivities(const int n_leg, const char *reac_type, Opacity
     }
 
     // Grey opacity parameters
-    GreyOpacityParams grey_pars = {.eos_pars = eos_pars, .opacity_flags = *opacity_flags, .opacity_pars = opacity_params_default_none, .distr_pars = distr_pars, .m1_pars = m1_pars};
-
+    GreyOpacityParams grey_pars = {.opacity_pars = opacity_params_default_none,
+                                   .eos_pars = eos_pars,
+                                   .distr_pars = distr_pars,
+                                   .m1_pars = m1_pars,
+                                   .opacity_flags = *opacity_flags};
     fprintf(fw, "%.10e ", r[i]);
     fprintf(fw, "%.10e ", rho[i]);
     fprintf(fw, "%.10e ", T[i]);
@@ -256,7 +264,12 @@ void ComputeDoubleIntegrand(const int n_leg, const char *reac_type, OpacityFlags
     return;
   }
 
-  MyQuadrature quad_1d = {.nx = n_leg, .dim = 1, .type = kGauleg, .x1 = 0., .x2 = 1.};
+  MyQuadrature quad_1d = quadrature_default;
+  quad_1d.nx = n_leg;
+  quad_1d.dim = 1;
+  quad_1d.type = kGauleg;
+  quad_1d.x1 = 0.;
+  quad_1d.x2 = 1.;
   GaussLegendreMultiD(&quad_1d);
 
   fprintf(fw, "# Computing 2d integrand for reaction %s with number of quadrature points: n = 2 * %d\n", reac_type, n_leg);
@@ -306,7 +319,11 @@ void ComputeDoubleIntegrand(const int n_leg, const char *reac_type, OpacityFlags
     }
 
     // Grey opacity parameters
-    GreyOpacityParams grey_pars = {.eos_pars = eos_pars, .opacity_flags = *opacity_flags, .opacity_pars = opacity_params_default_none, .distr_pars = distr_pars, .m1_pars = m1_pars};
+    GreyOpacityParams grey_pars = {.opacity_pars = opacity_params_default_none,
+                                   .eos_pars = eos_pars,
+                                   .distr_pars = distr_pars,
+                                   .m1_pars = m1_pars,
+                                   .opacity_flags = *opacity_flags};
     
     ComputeM1DoubleIntegrand(&quad_1d, &grey_pars, s, &mat_n, &mat_j);
 
@@ -351,7 +368,7 @@ void ComputeDoubleIntegrand(const int n_leg, const char *reac_type, OpacityFlags
 int main() {
 
   // Opacity flags
-  OpacityFlags opacity_flags = {.use_abs_em = 0, .use_iso = 0, .use_brem = 0, .use_pair = 1, .use_inelastic_scatt = 0};
+  OpacityFlags opacity_flags = {.use_abs_em = 0, .use_pair = 1, .use_brem = 0, .use_inelastic_scatt = 0, .use_iso = 0};
   const char* reac_type = "pair";
  
   //ComputeSpectralEmissivities(50, reac_type, &opacity_flags);

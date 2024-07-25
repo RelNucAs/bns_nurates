@@ -83,7 +83,13 @@ int main() {
   // test Gauss-Laguerre implementation
   const int n = 35;
   const double alpha = 0.;
-  MyQuadrature quad = {.nx = n, .dim = 1, .type = kGaulag, .x1 = 0., .x2 = 1., .alpha = alpha};
+  MyQuadrature quad = quadrature_default;
+  quad.nx = n;
+  quad.dim = 1;
+  quad.type = kGaulag;
+  quad.x1 = 0.;
+  quad.x2 = 1.;
+  quad.alpha = alpha;
   GaussLaguerre(&quad);
 
   // Gauss-Laguerre integration (weight = (points-a)^alpha * exp(-b*(points-a)))

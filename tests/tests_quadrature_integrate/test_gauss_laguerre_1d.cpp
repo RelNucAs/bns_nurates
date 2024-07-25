@@ -28,7 +28,11 @@ int main() {
   int n = 2;
   double alpha = 0.;
 
-  MyQuadrature quad = {.dim =1, .type = kGaulag, .nx = n, .alpha = alpha};
+  MyQuadrature quad = quadrature_default;
+  quad.dim =1;
+  quad.type = kGaulag;
+  quad.nx = n;
+  quad.alpha = alpha;
   GaussLaguerre(&quad);
 
   printf("x1 = 0 \t\t x2 = inf \t nx = %d\n", quad.nx);

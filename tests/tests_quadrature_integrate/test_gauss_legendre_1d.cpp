@@ -25,7 +25,12 @@ int main() {
   double x1 = -1.;
   double x2 = 1.;
 
-  MyQuadrature quad = {.dim =1, .type = kGauleg, .x1=x1, .x2=x2, .nx = n};
+  MyQuadrature quad = quadrature_default;
+  quad.dim =1;
+  quad.type = kGauleg;
+  quad.x1=x1;
+  quad.x2=x2;
+  quad.nx = n;
   GaussLegendre(&quad);
 
   printf("Generating Gauss-Legendre quadratures ... \n");

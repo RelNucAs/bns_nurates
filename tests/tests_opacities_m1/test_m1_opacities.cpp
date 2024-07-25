@@ -23,6 +23,8 @@
 
 void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityParams *opacity_pars) {
 
+  Kokkos::initialize();
+
   using DevExeSpace = Kokkos::DefaultExecutionSpace;
   using DevMemSpace = Kokkos::DefaultExecutionSpace::memory_space;
   using HostMemSpace = Kokkos::HostSpace;

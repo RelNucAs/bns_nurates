@@ -88,7 +88,12 @@ void ComputeM1CoeffsGivenQuadrature(const int n_leg, const char *reac_type, Opac
 
   printf("Computing M1 source coefficients for n_leg = 2 * %d....\n", n_leg);
 
-  MyQuadrature quad_1d = {.nx = n_leg, .dim = 1, .type = kGauleg, .x1 = 0., .x2 = 1.};
+  MyQuadrature quad_1d = quadrature_default;
+  quad_1d.nx = n_leg;
+  quad_1d.dim = 1;
+  quad_1d.type = kGauleg;
+  quad_1d.x1 = 0.;
+  quad_1d.x2 = 1.;
   GaussLegendreMultiD(&quad_1d);
 
   fprintf(fw, "# Convergence test of M1 source coefficients with number of quadrature points: n = 2 * %d\n", n_leg);
@@ -131,7 +136,11 @@ void ComputeM1CoeffsGivenQuadrature(const int n_leg, const char *reac_type, Opac
     }
 
     // Grey opacity parameters
-    GreyOpacityParams grey_pars = {.eos_pars = eos_pars, .opacity_flags = *opacity_flags, .opacity_pars = opacity_params_default_none, .distr_pars = distr_pars, .m1_pars = m1_pars};
+    GreyOpacityParams grey_pars = {.opacity_pars = opacity_params_default_none,
+                                   .eos_pars = eos_pars,
+                                   .distr_pars = distr_pars,
+                                   .m1_pars = m1_pars,
+                                   .opacity_flags = *opacity_flags };
 
     M1Opacities m1_coeffs = ComputeM1Opacities(&quad_1d, &quad_1d, &grey_pars);
 

@@ -169,7 +169,12 @@ void ComputeSpectralRatesGivenQuadrature(const int n_leg, const int id_point, co
 
   printf("Computing spectral rates for n_leg = 2 * %d....\n", n_leg);
 
-  MyQuadrature quad_1d = {.nx = n_leg, .dim = 1, .type = kGauleg, .x1 = 0., .x2 = 1.};
+  MyQuadrature quad_1d = quadrature_default;
+  quad_1d.nx = n_leg;
+  quad_1d.dim = 1;
+  quad_1d.type = kGauleg;
+  quad_1d.x1 = 0.;
+  quad_1d.x2 = 1.;
   GaussLegendreMultiD(&quad_1d);
 
   fprintf(fp, "# Convergence test of spectral rates with number of quadrature points: n = 2 * %d\n", n_leg);
@@ -209,7 +214,11 @@ void ComputeSpectralRatesGivenQuadrature(const int n_leg, const int id_point, co
   }
   
   // Grey opacity parameters
-  GreyOpacityParams grey_pars = {.eos_pars = *eos_pars, .opacity_flags = *opacity_flags, .opacity_pars = opacity_params_default_none, .distr_pars = distr_pars, .m1_pars =  m1_pars};
+  GreyOpacityParams grey_pars = {.opacity_pars = opacity_params_default_none,
+                                 .eos_pars = *eos_pars,
+                                 .distr_pars = distr_pars,
+                                 .m1_pars =  m1_pars,
+                                 .opacity_flags = *opacity_flags};
   
   // Compute spectral emissivities and opacities for NuLib energies
   fprintf(fp, "# Energy [MeV], j_nue/anue/nux/anux [s-1], NON STIMULATED op_ab_nue/anue/nux/anux [cm-1], STIMULATED op_ab_nue/anue/nux/anux [cm-1], op_sc_nue/anue/nux/anux [cm-1]\n");
@@ -263,7 +272,7 @@ int main() {
   int n_leg[6] = {5, 10, 20, 30, 40, 50};
 
   // Opacity flags
-  OpacityFlags opacity_flags = {.use_abs_em = 0, .use_iso = 0, .use_brem = 1, .use_pair = 0, .use_inelastic_scatt = 0};
+  OpacityFlags opacity_flags = {.use_abs_em = 0, .use_pair = 0, .use_brem = 1,  .use_inelastic_scatt = 0, .use_iso = 0,};
   const char* reac_type = "brem";
  
   for (int id_p = 1; id_p <= 4; id_p++){
@@ -274,12 +283,12 @@ int main() {
     MyEOSParams eos_pars = {.nb = nb,
                             .temp = temp_array[id_p-1],
                             .ye = ye_array[id_p-1],
-                            .yn = xn_array[id_p-1],
                             .yp = xp_array[id_p-1],
-                            .mu_e = mue_array[id_p-1],
+                            .yn = xn_array[id_p-1],
+                            .mu_p = mup_array[id_p-1],
                             .mu_n = mun_array[id_p-1],
-                            .mu_p = mup_array[id_p-1]};
-  
+                            .mu_e = mue_array[id_p-1],
+                            };
     for (int i = 0; i < 6; i++) {
       ComputeSpectralRatesGivenQuadrature(n_leg[i], id_p, reac_type, &eos_pars, &opacity_flags);
     }

@@ -42,7 +42,7 @@ MyKernelQuantity ModifiedFermiDiracLegendreSpecial(double *x, MyEOSParams *my_eo
   int k = (params->nb);
   double eta = (params->mu_e);
   double result = exp(-x[2] * x[2]) * exp(-x[1]) * pow(x[0], k) / (exp(x[0] - eta) + 1.);
-  MyKernelQuantity result_special = {.em_x = result, .em_e = result, .abs_x = result, .abs_e = result};
+  MyKernelQuantity result_special = {.em_e = result, .abs_e = result, .em_x = result, .abs_x = result};
 
   return result_special;
 }
