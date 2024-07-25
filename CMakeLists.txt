@@ -52,7 +52,6 @@ add_executable(bns_nurates
 		src/functions/gamma.cpp
 		src/functions/lambert.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		src/functions/m1matrix.cpp
 		include/integration.hpp
@@ -61,7 +60,6 @@ add_executable(bns_nurates
 		src/opacities/weak_magnetism/weak_magnetism.cpp
 		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
-		src/opacities/nu_abs_em_beta.cpp
 		src/opacities/nu_scatt_iso.cpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -104,12 +102,10 @@ add_library(nurates SHARED
 		src/functions/gamma.cpp
 		src/functions/lambert.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		src/functions/m1matrix.cpp
 		src/opacities/weak_magnetism/weak_magnetism.cpp
 		src/opacities/weak_magnetism/nucfrmfac.cpp
-		src/opacities/nu_abs_em_beta.cpp
 		src/opacities/nu_scatt_iso.cpp
 		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
 		tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.cpp
@@ -146,7 +142,6 @@ install(TARGETS nurates LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PUBLIC_HEADE
 add_executable(test_pair_t
 		tests/tests_pair/test_pair_t.cpp
 		include/constants.hpp
-		src/functions/safe_exp.cpp
 		src/functions/fermi_integrals.cpp
 		include/kernels.hpp
 		src/opacities/kernels/kernel_pair.cpp)
@@ -160,7 +155,6 @@ target_link_libraries(test_pair_t m)
 add_executable(test_pair_f
 		tests/tests_pair/test_pair_f.cpp
 		include/constants.hpp
-		src/functions/safe_exp.cpp
 		src/functions/fermi_integrals.cpp
 		include/kernels.hpp
 		src/opacities/kernels/kernel_pair.cpp)
@@ -174,7 +168,6 @@ target_link_libraries(test_pair_f m)
 add_executable(test_pair_g
 		tests/tests_pair/test_pair_g.cpp
 		include/constants.hpp
-		src/functions/safe_exp.cpp
 		src/functions/fermi_integrals.cpp
 		include/kernels.hpp
 		src/opacities/kernels/kernel_pair.cpp)
@@ -188,7 +181,6 @@ target_link_libraries(test_pair_g m)
 add_executable(test_pair_psi
 		tests/tests_pair/test_pair_psi.cpp
 		include/constants.hpp
-		src/functions/safe_exp.cpp
 		src/functions/fermi_integrals.cpp
 		include/kernels.hpp
 		src/opacities/kernels/kernel_pair.cpp)
@@ -202,7 +194,6 @@ target_link_libraries(test_pair_psi m)
 add_executable(test_pair_phi
 		tests/tests_pair/test_pair_phi.cpp
 		include/constants.hpp
-		src/functions/safe_exp.cpp
 		src/functions/fermi_integrals.cpp
 		include/kernels.hpp
 		src/opacities/kernels/kernel_pair.cpp
@@ -218,7 +209,6 @@ if (${GSL_FOUND})
 add_executable(test_pair_kernels
 		tests/tests_pair/test_pair_kernels.cpp
 		include/constants.hpp
-		src/functions/safe_exp.cpp
 		src/functions/fermi_integrals.cpp
 		include/kernels.hpp
 		src/opacities/kernels/kernel_pair.cpp
@@ -235,7 +225,6 @@ if (${GSL_FOUND})
 add_executable(test_pair_kernels_phi_mu_integrated
 		tests/tests_pair/test_pair_kernels_phi_mu_integrated.cpp
 		include/constants.hpp
-		src/functions/safe_exp.cpp
 		src/functions/fermi_integrals.cpp
 		include/kernels.hpp
 		src/opacities/kernels/kernel_pair.cpp
@@ -257,7 +246,6 @@ add_executable(test_pair_opacities
 		src/functions/fermi_distr.cpp
 		src/functions/gamma.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		src/functions/fermi_integrals.cpp
 		src/functions/m1matrix.cpp
@@ -287,7 +275,6 @@ add_executable(test_beta
 		src/functions/fermi_integrals.cpp
 		src/functions/gamma.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		src/functions/m1matrix.cpp
 		include/integration.hpp
@@ -302,7 +289,6 @@ add_executable(test_beta
 		include/weak_magnetism.hpp
 		src/opacities/weak_magnetism/weak_magnetism.cpp
 		src/opacities/weak_magnetism/nucfrmfac.cpp
-		src/opacities/nu_abs_em_beta.cpp
 )
 
 if (${GSL_FOUND})
@@ -321,7 +307,6 @@ add_executable(test_iso
 		src/functions/fermi_integrals.cpp
 		src/functions/gamma.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		src/functions/m1matrix.cpp
 		include/integration.hpp
@@ -356,7 +341,6 @@ add_executable(test_brem
 		src/functions/fermi_integrals.cpp
 		src/functions/gamma.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		src/functions/m1matrix.cpp
 		include/integration.hpp
@@ -389,7 +373,6 @@ add_executable(test_gauss_legendre_1d
 		src/functions/fermi_distr.cpp
 		src/functions/gamma.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
@@ -412,7 +395,6 @@ add_executable(test_gauss_legendre_2d
 		src/functions/fermi_distr.cpp
 		src/functions/gamma.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
@@ -435,7 +417,6 @@ add_executable(test_gauss_legendre_3d
 		src/functions/fermi_distr.cpp
 		src/functions/gamma.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
@@ -458,7 +439,6 @@ add_executable(test_gauss_laguerre_1d
 		src/functions/fermi_distr.cpp
 		src/functions/gamma.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
@@ -481,7 +461,6 @@ add_executable(test_quadrature_io
 		src/functions/fermi_distr.cpp
 		src/functions/gamma.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
@@ -506,7 +485,6 @@ add_executable(test_integration_1d
 		src/functions/fermi_distr.cpp
 		src/functions/gamma.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
@@ -531,7 +509,6 @@ add_executable(test_integration_2d
 		src/functions/fermi_distr.cpp
 		src/functions/gamma.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
@@ -556,7 +533,6 @@ add_executable(test_integration_3d
 		src/functions/fermi_distr.cpp
 		src/functions/gamma.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
@@ -581,7 +557,6 @@ add_executable(test_integration_special
 		src/functions/fermi_distr.cpp
 		src/functions/gamma.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		src/functions/m1matrix.cpp
 		include/integration.hpp
@@ -608,7 +583,6 @@ add_executable(test_integration_multi_func_1d
 		src/functions/fermi_distr.cpp
 		src/functions/gamma.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		src/functions/m1matrix.cpp
 		include/integration.hpp
@@ -635,7 +609,6 @@ add_executable(test_integration_multi_func_2d
 		src/functions/fermi_distr.cpp
 		src/functions/gamma.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		src/functions/m1matrix.cpp
 		include/integration.hpp
@@ -666,7 +639,6 @@ add_executable(test_opacities_electron_capture
 		src/functions/gamma.cpp
 		src/functions/lambert.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		src/functions/m1matrix.cpp
 		include/integration.hpp
@@ -675,7 +647,6 @@ add_executable(test_opacities_electron_capture
 		src/opacities/weak_magnetism/weak_magnetism.cpp
 		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
-		src/opacities/nu_abs_em_beta.cpp
 		src/opacities/nu_scatt_iso.cpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -718,7 +689,6 @@ add_executable(test_opacities_pair
 		src/functions/gamma.cpp
 		src/functions/lambert.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		src/functions/m1matrix.cpp
 		include/integration.hpp
@@ -727,7 +697,6 @@ add_executable(test_opacities_pair
 		src/opacities/weak_magnetism/weak_magnetism.cpp
 		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
-		src/opacities/nu_abs_em_beta.cpp
 		src/opacities/nu_scatt_iso.cpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -770,7 +739,6 @@ add_executable(test_opacities_brem
 		src/functions/gamma.cpp
 		src/functions/lambert.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		src/functions/m1matrix.cpp
 		include/integration.hpp
@@ -779,7 +747,6 @@ add_executable(test_opacities_brem
 		src/opacities/weak_magnetism/weak_magnetism.cpp
 		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
-		src/opacities/nu_abs_em_beta.cpp
 		src/opacities/nu_scatt_iso.cpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -824,7 +791,6 @@ add_executable(test_opacities_inelastic_scatt
 		src/functions/gamma.cpp
 		src/functions/lambert.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		src/functions/m1matrix.cpp
 		include/integration.hpp
@@ -833,7 +799,6 @@ add_executable(test_opacities_inelastic_scatt
 		src/opacities/weak_magnetism/weak_magnetism.cpp
 		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
-		src/opacities/nu_abs_em_beta.cpp
 		src/opacities/nu_scatt_iso.cpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -876,7 +841,6 @@ add_executable(test_opacities_isoscatt
 		src/functions/gamma.cpp
 		src/functions/lambert.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		src/functions/m1matrix.cpp
 		include/integration.hpp
@@ -885,7 +849,6 @@ add_executable(test_opacities_isoscatt
 		src/opacities/weak_magnetism/weak_magnetism.cpp
 		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
-		src/opacities/nu_abs_em_beta.cpp
 		src/opacities/nu_scatt_iso.cpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -928,7 +891,6 @@ add_executable(test_opacities_all_reactions
 		src/functions/gamma.cpp
 		src/functions/lambert.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		src/functions/m1matrix.cpp
 		include/integration.hpp
@@ -937,7 +899,6 @@ add_executable(test_opacities_all_reactions
 		src/opacities/weak_magnetism/weak_magnetism.cpp
 		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
-		src/opacities/nu_abs_em_beta.cpp
 		src/opacities/nu_scatt_iso.cpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -976,7 +937,6 @@ add_executable(test_opacities_thc
 		src/functions/gamma.cpp
 		src/functions/lambert.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		src/functions/m1matrix.cpp
 		include/integration.hpp
@@ -985,7 +945,6 @@ add_executable(test_opacities_thc
 		src/opacities/weak_magnetism/weak_magnetism.cpp
 		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
-		src/opacities/nu_abs_em_beta.cpp
 		src/opacities/nu_scatt_iso.cpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -1025,7 +984,6 @@ add_executable(test_m1_distribution
 		src/functions/gamma.cpp
 		src/functions/lambert.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		src/functions/m1matrix.cpp
 		include/integration.hpp
@@ -1034,7 +992,6 @@ add_executable(test_m1_distribution
 		src/opacities/weak_magnetism/weak_magnetism.cpp
 		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
-		src/opacities/nu_abs_em_beta.cpp
 		src/opacities/nu_scatt_iso.cpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -1074,7 +1031,6 @@ add_executable(test_quadrature_convergence_spectral
 		src/functions/gamma.cpp
 		src/functions/lambert.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		src/functions/m1matrix.cpp
 		include/integration.hpp
@@ -1083,7 +1039,6 @@ add_executable(test_quadrature_convergence_spectral
 		src/opacities/weak_magnetism/weak_magnetism.cpp
 		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
-		src/opacities/nu_abs_em_beta.cpp
 		src/opacities/nu_scatt_iso.cpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -1121,7 +1076,6 @@ add_executable(test_quadrature_convergence_integrated
 		src/functions/gamma.cpp
 		src/functions/lambert.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		src/functions/m1matrix.cpp
 		include/integration.hpp
@@ -1130,7 +1084,6 @@ add_executable(test_quadrature_convergence_integrated
 		src/opacities/weak_magnetism/weak_magnetism.cpp
 		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
-		src/opacities/nu_abs_em_beta.cpp
 		src/opacities/nu_scatt_iso.cpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -1168,7 +1121,6 @@ add_executable(test_quadrature_convergence_find_max
 		src/functions/gamma.cpp
 		src/functions/lambert.cpp
 		src/functions/mnewt.cpp
-		src/functions/safe_exp.cpp
 		src/functions/theta.cpp
 		src/functions/m1matrix.cpp
 		include/integration.hpp
@@ -1177,7 +1129,6 @@ add_executable(test_quadrature_convergence_find_max
 		src/opacities/weak_magnetism/weak_magnetism.cpp
 		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
-		src/opacities/nu_abs_em_beta.cpp
 		src/opacities/nu_scatt_iso.cpp
 		src/output/outputs.hpp
 		include/eos.hpp
