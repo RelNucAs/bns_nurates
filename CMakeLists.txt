@@ -472,7 +472,8 @@ add_executable(test_quadrature_io
 		src/integration/integration_quadrature_io.cpp
 		src/integration/integration_quadrature_integrate.cpp
 )
-
+target_link_libraries(test_quadrature_io Kokkos::kokkos)
+target_link_libraries(test_quadrature_io OpenMP::OpenMP_CXX)
 if (${GSL_FOUND})
 	target_link_libraries(test_quadrature_io GSL::gsl GSL::gslcblas)
 endif()
