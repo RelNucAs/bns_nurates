@@ -42,15 +42,6 @@ add_executable(bns_nurates
 		include/bns_nurates.hpp
 		include/distribution.hpp
 		include/functions.hpp
-		src/functions/bessel.cpp
-		src/functions/digamma.cpp
-		src/functions/fermi_integrals.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/lambert.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
-		src/functions/m1matrix.cpp
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
@@ -87,15 +78,6 @@ target_link_libraries(bns_nurates m)
 
 # create shared library for THC
 add_library(nurates SHARED
-		src/functions/bessel.cpp
-		src/functions/digamma.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/fermi_integrals.cpp
-		src/functions/gamma.cpp
-		src/functions/lambert.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
-		src/functions/m1matrix.cpp
 		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
 		tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.cpp
 		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
@@ -133,7 +115,6 @@ install(TARGETS nurates LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PUBLIC_HEADE
 add_executable(test_pair_t
 		tests/tests_pair/test_pair_t.cpp
 		include/constants.hpp
-		src/functions/fermi_integrals.cpp
 		include/kernels.hpp
 		include/kernel_pair.hpp)
 target_link_libraries(test_pair_t Kokkos::kokkos)
@@ -147,7 +128,6 @@ target_link_libraries(test_pair_t m)
 add_executable(test_pair_f
 		tests/tests_pair/test_pair_f.cpp
 		include/constants.hpp
-		src/functions/fermi_integrals.cpp
 		include/kernels.hpp
 		include/kernel_pair.hpp)
 
@@ -162,7 +142,6 @@ target_link_libraries(test_pair_f m)
 add_executable(test_pair_g
 		tests/tests_pair/test_pair_g.cpp
 		include/constants.hpp
-		src/functions/fermi_integrals.cpp
 		include/kernels.hpp
 		include/kernel_pair.hpp)
 target_link_libraries(test_pair_g Kokkos::kokkos)
@@ -176,7 +155,6 @@ target_link_libraries(test_pair_g m)
 add_executable(test_pair_psi
 		tests/tests_pair/test_pair_psi.cpp
 		include/constants.hpp
-		src/functions/fermi_integrals.cpp
 		include/kernels.hpp
 		include/kernel_pair.hpp)
 target_link_libraries(test_pair_psi Kokkos::kokkos)
@@ -190,7 +168,6 @@ target_link_libraries(test_pair_psi m)
 add_executable(test_pair_phi
 		tests/tests_pair/test_pair_phi.cpp
 		include/constants.hpp
-		src/functions/fermi_integrals.cpp
 		include/kernels.hpp
 		include/kernel_pair.hpp
 )
@@ -206,7 +183,6 @@ if (${GSL_FOUND})
 add_executable(test_pair_kernels
 		tests/tests_pair/test_pair_kernels.cpp
 		include/constants.hpp
-		src/functions/fermi_integrals.cpp
 		include/kernels.hpp
 		include/kernel_pair.hpp
 )
@@ -222,7 +198,6 @@ if (${GSL_FOUND})
 add_executable(test_pair_kernels_phi_mu_integrated
 		tests/tests_pair/test_pair_kernels_phi_mu_integrated.cpp
 		include/constants.hpp
-		src/functions/fermi_integrals.cpp
 		include/kernels.hpp
 		include/kernel_pair.hpp
 )
@@ -240,13 +215,6 @@ add_executable(test_pair_opacities
 		include/bns_nurates.hpp
 		include/functions.hpp
 		include/opacities.hpp
-		src/functions/digamma.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
-		src/functions/fermi_integrals.cpp
-		src/functions/m1matrix.cpp
 		include/integration.hpp
 		include/kernels.hpp
 		include/kernel_pair.hpp
@@ -269,13 +237,6 @@ add_executable(test_beta
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/functions.hpp
-		src/functions/digamma.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/fermi_integrals.cpp
-		src/functions/gamma.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
-		src/functions/m1matrix.cpp
 		include/integration.hpp
 		include/kernels.hpp
 		include/opacities.hpp
@@ -301,13 +262,6 @@ add_executable(test_iso
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/functions.hpp
-		src/functions/digamma.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/fermi_integrals.cpp
-		src/functions/gamma.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
-		src/functions/m1matrix.cpp
 		include/integration.hpp
 		include/kernels.hpp
 		include/opacities.hpp
@@ -333,14 +287,6 @@ add_executable(test_brem
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/functions.hpp
-		src/functions/bessel.cpp
-		src/functions/digamma.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/fermi_integrals.cpp
-		src/functions/gamma.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
-		src/functions/m1matrix.cpp
 		include/integration.hpp
 		include/kernels.hpp
 		include/opacities.hpp
@@ -367,11 +313,6 @@ add_executable(test_gauss_legendre_1d
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/functions.hpp
-		src/functions/digamma.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
@@ -391,11 +332,6 @@ add_executable(test_gauss_legendre_2d
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/functions.hpp
-		src/functions/digamma.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
@@ -415,11 +351,6 @@ add_executable(test_gauss_legendre_3d
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/functions.hpp
-		src/functions/digamma.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
@@ -439,11 +370,6 @@ add_executable(test_gauss_laguerre_1d
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/functions.hpp
-		src/functions/digamma.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
@@ -463,11 +389,6 @@ add_executable(test_quadrature_io
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/functions.hpp
-		src/functions/digamma.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
@@ -488,11 +409,6 @@ add_executable(test_integration_1d
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/functions.hpp
-		src/functions/digamma.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
@@ -514,11 +430,6 @@ add_executable(test_integration_2d
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/functions.hpp
-		src/functions/digamma.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
@@ -540,11 +451,6 @@ add_executable(test_integration_3d
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/functions.hpp
-		src/functions/digamma.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
@@ -566,12 +472,6 @@ add_executable(test_integration_special
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/functions.hpp
-		src/functions/digamma.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
-		src/functions/m1matrix.cpp
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
@@ -594,12 +494,6 @@ add_executable(test_integration_multi_func_1d
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/functions.hpp
-		src/functions/digamma.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
-		src/functions/m1matrix.cpp
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
@@ -622,12 +516,6 @@ add_executable(test_integration_multi_func_2d
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/functions.hpp
-		src/functions/digamma.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
-		src/functions/m1matrix.cpp
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
@@ -648,15 +536,6 @@ add_executable(test_opacities_electron_capture
 		include/bns_nurates.hpp
 		include/distribution.hpp
 		include/functions.hpp
-		src/functions/bessel.cpp
-		src/functions/digamma.cpp
-		src/functions/fermi_integrals.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/lambert.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
-		src/functions/m1matrix.cpp
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
@@ -692,15 +571,6 @@ add_executable(test_opacities_pair
 		include/bns_nurates.hpp
 		include/distribution.hpp
 		include/functions.hpp
-		src/functions/bessel.cpp
-		src/functions/digamma.cpp
-		src/functions/fermi_integrals.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/lambert.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
-		src/functions/m1matrix.cpp
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
@@ -736,15 +606,6 @@ add_executable(test_opacities_brem
 		include/bns_nurates.hpp
 		include/distribution.hpp
 		include/functions.hpp
-		src/functions/bessel.cpp
-		src/functions/digamma.cpp
-		src/functions/fermi_integrals.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/lambert.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
-		src/functions/m1matrix.cpp
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
@@ -782,15 +643,6 @@ add_executable(test_opacities_inelastic_scatt
 		include/bns_nurates.hpp
 		include/distribution.hpp
 		include/functions.hpp
-		src/functions/bessel.cpp
-		src/functions/digamma.cpp
-		src/functions/fermi_integrals.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/lambert.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
-		src/functions/m1matrix.cpp
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
@@ -826,15 +678,6 @@ add_executable(test_opacities_isoscatt
 		include/bns_nurates.hpp
 		include/distribution.hpp
 		include/functions.hpp
-		src/functions/bessel.cpp
-		src/functions/digamma.cpp
-		src/functions/fermi_integrals.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/lambert.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
-		src/functions/m1matrix.cpp
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
@@ -870,15 +713,6 @@ add_executable(test_opacities_all_reactions
 		include/bns_nurates.hpp
 		include/distribution.hpp
 		include/functions.hpp
-		src/functions/bessel.cpp
-		src/functions/digamma.cpp
-		src/functions/fermi_integrals.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/lambert.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
-		src/functions/m1matrix.cpp
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
@@ -910,15 +744,6 @@ add_executable(test_opacities_thc
 		include/bns_nurates.hpp
 		include/distribution.hpp
 		include/functions.hpp
-		src/functions/bessel.cpp
-		src/functions/digamma.cpp
-		src/functions/fermi_integrals.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/lambert.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
-		src/functions/m1matrix.cpp
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
@@ -951,15 +776,6 @@ add_executable(test_m1_distribution
 		include/bns_nurates.hpp
 		include/distribution.hpp
 		include/functions.hpp
-		src/functions/bessel.cpp
-		src/functions/digamma.cpp
-		src/functions/fermi_integrals.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/lambert.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
-		src/functions/m1matrix.cpp
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
@@ -994,15 +810,6 @@ add_executable(test_quadrature_convergence_spectral
 		include/bns_nurates.hpp
 		include/distribution.hpp
 		include/functions.hpp
-		src/functions/bessel.cpp
-		src/functions/digamma.cpp
-		src/functions/fermi_integrals.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/lambert.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
-		src/functions/m1matrix.cpp
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
@@ -1034,15 +841,6 @@ add_executable(test_quadrature_convergence_integrated
 		include/bns_nurates.hpp
 		include/distribution.hpp
 		include/functions.hpp
-		src/functions/bessel.cpp
-		src/functions/digamma.cpp
-		src/functions/fermi_integrals.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/lambert.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
-		src/functions/m1matrix.cpp
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
@@ -1074,15 +872,6 @@ add_executable(test_quadrature_convergence_find_max
 		include/bns_nurates.hpp
 		include/distribution.hpp
 		include/functions.hpp
-		src/functions/bessel.cpp
-		src/functions/digamma.cpp
-		src/functions/fermi_integrals.cpp
-		src/functions/fermi_distr.cpp
-		src/functions/gamma.cpp
-		src/functions/lambert.cpp
-		src/functions/mnewt.cpp
-		src/functions/theta.cpp
-		src/functions/m1matrix.cpp
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
