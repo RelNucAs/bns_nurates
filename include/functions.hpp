@@ -7,6 +7,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+
+#include <Kokkos_Core.hpp>
 
 #include "bns_nurates.hpp"
 
@@ -14,13 +17,18 @@
 // Exception handling from Numerical Recipes
 // @TODO: decide how to handle errors in the code
 
+/*
 #ifndef _USENRERRORCLASS_
 #define throw(message)                                                         \
-    {                                                                          \
-        printf("ERROR: %s\n     in file %s at line %d\n", message, __FILE__,   \
-               __LINE__);                                                      \
-        exit(1);                                                               \
-    }
+    //}                                                                          //\
+        //printf("ERROR: %s\n     in file %s at line %d\n", message, __FILE__,   \
+               __LINE__);
+                                                                     \
+        //exit(1);
+        //double dummy_var = -42.;
+        printf("Throw function here");
+                                                                      \
+    //}
 #else
 struct NRerror
 {
@@ -39,6 +47,7 @@ void NRcatch(NRerror err)
     exit(1);
 }
 #endif
+*/
 
 /*===========================================================================*/
 
@@ -209,9 +218,21 @@ void MNewt2d(double* x, double C[2],
 
 // safe_exp.c
 
-// Safe exp function to avoid underflow/overflow
-double SafeExp(const double x);
+// Cut-off parameter for exponential evaluation
+// Warning: this value was tuned on the previous version of the code
+//          (with C++ math functions)
+const double fExpUppLim =
+    700.; // possible alternative choice: const*DBL_MAX_EXP
+const double fExpLowLim =
+    -fExpUppLim; //                              const*DBL_MIN_EXP
 
+// Safe exp function to avoid underflow/overflow
+// Safe exp function to avoid underflow/overflow
+KOKKOS_INLINE_FUNCTION
+double SafeExp(const double x)
+{
+    return exp(fmin(fmax(x, fExpLowLim), fExpUppLim));
+}
 /*===========================================================================*/
 
 // theta.c

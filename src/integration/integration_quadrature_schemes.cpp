@@ -238,7 +238,9 @@ void GaussLaguerre(MyQuadrature* quad)
         }
         if (its >= kMaxIt)
         {
-            throw("Too many iterations for Gauss-Laguerre!")
+            //throw("Too many iterations for Gauss-Laguerre!")
+            printf("Too many iterations for Gauss-Laguerre!");
+            exit(1);
         };
 
         x[i] = z;

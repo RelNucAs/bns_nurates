@@ -16,8 +16,11 @@ double Gammln(const double xx)
         -.210264441724104883e-3, .217439618115212643e-3,
         -.164318106536763890e-3, .844182239838527433e-4,
         -.261908384015814087e-4, .368991826595316234e-5};
-    if (xx <= 0)
-        throw("bad arg in gammln");
+    if (xx <= 0) {
+        //throw("bad arg in gammln");
+        printf("bad arg in gammln");
+        exit(1);
+    }
     y = x = xx;
     tmp   = x + 5.24218750000000000;
     tmp   = (x + 0.5) * log(tmp) - tmp;

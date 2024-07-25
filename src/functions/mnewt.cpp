@@ -70,7 +70,9 @@ double MNewt1d(double guess, double x1, double x2, double f0, MyFunction* func,
     {
         printf("xl = %.3e, fl = %.3e\n", x1, fl);
         printf("xh = %.3e, fh = %.3e\n", x2, fh);
-        throw("Root must be bracketed in rtsafe");
+        printf("Root must be bracketed in rtsafe");
+        exit(1);
+        //throw("Root must be bracketed in rtsafe");
     }
 
     if (fl == 0.0)
@@ -133,7 +135,10 @@ double MNewt1d(double guess, double x1, double x2, double f0, MyFunction* func,
             xh = rts;
         }
     }
-    throw("Maximum number of iterations exceeded in rtsafe");
+    //throw("Maximum number of iterations exceeded in rtsafe");
+    printf("Maximum number of iterations exceeded in rtsafe");
+    exit(1);
+    
 }
 
 /*===========================================================================*/
