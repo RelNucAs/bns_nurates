@@ -41,9 +41,6 @@ add_executable(bns_nurates
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/distribution.hpp
-		src/distribution/distribution_opt_thick.cpp
-		src/distribution/distribution_opt_thin.cpp
-		src/distribution/distribution_total.cpp
 		include/functions.hpp
 		src/functions/bessel.cpp
 		src/functions/digamma.cpp
@@ -90,9 +87,6 @@ target_link_libraries(bns_nurates m)
 
 # create shared library for THC
 add_library(nurates SHARED
-		src/distribution/distribution_opt_thick.cpp
-		src/distribution/distribution_opt_thin.cpp
-		src/distribution/distribution_total.cpp
 		src/functions/bessel.cpp
 		src/functions/digamma.cpp
 		src/functions/fermi_distr.cpp
@@ -653,9 +647,6 @@ add_executable(test_opacities_electron_capture
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/distribution.hpp
-		src/distribution/distribution_opt_thick.cpp
-		src/distribution/distribution_opt_thin.cpp
-		src/distribution/distribution_total.cpp
 		include/functions.hpp
 		src/functions/bessel.cpp
 		src/functions/digamma.cpp
@@ -700,9 +691,6 @@ add_executable(test_opacities_pair
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/distribution.hpp
-		src/distribution/distribution_opt_thick.cpp
-		src/distribution/distribution_opt_thin.cpp
-		src/distribution/distribution_total.cpp
 		include/functions.hpp
 		src/functions/bessel.cpp
 		src/functions/digamma.cpp
@@ -747,9 +735,6 @@ add_executable(test_opacities_brem
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/distribution.hpp
-		src/distribution/distribution_opt_thick.cpp
-		src/distribution/distribution_opt_thin.cpp
-		src/distribution/distribution_total.cpp
 		include/functions.hpp
 		src/functions/bessel.cpp
 		src/functions/digamma.cpp
@@ -796,9 +781,6 @@ add_executable(test_opacities_inelastic_scatt
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/distribution.hpp
-		src/distribution/distribution_opt_thick.cpp
-		src/distribution/distribution_opt_thin.cpp
-		src/distribution/distribution_total.cpp
 		include/functions.hpp
 		src/functions/bessel.cpp
 		src/functions/digamma.cpp
@@ -843,9 +825,6 @@ add_executable(test_opacities_isoscatt
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/distribution.hpp
-		src/distribution/distribution_opt_thick.cpp
-		src/distribution/distribution_opt_thin.cpp
-		src/distribution/distribution_total.cpp
 		include/functions.hpp
 		src/functions/bessel.cpp
 		src/functions/digamma.cpp
@@ -890,9 +869,6 @@ add_executable(test_opacities_all_reactions
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/distribution.hpp
-		src/distribution/distribution_opt_thick.cpp
-		src/distribution/distribution_opt_thin.cpp
-		src/distribution/distribution_total.cpp
 		include/functions.hpp
 		src/functions/bessel.cpp
 		src/functions/digamma.cpp
@@ -933,9 +909,6 @@ add_executable(test_opacities_thc
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/distribution.hpp
-		src/distribution/distribution_opt_thick.cpp
-		src/distribution/distribution_opt_thin.cpp
-		src/distribution/distribution_total.cpp
 		include/functions.hpp
 		src/functions/bessel.cpp
 		src/functions/digamma.cpp
@@ -977,9 +950,6 @@ add_executable(test_m1_distribution
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/distribution.hpp
-		src/distribution/distribution_opt_thick.cpp
-		src/distribution/distribution_opt_thin.cpp
-		src/distribution/distribution_total.cpp
 		include/functions.hpp
 		src/functions/bessel.cpp
 		src/functions/digamma.cpp
@@ -1023,9 +993,6 @@ add_executable(test_quadrature_convergence_spectral
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/distribution.hpp
-		src/distribution/distribution_opt_thick.cpp
-		src/distribution/distribution_opt_thin.cpp
-		src/distribution/distribution_total.cpp
 		include/functions.hpp
 		src/functions/bessel.cpp
 		src/functions/digamma.cpp
@@ -1066,9 +1033,6 @@ add_executable(test_quadrature_convergence_integrated
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/distribution.hpp
-		src/distribution/distribution_opt_thick.cpp
-		src/distribution/distribution_opt_thin.cpp
-		src/distribution/distribution_total.cpp
 		include/functions.hpp
 		src/functions/bessel.cpp
 		src/functions/digamma.cpp
@@ -1109,9 +1073,6 @@ add_executable(test_quadrature_convergence_find_max
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/distribution.hpp
-		src/distribution/distribution_opt_thick.cpp
-		src/distribution/distribution_opt_thin.cpp
-		src/distribution/distribution_total.cpp
 		include/functions.hpp
 		src/functions/bessel.cpp
 		src/functions/digamma.cpp
