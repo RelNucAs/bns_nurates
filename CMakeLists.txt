@@ -57,8 +57,6 @@ add_executable(bns_nurates
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
-		src/opacities/weak_magnetism/weak_magnetism.cpp
-		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -103,8 +101,6 @@ add_library(nurates SHARED
 		src/functions/mnewt.cpp
 		src/functions/theta.cpp
 		src/functions/m1matrix.cpp
-		src/opacities/weak_magnetism/weak_magnetism.cpp
-		src/opacities/weak_magnetism/nucfrmfac.cpp
 		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
 		tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.cpp
 		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
@@ -293,8 +289,6 @@ add_executable(test_beta
 		src/opacities/nu_abs_em_pair.cpp
 		src/integration/integration_quadrature_integrate_kernels.cpp
 		include/weak_magnetism.hpp
-		src/opacities/weak_magnetism/weak_magnetism.cpp
-		src/opacities/weak_magnetism/nucfrmfac.cpp
 )
 
 if (${GSL_FOUND})
@@ -325,8 +319,6 @@ add_executable(test_iso
 		src/opacities/nu_abs_em_pair.cpp
 		src/integration/integration_quadrature_integrate_kernels.cpp
 		include/weak_magnetism.hpp
-		src/opacities/weak_magnetism/weak_magnetism.cpp
-		src/opacities/weak_magnetism/nucfrmfac.cpp
 )
 
 if (${GSL_FOUND})
@@ -358,8 +350,6 @@ add_executable(test_brem
 		src/opacities/nu_abs_em_pair.cpp
 		src/integration/integration_quadrature_integrate_kernels.cpp
 		include/weak_magnetism.hpp
-		src/opacities/weak_magnetism/weak_magnetism.cpp
-		src/opacities/weak_magnetism/nucfrmfac.cpp
 		src/opacities/nu_abs_em_brem.cpp
 )
 
@@ -650,8 +640,6 @@ add_executable(test_opacities_electron_capture
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
-		src/opacities/weak_magnetism/weak_magnetism.cpp
-		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -699,8 +687,6 @@ add_executable(test_opacities_pair
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
-		src/opacities/weak_magnetism/weak_magnetism.cpp
-		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -748,8 +734,6 @@ add_executable(test_opacities_brem
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
-		src/opacities/weak_magnetism/weak_magnetism.cpp
-		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -799,8 +783,6 @@ add_executable(test_opacities_inelastic_scatt
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
-		src/opacities/weak_magnetism/weak_magnetism.cpp
-		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -848,8 +830,6 @@ add_executable(test_opacities_isoscatt
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
-		src/opacities/weak_magnetism/weak_magnetism.cpp
-		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -897,8 +877,6 @@ add_executable(test_opacities_all_reactions
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
-		src/opacities/weak_magnetism/weak_magnetism.cpp
-		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -942,8 +920,6 @@ add_executable(test_opacities_thc
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
-		src/opacities/weak_magnetism/weak_magnetism.cpp
-		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -988,8 +964,6 @@ add_executable(test_m1_distribution
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
-		src/opacities/weak_magnetism/weak_magnetism.cpp
-		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -1034,8 +1008,6 @@ add_executable(test_quadrature_convergence_spectral
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
-		src/opacities/weak_magnetism/weak_magnetism.cpp
-		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -1079,8 +1051,6 @@ add_executable(test_quadrature_convergence_integrated
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
-		src/opacities/weak_magnetism/weak_magnetism.cpp
-		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
 		src/output/outputs.hpp
 		include/eos.hpp
@@ -1124,8 +1094,6 @@ add_executable(test_quadrature_convergence_find_max
 		include/integration.hpp
 		include/kernels.hpp
 		include/weak_magnetism.hpp
-		src/opacities/weak_magnetism/weak_magnetism.cpp
-		src/opacities/weak_magnetism/nucfrmfac.cpp
 		include/opacities.hpp
 		src/output/outputs.hpp
 		include/eos.hpp
