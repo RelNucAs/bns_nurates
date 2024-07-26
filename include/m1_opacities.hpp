@@ -1,19 +1,20 @@
-// ================================================
+#ifndef BNS_NURATES_SRC_OPACITIES_M1_OPACITIES_H_
+#define BNS_NURATES_SRC_OPACITIES_M1_OPACITIES_H_
+
+//=================================================
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
-//! \file m1_opacities.h
-//  \brief compute opacities for all processes in the M1 code
+//! \file  m1_opacities.hpp
+//  \brief header file for all integration routines
 
-#include <math.h>
+#include <Kokkos_Core.hpp>
 
 #include "bns_nurates.hpp"
-#include "constants.hpp"
+#include "opacities.hpp"
 #include "kernels.hpp"
-#include "functions.hpp"
 #include "integration.hpp"
 #include "distribution.hpp"
-#include "opacities.hpp"
 
 /* Compute the 2d integrands for all reactions from Leonardo's notes [Eqns. (51)
  * & (52)] There are a total of two expressions for 'e' and 'x' neutrinos, so 4
@@ -29,6 +30,7 @@
  * Note that there are no double integrals for the computation of the scattering
  * coefficient.
  */
+KOKKOS_INLINE_FUNCTION
 MyQuadratureIntegrand M1CoeffsDoubleIntegrand(double* var, void* p)
 {
 
@@ -210,6 +212,7 @@ MyQuadratureIntegrand M1CoeffsDoubleIntegrand(double* var, void* p)
  * 3. Contribution to scattering coefficient: (1/(c J)) (4 pi)^2 nu^5 g_nu
  * (R_iso(1)/3 - R_iso(0))
  */
+KOKKOS_INLINE_FUNCTION
 MyQuadratureIntegrand M1CoeffsSingleIntegrandNotStimulated(double* var, void* p)
 {
 
@@ -289,6 +292,7 @@ MyQuadratureIntegrand M1CoeffsSingleIntegrandNotStimulated(double* var, void* p)
     return result;
 }
 
+KOKKOS_INLINE_FUNCTION
 MyQuadratureIntegrand M1CoeffsSingleIntegrand(double* var, void* p)
 {
 
@@ -362,6 +366,7 @@ MyQuadratureIntegrand M1CoeffsSingleIntegrand(double* var, void* p)
     return result;
 }
 
+KOKKOS_INLINE_FUNCTION
 void ComputeM1DoubleIntegrandNotStimulated(MyQuadrature* quad_1d,
                                            GreyOpacityParams* grey_pars,
                                            double t, M1Matrix* out_n,
@@ -577,6 +582,7 @@ void ComputeM1DoubleIntegrandNotStimulated(MyQuadrature* quad_1d,
     return;
 }
 
+KOKKOS_INLINE_FUNCTION
 void ComputeM1DoubleIntegrand(MyQuadrature* quad_1d,
                               GreyOpacityParams* grey_pars, double t,
                               M1Matrix* out_n, M1Matrix* out_j)
@@ -795,7 +801,7 @@ void ComputeM1DoubleIntegrand(MyQuadrature* quad_1d,
 /* Computes the opacities for the M1 code
  *
  */
-
+KOKKOS_INLINE_FUNCTION
 M1Opacities
 ComputeM1OpacitiesNotStimulated(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
                                 GreyOpacityParams* my_grey_opacity_params)
@@ -914,6 +920,7 @@ ComputeM1OpacitiesNotStimulated(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
     return m1_opacities;
 }
 
+KOKKOS_INLINE_FUNCTION
 M1Opacities ComputeM1Opacities(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
                                GreyOpacityParams* my_grey_opacity_params)
 {
@@ -1094,6 +1101,7 @@ M1Opacities ComputeM1Opacities(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
 
 /* Compute the integrands for the computation of the spectral emissivity and
  * inverse mean free path */
+KOKKOS_INLINE_FUNCTION
 MyQuadratureIntegrand SpectralIntegrand(double* var, void* p)
 {
     // energies and parameters
@@ -1268,6 +1276,7 @@ MyQuadratureIntegrand SpectralIntegrand(double* var, void* p)
 /* Computes the spectral emissivity and inverse mean free path */
 
 // Version without stimulated absorption
+KOKKOS_INLINE_FUNCTION
 SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
     const double nu, MyQuadrature* quad_1d,
     GreyOpacityParams* my_grey_opacity_params)
@@ -1371,6 +1380,7 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
 
 
 // Version with stimulated absorption
+KOKKOS_INLINE_FUNCTION
 SpectralOpacities
 ComputeSpectralOpacitiesStimulatedAbs(const double nu, MyQuadrature* quad_1d,
                                       GreyOpacityParams* my_grey_opacity_params)
@@ -1388,3 +1398,5 @@ ComputeSpectralOpacitiesStimulatedAbs(const double nu, MyQuadrature* quad_1d,
 
     return spec_opacs;
 }
+
+#endif // BNS_NURATES_SRC_OPACITIES_M1_OPACITIES_H_

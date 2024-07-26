@@ -13,6 +13,7 @@
 #include "../../include/constants.hpp"
 #include "../../include/weak_magnetism.hpp"
 #include "opacities.hpp"
+#include "m1_opacities.hpp"
 
 void generate_comparison_data(const bool use_dU) {
 

@@ -9,6 +9,7 @@
 #include "../../include/bns_nurates.hpp"
 #include "../../include/integration.hpp"
 #include "opacities.hpp"
+#include "m1_opacities.hpp"
 
 int main() {
 

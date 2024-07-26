@@ -11,6 +11,7 @@
 #include "../../include/constants.hpp"
 #include "../../include/integration.hpp"
 #include "opacities.hpp"
+#include "m1_opacities.hpp"
 #include "../../include/kernels.hpp"
 
 #define POW2(X) ((X) * (X))
