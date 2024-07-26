@@ -9,7 +9,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+
+#include <Kokkos_Core.hpp>
+
 #include "opacities.hpp"
+#include "m1_opacities.hpp"
 #include "../../include/integration.hpp"
 #include "../../include/distribution.hpp"
 #include "../../include/constants.hpp"
@@ -17,6 +21,13 @@
 
 int main() {
 
+  Kokkos::initialize();
+
+  using DevExeSpace = Kokkos::DefaultExecutionSpace;
+  using DevMemSpace = Kokkos::DefaultExecutionSpace::memory_space;
+  using HostMemSpace = Kokkos::HostSpace;
+  using LayoutWrapper = Kokkos::LayoutRight;                // increments last index fastest views defined like
+  
   printf("=================================================== \n");
   printf("Testing distribution function reconstruction for M1 \n");
   printf("=================================================== \n");
@@ -48,7 +59,7 @@ int main() {
                           23.36489302, 29.77329872, 37.9393698, 48.34518991, 61.60506618, 78.50179483, 100.03287349, 127.46938843,
                           162.43105312, 206.98182789, 263.75176578, 336.09227757};
   int num_data = 102;
-  double T[num_data];
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_T("T", num_data);
   double mu_e[num_data];
   double mu_p[num_data];
   double mu_n[num_data];
@@ -129,4 +140,6 @@ int main() {
   }
 
   fclose(fptr);
+
+  Kokkos::finalize();
 }

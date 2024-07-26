@@ -17,6 +17,7 @@
 #include "../include/distribution.hpp"
 #include "../include/integration.hpp"
 #include "../include/opacities.hpp"
+#include "m1_opacities.hpp"
 
 int main() {
 

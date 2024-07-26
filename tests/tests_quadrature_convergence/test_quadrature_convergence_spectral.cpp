@@ -11,6 +11,7 @@
 #include "bns_nurates.hpp"
 #include "constants.hpp"
 #include "opacities.hpp"
+#include "m1_opacities.hpp"
 #include "integration.hpp"
 #include "distribution.hpp"
 

@@ -19,6 +19,7 @@
 #include "include/kernels.hpp"
 #include "include/functions.hpp"
 #include "include/opacities.hpp"
+#include "include/m1_opacities.hpp"
 
 #define n_points 4
 #define n_bins 128

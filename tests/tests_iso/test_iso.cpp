@@ -13,6 +13,7 @@
 #include "../../include/constants.hpp"
 #include "../../include/weak_magnetism.hpp"
 #include "opacities.hpp"
+#include "m1_opacities.hpp"
 
 int main () {
   printf("Kernel is compared with the result of a tested Fortran code\n");

@@ -17,7 +17,7 @@ cmake_policy(SET CMP0079 NEW)
 find_package(GSL)
 
 # set OpenMP macro (true/false)
-set(ENABLE_OPENMP ON)
+set(ENABLE_OPENMP OFF)
 find_package(OpenMP COMPONENTS CXX)
 if (NOT OpenMP_FOUND)
   message(FATAL_ERROR "OpenMP package is required but could not be found.")
@@ -55,7 +55,6 @@ add_executable(bns_nurates
 		src/integration/integration_quadrature_io.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/m1_opacities.cpp
 		include/kernel_brem.hpp)
 
 add_subdirectory(kokkos)
@@ -80,8 +79,7 @@ add_library(nurates SHARED
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 		include/kernel_pair.hpp
-		include/kernel_nes.hpp
-		src/opacities/m1_opacities.cpp)
+		include/kernel_nes.hpp)
 
 #set_target_properties(nurates PROPERTIES PUBLIC_HEADER include/*.h)
 include_directories(include)
@@ -514,7 +512,6 @@ add_executable(test_opacities_electron_capture
 		src/integration/integration_quadrature_io.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/m1_opacities.cpp
 		tests/tests_opacities_m1/test_opacities_electron_capture.cpp
         tests/tests_opacities_m1/test_m1_opacities.cpp
 		tests/tests.hpp
@@ -545,7 +542,6 @@ add_executable(test_opacities_pair
 		src/integration/integration_quadrature_io.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/m1_opacities.cpp
 		tests/tests_opacities_m1/test_opacities_pair.cpp
         tests/tests_opacities_m1/test_m1_opacities.cpp
 		tests/tests.hpp
@@ -576,7 +572,6 @@ add_executable(test_opacities_brem
 		src/integration/integration_quadrature_io.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/m1_opacities.cpp
 		tests/tests_opacities_m1/test_opacities_brem.cpp
         tests/tests_opacities_m1/test_m1_opacities.cpp
 		tests/tests.hpp
@@ -609,7 +604,6 @@ add_executable(test_opacities_inelastic_scatt
 		src/integration/integration_quadrature_io.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/m1_opacities.cpp
 		tests/tests_opacities_m1/test_opacities_inelastic_scatt.cpp
         tests/tests_opacities_m1/test_m1_opacities.cpp
 		tests/tests.hpp
@@ -640,7 +634,6 @@ add_executable(test_opacities_isoscatt
 		src/integration/integration_quadrature_io.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/m1_opacities.cpp
 		tests/tests_opacities_m1/test_opacities_isoscatt.cpp
         tests/tests_opacities_m1/test_m1_opacities.cpp
 		tests/tests.hpp
@@ -668,7 +661,6 @@ add_executable(test_opacities_all_reactions
 		src/integration/integration_quadrature_io.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/m1_opacities.cpp
         tests/tests_opacities_m1/test_opacities_all_reactions.cpp
         tests/tests_opacities_m1/test_m1_opacities.cpp
 		tests/tests.hpp
@@ -695,7 +687,6 @@ add_executable(test_opacities_thc
 		src/integration/integration_quadrature_io.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/m1_opacities.cpp
 		tests/tests_opacities_m1/test_opacities_thc.cpp
         tests/tests_opacities_m1/test_m1_opacities.cpp
 		tests/tests.hpp
@@ -726,7 +717,6 @@ add_executable(test_m1_distribution
 		src/integration/integration_quadrature_io.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/m1_opacities.cpp
 		tests/tests_distribution/test_m1_distribution.cpp
 )
 
@@ -753,7 +743,6 @@ add_executable(test_quadrature_convergence_spectral
 		src/integration/integration_quadrature_io.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/m1_opacities.cpp
 		tests/tests_quadrature_convergence/test_quadrature_convergence_spectral.cpp
 		tests/tests.hpp
 )
@@ -780,7 +769,6 @@ add_executable(test_quadrature_convergence_integrated
 		src/integration/integration_quadrature_io.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/m1_opacities.cpp
 		tests/tests_quadrature_convergence/test_quadrature_convergence_integrated.cpp
 		tests/tests.hpp
 )
@@ -807,7 +795,6 @@ add_executable(test_quadrature_convergence_find_max
 		src/integration/integration_quadrature_io.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/m1_opacities.cpp
 		tests/tests_quadrature_convergence/test_quadrature_convergence_find_max.cpp
 		tests/tests.hpp
 )

@@ -16,6 +16,7 @@
 
 #include "../tests.hpp"
 #include "opacities.hpp"
+#include "m1_opacities.hpp"
 #include "../../include/integration.hpp"
 #include "../../include/distribution.hpp"
 #include "../../include/constants.hpp"
