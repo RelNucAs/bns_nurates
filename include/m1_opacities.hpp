@@ -369,15 +369,14 @@ MyQuadratureIntegrand M1CoeffsSingleIntegrand(double* var, void* p)
 KOKKOS_INLINE_FUNCTION
 void ComputeM1DoubleIntegrandNotStimulated(MyQuadrature* quad_1d,
                                            GreyOpacityParams* grey_pars,
-                                           double t, M1Matrix* out_n,
-                                           M1Matrix* out_j)
+                                           double t, M1MatrixKokkos* out_n,
+                                           M1MatrixKokkos* out_j)
 {
     const int n = quad_1d->nx;
 
     double nu, nu_bar;
 
     double* nu_array;
-    nu_array = (double*)malloc(sizeof(double) * 2 * n);
 
     for (int i = 0; i < n; i++)
     {
@@ -398,18 +397,16 @@ void ComputeM1DoubleIntegrandNotStimulated(MyQuadrature* quad_1d,
     OpacityParams opacity_pars = grey_pars->opacity_pars;
 
     // M1Matrix beta;
-    M1Matrix pair, brem, inel;
+    M1MatrixKokkos pair, brem, inel;
 
     // BetaOpacitiesTable(quad_1d, &my_grey_opacity_params->eos_pars,
     // &grey_pars->opacity_pars, t, &beta);
 
-    InitializeM1Matrix(&pair, n);
     if (grey_pars->opacity_flags.use_pair == 1)
     {
         PairKernelsTable(2 * n, nu_array, grey_pars, &pair);
     }
 
-    InitializeM1MatrixSingleFlavor(&brem, n, 0);
     if (grey_pars->opacity_flags.use_brem == 1)
     {
         if (grey_pars->opacity_pars.use_BRT_brem == true)
@@ -422,14 +419,10 @@ void ComputeM1DoubleIntegrandNotStimulated(MyQuadrature* quad_1d,
         }
     }
 
-    InitializeM1Matrix(&inel, n);
     if (grey_pars->opacity_flags.use_inelastic_scatt == 1)
     {
         InelasticKernelsTable(2 * n, nu_array, grey_pars, &inel);
     }
-
-    InitializeM1Matrix(out_n, n);
-    InitializeM1Matrix(out_j, n);
 
     for (int i = 0; i < 2 * n; i++)
     {
@@ -574,10 +567,10 @@ void ComputeM1DoubleIntegrandNotStimulated(MyQuadrature* quad_1d,
         }
     }
 
-    FreeM1Matrix(&pair, n);
-    FreeM1Matrix(&inel, n);
+    //FreeM1Matrix(&pair, n);
+    //FreeM1Matrix(&inel, n);
 
-    FreeM1MatrixSingleFlavor(&brem, n, 0);
+    //FreeM1MatrixSingleFlavor(&brem, n, 0);
 
     return;
 }
@@ -585,20 +578,20 @@ void ComputeM1DoubleIntegrandNotStimulated(MyQuadrature* quad_1d,
 KOKKOS_INLINE_FUNCTION
 void ComputeM1DoubleIntegrand(MyQuadrature* quad_1d,
                               GreyOpacityParams* grey_pars, double t,
-                              M1Matrix* out_n, M1Matrix* out_j)
+                              M1MatrixKokkos* out_n, M1MatrixKokkos* out_j)
 {
     const int n = quad_1d->nx;
 
     double nu, nu_bar;
 
-    double* nu_array;
-    nu_array = (double*)malloc(sizeof(double) * 2 * n);
+    double nu_array[n_max];
 
     for (int i = 0; i < n; i++)
     {
         nu_array[i]     = t * quad_1d->points[i];
         nu_array[n + i] = t / quad_1d->points[i];
     }
+
 
     // compute the neutrino & anti-neutrino distribution function
     double g_nu[total_num_species], g_nu_bar[total_num_species];
@@ -612,19 +605,20 @@ void ComputeM1DoubleIntegrand(MyQuadrature* quad_1d,
 
     OpacityParams opacity_pars = grey_pars->opacity_pars;
 
+
     // M1Matrix beta;
-    M1Matrix pair, brem, inel;
+    M1MatrixKokkos pair, brem, inel;
 
     // BetaOpacitiesTable(quad_1d, &my_grey_opacity_params->eos_pars,
     // &grey_pars->opacity_pars, t, &beta);
 
-    InitializeM1Matrix(&pair, n);
+    //InitializeM1Matrix(&pair, n);
     if (grey_pars->opacity_flags.use_pair == 1)
     {
         PairKernelsTable(2 * n, nu_array, grey_pars, &pair);
     }
 
-    InitializeM1MatrixSingleFlavor(&brem, n, 0);
+    //InitializeM1MatrixSingleFlavor(&brem, n, 0);
     if (grey_pars->opacity_flags.use_brem == 1)
     {
         if (grey_pars->opacity_pars.use_BRT_brem == true)
@@ -637,14 +631,14 @@ void ComputeM1DoubleIntegrand(MyQuadrature* quad_1d,
         }
     }
 
-    InitializeM1Matrix(&inel, n);
+    //InitializeM1Matrix(&inel, n);
     if (grey_pars->opacity_flags.use_inelastic_scatt == 1)
     {
         InelasticKernelsTable(2 * n, nu_array, grey_pars, &inel);
     }
 
-    InitializeM1Matrix(out_n, n);
-    InitializeM1Matrix(out_j, n);
+    //InitializeM1Matrix(out_n, n);
+    //InitializeM1Matrix(out_j, n);
 
     for (int i = 0; i < 2 * n; i++)
     {
@@ -789,10 +783,10 @@ void ComputeM1DoubleIntegrand(MyQuadrature* quad_1d,
         }
     }
 
-    FreeM1Matrix(&pair, n);
-    FreeM1Matrix(&inel, n);
+    //FreeM1Matrix(&pair, n);
+    //FreeM1Matrix(&inel, n);
 
-    FreeM1MatrixSingleFlavor(&brem, n, 0);
+    //FreeM1MatrixSingleFlavor(&brem, n, 0);
 
     return;
 }
@@ -858,7 +852,7 @@ ComputeM1OpacitiesNotStimulated(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
     MyQuadratureIntegrand integrals_1d =
         GaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s_array);
 
-    M1Matrix out_n, out_j;
+    M1MatrixKokkos out_n, out_j;
     ComputeM1DoubleIntegrandNotStimulated(quad_1d, my_grey_opacity_params, s,
                                           &out_n, &out_j);
     MyQuadratureIntegrand n_integrals_2d =
@@ -924,6 +918,7 @@ KOKKOS_INLINE_FUNCTION
 M1Opacities ComputeM1Opacities(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
                                GreyOpacityParams* my_grey_opacity_params)
 {
+
     // compute some constants
     static const double four_pi_hc3 =
         (4. * kPi) / (kHClight * kHClight * kHClight); // [MeV^-3 cm^-3]
@@ -1008,14 +1003,16 @@ M1Opacities ComputeM1Opacities(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
 
     // MyQuadratureIntegrand integrals_1d =
     // GaussLegendreIntegrateFixedSplit1D(quad_1d, &integrand_m1_1d, s);
-    MyQuadratureIntegrand integrals_1d =
+    //MyQuadratureIntegrand integrals_1d =
         GaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s_array);
+    MyQuadratureIntegrand integrals_1d = {0};
 
     // MyQuadratureIntegrand integrals_2d =
     // GaussLegendreIntegrateFixedSplit2D(quad_2d, &integrand_m1_2d, s);
-    M1Matrix out_n, out_j;
+    M1MatrixKokkos out_n, out_j;
     ComputeM1DoubleIntegrand(quad_1d, my_grey_opacity_params, s, &out_n,
                              &out_j);
+
     MyQuadratureIntegrand n_integrals_2d =
         GaussLegendreIntegrate2DMatrix(quad_1d, &out_n, s);
     MyQuadratureIntegrand e_integrals_2d =

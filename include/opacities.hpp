@@ -335,20 +335,11 @@ MyOpacity StimAbsOpacity(const double omega, OpacityParams* opacity_pars,
 
 KOKKOS_INLINE_FUNCTION
 void BetaOpacitiesTable(MyQuadrature* quad, MyEOSParams* eos_pars,
-                        OpacityParams* opacity_pars, double t, M1Matrix* out)
+                        OpacityParams* opacity_pars, double t, M1MatrixKokkos* out)
 {
     const int n = quad->nx;
 
     MyOpacity beta_1, beta_2;
-
-    for (int idx = 0; idx < total_num_species; idx++)
-    {
-        out->m1_mat_ab[idx] = (double**)malloc(sizeof(double*));
-        out->m1_mat_em[idx] = (double**)malloc(sizeof(double*));
-
-        out->m1_mat_ab[idx][0] = (double*)malloc(sizeof(double) * 2 * n);
-        out->m1_mat_em[idx][0] = (double*)malloc(sizeof(double) * 2 * n);
-    }
 
     for (int i = 0; i < n; i++)
     {
@@ -658,27 +649,5 @@ MyKernelQuantity BremOpacitiesFermi(MyQuadrature* quad,
                                     MyEOSParams* my_eos_params,
                                     MyKernelParams* my_kernel_params);
 #endif // GSL_INCLUDES_H
-
-// M1 opacities
-MyQuadratureIntegrand M1CoeffsDoubleIntegrand(double* var, void* p);
-MyQuadratureIntegrand M1CoeffsSingleIntegrand(double* var, void* p);
-M1Opacities
-ComputeM1OpacitiesNotStimulated(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
-                                GreyOpacityParams* my_grey_opacity_params);
-M1Opacities ComputeM1Opacities(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
-                               GreyOpacityParams* my_grey_opacity_params);
-void ComputeM1DoubleIntegrandNotStimulated(
-    MyQuadrature* quad_1d, GreyOpacityParams* my_grey_opacity_params, double t,
-    M1Matrix* out_n, M1Matrix* out_j);
-void ComputeM1DoubleIntegrand(MyQuadrature* quad_1d,
-                              GreyOpacityParams* my_grey_opacity_params,
-                              double t, M1Matrix* out_n, M1Matrix* out_j);
-SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
-    const double nu, MyQuadrature* quad_1d,
-    GreyOpacityParams* my_grey_opacity_params);
-SpectralOpacities ComputeSpectralOpacitiesStimulatedAbs(
-    const double nu, MyQuadrature* quad_1d,
-    GreyOpacityParams* my_grey_opacity_params);
-
 
 #endif // BNS_NURATES_SRC_OPACITIES_OPACITIES_H_

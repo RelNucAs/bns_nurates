@@ -15,7 +15,7 @@
 #include "../tests.hpp"
 
 int main() {
-  
+
   printf("=================================================== \n");
   printf("Testing opacities for all reactions ... \n");
   printf("=================================================== \n");
