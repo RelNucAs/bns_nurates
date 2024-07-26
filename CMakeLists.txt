@@ -698,20 +698,6 @@ add_executable(test_m1_distribution
 		include/constants.hpp
 		include/bns_nurates.hpp
 		include/distribution.hpp
-		include/functions.hpp
-		include/integration.hpp
-		include/kernels.hpp
-		include/weak_magnetism.hpp
-		include/opacities.hpp
-		src/output/outputs.hpp
-		include/eos.hpp
-		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
-		tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.cpp
-		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
-		src/integration/integration_quadrature_schemes.cpp
-		src/integration/integration_quadrature_io.cpp
-		include/kernel_pair.hpp
-		include/kernel_nes.hpp
 		tests/tests_distribution/test_m1_distribution.cpp
 )
 
