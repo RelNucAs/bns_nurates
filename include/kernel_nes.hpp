@@ -330,7 +330,7 @@ MyKernelOutput InelasticScattKernels(InelasticScattKernelParams* kernel_params,
 
 KOKKOS_INLINE_FUNCTION
 void InelasticKernelsTable(const int n, double* nu_array,
-                           GreyOpacityParams* grey_pars, M1Matrix* out)
+                           GreyOpacityParams* grey_pars, M1MatrixKokkos* out)
 {
     MyKernelOutput inel_1, inel_2;
 

@@ -22,6 +22,9 @@
 // Define dimension of tabulated PairT function
 #define dim_pair_t 10000
 
+// Define maximum number of quadrature points
+#define n_max 120
+
 /* ==================================================================================
  * Integration structures
  * ==================================================================================
@@ -436,6 +439,12 @@ struct M1Matrix
 };
 typedef struct M1Matrix M1Matrix;
 
+struct M1MatrixKokkos
+{
+    double m1_mat_em[total_num_species][n_max][n_max];
+    double m1_mat_ab[total_num_species][n_max][n_max];
+};
+typedef struct M1MatrixKokkos M1MatrixKokkos;
 
 /* SpectralOpacities struct
  *

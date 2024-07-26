@@ -343,7 +343,7 @@ MyKernelOutput BremKernelsLegCoeff(BremKernelParams* kernel_params,
 
 KOKKOS_INLINE_FUNCTION
 void BremKernelsTable(const int n, double* nu_array,
-                      GreyOpacityParams* grey_pars, M1Matrix* out)
+                      GreyOpacityParams* grey_pars, M1MatrixKokkos* out)
 {
     MyKernelOutput brem_ker;
 
@@ -428,7 +428,7 @@ MyKernelOutput BremKernelsBRT06(BremKernelParams* kernel_params,
 
 KOKKOS_INLINE_FUNCTION
 void BremKernelsTableBRT06(const int n, double* nu_array,
-                           GreyOpacityParams* grey_pars, M1Matrix* out)
+                           GreyOpacityParams* grey_pars, M1MatrixKokkos* out)
 {
     MyKernelOutput brem_ker;
 

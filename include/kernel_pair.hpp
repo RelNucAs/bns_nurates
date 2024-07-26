@@ -985,7 +985,7 @@ void PairKernelsM1Test(MyEOSParams* eos_pars, PairKernelParams* kernel_pars,
 
 KOKKOS_INLINE_FUNCTION
 void PairKernelsTable(const int n, double* nu_array,
-                      GreyOpacityParams* grey_pars, M1Matrix* out)
+                      GreyOpacityParams* grey_pars, M1MatrixKokkos* out)
 {
     MyKernelOutput pair_1, pair_2;
 
