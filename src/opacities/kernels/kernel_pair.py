@@ -1,6 +1,7 @@
 import numpy as np
 import sympy as sp
 import sys
+import re
 
 print("Script used to generate the expressions for the optimized pair process"
       "kernel functions, from:")
@@ -148,4 +149,40 @@ print("")
 print("Psi(y, z) * (15*y**2*z**2) (but now as a function of the shorthands):\n", reduced_exprs[0])
 print("")
 print("Psi(z, y) * (15*y**2*z**2) (but now as a function of the shorthands):\n", reduced_exprs[1])
+print("")
+
+
+# Compute the limit in the case of large eta
+psiyz_limit = psiyz
+psizy_limit = psizy
+for f in FDI_names.values():
+    m = re.match(r"FDI_((?:0)|(?:p([1-5])))_e((?:myz)|(?:pyz)|(?:my)|(?:py)|(?:mz)|(?:pz))?", str(f))
+    if m[3] is None:
+        v = eta
+    elif m[3] == "my":
+        v = eta - y
+    elif m[3] == "py":
+        v = eta + y
+    elif m[3] == "mz":
+        v = eta - z
+    elif m[3] == "pz":
+        v = eta + z
+    elif m[3] == "myz":
+        v = eta - y - z
+    elif m[3] == "pyz":
+        v = eta + y + z
+    k = int(m[2] if m[2] is not None else m[1])
+    v = v ** (k + 1) / (k + 1)
+
+    psiyz_limit = psiyz_limit.subs(f, v)
+    psizy_limit = psizy_limit.subs(f, v)
+
+
+psiyz_limit = sp.horner(sp.simplify(sp.expand(psiyz_limit)), wrt=eta)
+psizy_limit = sp.horner(sp.simplify(sp.expand(psizy_limit)), wrt=eta)
+
+print("Result in the case of large degeneracy parameter (eta >> 1, >> y, >> z)")
+print("Psi(y, z) * (15*y**2*z**2):\n", psiyz_limit)
+print("")
+print("Psi(z, y) * (15*y**2*z**2):\n", psizy_limit)
 print("")
