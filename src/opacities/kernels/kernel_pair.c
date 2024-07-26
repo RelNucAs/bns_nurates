@@ -809,71 +809,88 @@ void PairPsiOptimized(int l, double y, double z, double eta, double* psi_out)
 {
     assert(l == 0);
 
-    const double FDI_p1_emy  = FDI_p1(eta - y);
-    const double FDI_p1_emz  = FDI_p1(eta - z);
-    const double FDI_p1_epy  = FDI_p1(eta + y);
-    const double FDI_p1_epz  = FDI_p1(eta + z);
-    const double FDI_p2_emy  = FDI_p2(eta - y);
-    const double FDI_p2_emz  = FDI_p2(eta - z);
-    const double FDI_p2_epy  = FDI_p2(eta + y);
-    const double FDI_p2_epz  = FDI_p2(eta + z);
-    const double FDI_p3_e    = FDI_p3(eta);
-    const double FDI_p3_emy  = FDI_p3(eta - y);
-    const double FDI_p3_emz  = FDI_p3(eta - z);
-    const double FDI_p3_epy  = FDI_p3(eta + y);
-    const double FDI_p3_epz  = FDI_p3(eta + z);
-    const double FDI_p3_emyz = FDI_p3(eta - y - z);
-    const double FDI_p3_epyz = FDI_p3(eta + y + z);
-    const double FDI_p4_e    = FDI_p4(eta);
-    const double FDI_p4_emy  = FDI_p4(eta - y);
-    const double FDI_p4_emz  = FDI_p4(eta - z);
-    const double FDI_p4_epy  = FDI_p4(eta + y);
-    const double FDI_p4_epz  = FDI_p4(eta + z);
-    const double FDI_p4_emyz = FDI_p4(eta - y - z);
-    const double FDI_p4_epyz = FDI_p4(eta + y + z);
-    const double FDI_p5_emy  = FDI_p5(eta - y);
-    const double FDI_p5_emz  = FDI_p5(eta - z);
-    const double FDI_p5_epy  = FDI_p5(eta + y);
-    const double FDI_p5_epz  = FDI_p5(eta + z);
-    const double FDI_p5_emyz = FDI_p5(eta - y - z);
-    const double FDI_p5_epyz = FDI_p5(eta + y + z);
+    /* The check on eta is necessary because, if eta is very large, the electron
+    phase space is full and the reaction is suppressed. The kernel should in
+    principle go to 0 automatically, however in some cases numerical
+    cancellation results in small but negative (and so unphysical) rates. This
+    check fixes that. */
+    /* TODO: in principle the check should also depend on the neutrino energy,
+    something like "if (eta - y - z > 200.)" would be more physically motivated.
+    Also, the threshold of 200. is somewhat arbitrary, can we find some better
+    motivated number? */
+    if (eta > 200.)
+    {
+        psi_out[0] = 0.;
+        psi_out[1] = 0.;
+    }
+    else
+    {
+        const double FDI_p1_emy  = FDI_p1(eta - y);
+        const double FDI_p1_emz  = FDI_p1(eta - z);
+        const double FDI_p1_epy  = FDI_p1(eta + y);
+        const double FDI_p1_epz  = FDI_p1(eta + z);
+        const double FDI_p2_emy  = FDI_p2(eta - y);
+        const double FDI_p2_emz  = FDI_p2(eta - z);
+        const double FDI_p2_epy  = FDI_p2(eta + y);
+        const double FDI_p2_epz  = FDI_p2(eta + z);
+        const double FDI_p3_e    = FDI_p3(eta);
+        const double FDI_p3_emy  = FDI_p3(eta - y);
+        const double FDI_p3_emz  = FDI_p3(eta - z);
+        const double FDI_p3_epy  = FDI_p3(eta + y);
+        const double FDI_p3_epz  = FDI_p3(eta + z);
+        const double FDI_p3_emyz = FDI_p3(eta - y - z);
+        const double FDI_p3_epyz = FDI_p3(eta + y + z);
+        const double FDI_p4_e    = FDI_p4(eta);
+        const double FDI_p4_emy  = FDI_p4(eta - y);
+        const double FDI_p4_emz  = FDI_p4(eta - z);
+        const double FDI_p4_epy  = FDI_p4(eta + y);
+        const double FDI_p4_epz  = FDI_p4(eta + z);
+        const double FDI_p4_emyz = FDI_p4(eta - y - z);
+        const double FDI_p4_epyz = FDI_p4(eta + y + z);
+        const double FDI_p5_emy  = FDI_p5(eta - y);
+        const double FDI_p5_emz  = FDI_p5(eta - z);
+        const double FDI_p5_epy  = FDI_p5(eta + y);
+        const double FDI_p5_epz  = FDI_p5(eta + z);
+        const double FDI_p5_emyz = FDI_p5(eta - y - z);
+        const double FDI_p5_epyz = FDI_p5(eta + y + z);
 
-    const double x0  = 20 * FDI_p4_emy;
-    const double x1  = 20 * FDI_p4_epz;
-    const double x2  = 120 * FDI_p2_emy - 120 * FDI_p2_epz;
-    const double x3  = -40 * FDI_p3_emy + 40 * FDI_p3_epz;
-    const double x4  = 40 * FDI_p3_e;
-    const double x5  = 40 * FDI_p3_emyz - x4;
-    const double x6  = -20 * FDI_p4_e;
-    const double x7  = 20 * FDI_p4_emyz + x6;
-    const double x8  = -40 * FDI_p3_epyz + x4;
-    const double x9  = 20 * FDI_p4_epyz + x6;
-    const double x10 = -4 * FDI_p5_emy + 4 * FDI_p5_emyz - 4 * FDI_p5_emz +
-                       4 * FDI_p5_epy - 4 * FDI_p5_epyz + 4 * FDI_p5_epz;
-    const double x11 = 20 * FDI_p4_epy;
-    const double x12 = 20 * FDI_p4_emz;
-    const double x13 = -40 * FDI_p3_emz + 40 * FDI_p3_epy;
-    const double x14 = 120 * FDI_p2_emz - 120 * FDI_p2_epy;
+        const double x0  = 20 * FDI_p4_emy;
+        const double x1  = 20 * FDI_p4_epz;
+        const double x2  = 120 * FDI_p2_emy - 120 * FDI_p2_epz;
+        const double x3  = -40 * FDI_p3_emy + 40 * FDI_p3_epz;
+        const double x4  = 40 * FDI_p3_e;
+        const double x5  = 40 * FDI_p3_emyz - x4;
+        const double x6  = -20 * FDI_p4_e;
+        const double x7  = 20 * FDI_p4_emyz + x6;
+        const double x8  = -40 * FDI_p3_epyz + x4;
+        const double x9  = 20 * FDI_p4_epyz + x6;
+        const double x10 = -4 * FDI_p5_emy + 4 * FDI_p5_emyz - 4 * FDI_p5_emz +
+                           4 * FDI_p5_epy - 4 * FDI_p5_epyz + 4 * FDI_p5_epz;
+        const double x11 = 20 * FDI_p4_epy;
+        const double x12 = 20 * FDI_p4_emz;
+        const double x13 = -40 * FDI_p3_emz + 40 * FDI_p3_epy;
+        const double x14 = 120 * FDI_p2_emz - 120 * FDI_p2_epy;
 
-    const double aux = (15 * POW2(y) * POW2(z));
+        const double aux = (15 * POW2(y) * POW2(z));
 
-    psi_out[0] =
-        x10 +
-        y * (-x0 + x1 + x7 +
-             y * (x3 + x5 +
-                  z * (x2 + z * (-120 * FDI_p1_emy + 120 * FDI_p1_epz))) +
-             z * (80 * FDI_p3_emy - 80 * FDI_p3_epz - x2 * z)) +
-        z * (x0 - x1 + x9 + z * (x3 + x8));
+        psi_out[0] =
+            x10 +
+            y * (-x0 + x1 + x7 +
+                 y * (x3 + x5 +
+                      z * (x2 + z * (-120 * FDI_p1_emy + 120 * FDI_p1_epz))) +
+                 z * (80 * FDI_p3_emy - 80 * FDI_p3_epz - x2 * z)) +
+            z * (x0 - x1 + x9 + z * (x3 + x8));
 
-    psi_out[1] =
-        x10 + y * (-x11 + x12 + x9 + y * (x13 + x8)) +
-        z * (x11 - x12 + x7 +
-             y * (80 * FDI_p3_emz - 80 * FDI_p3_epy - x14 * y) +
-             z * (x13 + x5 +
-                  y * (x14 + y * (-120 * FDI_p1_emz + 120 * FDI_p1_epy))));
+        psi_out[1] =
+            x10 + y * (-x11 + x12 + x9 + y * (x13 + x8)) +
+            z * (x11 - x12 + x7 +
+                 y * (80 * FDI_p3_emz - 80 * FDI_p3_epy - x14 * y) +
+                 z * (x13 + x5 +
+                      y * (x14 + y * (-120 * FDI_p1_emz + 120 * FDI_p1_epy))));
 
-    psi_out[0] /= aux;
-    psi_out[1] /= aux;
+        psi_out[0] /= aux;
+        psi_out[1] /= aux;
+    }
 
     return;
 }
