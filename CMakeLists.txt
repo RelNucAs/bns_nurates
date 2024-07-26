@@ -53,12 +53,8 @@ add_executable(bns_nurates
 		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/nu_abs_em_pair.cpp
-		src/opacities/nu_abs_em_brem.cpp
-		src/integration/integration_quadrature_integrate_kernels.cpp
 		src/opacities/m1_opacities.cpp
 		include/kernel_brem.hpp)
 
@@ -83,12 +79,8 @@ add_library(nurates SHARED
 		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/nu_abs_em_pair.cpp
-		src/opacities/nu_abs_em_brem.cpp
-		src/integration/integration_quadrature_integrate_kernels.cpp
 		src/opacities/m1_opacities.cpp)
 
 #set_target_properties(nurates PROPERTIES PUBLIC_HEADER include/*.h)
@@ -220,9 +212,6 @@ add_executable(test_pair_opacities
 		include/kernel_pair.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
-		src/opacities/nu_abs_em_pair.cpp
-		src/integration/integration_quadrature_integrate_kernels.cpp
 )
 target_link_libraries(test_pair_opacities Kokkos::kokkos)
 target_link_libraries(test_pair_opacities OpenMP::OpenMP_CXX)
@@ -242,10 +231,7 @@ add_executable(test_beta
 		include/opacities.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 		include/kernel_pair.hpp
-		src/opacities/nu_abs_em_pair.cpp
-		src/integration/integration_quadrature_integrate_kernels.cpp
 		include/weak_magnetism.hpp
 )
 
@@ -267,10 +253,7 @@ add_executable(test_iso
 		include/opacities.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 		include/kernel_pair.hpp
-		src/opacities/nu_abs_em_pair.cpp
-		src/integration/integration_quadrature_integrate_kernels.cpp
 		include/weak_magnetism.hpp
 )
 
@@ -292,12 +275,8 @@ add_executable(test_brem
 		include/opacities.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 		include/kernel_pair.hpp
-		src/opacities/nu_abs_em_pair.cpp
-		src/integration/integration_quadrature_integrate_kernels.cpp
 		include/weak_magnetism.hpp
-		src/opacities/nu_abs_em_brem.cpp
 )
 
 target_link_libraries(test_brem Kokkos::kokkos)
@@ -316,7 +295,6 @@ add_executable(test_gauss_legendre_1d
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 )
 
 target_link_libraries(test_gauss_legendre_1d Kokkos::kokkos)
@@ -335,7 +313,6 @@ add_executable(test_gauss_legendre_2d
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 )
 
 target_link_libraries(test_gauss_legendre_2d Kokkos::kokkos)
@@ -354,7 +331,6 @@ add_executable(test_gauss_legendre_3d
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 )
 
 target_link_libraries(test_gauss_legendre_3d Kokkos::kokkos)
@@ -373,7 +349,6 @@ add_executable(test_gauss_laguerre_1d
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 )
 
 target_link_libraries(test_gauss_laguerre_1d Kokkos::kokkos)
@@ -392,7 +367,6 @@ add_executable(test_quadrature_io
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 )
 target_link_libraries(test_quadrature_io Kokkos::kokkos)
 target_link_libraries(test_quadrature_io OpenMP::OpenMP_CXX)
@@ -412,7 +386,6 @@ add_executable(test_integration_1d
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 )
 
 target_link_libraries(test_integration_1d Kokkos::kokkos)
@@ -433,7 +406,6 @@ add_executable(test_integration_2d
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 )
 
 target_link_libraries(test_integration_2d Kokkos::kokkos)
@@ -454,7 +426,6 @@ add_executable(test_integration_3d
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 )
 
 target_link_libraries(test_integration_3d Kokkos::kokkos)
@@ -475,8 +446,6 @@ add_executable(test_integration_special
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
-		src/integration/integration_quadrature_integrate_kernels.cpp
 )
 
 target_link_libraries(test_integration_special Kokkos::kokkos)
@@ -497,8 +466,6 @@ add_executable(test_integration_multi_func_1d
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
-		src/integration/integration_quadrature_integrate_kernels.cpp
 )
 
 target_link_libraries(test_integration_multi_func_1d Kokkos::kokkos)
@@ -519,8 +486,6 @@ add_executable(test_integration_multi_func_2d
 		include/integration.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
-		src/integration/integration_quadrature_integrate_kernels.cpp
 )
 
 target_link_libraries(test_integration_multi_func_2d Kokkos::kokkos)
@@ -547,12 +512,8 @@ add_executable(test_opacities_electron_capture
 		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/nu_abs_em_pair.cpp
-		src/opacities/nu_abs_em_brem.cpp
-		src/integration/integration_quadrature_integrate_kernels.cpp
 		src/opacities/m1_opacities.cpp
 		tests/tests_opacities_m1/test_opacities_electron_capture.cpp
         tests/tests_opacities_m1/test_m1_opacities.cpp
@@ -582,12 +543,8 @@ add_executable(test_opacities_pair
 		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/nu_abs_em_pair.cpp
-		src/opacities/nu_abs_em_brem.cpp
-		src/integration/integration_quadrature_integrate_kernels.cpp
 		src/opacities/m1_opacities.cpp
 		tests/tests_opacities_m1/test_opacities_pair.cpp
         tests/tests_opacities_m1/test_m1_opacities.cpp
@@ -617,12 +574,8 @@ add_executable(test_opacities_brem
 		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/nu_abs_em_pair.cpp
-		src/opacities/nu_abs_em_brem.cpp
-		src/integration/integration_quadrature_integrate_kernels.cpp
 		src/opacities/m1_opacities.cpp
 		tests/tests_opacities_m1/test_opacities_brem.cpp
         tests/tests_opacities_m1/test_m1_opacities.cpp
@@ -654,12 +607,8 @@ add_executable(test_opacities_inelastic_scatt
 		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/nu_abs_em_pair.cpp
-		src/opacities/nu_abs_em_brem.cpp
-		src/integration/integration_quadrature_integrate_kernels.cpp
 		src/opacities/m1_opacities.cpp
 		tests/tests_opacities_m1/test_opacities_inelastic_scatt.cpp
         tests/tests_opacities_m1/test_m1_opacities.cpp
@@ -689,12 +638,8 @@ add_executable(test_opacities_isoscatt
 		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/nu_abs_em_pair.cpp
-		src/opacities/nu_abs_em_brem.cpp
-		src/integration/integration_quadrature_integrate_kernels.cpp
 		src/opacities/m1_opacities.cpp
 		tests/tests_opacities_m1/test_opacities_isoscatt.cpp
         tests/tests_opacities_m1/test_m1_opacities.cpp
@@ -721,12 +666,8 @@ add_executable(test_opacities_all_reactions
 		include/eos.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/nu_abs_em_pair.cpp
-		src/opacities/nu_abs_em_brem.cpp
-		src/integration/integration_quadrature_integrate_kernels.cpp
 		src/opacities/m1_opacities.cpp
         tests/tests_opacities_m1/test_opacities_all_reactions.cpp
         tests/tests_opacities_m1/test_m1_opacities.cpp
@@ -752,12 +693,8 @@ add_executable(test_opacities_thc
 		include/eos.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/nu_abs_em_pair.cpp
-		src/opacities/nu_abs_em_brem.cpp
-		src/integration/integration_quadrature_integrate_kernels.cpp
 		src/opacities/m1_opacities.cpp
 		tests/tests_opacities_m1/test_opacities_thc.cpp
         tests/tests_opacities_m1/test_m1_opacities.cpp
@@ -787,12 +724,8 @@ add_executable(test_m1_distribution
 		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/nu_abs_em_pair.cpp
-		src/opacities/nu_abs_em_brem.cpp
-		src/integration/integration_quadrature_integrate_kernels.cpp
 		src/opacities/m1_opacities.cpp
 		tests/tests_distribution/test_m1_distribution.cpp
 )
@@ -818,12 +751,8 @@ add_executable(test_quadrature_convergence_spectral
 		include/eos.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/nu_abs_em_pair.cpp
-		src/opacities/nu_abs_em_brem.cpp
-		src/integration/integration_quadrature_integrate_kernels.cpp
 		src/opacities/m1_opacities.cpp
 		tests/tests_quadrature_convergence/test_quadrature_convergence_spectral.cpp
 		tests/tests.hpp
@@ -849,12 +778,8 @@ add_executable(test_quadrature_convergence_integrated
 		include/eos.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/nu_abs_em_pair.cpp
-		src/opacities/nu_abs_em_brem.cpp
-		src/integration/integration_quadrature_integrate_kernels.cpp
 		src/opacities/m1_opacities.cpp
 		tests/tests_quadrature_convergence/test_quadrature_convergence_integrated.cpp
 		tests/tests.hpp
@@ -880,12 +805,8 @@ add_executable(test_quadrature_convergence_find_max
 		include/eos.hpp
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
-		src/integration/integration_quadrature_integrate.cpp
 		include/kernel_pair.hpp
 		include/kernel_nes.hpp
-		src/opacities/nu_abs_em_pair.cpp
-		src/opacities/nu_abs_em_brem.cpp
-		src/integration/integration_quadrature_integrate_kernels.cpp
 		src/opacities/m1_opacities.cpp
 		tests/tests_quadrature_convergence/test_quadrature_convergence_find_max.cpp
 		tests/tests.hpp

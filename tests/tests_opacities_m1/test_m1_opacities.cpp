@@ -161,14 +161,13 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
     GreyOpacityParams my_grey_opacity_params;
     my_grey_opacity_params.opacity_flags = *opacity_flags;
 
-   printf("Generating quadratures ...\n");
-   MyQuadrature my_quadrature_1d = {.type = kGauleg, .alpha = -42., .dim = 1, .nx = 10, .ny = 1, .nz = 1, .x1 = 0., .x2 = 1., .y1 = -42., .y2 = -42., .z1 = -42., .z2 = -42., .points = NULL, .w = NULL};
-   GaussLegendreMultiD(&my_quadrature_1d);
-   MyQuadrature my_quadrature_2d = {.type = kGauleg, .alpha = -42., .dim = 1, .nx = 10, .ny = 1, .nz = 1, .x1 = 0., .x2 = 1., .y1 = -42., .y2 = -42., .z1 = -42., .z2 = -42., .points = NULL, .w = NULL};
-   GaussLegendreMultiD(&my_quadrature_2d);
-   printf("Quadratures generated.\n");
+    printf("Generating quadratures ...\n");
+    MyQuadrature my_quadrature_1d = {.type = kGauleg, .alpha = -42., .dim = 1, .nx = 10, .ny = 1, .nz = 1, .x1 = 0., .x2 = 1., .y1 = -42., .y2 = -42., .z1 = -42., .z2 = -42., .points = NULL, .w = NULL};
+    GaussLegendreMultiD(&my_quadrature_1d);
+    MyQuadrature my_quadrature_2d = {.type = kGauleg, .alpha = -42., .dim = 1, .nx = 10, .ny = 1, .nz = 1, .x1 = 0., .x2 = 1., .y1 = -42., .y2 = -42., .z1 = -42., .z2 = -42., .points = NULL, .w = NULL};
+    GaussLegendreMultiD(&my_quadrature_2d);
+    printf("Quadratures generated.\n");
 
-    printf("Greetings...");		  
     // populate EOS parameters from table
     my_grey_opacity_params.eos_pars.mu_e = mu_e(i);
     my_grey_opacity_params.eos_pars.mu_p = 0.;
