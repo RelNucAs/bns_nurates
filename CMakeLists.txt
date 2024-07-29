@@ -263,14 +263,7 @@ add_executable(test_brem
 		tests/tests_brem/test_brem.cpp
 		include/constants.hpp
 		include/bns_nurates.hpp
-		include/functions.hpp
-		include/integration.hpp
-		include/kernels.hpp
-		include/opacities.hpp
-		src/integration/integration_quadrature_schemes.cpp
-		src/integration/integration_quadrature_io.cpp
-		include/kernel_pair.hpp
-		include/weak_magnetism.hpp
+		include/kernel_brem.hpp
 )
 
 target_link_libraries(test_brem Kokkos::kokkos)

@@ -324,7 +324,7 @@ MyKernelOutput BremKernelsLegCoeff(BremKernelParams* kernel_params,
         printf("BremKernelsLegCoeff (kernel_brem.c): l = %d must be either 0 "
                "or 1\n",
                l);
-        exit(EXIT_FAILURE);
+        //exit(EXIT_FAILURE); cannot access from gpu, so removing
     }
 
     // production kernel from detailed balance
