@@ -241,13 +241,7 @@ add_executable(test_iso
 		tests/tests_iso/test_iso.cpp
 		include/constants.hpp
 		include/bns_nurates.hpp
-		include/functions.hpp
-		include/integration.hpp
-		include/kernels.hpp
 		include/opacities.hpp
-		src/integration/integration_quadrature_schemes.cpp
-		src/integration/integration_quadrature_io.cpp
-		include/kernel_pair.hpp
 		include/weak_magnetism.hpp
 )
 

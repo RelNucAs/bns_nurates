@@ -162,4 +162,6 @@ int main() {
   });
 
   Kokkos::finalize();
+
+  return 0;
 }

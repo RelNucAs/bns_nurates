@@ -159,7 +159,7 @@ void generate_comparison_data(const bool use_dU) {
     i++;
   }
 
-    // Data arrays (rates are not corrected for the weak magnetism, WM corrections are provided separately)
+  // Data arrays (rates are not corrected for the weak magnetism, WM corrections are provided separately)
   Kokkos::View<int*, LayoutWrapper, DevMemSpace> zone("zone", n_data);        // zone (counter)
   Kokkos::View<double*, LayoutWrapper, DevMemSpace> r("r", n_data);        // radius [cm]
   Kokkos::View<double*, LayoutWrapper, DevMemSpace> rho("rho", n_data);      // mass density [g/cm3]
