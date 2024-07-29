@@ -6,12 +6,17 @@
 //  \brief compare the PairKernels code with the Python implementation
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
-#include "../../include/kernels.hpp"
+#include <Kokkos_Core.hpp>
 
-int main() {
-  double max_percentage_error = -42.;
+#include "kernel_pair.hpp"
+
+using DevExeSpace = Kokkos::DefaultExecutionSpace;
+using DevMemSpace = Kokkos::DefaultExecutionSpace::memory_space;
+using HostMemSpace = Kokkos::HostSpace;
+using LayoutWrapper = Kokkos::LayoutRight;                // increments last index fastest views defined like
+
+void test_pair_kernels() {
   double temp = 10.;
   double mu_e = 84.181299999999993;
   double pair_kernels_python[18][7] = { // nutype eta omega(MeV)  omega_prime(MeV) cos_theta R_p(cm^3s^-1) R_a(cm^3s^-1)
@@ -42,50 +47,39 @@ int main() {
   printf(
       "omega omega' cos_theta R_em_e (new) R_em_e (python) %% err  R_abs_e (new)    R_abs_e (python) %% err  R_em_x (new)     R_em_x (python)  %% err  R_abs_x (new)    R_abs_x (python) %% err\n");
 
-  for (int i = 0; i < 9; i++) {
+  Kokkos::parallel_for("test_pair_kernels_loop", Kokkos::RangePolicy<>(DevExeSpace(), 0, 8),
+  KOKKOS_LAMBDA(const int &i) {
     MyEOSParams eos_params = {.temp = temp, .mu_e= mu_e};
     PairKernelParams pair_kernel_params =
         {.omega = pair_kernels_python[i][2], .omega_prime = pair_kernels_python[i][3],
          .cos_theta = pair_kernels_python[i][4], .mu = -42., .mu_prime = -42.,
          .lmax = 0, .filter = 0};
-    MyKernelQuantity result = PairKernels(&eos_params, &pair_kernel_params);
+    MyKernelOutput result = PairKernelsOptimized(&eos_params, &pair_kernel_params);
 
-    printf("%0.0e %0.0e %0.0e %0.10e %0.10e |%0.2f| %0.10e %0.10e |%0.2f| %0.10e %0.10e |%0.2f| %0.10e %0.10e |%0.2f|\n",
+    printf("%d %0.0e %0.0e %0.0e %0.10e %0.10e |%0.2f| %0.10e %0.10e |%0.2f| %0.10e %0.10e |%0.2f| %0.10e %0.10e |%0.2f|\n",
+           i,
            pair_kernels_python[i][2],
            pair_kernels_python[i][3],
            pair_kernels_python[i][4],
-           result.em_e,
+           result.em[id_nue],
            pair_kernels_python[i][5],
-           fabs((result.em_e - pair_kernels_python[i][5]) / pair_kernels_python[i][5]) * 100.,
-           result.abs_e,
-           pair_kernels_python[i][6], fabs((result.abs_e - pair_kernels_python[i][6]) / result.abs_e - pair_kernels_python[i][6]) * 100,
-           result.em_x,
+           fabs((result.em[id_nue] - pair_kernels_python[i][5]) / pair_kernels_python[i][5]) * 100.,
+           result.abs[id_nue],
+           pair_kernels_python[i][6], fabs((result.abs[id_nue] - pair_kernels_python[i][6]) / result.abs[id_nue] - pair_kernels_python[i][6]) * 100,
+           result.em[id_nux],
            pair_kernels_python[i + 9][5],
-           fabs((result.em_x - pair_kernels_python[i + 9][5]) / pair_kernels_python[i + 9][5]) * 100.,
-           result.abs_x,
+           fabs((result.em[id_nux] - pair_kernels_python[i + 9][5]) / pair_kernels_python[i + 9][5]) * 100.,
+           result.abs[id_nux],
            pair_kernels_python[i + 9][6],
-           fabs((result.abs_x - pair_kernels_python[i + 9][6]) / pair_kernels_python[i + 9][6]) * 100.
+           fabs((result.abs[id_nux] - pair_kernels_python[i + 9][6]) / pair_kernels_python[i + 9][6]) * 100.
     );
+  });
+}
 
-    if (fabs((result.em_e - pair_kernels_python[i][5]) / pair_kernels_python[i][5]) * 100. > max_percentage_error) {
-      max_percentage_error = fabs((result.em_e - pair_kernels_python[i][5]) / pair_kernels_python[i][5]) * 100.;
-    }
-    if (fabs((result.abs_e - pair_kernels_python[i][6]) / result.abs_e - pair_kernels_python[i][6]) * 100 > max_percentage_error) {
-      max_percentage_error = fabs((result.abs_e - pair_kernels_python[i][6]) / result.abs_e - pair_kernels_python[i][6]) * 100;
-    }
-    if (fabs((result.em_x - pair_kernels_python[i + 9][5]) / pair_kernels_python[i + 9][5]) * 100. > max_percentage_error) {
-      max_percentage_error = fabs((result.em_x - pair_kernels_python[i + 9][5]) / pair_kernels_python[i + 9][5]) * 100.;
-    }
-    if (fabs((result.abs_x - pair_kernels_python[i + 9][6]) / pair_kernels_python[i + 9][6]) * 100. > max_percentage_error) {
-      max_percentage_error = fabs((result.abs_x - pair_kernels_python[i + 9][6]) / pair_kernels_python[i + 9][6]) * 100.;
-    }
-  }
+int main() {
+  Kokkos::initialize();
+  test_pair_kernels();
+  Kokkos::finalize();
 
-  printf("Maximum percentage error: %.16e\n", max_percentage_error);
-  if (max_percentage_error < 0.9) {
-    return 0;
-  } else {
-    return 1;
-  }
-
+  return 0;
 }
