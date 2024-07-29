@@ -129,19 +129,6 @@ if (${GSL_FOUND})
 endif()
 target_link_libraries(test_pair_f m)
 
-# test pair kernel F
-add_executable(test_pair_g
-		tests/tests_pair/test_pair_g.cpp
-		include/constants.hpp
-		include/kernels.hpp
-		include/kernel_pair.hpp)
-target_link_libraries(test_pair_g Kokkos::kokkos)
-target_link_libraries(test_pair_g OpenMP::OpenMP_CXX)
-if (${GSL_FOUND})
-	target_link_libraries(test_pair_g GSL::gsl GSL::gslcblas)
-endif()
-target_link_libraries(test_pair_g m)
-
 # test pair kernel Psi
 add_executable(test_pair_psi
 		tests/tests_pair/test_pair_psi.cpp
@@ -169,7 +156,7 @@ if (${GSL_FOUND})
 endif()
 target_link_libraries(test_pair_phi m)
 
-if (${GSL_FOUND})
+
 # test pair kernel Kernels
 add_executable(test_pair_kernels
 		tests/tests_pair/test_pair_kernels.cpp
@@ -179,45 +166,10 @@ add_executable(test_pair_kernels
 )
 target_link_libraries(test_pair_kernels Kokkos::kokkos)
 target_link_libraries(test_pair_kernels OpenMP::OpenMP_CXX)
-target_link_libraries(test_pair_kernels GSL::gsl GSL::gslcblas)
+if (${GSL_FOUND})
+	target_link_libraries(test_pair_kernels GSL::gsl GSL::gslcblas)
+endif()
 target_link_libraries(test_pair_kernels m)
-endif()
-
-
-if (${GSL_FOUND})
-# test pair kernel Kernels phi integrated
-add_executable(test_pair_kernels_phi_mu_integrated
-		tests/tests_pair/test_pair_kernels_phi_mu_integrated.cpp
-		include/constants.hpp
-		include/kernels.hpp
-		include/kernel_pair.hpp
-)
-target_link_libraries(test_pair_kernels_phi_mu_integrated Kokkos::kokkos)
-target_link_libraries(test_pair_kernels_phi_mu_integrated OpenMP::OpenMP_CXX)
-target_link_libraries(test_pair_kernels_phi_mu_integrated GSL::gsl GSL::gslcblas)
-target_link_libraries(test_pair_kernels_phi_mu_integrated m)
-endif()
-
-
-# test pair kernel opacities
-add_executable(test_pair_opacities
-		tests/tests_pair/test_pair_opacities.cpp
-		include/constants.hpp
-		include/bns_nurates.hpp
-		include/functions.hpp
-		include/opacities.hpp
-		include/integration.hpp
-		include/kernels.hpp
-		include/kernel_pair.hpp
-		src/integration/integration_quadrature_schemes.cpp
-		src/integration/integration_quadrature_io.cpp
-)
-target_link_libraries(test_pair_opacities Kokkos::kokkos)
-target_link_libraries(test_pair_opacities OpenMP::OpenMP_CXX)
-if (${GSL_FOUND})
-	target_link_libraries(test_pair_opacities GSL::gsl GSL::gslcblas)
-endif()
-target_link_libraries(test_pair_opacities m)
 
 # test beta processes spectral rates
 add_executable(test_beta
@@ -782,20 +734,12 @@ add_test(NAME test_pair_t
         COMMAND $<TARGET_FILE:test_pair_t>)
 add_test(NAME test_pair_f
         COMMAND $<TARGET_FILE:test_pair_f>)
-add_test(NAME test_pair_g
-        COMMAND $<TARGET_FILE:test_pair_g>)
 add_test(NAME test_pair_psi
         COMMAND $<TARGET_FILE:test_pair_psi>)
 add_test(NAME test_pair_phi
         COMMAND $<TARGET_FILE:test_pair_phi>)
-if (${GSL_FOUND})
-	add_test(NAME test_pair_kernels
-        	COMMAND $<TARGET_FILE:test_pair_kernels>)
-	add_test(NAME test_pair_kernels_phi_mu_integrated
-        	COMMAND $<TARGET_FILE:test_pair_kernels_phi_mu_integrated>)
-endif()
-add_test(NAME test_pair_opacities
-        COMMAND $<TARGET_FILE:test_pair_opacities>)
+add_test(NAME test_pair_kernels
+		COMMAND $<TARGET_FILE:test_pair_kernels>)
 add_test(NAME test_gauss_legendre_1d
         COMMAND $<TARGET_FILE:test_gauss_legendre_1d>)
 add_test(NAME test_gauss_legendre_2d
