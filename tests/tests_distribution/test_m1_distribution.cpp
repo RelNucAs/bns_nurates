@@ -12,12 +12,7 @@
 
 #include <Kokkos_Core.hpp>
 
-#include "opacities.hpp"
-#include "m1_opacities.hpp"
-#include "../../include/integration.hpp"
 #include "../../include/distribution.hpp"
-#include "../../include/constants.hpp"
-#include "../../include/functions.hpp"
 
 int main() {
 
@@ -94,6 +89,7 @@ int main() {
     printf("%lf %lf %lf %lf\n", h_T(i), h_mu_p(i), h_mu_e(i), h_mu_n(i));
     i++;
   }
+  printf("\n");
 
   Kokkos::View<double*, LayoutWrapper, DevMemSpace> T("T", num_data);
   Kokkos::View<double*, LayoutWrapper, DevMemSpace> mu_e("mu_e", num_data);
@@ -132,7 +128,11 @@ int main() {
   Kokkos::parallel_for("par_for_test_m1_distribution", Kokkos::RangePolicy<>(DevExeSpace(), 0, num_data - 1),
   KOKKOS_LAMBDA(const int &i) {
     GreyOpacityParams my_grey_opacity_params;
-    my_grey_opacity_params.opacity_flags = opacity_flags_default_none;
+    my_grey_opacity_params.opacity_flags = {.use_abs_em = 0,
+                                            .use_pair = 0,
+                                            .use_brem = 0,
+                                            .use_inelastic_scatt = 0,
+                                            .use_iso = 0};
 
     my_grey_opacity_params.eos_pars.mu_e = mu_e(i);
     my_grey_opacity_params.eos_pars.mu_p = mu_p(i);
@@ -152,38 +152,14 @@ int main() {
     my_grey_opacity_params.m1_pars.chi[id_anux] = chi_muon(i);
 
     NuDistributionParams my_nudistributionparams = CalculateDistrParamsFromM1(&my_grey_opacity_params.m1_pars, &my_grey_opacity_params.eos_pars);
-
-  });
-
-
-
-  char fileline[1000];
-  fptr = fopen(data_filepath, "w");
-  if (fptr == NULL) {
-    printf("%s: The file %s does not exist!\n", __FILE__, filepath);
-    exit(1);
-  }
-  fputs(
-      "#w_t_nue temp_t_nue eta_t_nue w_f_nue temp_f_nue c_f_nue beta_f_nue w_t_anue temp_t_anue eta_t_anue w_f_anue temp_f_anue c_f_anue beta_f_anue w_t_nux temp_t_nux eta_t_nux w_f_nux temp_f_nux c_f_nux beta_f_nux\n",
-      fptr);
-  /*
-  for (i = 0; i < num_data; i++) {
-
-
-    sprintf(fileline, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
+    printf("%d %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n", i,
             my_nudistributionparams.w_t[id_nue], my_nudistributionparams.temp_t[id_nue], my_nudistributionparams.eta_t[id_nue], my_nudistributionparams.w_f[id_nue],
             my_nudistributionparams.temp_f[id_nue], my_nudistributionparams.c_f[id_nue], my_nudistributionparams.beta_f[id_nue],
             my_nudistributionparams.w_t[id_anue], my_nudistributionparams.temp_t[id_anue], my_nudistributionparams.eta_t[id_anue], my_nudistributionparams.w_f[id_anue],
             my_nudistributionparams.temp_f[id_anue], my_nudistributionparams.c_f[id_anue], my_nudistributionparams.beta_f[id_anue],
             my_nudistributionparams.w_t[id_nux], my_nudistributionparams.temp_t[id_nux], my_nudistributionparams.eta_t[id_nux], my_nudistributionparams.w_f[id_nux],
             my_nudistributionparams.temp_f[id_nux], my_nudistributionparams.c_f[id_nux], my_nudistributionparams.beta_f[id_nux]);
-    fputs(fileline, fptr);
+  });
 
-  }
-  */
-  fclose(fptr);
-
-  //Kokkos::finalize();
-
-  return 0;
+  Kokkos::finalize();
 }
