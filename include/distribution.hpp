@@ -17,7 +17,7 @@
 #include "bns_nurates.hpp"
 #include "constants.hpp"
 #include "functions.hpp"
-#include "integration.hpp"
+//#include "integration.hpp"
 
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 #define POW2(X) ((X) * (X))
@@ -305,6 +305,7 @@ MyQuadratureIntegrand NuNumberIntegrand(double* x, void* p)
  *
  * Computes this for three neutrino species
  */
+/*
 inline MyQuadratureIntegrand NuNumber(NuDistributionParams* distr_pars)
 {
     MyFunctionMultiD integrand;
@@ -336,6 +337,7 @@ inline MyQuadratureIntegrand NuNumber(NuDistributionParams* distr_pars)
 
     return result;
 }
+*/
 
 /* Integrand for computing the neutrino energy density
  *
@@ -357,6 +359,7 @@ inline MyQuadratureIntegrand NuEnergyIntegrand(double* x, void* p)
  *
  * Computes this for three neutrino species
  */
+/*
 inline MyQuadratureIntegrand NuEnergy(NuDistributionParams* distr_pars)
 {
     MyFunctionMultiD integrand;
@@ -388,6 +391,7 @@ inline MyQuadratureIntegrand NuEnergy(NuDistributionParams* distr_pars)
 
     return result;
 }
+*/
 
 KOKKOS_INLINE_FUNCTION
 void ComputeM1DensitiesEq(MyEOSParams* eos_params,
