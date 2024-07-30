@@ -17,9 +17,9 @@ using HostMemSpace = Kokkos::HostSpace;
 using LayoutWrapper = Kokkos::LayoutRight;                // increments last index fastest views defined like
 
 void test_pair_kernels() {
-  double temp = 10.;
-  double mu_e = 84.181299999999993;
-  double pair_kernels_python[18][7] = { // nutype eta omega(MeV)  omega_prime(MeV) cos_theta R_p(cm^3s^-1) R_a(cm^3s^-1)
+  const double temp = 10.;
+  const double mu_e = 84.181299999999993;
+  const double pair_kernels_python[18][7] = { // nutype eta omega(MeV)  omega_prime(MeV) cos_theta R_p(cm^3s^-1) R_a(cm^3s^-1)
       {0, 8.4181299999999997, 2, 2, 0, 3.7344281862494617e-37, 5.5711121998146404e-37},
       {0, 8.4181299999999997, 2, 5, 0, 7.5952594997506983e-37, 1.5294974381563826e-36},
       {0, 8.4181299999999997, 2, 50, 0, 7.6816308521376666e-37, 1.3924664458243231e-34},
@@ -40,6 +40,16 @@ void test_pair_kernels() {
       {1, 8.4181299999999997, 50, 50, 0, 7.995294986861833e-37, 1.7610809154750178e-32}
   };
 
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> result_em_id_nue("result_em_id_nue", 18);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> result_abs_id_nue("result_abs_id_nue", 18);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> result_em_id_nux("result_em_id_nux", 18);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> result_abs_id_nux("result_abs_id_nux", 18);
+
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_result_em_id_nue("h_result_em_id_nue", 18);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_result_abs_id_nue("h_result_abs_id_nue", 18);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_result_em_id_nux("h_result_em_id_nux", 18);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_result_abs_id_nux("h_result_abs_id_nux", 18);
+
   printf("=============================================================\n");
   printf("Pair process: Comparison of pair kernels with old Python code\n");
   printf("=============================================================\n");
@@ -47,7 +57,7 @@ void test_pair_kernels() {
   printf(
       "omega omega' cos_theta R_em_e (new) R_em_e (python) %% err  R_abs_e (new)    R_abs_e (python) %% err  R_em_x (new)     R_em_x (python)  %% err  R_abs_x (new)    R_abs_x (python) %% err\n");
 
-  Kokkos::parallel_for("test_pair_kernels_loop", Kokkos::RangePolicy<>(DevExeSpace(), 0, 8),
+  Kokkos::parallel_for("test_pair_kernels_loop", Kokkos::RangePolicy<>(DevExeSpace(), 0, 9),
   KOKKOS_LAMBDA(const int &i) {
     MyEOSParams eos_params = {.temp = temp, .mu_e= mu_e};
     PairKernelParams pair_kernel_params =
@@ -56,24 +66,37 @@ void test_pair_kernels() {
          .lmax = 0, .filter = 0};
     MyKernelOutput result = PairKernelsOptimized(&eos_params, &pair_kernel_params);
 
-    printf("%d %0.0e %0.0e %0.0e %0.10e %0.10e |%0.2f| %0.10e %0.10e |%0.2f| %0.10e %0.10e |%0.2f| %0.10e %0.10e |%0.2f|\n",
-           i,
+    result_em_id_nue(i) = result.em[id_nue];
+    result_abs_id_nue(i) = result.abs[id_nue];
+    result_em_id_nux(i) = result.em[id_nux];
+    result_abs_id_nux(i) = result.abs[id_nux];
+
+  });
+
+  Kokkos::deep_copy(h_result_em_id_nue, result_em_id_nue);
+  Kokkos::deep_copy(h_result_abs_id_nue, result_abs_id_nue);
+  Kokkos::deep_copy(h_result_em_id_nux, result_em_id_nux);
+  Kokkos::deep_copy(h_result_abs_id_nux, result_abs_id_nux);
+
+  for (int i = 0; i < 9; i++) {
+    printf("%0.0e %0.0e %0.0e %0.10e %0.10e |%0.2f| %0.10e %0.10e |%0.2f| %0.10e %0.10e |%0.2f| %0.10e %0.10e |%0.2f|\n",
            pair_kernels_python[i][2],
            pair_kernels_python[i][3],
            pair_kernels_python[i][4],
-           result.em[id_nue],
+           h_result_em_id_nue(i),
            pair_kernels_python[i][5],
-           fabs((result.em[id_nue] - pair_kernels_python[i][5]) / pair_kernels_python[i][5]) * 100.,
-           result.abs[id_nue],
-           pair_kernels_python[i][6], fabs((result.abs[id_nue] - pair_kernels_python[i][6]) / result.abs[id_nue] - pair_kernels_python[i][6]) * 100,
-           result.em[id_nux],
+           Kokkos::fabs((h_result_em_id_nue(i) - pair_kernels_python[i][5]) / pair_kernels_python[i][5]) * 100.,
+           h_result_abs_id_nue(i),
+           pair_kernels_python[i][6],
+           Kokkos::fabs((h_result_abs_id_nue(i) - pair_kernels_python[i][6]) / h_result_abs_id_nue(i) - pair_kernels_python[i][6]) * 100,
+           h_result_em_id_nux(i),
            pair_kernels_python[i + 9][5],
-           fabs((result.em[id_nux] - pair_kernels_python[i + 9][5]) / pair_kernels_python[i + 9][5]) * 100.,
-           result.abs[id_nux],
+           Kokkos::fabs((h_result_em_id_nux(i) - pair_kernels_python[i + 9][5]) / pair_kernels_python[i + 9][5]) * 100.,
+           h_result_abs_id_nux(i),
            pair_kernels_python[i + 9][6],
-           fabs((result.abs[id_nux] - pair_kernels_python[i + 9][6]) / pair_kernels_python[i + 9][6]) * 100.
+           Kokkos::fabs((h_result_abs_id_nux(i) - pair_kernels_python[i + 9][6]) / pair_kernels_python[i + 9][6]) * 100.
     );
-  });
+  }
 }
 
 int main() {

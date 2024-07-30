@@ -176,8 +176,6 @@ add_executable(test_beta
 		tests/tests_beta/test_beta.cpp
 		include/constants.hpp
 		include/bns_nurates.hpp
-		include/functions.hpp
-		include/kernels.hpp
 		include/weak_magnetism.hpp
 )
 

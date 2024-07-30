@@ -386,12 +386,12 @@ MyKernelOutput PairKernelsOptimized(MyEOSParams* eos_pars,
                                     PairKernelParams* kernel_pars)
 {
     // EOS specific parameters
-    double eta  = eos_pars->mu_e / eos_pars->temp;
-    double temp = eos_pars->temp;
+    const double eta  = eos_pars->mu_e / eos_pars->temp;
+    const double temp = eos_pars->temp;
 
     // kernel specific parameters
-    double omega       = kernel_pars->omega;
-    double omega_prime = kernel_pars->omega_prime;
+    const double omega       = kernel_pars->omega;
+    const double omega_prime = kernel_pars->omega_prime;
 
     double pair_phi[4] = {0.};
 
