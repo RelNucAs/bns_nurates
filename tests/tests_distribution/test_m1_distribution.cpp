@@ -2,27 +2,23 @@
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
-//! \file  tests_opacities_bremsstrahlung.c
-//  \brief Generate a table for bremsstrahlung
+//! \file  tests_m1_distribution.cpp
+//  \brief Tests the generation of the M1 distribution parameters
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
-
 #include <Kokkos_Core.hpp>
 
-#include "../../include/distribution.hpp"
+#include "distribution.hpp"
 
-int main() {
+using DevExeSpace = Kokkos::DefaultExecutionSpace;
+using DevMemSpace = Kokkos::DefaultExecutionSpace::memory_space;
+using HostMemSpace = Kokkos::HostSpace;
+using LayoutWrapper = Kokkos::LayoutRight;                // increments last index fastest views defined like
 
-  Kokkos::initialize();
+void test_distribution() {
 
-  using DevExeSpace = Kokkos::DefaultExecutionSpace;
-  using DevMemSpace = Kokkos::DefaultExecutionSpace::memory_space;
-  using HostMemSpace = Kokkos::HostSpace;
-  using LayoutWrapper = Kokkos::LayoutRight;                // increments last index fastest views defined like
-  
   printf("=================================================== \n");
   printf("Testing distribution function reconstruction for M1 \n");
   printf("=================================================== \n");
@@ -49,11 +45,7 @@ int main() {
     exit(1);
   }
 
-  __attribute__((unused))
-  double energy_vals[] = {3.36092278, 4.28273982, 5.45738823, 6.9542133, 8.86158006, 11.2920898, 14.38922757, 18.33583276,
-                          23.36489302, 29.77329872, 37.9393698, 48.34518991, 61.60506618, 78.50179483, 100.03287349, 127.46938843,
-                          162.43105312, 206.98182789, 263.75176578, 336.09227757};
-  int num_data = 102;
+  const int num_data = 102;
   Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_T("h_T", num_data);
   Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_mu_e("h_mu_e", num_data);
   Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_mu_p("h_mu_p", num_data);
@@ -125,8 +117,64 @@ int main() {
   Kokkos::deep_copy(j_amuon, h_j_amuon);
   Kokkos::deep_copy(chi_amuon, h_chi_amuon);
 
-  Kokkos::parallel_for("par_for_test_m1_distribution", Kokkos::RangePolicy<>(DevExeSpace(), 0, num_data - 1),
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_my_nudistributionparams_w_t_id_nue("h_my_nudistributionparams_w_t_id_nue", num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_my_nudistributionparams_temp_t_id_nue("h_my_nudistributionparams_temp_t_id_nue", num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_my_nudistributionparams_eta_t_id_nue("h_my_nudistributionparams_eta_t_id_nue", num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_my_nudistributionparams_w_f_id_nue("h_my_nudistributionparams_w_f_id_nue", num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_my_nudistributionparams_temp_f_id_nue("h_my_nudistributionparams_temp_f_id_nue", num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_my_nudistributionparams_c_f_id_nue("h_my_nudistributionparams_c_f_id_nue", num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_my_nudistributionparams_beta_f_id_nue("h_my_nudistributionparams_beta_f_id_nue", num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_my_nudistributionparams_w_t_id_anue("h_my_nudistributionparams_w_t_id_anue", num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_my_nudistributionparams_temp_t_id_anue("h_my_nudistributionparams_temp_t_id_anue", num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_my_nudistributionparams_eta_t_id_anue("h_my_nudistributionparams_eta_t_id_anue", num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_my_nudistributionparams_w_f_id_anue("h_my_nudistributionparams_w_f_id_anue", num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_my_nudistributionparams_temp_f_id_anue("h_my_nudistributionparams_temp_f_id_anue", num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_my_nudistributionparams_c_f_id_anue("h_my_nudistributionparams_c_f_id_anue", num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_my_nudistributionparams_beta_f_id_anue("h_my_nudistributionparams_beta_f_id_anue", num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_my_nudistributionparams_w_t_id_nux("h_my_nudistributionparams_w_t_id_nux", num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_my_nudistributionparams_temp_t_id_nux("h_my_nudistributionparams_temp_t_id_nux", num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_my_nudistributionparams_eta_t_id_nux("h_my_nudistributionparams_eta_t_id_nux", num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_my_nudistributionparams_w_f_id_nux("h_my_nudistributionparams_w_f_id_nux", num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_my_nudistributionparams_temp_f_id_nux("h_my_nudistributionparams_temp_f_id_nux", num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_my_nudistributionparams_c_f_id_nux("h_my_nudistributionparams_c_f_id_nux", num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_my_nudistributionparams_beta_f_id_nux("h_my_nudistributionparams_beta_f_id_nux", num_data);
+
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_w_t_id_nue("my_nudistributionparams_w_t_id_nue", num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_temp_t_id_nue("my_nudistributionparams_temp_t_id_nue", num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_eta_t_id_nue("my_nudistributionparams_eta_t_id_nue", num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_w_f_id_nue("my_nudistributionparams_w_f_id_nue", num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_temp_f_id_nue("my_nudistributionparams_temp_f_id_nue", num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_c_f_id_nue("my_nudistributionparams_c_f_id_nue", num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_beta_f_id_nue("my_nudistributionparams_beta_f_id_nue", num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_w_t_id_anue("my_nudistributionparams_w_t_id_anue", num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_temp_t_id_anue("my_nudistributionparams_temp_t_id_anue", num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_eta_t_id_anue("my_nudistributionparams_eta_t_id_anue", num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_w_f_id_anue("my_nudistributionparams_w_f_id_anue", num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_temp_f_id_anue("my_nudistributionparams_temp_f_id_anue", num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_c_f_id_anue("my_nudistributionparams_c_f_id_anue", num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_beta_f_id_anue("my_nudistributionparams_beta_f_id_anue", num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_w_t_id_nux("my_nudistributionparams_w_t_id_nux", num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_temp_t_id_nux("my_nudistributionparams_temp_t_id_nux", num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_eta_t_id_nux("my_nudistributionparams_eta_t_id_nux", num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_w_f_id_nux("my_nudistributionparams_w_f_id_nux", num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_temp_f_id_nux("my_nudistributionparams_temp_f_id_nux", num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_c_f_id_nux("my_nudistributionparams_c_f_id_nux", num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_beta_f_id_nux("my_nudistributionparams_beta_f_id_nux", num_data);
+
+  char fileline[1000];
+  fptr = fopen(data_filepath, "w");
+  if (fptr == NULL) {
+    printf("%s: The file %s does not exist!\n", __FILE__, filepath);
+    exit(1);
+  }
+  fprintf(fptr,
+      "#w_t_nue temp_t_nue eta_t_nue w_f_nue temp_f_nue c_f_nue beta_f_nue w_t_anue temp_t_anue eta_t_anue w_f_anue temp_f_anue c_f_anue beta_f_anue w_t_nux temp_t_nux eta_t_nux w_f_nux temp_f_nux c_f_nux beta_f_nux\n");
+
+
+  printf("got here! just before start of loop\n");
+  Kokkos::parallel_for("par_for_test_m1_distribution", Kokkos::RangePolicy<>(DevExeSpace(), 0, num_data),
   KOKKOS_LAMBDA(const int &i) {
+    printf("got here! just beginning of loop\n");
     GreyOpacityParams my_grey_opacity_params;
     my_grey_opacity_params.opacity_flags = {.use_abs_em = 0,
                                             .use_pair = 0,
@@ -151,15 +199,91 @@ int main() {
     my_grey_opacity_params.m1_pars.J[id_anux] = j_muon(i);
     my_grey_opacity_params.m1_pars.chi[id_anux] = chi_muon(i);
 
+    printf("got here! before calculate distribution params\n");
     NuDistributionParams my_nudistributionparams = CalculateDistrParamsFromM1(&my_grey_opacity_params.m1_pars, &my_grey_opacity_params.eos_pars);
+
+    my_nudistributionparams_w_t_id_nue(i) = my_nudistributionparams.w_t[id_nue];
+    my_nudistributionparams_temp_t_id_nue(i) = my_nudistributionparams.temp_t[id_nue];
+    my_nudistributionparams_eta_t_id_nue(i) = my_nudistributionparams.eta_t[id_nue];
+    my_nudistributionparams_w_f_id_nue(i) = my_nudistributionparams.w_f[id_nue];
+    my_nudistributionparams_temp_f_id_nue(i) = my_nudistributionparams.temp_f[id_nue];
+    my_nudistributionparams_c_f_id_nue(i) = my_nudistributionparams.c_f[id_nue];
+    my_nudistributionparams_beta_f_id_nue(i) = my_nudistributionparams.beta_f[id_nue];
+
+    my_nudistributionparams_w_t_id_anue(i) = my_nudistributionparams.w_t[id_anue];
+    my_nudistributionparams_temp_t_id_anue(i) = my_nudistributionparams.temp_t[id_anue];
+    my_nudistributionparams_eta_t_id_anue(i) = my_nudistributionparams.eta_t[id_anue];
+    my_nudistributionparams_w_f_id_anue(i) = my_nudistributionparams.w_f[id_anue];
+    my_nudistributionparams_temp_f_id_anue(i) = my_nudistributionparams.temp_f[id_anue];
+    my_nudistributionparams_c_f_id_anue(i) = my_nudistributionparams.c_f[id_anue];
+    my_nudistributionparams_beta_f_id_anue(i) = my_nudistributionparams.beta_f[id_anue];
+
+    my_nudistributionparams_w_t_id_nux(i) = my_nudistributionparams.w_t[id_nux];
+    my_nudistributionparams_temp_t_id_nux(i) = my_nudistributionparams.temp_t[id_nux];
+    my_nudistributionparams_eta_t_id_nux(i) = my_nudistributionparams.eta_t[id_nux];
+    my_nudistributionparams_w_f_id_nux(i) = my_nudistributionparams.w_f[id_nux];
+    my_nudistributionparams_temp_f_id_nux(i) = my_nudistributionparams.temp_f[id_nux];
+    my_nudistributionparams_c_f_id_nux(i) = my_nudistributionparams.c_f[id_nux];
+    my_nudistributionparams_beta_f_id_nux(i) = my_nudistributionparams.beta_f[id_nux];
+
+    /*
     printf("%d %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n", i,
             my_nudistributionparams.w_t[id_nue], my_nudistributionparams.temp_t[id_nue], my_nudistributionparams.eta_t[id_nue], my_nudistributionparams.w_f[id_nue],
             my_nudistributionparams.temp_f[id_nue], my_nudistributionparams.c_f[id_nue], my_nudistributionparams.beta_f[id_nue],
             my_nudistributionparams.w_t[id_anue], my_nudistributionparams.temp_t[id_anue], my_nudistributionparams.eta_t[id_anue], my_nudistributionparams.w_f[id_anue],
             my_nudistributionparams.temp_f[id_anue], my_nudistributionparams.c_f[id_anue], my_nudistributionparams.beta_f[id_anue],
             my_nudistributionparams.w_t[id_nux], my_nudistributionparams.temp_t[id_nux], my_nudistributionparams.eta_t[id_nux], my_nudistributionparams.w_f[id_nux],
-            my_nudistributionparams.temp_f[id_nux], my_nudistributionparams.c_f[id_nux], my_nudistributionparams.beta_f[id_nux]);
+            my_nudistributionparams.temp_f[id_nux], my_nudistributionparams.c_f[id_nux], my_nudistributionparams.beta_f[id_nux]); */
+    printf("got here! 5\n");
   });
+
+  Kokkos::deep_copy(h_my_nudistributionparams_w_t_id_nue, my_nudistributionparams_w_t_id_nue);
+  Kokkos::deep_copy(h_my_nudistributionparams_temp_t_id_nue, my_nudistributionparams_temp_t_id_nue);
+  Kokkos::deep_copy(h_my_nudistributionparams_eta_t_id_nue, my_nudistributionparams_eta_t_id_nue);
+  Kokkos::deep_copy(h_my_nudistributionparams_w_f_id_nue, my_nudistributionparams_w_f_id_nue);
+  Kokkos::deep_copy(h_my_nudistributionparams_temp_f_id_nue, my_nudistributionparams_temp_f_id_nue);
+  Kokkos::deep_copy(h_my_nudistributionparams_c_f_id_nue, my_nudistributionparams_c_f_id_nue);
+  Kokkos::deep_copy(h_my_nudistributionparams_beta_f_id_nue, my_nudistributionparams_beta_f_id_nue);
+
+  Kokkos::deep_copy(h_my_nudistributionparams_w_t_id_anue, my_nudistributionparams_w_t_id_anue);
+  Kokkos::deep_copy(h_my_nudistributionparams_temp_t_id_anue, my_nudistributionparams_temp_t_id_anue);
+  Kokkos::deep_copy(h_my_nudistributionparams_eta_t_id_anue, my_nudistributionparams_eta_t_id_anue);
+  Kokkos::deep_copy(h_my_nudistributionparams_w_f_id_anue, my_nudistributionparams_w_f_id_anue);
+  Kokkos::deep_copy(h_my_nudistributionparams_temp_f_id_anue, my_nudistributionparams_temp_f_id_anue);
+  Kokkos::deep_copy(h_my_nudistributionparams_c_f_id_anue, my_nudistributionparams_c_f_id_anue);
+  Kokkos::deep_copy(h_my_nudistributionparams_beta_f_id_anue, my_nudistributionparams_beta_f_id_anue);
+
+  Kokkos::deep_copy(h_my_nudistributionparams_w_t_id_nux, my_nudistributionparams_w_t_id_nux);
+  Kokkos::deep_copy(h_my_nudistributionparams_temp_t_id_nux, my_nudistributionparams_temp_t_id_nux);
+  Kokkos::deep_copy(h_my_nudistributionparams_eta_t_id_nux, my_nudistributionparams_eta_t_id_nux);
+  Kokkos::deep_copy(h_my_nudistributionparams_w_f_id_nux, my_nudistributionparams_w_f_id_nux);
+  Kokkos::deep_copy(h_my_nudistributionparams_temp_f_id_nux, my_nudistributionparams_temp_f_id_nux);
+  Kokkos::deep_copy(h_my_nudistributionparams_c_f_id_nux, my_nudistributionparams_c_f_id_nux);
+  Kokkos::deep_copy(h_my_nudistributionparams_beta_f_id_nue, my_nudistributionparams_beta_f_id_nue);
+
+  for (int i = 0; i < num_data; i++) {
+    fprintf(fptr, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
+            h_my_nudistributionparams_w_t_id_nue(i), h_my_nudistributionparams_temp_t_id_nue(i),
+            h_my_nudistributionparams_eta_t_id_nue(i), h_my_nudistributionparams_w_f_id_nue(i),
+            h_my_nudistributionparams_temp_f_id_nue(i), h_my_nudistributionparams_c_f_id_nue(i),
+            h_my_nudistributionparams_beta_f_id_nue(i),
+            h_my_nudistributionparams_w_t_id_anue(i), h_my_nudistributionparams_temp_t_id_anue(i),
+            h_my_nudistributionparams_eta_t_id_anue(i), h_my_nudistributionparams_w_f_id_anue(i),
+            h_my_nudistributionparams_temp_f_id_anue(i), h_my_nudistributionparams_c_f_id_anue(i),
+            h_my_nudistributionparams_beta_f_id_anue(i),
+            h_my_nudistributionparams_w_t_id_nux(i), h_my_nudistributionparams_temp_t_id_nux(i),
+            h_my_nudistributionparams_eta_t_id_nux(i), h_my_nudistributionparams_w_f_id_nux(i),
+            h_my_nudistributionparams_temp_f_id_nux(i), h_my_nudistributionparams_c_f_id_nux(i),
+            h_my_nudistributionparams_beta_f_id_nux(i));
+  }
+
+  fclose(fptr);
+}
+int main() {
+
+  Kokkos::initialize();
+
+  test_distribution();
 
   Kokkos::finalize();
 
