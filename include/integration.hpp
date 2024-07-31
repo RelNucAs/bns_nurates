@@ -55,8 +55,7 @@ double DoIntegration(const int n, const double* wtarray, const double* fnarray)
  * x2 = 1. func: The function struct to be integrated t:    The value of points
  * at which to break the integral into two
  */
-KOKKOS_INLINE_FUNCTION
-double GaussLegendreIntegrateZeroInf(MyQuadrature* quad, MyFunction* func,
+inline double GaussLegendreIntegrateZeroInf(MyQuadrature* quad, MyFunction* func,
                                      double t)
 {
 
@@ -92,7 +91,7 @@ double GaussLegendreIntegrateZeroInf(MyQuadrature* quad, MyFunction* func,
 
     return DoIntegration(quad->nz, f_z, w_z);
 }
-                                     
+
 /* Compute 4 different integration results at once (emission & absorption for e
  * & points neutrinos) Use this function for integrating over kernel quantities
  *
@@ -106,8 +105,7 @@ double GaussLegendreIntegrateZeroInf(MyQuadrature* quad, MyFunction* func,
  *      the emissivities and absoptivities for e and points neutrinos (take care
  * of constant multiplications separately outside)
  */
-KOKKOS_INLINE_FUNCTION
-MyKernelQuantity GaussLegendreIntegrateZeroInfSpecial(MyQuadrature* quad,
+inline MyKernelQuantity GaussLegendreIntegrateZeroInfSpecial(MyQuadrature* quad,
                                                       MyFunctionSpecial* func,
                                                       double t)
 {
@@ -190,8 +188,7 @@ MyKernelQuantity GaussLegendreIntegrateZeroInfSpecial(MyQuadrature* quad,
  *    quad: A properly populated Gauss-Laguerre quadrature struct
  *    func:    The function struct to be integrated
  */
-KOKKOS_INLINE_FUNCTION
-double GaussLaguerreIntegrateZeroInf(MyQuadrature* quad, MyFunction* func)
+inline double GaussLaguerreIntegrateZeroInf(MyQuadrature* quad, MyFunction* func)
 {
 
     double f[quad->nx];
@@ -224,7 +221,7 @@ double GaussLaguerreIntegrateZeroInf(MyQuadrature* quad, MyFunction* func)
  * t:       the value at which to break the integral into two
  */
 // @TODO: rewrite loops in row-wise order
-KOKKOS_INLINE_FUNCTION
+inline
 MyQuadratureIntegrand GaussLegendreIntegrateFixedSplit2D(MyQuadrature* quad,
                                                          MyFunctionMultiD* func,
                                                          double t)
@@ -317,7 +314,7 @@ MyQuadratureIntegrand GaussLegendreIntegrateFixedSplit2D(MyQuadrature* quad,
  * t:       the value at which to break the integral into two
  */
 // @TODO: rewrite loops in row-wise order
-KOKKOS_INLINE_FUNCTION
+inline
 MyQuadratureIntegrand GaussLegendreIntegrateFixedSplit1D(MyQuadrature* quad,
                                                          MyFunctionMultiD* func,
                                                          double t)
@@ -366,7 +363,7 @@ MyQuadratureIntegrand GaussLegendreIntegrateFixedSplit1D(MyQuadrature* quad,
  * func:    the function(s) to be integrated
  * t:       the value at which to break the integral into two
  */
-KOKKOS_INLINE_FUNCTION
+inline
 MyQuadratureIntegrand GaussLegendreIntegrate2D(MyQuadrature* quad,
                                                MyFunctionMultiD* func,
                                                double* tx, double* ty)
@@ -445,7 +442,7 @@ MyQuadratureIntegrand GaussLegendreIntegrate2D(MyQuadrature* quad,
  * func:    the function(s) to be integrated
  * t:       the value at which to break the integral into two
  */
-KOKKOS_INLINE_FUNCTION
+inline
 MyQuadratureIntegrand
 GaussLegendreIntegrate1D(MyQuadrature* quad, MyFunctionMultiD* func, double* t)
 {
@@ -482,7 +479,7 @@ GaussLegendreIntegrate1D(MyQuadrature* quad, MyFunctionMultiD* func, double* t)
 }
 
 KOKKOS_INLINE_FUNCTION
-MyQuadratureIntegrand GaussLegendreIntegrate2DMatrix(MyQuadrature* quad,
+MyQuadratureIntegrand GaussLegendreIntegrate2DMatrix(const MyQuadrature* quad,
                                                      M1MatrixKokkos* mat, double t)
 {
     const int n              = quad->nx;
@@ -545,7 +542,7 @@ MyQuadratureIntegrand GaussLegendreIntegrate2DMatrix(MyQuadrature* quad,
  * quad:    must be a properly populated 1d quadrature generated from between
  * interval of integration func:    the function(s) to be integrated
  */
-KOKKOS_INLINE_FUNCTION
+inline
 MyQuadratureIntegrand
 GaussLegendreIntegrate1DFiniteInterval(MyQuadrature* quad,
                                        MyFunctionMultiD* func, double* t)
@@ -583,7 +580,7 @@ GaussLegendreIntegrate1DFiniteInterval(MyQuadrature* quad,
  * quad:    must be a properly populated 2d quadrature generated from between
  * interval of integration func:    the function(s) to be integrated
  */
-KOKKOS_INLINE_FUNCTION
+inline
 MyQuadratureIntegrand GaussLegendreIntegrate2DFiniteInterval(
     MyQuadrature* quad, MyFunctionMultiD* func, double* tx, double* ty)
 {

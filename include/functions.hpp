@@ -3927,7 +3927,7 @@ double Gammln(const double xx)
     if (xx <= 0) {
         //throw("bad arg in gammln");
         printf("bad arg in gammln");
-        exit(1);
+        //exit(1);
     }
     y = x = xx;
     tmp   = x + 5.24218750000000000;

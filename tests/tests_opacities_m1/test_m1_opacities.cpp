@@ -144,6 +144,13 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
   FILE *file;
   file = fopen(data_filepath, "w+");
 
+  printf("Generating quadratures ...\n");
+  MyQuadrature my_quadrature_1d = {.type = kGauleg, .alpha = -42., .dim = 1, .nx = 10, .ny = 1, .nz = 1, .x1 = 0., .x2 = 1., .y1 = -42., .y2 = -42., .z1 = -42., .z2 = -42., .points = NULL, .w = NULL};
+  GaussLegendreMultiD(&my_quadrature_1d);
+  MyQuadrature my_quadrature_2d = {.type = kGauleg, .alpha = -42., .dim = 1, .nx = 10, .ny = 1, .nz = 1, .x1 = 0., .x2 = 1., .y1 = -42., .y2 = -42., .z1 = -42., .z2 = -42., .points = NULL, .w = NULL};
+  GaussLegendreMultiD(&my_quadrature_2d);
+  printf("Quadratures generated.\n");
+
   printf("\n");
 
   printf("Generated tables:\n");
@@ -157,17 +164,10 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
   
   start = clock();
  
-  Kokkos::parallel_for("loop_over_ccsn", Kokkos::RangePolicy<>(DevExeSpace(), 0, 101),
+  Kokkos::parallel_for("loop_over_ccsn", Kokkos::RangePolicy<>(DevExeSpace(), 0, num_data),
   KOKKOS_LAMBDA(const int &i) {
     GreyOpacityParams my_grey_opacity_params;
     my_grey_opacity_params.opacity_flags = *opacity_flags;
-
-    printf("Generating quadratures ...\n");
-    MyQuadrature my_quadrature_1d = {.type = kGauleg, .alpha = -42., .dim = 1, .nx = 10, .ny = 1, .nz = 1, .x1 = 0., .x2 = 1., .y1 = -42., .y2 = -42., .z1 = -42., .z2 = -42., .points = NULL, .w = NULL};
-    GaussLegendreMultiD(&my_quadrature_1d);
-    MyQuadrature my_quadrature_2d = {.type = kGauleg, .alpha = -42., .dim = 1, .nx = 10, .ny = 1, .nz = 1, .x1 = 0., .x2 = 1., .y1 = -42., .y2 = -42., .z1 = -42., .z2 = -42., .points = NULL, .w = NULL};
-    GaussLegendreMultiD(&my_quadrature_2d);
-    printf("Quadratures generated.\n");
 
     // populate EOS parameters from table
     my_grey_opacity_params.eos_pars.mu_e = mu_e(i);
@@ -195,7 +195,8 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
     double distr_fermi =
         FermiDistr(123.4, my_grey_opacity_params.eos_pars.temp, my_grey_opacity_params.eos_pars.mu_e - my_grey_opacity_params.eos_pars.mu_n + my_grey_opacity_params.eos_pars.mu_p);
     double distr_nuftot = TotalNuF(123.4, &my_grey_opacity_params.distr_pars, 0);
-    double diff_distr = fabs(distr_fermi - distr_nuftot);
+    double diff_distr = Kokkos::fabs(distr_fermi - distr_nuftot);
+
 
     M1Opacities coeffs = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
     
@@ -206,13 +207,13 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
             coeffs.kappa_0_a[id_nue], coeffs.kappa_0_a[id_anue], coeffs.kappa_0_a[id_nux], coeffs.kappa_0_a[id_anux],
             coeffs.kappa_a[id_nue], coeffs.kappa_a[id_anue], coeffs.kappa_a[id_nux], coeffs.kappa_a[id_anux],
             coeffs.kappa_s[id_nue], coeffs.kappa_s[id_anue], coeffs.kappa_s[id_nux], coeffs.kappa_s[id_anux]);
-    fprintf(file, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
+    /*fprintf(file, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
             r(i), diff_distr,
             coeffs.eta_0[id_nue], coeffs.eta_0[id_anue], coeffs.eta_0[id_nux], coeffs.eta_0[id_anux],
             coeffs.eta[id_nue], coeffs.eta[id_anue], coeffs.eta[id_nux], coeffs.eta[id_anux],
             coeffs.kappa_0_a[id_nue], coeffs.kappa_0_a[id_anue], coeffs.kappa_0_a[id_nux], coeffs.kappa_0_a[id_anux],
             coeffs.kappa_a[id_nue], coeffs.kappa_a[id_anue], coeffs.kappa_a[id_nux], coeffs.kappa_a[id_anux],
-            coeffs.kappa_s[id_nue], coeffs.kappa_s[id_anue], coeffs.kappa_s[id_nux], coeffs.kappa_s[id_anux]);
+            coeffs.kappa_s[id_nue], coeffs.kappa_s[id_anue], coeffs.kappa_s[id_nux], coeffs.kappa_s[id_anux]); */
   
   });
   
