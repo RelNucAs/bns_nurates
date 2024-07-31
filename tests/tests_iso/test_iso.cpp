@@ -90,28 +90,43 @@ void test_iso() {
   printf("Neutrino energy: %.5e MeV\n", omega);
   printf("\n");
 
+  // Define path of output file
+  filepath[0] = '\0';
+  sprintf(outname, "/tests/tests_iso/test_iso_%.3e.txt", omega);
+
+  strcat(filepath, filedir);
+  strcat(filepath, outname);
+
+  // Open output file
+  FILE *fptr_out;
+  fptr_out = fopen(filepath, "w");
+  if (fptr_out == NULL) {
+    printf("%s: Error in opening in write mode file %s!\n", __FILE__, filepath);
+    exit(1);
+  }
+
   printf("Output data file: %s\n", filepath);
   printf("\n");
 
   // Print neutrino energy in output file
-  printf("# E_nu = %.5e MeV\n", omega);
-  printf("\n");
+  fprintf(fptr_out, "# E_nu = %.5e MeV\n", omega);
+  fprintf(fptr_out, "\n");
 
   // Print legend as output file header
-  printf("#  1: zone\n");
-  printf("#  2: r [cm]\n");
-  printf("#  3: rho [g/cm^3]\n");
-  printf("#  4: T [MeV]\n");
-  printf("#  5: Ye\n");
-  printf("#  6: mu_e [MeV]\n");
-  printf("#  7: mu_hat [MeV]\n");
-  printf("#  8: Yh\n");
-  printf("#  9: Ya\n");
-  printf("# 10: Yp\n");
-  printf("# 11: Yn\n");
-  printf("# 12: Fortran R_iso with WM [cm-1]\n");
-  printf("# 13: C R_iso with WM [cm-1]\n");
-  printf("\n");
+  fprintf(fptr_out, "#  1: zone\n");
+  fprintf(fptr_out, "#  2: r [cm]\n");
+  fprintf(fptr_out, "#  3: rho [g/cm^3]\n");
+  fprintf(fptr_out, "#  4: T [MeV]\n");
+  fprintf(fptr_out, "#  5: Ye\n");
+  fprintf(fptr_out, "#  6: mu_e [MeV]\n");
+  fprintf(fptr_out, "#  7: mu_hat [MeV]\n");
+  fprintf(fptr_out, "#  8: Yh\n");
+  fprintf(fptr_out, "#  9: Ya\n");
+  fprintf(fptr_out, "# 10: Yp\n");
+  fprintf(fptr_out, "# 11: Yn\n");
+  fprintf(fptr_out, "# 12: Fortran R_iso with WM [cm-1]\n");
+  fprintf(fptr_out, "# 13: C R_iso with WM [cm-1]\n");
+  fprintf(fptr_out, "\n");
 
   // Read in data from profile, compute rates and store results in output file
   while (fgets(line, sizeof(line), fptr_in) != NULL) {
@@ -131,19 +146,21 @@ void test_iso() {
       WMScatt(omega, &w0_p_out, &w1_p_out, 1);
       WMScatt(omega, &w0_n_out, &w1_n_out, 2);
 
-      // Print weak magnetism correction in output file
-      printf("# Weak magnetism correction (Fortran):\n");
-      printf("# W0_n = %lf\n", h_w0_n(i));
-      printf("# W1_n = %lf\n", h_w1_n(i));
-      printf("# W0_p = %lf\n", h_w0_p(i));
-      printf("# W1_p = %lf\n", h_w1_p(i));
-      printf("# Weak magnetism correction (C):\n");
-      printf("# W0_n = %lf\n", w0_n_out);
-      printf("# W1_n = %lf\n", w1_n_out);
-      printf("# W0_p = %lf\n", w0_p_out);
-      printf("# W1_p = %lf\n", w1_p_out);
-      printf("\n");
+       // Print weak magnetism correction in output file
+      fprintf(fptr_out, "# Weak magnetism correction (Fortran):\n");
+      fprintf(fptr_out, "# W0_n = %lf\n", h_w0_n(i));
+      fprintf(fptr_out, "# W1_n = %lf\n", h_w1_n(i));
+      fprintf(fptr_out, "# W0_p = %lf\n", h_w0_p(i));
+      fprintf(fptr_out, "# W1_p = %lf\n", h_w1_p(i));
+      fprintf(fptr_out, "# Weak magnetism correction (C):\n");
+      fprintf(fptr_out, "# W0_n = %lf\n", w0_n_out);
+      fprintf(fptr_out, "# W1_n = %lf\n", w1_n_out);
+      fprintf(fptr_out, "# W0_p = %lf\n", w0_p_out);
+      fprintf(fptr_out, "# W1_p = %lf\n", w1_p_out);
+      fprintf(fptr_out, "\n");
     }
+
+    i++;
   }
 
   // Data arrays (rates are not corrected for the weak magnetism, WM corrections are provided separately)
@@ -192,7 +209,10 @@ void test_iso() {
   Kokkos::deep_copy(w1_n, h_w1_n);
   Kokkos::deep_copy(w1_p, h_w1_p);
 
-  Kokkos::parallel_for("loop_over_opacities_test_iso", Kokkos::RangePolicy<>(DevExeSpace(), 0, n_data - 1),
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> outvals("outvals", n_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_outvals("h_outvals", n_data);
+
+  Kokkos::parallel_for("loop_over_opacities_test_iso", Kokkos::RangePolicy<>(DevExeSpace(), 0, n_data),
   KOKKOS_LAMBDA(const int &i) {
 
     // Opacity parameters (correction to rates)
@@ -210,13 +230,28 @@ void test_iso() {
     double out = IsoScattTotal(omega, &opacity_pars, &eos_pars);
 
     // Adjust to compare the same quantity
-    out = out * omega * omega * 4. * kPi / kClight;
+    outvals(i) = out * omega * omega * 4. * kPi / kClight;
 
-    printf("%d %d %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e\n",
-             i, zone(i), r(i), rho(i), temp(i), ye(i), mu_e(i), mu_hat(i),
-             yh(i), ya(i), yp(i), yn(i),
-             r_is(i), out);
   });
+
+  Kokkos::deep_copy(h_outvals, outvals);
+
+  for(int i = 0; i < n_data; i++) {
+    fprintf(fptr_out, "%d %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e\n",
+             h_zone(i), h_r(i), h_rho(i), h_temp(i), h_ye(i), h_mu_e(i), h_mu_hat(i),
+             h_yh(i), h_ya(i), h_yp(i), h_yn(i),
+             h_r_is(i), h_outvals(i));
+  }
+
+  // Close files
+  fclose(fptr_in);
+  fclose(fptr_out);
+
+  // Check if file was entirely read
+  if (n_data != h_zone(i-1)) {
+    printf("Warning: n_data (%d) different for number of lines in the input file (%d)",
+           n_data, h_zone(i-1));
+  }
 }
 int main () {
 
