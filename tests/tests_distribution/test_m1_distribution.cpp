@@ -226,14 +226,6 @@ void test_distribution() {
     my_nudistributionparams_c_f_id_nux(i) = my_nudistributionparams.c_f[id_nux];
     my_nudistributionparams_beta_f_id_nux(i) = my_nudistributionparams.beta_f[id_nux];
 
-    /*
-    printf("%d %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n", i,
-            my_nudistributionparams.w_t[id_nue], my_nudistributionparams.temp_t[id_nue], my_nudistributionparams.eta_t[id_nue], my_nudistributionparams.w_f[id_nue],
-            my_nudistributionparams.temp_f[id_nue], my_nudistributionparams.c_f[id_nue], my_nudistributionparams.beta_f[id_nue],
-            my_nudistributionparams.w_t[id_anue], my_nudistributionparams.temp_t[id_anue], my_nudistributionparams.eta_t[id_anue], my_nudistributionparams.w_f[id_anue],
-            my_nudistributionparams.temp_f[id_anue], my_nudistributionparams.c_f[id_anue], my_nudistributionparams.beta_f[id_anue],
-            my_nudistributionparams.w_t[id_nux], my_nudistributionparams.temp_t[id_nux], my_nudistributionparams.eta_t[id_nux], my_nudistributionparams.w_f[id_nux],
-            my_nudistributionparams.temp_f[id_nux], my_nudistributionparams.c_f[id_nux], my_nudistributionparams.beta_f[id_nux]); */
     printf("got here! 5\n");
   });
 
@@ -259,7 +251,7 @@ void test_distribution() {
   Kokkos::deep_copy(h_my_nudistributionparams_w_f_id_nux, my_nudistributionparams_w_f_id_nux);
   Kokkos::deep_copy(h_my_nudistributionparams_temp_f_id_nux, my_nudistributionparams_temp_f_id_nux);
   Kokkos::deep_copy(h_my_nudistributionparams_c_f_id_nux, my_nudistributionparams_c_f_id_nux);
-  Kokkos::deep_copy(h_my_nudistributionparams_beta_f_id_nue, my_nudistributionparams_beta_f_id_nue);
+  Kokkos::deep_copy(h_my_nudistributionparams_beta_f_id_nux, my_nudistributionparams_beta_f_id_nux);
 
   for (int i = 0; i < num_data; i++) {
     fprintf(fptr, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
