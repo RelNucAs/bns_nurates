@@ -254,7 +254,7 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
 
   for (int i = 0; i < num_data; i++) {
     fprintf(file, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
-            r(i), h_diff_distribution(i),
+            h_r(i), h_diff_distribution(i),
             h_coeffs_eta_0(i,id_nue), h_coeffs_eta_0(i,id_anue), h_coeffs_eta_0(i,id_nux), h_coeffs_eta_0(i,id_anux),
             h_coeffs_eta(i,id_nue), h_coeffs_eta(i,id_anue), h_coeffs_eta(i,id_nux), h_coeffs_eta(i,id_anux),
             h_coeffs_kappa_0_a(i,id_nue), h_coeffs_kappa_0_a(i,id_anue), h_coeffs_kappa_0_a(i,id_nux), h_coeffs_kappa_0_a(i,id_anux),
