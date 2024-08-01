@@ -161,7 +161,21 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
 
   clock_t start, end;
   double cpu_time_used;
-  
+
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> diff_distribution("diff_distribution", num_data);
+  Kokkos::View<double**, LayoutWrapper, DevMemSpace> coeffs_eta_0("coeffs_eta_0", num_data, 4);
+  Kokkos::View<double**, LayoutWrapper, DevMemSpace> coeffs_eta("coeffs_eta", num_data, 4);
+  Kokkos::View<double**, LayoutWrapper, DevMemSpace> coeffs_kappa_0_a("coeffs_kappa_0_a", num_data, 4);
+  Kokkos::View<double**, LayoutWrapper, DevMemSpace> coeffs_kappa_a("coeffs_kappa_a", num_data, 4);
+  Kokkos::View<double**, LayoutWrapper, DevMemSpace> coeffs_kappa_s("coeffs_kappa_s", num_data, 4);
+
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_diff_distribution("h_diff_distribution", num_data);
+  Kokkos::View<double**, LayoutWrapper, HostMemSpace> h_coeffs_eta_0("h_coeffs_eta_0", num_data, 4);
+  Kokkos::View<double**, LayoutWrapper, HostMemSpace> h_coeffs_eta("h_coeffs_eta", num_data, 4);
+  Kokkos::View<double**, LayoutWrapper, HostMemSpace> h_coeffs_kappa_0_a("h_coeffs_kappa_0_a", num_data, 4);
+  Kokkos::View<double**, LayoutWrapper, HostMemSpace> h_coeffs_kappa_a("h_coeffs_kappa_a", num_data, 4);
+  Kokkos::View<double**, LayoutWrapper, HostMemSpace> h_coeffs_kappa_s("h_coeffs_kappa_s", num_data, 4);
+
   start = clock();
  
   Kokkos::parallel_for("loop_over_ccsn", Kokkos::RangePolicy<>(DevExeSpace(), 0, num_data),
@@ -199,26 +213,54 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
 
 
     M1Opacities coeffs = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
-    
-    printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
-            r(i), diff_distr,
-            coeffs.eta_0[id_nue], coeffs.eta_0[id_anue], coeffs.eta_0[id_nux], coeffs.eta_0[id_anux],
-            coeffs.eta[id_nue], coeffs.eta[id_anue], coeffs.eta[id_nux], coeffs.eta[id_anux],
-            coeffs.kappa_0_a[id_nue], coeffs.kappa_0_a[id_anue], coeffs.kappa_0_a[id_nux], coeffs.kappa_0_a[id_anux],
-            coeffs.kappa_a[id_nue], coeffs.kappa_a[id_anue], coeffs.kappa_a[id_nux], coeffs.kappa_a[id_anux],
-            coeffs.kappa_s[id_nue], coeffs.kappa_s[id_anue], coeffs.kappa_s[id_nux], coeffs.kappa_s[id_anux]);
-    /*fprintf(file, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
-            r(i), diff_distr,
-            coeffs.eta_0[id_nue], coeffs.eta_0[id_anue], coeffs.eta_0[id_nux], coeffs.eta_0[id_anux],
-            coeffs.eta[id_nue], coeffs.eta[id_anue], coeffs.eta[id_nux], coeffs.eta[id_anux],
-            coeffs.kappa_0_a[id_nue], coeffs.kappa_0_a[id_anue], coeffs.kappa_0_a[id_nux], coeffs.kappa_0_a[id_anux],
-            coeffs.kappa_a[id_nue], coeffs.kappa_a[id_anue], coeffs.kappa_a[id_nux], coeffs.kappa_a[id_anux],
-            coeffs.kappa_s[id_nue], coeffs.kappa_s[id_anue], coeffs.kappa_s[id_nux], coeffs.kappa_s[id_anux]); */
+
+    diff_distribution(i) = diff_distr;
+
+    coeffs_eta_0(i,id_nue) = coeffs.eta_0[id_nue];
+    coeffs_eta_0(i,id_anue) = coeffs.eta_0[id_anue];
+    coeffs_eta_0(i,id_nux) = coeffs.eta_0[id_nux];
+    coeffs_eta_0(i,id_anux) = coeffs.eta_0[id_anux];
+
+    coeffs_eta(i,id_nue) = coeffs.eta[id_nue];
+    coeffs_eta(i,id_anue) = coeffs.eta[id_anue];
+    coeffs_eta(i,id_nux) = coeffs.eta[id_nux];
+    coeffs_eta(i,id_anux) = coeffs.eta[id_anux];
+
+    coeffs_kappa_0_a(i,id_nue) = coeffs.kappa_0_a[id_nue];
+    coeffs_kappa_0_a(i,id_anue) = coeffs.kappa_0_a[id_anue];
+    coeffs_kappa_0_a(i,id_nux) = coeffs.kappa_0_a[id_nux];
+    coeffs_kappa_0_a(i,id_anux) = coeffs.kappa_0_a[id_anux];
+
+    coeffs_kappa_a(i,id_nue) = coeffs.kappa_a[id_nue];
+    coeffs_kappa_a(i,id_anue) = coeffs.kappa_a[id_anue];
+    coeffs_kappa_a(i,id_nux) = coeffs.kappa_a[id_nux];
+    coeffs_kappa_a(i,id_anux) = coeffs.kappa_a[id_anux];
+
+    coeffs_kappa_s(i,id_nue) = coeffs.kappa_s[id_nue];
+    coeffs_kappa_s(i,id_anue) = coeffs.kappa_s[id_anue];
+    coeffs_kappa_s(i,id_nux) = coeffs.kappa_s[id_nux];
+    coeffs_kappa_s(i,id_anux) = coeffs.kappa_s[id_anux];
   
   });
   
   end = clock();
 
+  Kokkos::deep_copy(h_diff_distribution, diff_distribution);
+  Kokkos::deep_copy(h_coeffs_eta_0, coeffs_eta_0);
+  Kokkos::deep_copy(h_coeffs_eta, coeffs_eta);
+  Kokkos::deep_copy(h_coeffs_kappa_0_a, coeffs_kappa_0_a);
+  Kokkos::deep_copy(h_coeffs_kappa_a, coeffs_kappa_a);
+  Kokkos::deep_copy(h_coeffs_kappa_s, coeffs_kappa_s);
+
+  for (int i = 0; i < num_data; i++) {
+    fprintf(file, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
+            r(i), h_diff_distribution(i),
+            h_coeffs_eta_0(i,id_nue), h_coeffs_eta_0(i,id_anue), h_coeffs_eta_0(i,id_nux), h_coeffs_eta_0(i,id_anux),
+            h_coeffs_eta(i,id_nue), h_coeffs_eta(i,id_anue), h_coeffs_eta(i,id_nux), h_coeffs_eta(i,id_anux),
+            h_coeffs_kappa_0_a(i,id_nue), h_coeffs_kappa_0_a(i,id_anue), h_coeffs_kappa_0_a(i,id_nux), h_coeffs_kappa_0_a(i,id_anux),
+            h_coeffs_kappa_a(i,id_nue), h_coeffs_kappa_a(i,id_anue), h_coeffs_kappa_a(i,id_nux), h_coeffs_kappa_a(i,id_anux),
+            h_coeffs_kappa_s(i,id_nue), h_coeffs_kappa_s(i,id_anue), h_coeffs_kappa_s(i,id_nux), h_coeffs_kappa_s(i,id_anux));
+  }
   cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
   
   printf("Elapsed time: %.3lf sec\n", cpu_time_used);
