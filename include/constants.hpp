@@ -70,7 +70,9 @@ static const double kAlpha1X =
     -1. + 2. * kSinsqthetaw; // Table 1, Pons et. al. (1998)
 static const double kAlpha2X =
     2. * kSinsqthetaw; // Table 1, Pons et. al. (1998)
-static const double kAlpha1[2] = {kAlpha1E, kAlpha1X};
-static const double kAlpha2[2] = {kAlpha2E, kAlpha2X};
+static const double kAlpha1_0 = kAlpha1E;
+static const double kAlpha1_1 = kAlpha1X;
+static const double kAlpha2_0 = kAlpha2E;
+static const double kAlpha2_1 = kAlpha2X;
 
 #endif // BNS_NURATES_SRC_CONSTANTS_H_

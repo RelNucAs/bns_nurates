@@ -302,6 +302,7 @@ void ChebEvalE(const ChebSeries* cs, const double x, SFResult* result)
  * cases here because of the way we use even/odd parts
  * of the function
  */
+/*
 KOKKOS_INLINE_FUNCTION
 void SFPsiOutput(const double x, SFResult* result)
 {
@@ -348,11 +349,11 @@ void SFPsiOutput(const double x, SFResult* result)
         }
     }
     else
-    { /* -2 < x < 2 */
+    { // -2 < x < 2
         SFResult result_c;
 
         if (x < -1.0)
-        { /* x = -2 + v */
+        { // x = -2 + v
             const double v  = x + 2.0;
             const double t1 = 1.0 / x;
             const double t2 = 1.0 / (x + 1.0);
@@ -367,7 +368,7 @@ void SFPsiOutput(const double x, SFResult* result)
             return; // GSL_SUCCESS;
         }
         else if (x < 0.0)
-        { /* x = -1 + v */
+        { // x = -1 + v
             const double v  = x + 1.0;
             const double t1 = 1.0 / x;
             const double t2 = 1.0 / v;
@@ -380,7 +381,7 @@ void SFPsiOutput(const double x, SFResult* result)
             return; // GSL_SUCCESS;
         }
         else if (x < 1.0)
-        { /* x = v */
+        { // x = v
             const double t1 = 1.0 / x;
             ChebEvalE(&psi_cs, 2.0 * x - 1.0, &result_c);
 
@@ -391,15 +392,17 @@ void SFPsiOutput(const double x, SFResult* result)
             return; // GSL_SUCCESS;
         }
         else
-        { /* x = 1 + v */
+        { // x = 1 + v
             const double v = x - 1.0;
             ChebEvalE(&psi_cs, 2.0 * v - 1.0, result);
             return;
         }
     }
 }
+*/
 
 // Evaluation of Psi (Digamma) function (only result)
+/*
 KOKKOS_INLINE_FUNCTION
 double SFPsi(const double x)
 {
@@ -407,7 +410,7 @@ double SFPsi(const double x)
     SFPsiOutput(x, &result);
     return result.val;
 }
-
+*/
 
 /*===========================================================================*/
 
@@ -3924,7 +3927,7 @@ double Gammln(const double xx)
     if (xx <= 0) {
         //throw("bad arg in gammln");
         printf("bad arg in gammln");
-        exit(1);
+        //exit(1);
     }
     y = x = xx;
     tmp   = x + 5.24218750000000000;

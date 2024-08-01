@@ -10,10 +10,9 @@
 #include <string.h>
 #include <Kokkos_Core.hpp>
 
-#include "../../include/constants.hpp"
-#include "../../include/weak_magnetism.hpp"
+#include "constants.hpp"
+#include "weak_magnetism.hpp"
 #include "opacities.hpp"
-#include "m1_opacities.hpp"
 
 void generate_comparison_data(const bool use_dU) {
 
@@ -159,7 +158,7 @@ void generate_comparison_data(const bool use_dU) {
     i++;
   }
 
-    // Data arrays (rates are not corrected for the weak magnetism, WM corrections are provided separately)
+  // Data arrays (rates are not corrected for the weak magnetism, WM corrections are provided separately)
   Kokkos::View<int*, LayoutWrapper, DevMemSpace> zone("zone", n_data);        // zone (counter)
   Kokkos::View<double*, LayoutWrapper, DevMemSpace> r("r", n_data);        // radius [cm]
   Kokkos::View<double*, LayoutWrapper, DevMemSpace> rho("rho", n_data);      // mass density [g/cm3]
@@ -234,12 +233,6 @@ void generate_comparison_data(const bool use_dU) {
 
   // Compute emissivity and inverse mean free path for electron-type (anti)neutrinos
   MyOpacity out    = AbsOpacity(omega, &opacity_pars, &eos_pars);
-
-  //printf("%d %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e\n",
-  //          zone(i), r(i), rho(i), temp(i), ye(i), mu_e(i), mu_hat(i),
-  //          yh(i), ya(i), yp(i), yn(i), du(i),
-  //          em_nue(i), ab_nue(i), em_anue(i), ab_anue(i),
-  //          out.em[id_nue], out.abs[id_nue] / kClight, out.em[id_anue], out.abs[id_anue] / kClight);
 
   out_em_id_nue(i) = out.em[id_nue];
   out_abs_id_nue(i) = out.abs[id_nue];

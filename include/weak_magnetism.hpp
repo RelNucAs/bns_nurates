@@ -87,7 +87,6 @@ void NucFrmFac(const double E, double* cv, double* ca, double* F2,
     else
     {
         printf("Error: reacflag out of range in NucFrmFac\n");
-        exit(EXIT_FAILURE);
     }
 
     *cv = frm1;

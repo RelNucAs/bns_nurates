@@ -253,9 +253,9 @@ MyQuadratureIntegrand M1CoeffsSingleIntegrandNotStimulated(double* var, void* p)
                 abs_em_beta.abs[idx]; // ab = ab (NOT stimulated absorption)
             if (idx == 0)
             {
-                double tmp = my_grey_opacity_params->eos_pars.mu_n -
-                             my_grey_opacity_params->eos_pars.mu_p -
-                             my_grey_opacity_params->eos_pars.mu_e;
+                //double tmp = my_grey_opacity_params->eos_pars.mu_n -
+                //             my_grey_opacity_params->eos_pars.mu_p -
+                //             my_grey_opacity_params->eos_pars.mu_e;
             }
             e_integrand_2[idx] = nu * n_integrand_2[idx];
         }
@@ -679,7 +679,7 @@ void ComputeM1DoubleIntegrandNotStimulated(MyQuadrature* quad_1d,
 }
 
 KOKKOS_INLINE_FUNCTION
-void ComputeM1DoubleIntegrand(MyQuadrature* quad_1d,
+void ComputeM1DoubleIntegrand(const MyQuadrature* quad_1d,
                               GreyOpacityParams* grey_pars, double t,
                               M1MatrixKokkos2D* out_n, M1MatrixKokkos2D* out_j)
 {
@@ -898,7 +898,7 @@ void ComputeM1DoubleIntegrand(MyQuadrature* quad_1d,
 /* Computes the opacities for the M1 code
  *
  */
-KOKKOS_INLINE_FUNCTION
+inline
 M1Opacities
 ComputeM1OpacitiesNotStimulated(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
                                 GreyOpacityParams* my_grey_opacity_params)
@@ -1018,7 +1018,7 @@ ComputeM1OpacitiesNotStimulated(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
 }
 
 KOKKOS_INLINE_FUNCTION
-M1Opacities ComputeM1Opacities(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
+M1Opacities ComputeM1Opacities(const MyQuadrature* quad_1d, const MyQuadrature* quad_2d,
                                GreyOpacityParams* my_grey_opacity_params)
 {
 
@@ -1031,6 +1031,7 @@ M1Opacities ComputeM1Opacities(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
     const double temp = my_grey_opacity_params->eos_pars.temp;
 
     // set up 1d integration
+    __attribute__((unused))
     MyFunctionMultiD integrand_m1_1d;
     MyQuadratureIntegrand integrand_m1_1d_info = {.n = 12};
     integrand_m1_1d.function                   = &M1CoeffsSingleIntegrand;
@@ -1039,12 +1040,12 @@ M1Opacities ComputeM1Opacities(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
     integrand_m1_1d.my_quadrature_integrand    = integrand_m1_1d_info;
 
     // set up 2d integration
-    MyFunctionMultiD integrand_m1_2d;
-    MyQuadratureIntegrand integrand_m1_2d_info = {.n = 16};
-    integrand_m1_2d.function                   = &M1CoeffsDoubleIntegrand;
-    integrand_m1_2d.dim                        = 2;
-    integrand_m1_2d.params                     = my_grey_opacity_params;
-    integrand_m1_2d.my_quadrature_integrand    = integrand_m1_2d_info;
+    //MyFunctionMultiD integrand_m1_2d;
+    //MyQuadratureIntegrand integrand_m1_2d_info = {.n = 16};
+    //integrand_m1_2d.function                   = &M1CoeffsDoubleIntegrand;
+    //integrand_m1_2d.dim                        = 2;
+    //integrand_m1_2d.params                     = my_grey_opacity_params;
+    //integrand_m1_2d.my_quadrature_integrand    = integrand_m1_2d_info;
 
     double n[total_num_species];
     double J[total_num_species];
@@ -1072,13 +1073,14 @@ M1Opacities ComputeM1Opacities(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
     // s_1d[i] = 1.5 * my_grey_opacity_params->eos_pars.temp;
     //}
 
-    const double eta_e = my_grey_opacity_params->eos_pars.mu_e / temp;
+    //const double eta_e = my_grey_opacity_params->eos_pars.mu_e / temp;
 
     // const double s = 1.5 * temp;
     const double s = 0.5 * 4.364 * temp;
     // const double s = 0.5 * temp * (FDI_p4(eta_e) / FDI_p3(eta_e) +
     // FDI_p4(-eta_e) / FDI_p3(-eta_e));
 
+    __attribute__((unused))
     double s_array[12] = {0};
     for (int j = 0; j < 12; j++)
     {
@@ -1380,7 +1382,7 @@ MyQuadratureIntegrand SpectralIntegrand(double* var, void* p)
 /* Computes the spectral emissivity and inverse mean free path */
 
 // Version without stimulated absorption
-KOKKOS_INLINE_FUNCTION
+inline
 SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
     const double nu, MyQuadrature* quad_1d,
     GreyOpacityParams* my_grey_opacity_params)

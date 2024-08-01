@@ -52,8 +52,8 @@
 KOKKOS_INLINE_FUNCTION
 double BremKernelS(double x, double y, double eta_star)
 {
-    static const double kFiveThirds = 5. / 3.;
-    static const double kFiveSixths = 5. / 6.;
+    const double kFiveThirds = 5. / 3.;
+    const double kFiveSixths = 5. / 6.;
 
     // check non negativity of input quantities
     assert(x >= 0.);
@@ -324,7 +324,6 @@ MyKernelOutput BremKernelsLegCoeff(BremKernelParams* kernel_params,
         printf("BremKernelsLegCoeff (kernel_brem.c): l = %d must be either 0 "
                "or 1\n",
                l);
-        exit(EXIT_FAILURE);
     }
 
     // production kernel from detailed balance
