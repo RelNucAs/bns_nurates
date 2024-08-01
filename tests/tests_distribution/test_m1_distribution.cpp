@@ -161,7 +161,6 @@ void test_distribution() {
   Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_c_f_id_nux("my_nudistributionparams_c_f_id_nux", num_data);
   Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_beta_f_id_nux("my_nudistributionparams_beta_f_id_nux", num_data);
 
-  char fileline[1000];
   fptr = fopen(data_filepath, "w");
   if (fptr == NULL) {
     printf("%s: The file %s does not exist!\n", __FILE__, filepath);
