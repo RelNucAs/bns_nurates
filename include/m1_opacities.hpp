@@ -367,7 +367,7 @@ MyQuadratureIntegrand M1CoeffsSingleIntegrand(double* var, void* p)
 }
 
 KOKKOS_INLINE_FUNCTION
-void M1CoeffsSingleIntegrandMatrix(MyQuadrature* quad_1d,
+void M1CoeffsSingleIntegrandMatrix(const MyQuadrature* quad_1d,
                              GreyOpacityParams* grey_pars, double t,
                              M1MatrixKokkos1D* out)
 {
