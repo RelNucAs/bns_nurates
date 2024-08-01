@@ -55,10 +55,9 @@ density)
 parameter
  */
 KOKKOS_INLINE_FUNCTION
-void CalculateThickParamsFromM1(M1Quantities* M1_pars, MyEOSParams* eos_pars,
+void CalculateThickParamsFromM1(M1Quantities* M1_pars,
                                 NuDistributionParams* out_distr_pars)
 {
-    (void)eos_pars;
 
     for (int species = 0; species < total_num_species; ++species)
     {
@@ -275,7 +274,7 @@ NuDistributionParams CalculateDistrParamsFromM1(M1Quantities* M1_pars,
 {
     NuDistributionParams out_distr_pars;
 
-    CalculateThickParamsFromM1(M1_pars, eos_pars, &out_distr_pars);
+    CalculateThickParamsFromM1(M1_pars, &out_distr_pars);
     CalculateThinParamsFromM1(M1_pars, &out_distr_pars);
 
     return out_distr_pars;
