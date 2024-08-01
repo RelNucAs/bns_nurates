@@ -367,10 +367,113 @@ MyQuadratureIntegrand M1CoeffsSingleIntegrand(double* var, void* p)
 }
 
 KOKKOS_INLINE_FUNCTION
+void M1CoeffsSingleIntegrandMatrix(MyQuadrature* quad_1d,
+                             GreyOpacityParams* grey_pars, double t,
+                             M1MatrixKokkos1D* out)
+{
+    const int n = quad_1d->nx;
+
+    double nu;
+
+    double nu_array[n_max];
+
+    for (int i = 0; i < n; i++)
+    {
+        nu_array[i]     = t * quad_1d->points[i];
+        nu_array[n + i] = t / quad_1d->points[i];
+    }
+
+    // compute the neutrino distribution function
+    double g_nu[total_num_species];
+
+    if (grey_pars->opacity_flags.use_abs_em == 1)
+    {
+        MyOpacity abs_em_beta;
+        for (int i = 0; i < n; i ++) {
+            nu = nu_array[i];
+            for (int idx = 0; idx < total_num_species; idx++)
+            {
+                g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, idx);
+            }
+            abs_em_beta =
+                StimAbsOpacity(nu, &grey_pars->opacity_pars,
+                               &grey_pars->eos_pars); // [s^-1]
+
+            out->m1_mat[0][i] = nu * nu * abs_em_beta.em[0];
+            out->m1_mat[1][i] = nu * nu * abs_em_beta.em[1];
+
+            out->m1_mat[2][i] = nu * nu * g_nu[0] * abs_em_beta.abs[0]; // ab = em + ab (stimulated absorption)
+            out->m1_mat[3][i] = nu * nu * g_nu[1] * abs_em_beta.abs[1];
+
+            out->m1_mat[4][i] = nu * out->m1_mat[0][i];
+            out->m1_mat[5][i] = nu * out->m1_mat[1][i];
+
+            out->m1_mat[6][i] = nu * out->m1_mat[2][i];
+            out->m1_mat[7][i] = nu * out->m1_mat[3][i];
+
+            nu = nu_array[n + i];
+            for (int idx = 0; idx < total_num_species; idx++)
+            {
+                g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, idx);
+            }
+            abs_em_beta =
+                StimAbsOpacity(nu, &grey_pars->opacity_pars,
+                               &grey_pars->eos_pars); // [s^-1]
+
+            out->m1_mat[0][n + i] = nu * nu * abs_em_beta.em[0];
+            out->m1_mat[1][n + i] = nu * nu * abs_em_beta.em[1];
+
+            out->m1_mat[2][n + i] = nu * nu * g_nu[0] * abs_em_beta.abs[0]; // ab = em + ab (stimulated absorption)
+            out->m1_mat[3][n + i] = nu * nu * g_nu[1] * abs_em_beta.abs[1];
+
+            out->m1_mat[4][n + i] = nu * out->m1_mat[0][n + i];
+            out->m1_mat[5][n + i] = nu * out->m1_mat[1][n + i];
+
+            out->m1_mat[6][n + i] = nu * out->m1_mat[2][n + i];
+            out->m1_mat[7][n + i] = nu * out->m1_mat[3][n + i];
+
+        }
+    }
+
+    if (grey_pars->opacity_flags.use_iso == 1)
+    {
+        double iso_scatt;
+
+        for (int i = 0; i < n; i ++) {
+            nu = nu_array[i];
+            for (int idx = 0; idx < total_num_species; idx++)
+            {
+                g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, idx);
+            }
+            iso_scatt = IsoScattTotal(nu, &grey_pars->opacity_pars,
+                          &grey_pars->eos_pars);
+
+            for (int idx = 0; idx < total_num_species; idx++) {
+                out->m1_mat[idx + 8][i] = 4. * kPi * nu * nu * nu * nu * nu * g_nu[idx] * iso_scatt;
+            }
+
+            nu = nu_array[n + i];
+            for (int idx = 0; idx < total_num_species; idx++)
+            {
+                g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, idx);
+            }
+            iso_scatt = IsoScattTotal(nu, &grey_pars->opacity_pars,
+                          &grey_pars->eos_pars);
+
+            for (int idx = 0; idx < total_num_species; idx++) {
+                out->m1_mat[idx + 8][n + i] = 4. * kPi * nu * nu * nu * nu * nu * g_nu[idx] * iso_scatt;
+            }
+        }   
+    }
+
+    return;
+}
+
+KOKKOS_INLINE_FUNCTION
 void ComputeM1DoubleIntegrandNotStimulated(MyQuadrature* quad_1d,
                                            GreyOpacityParams* grey_pars,
-                                           double t, M1MatrixKokkos* out_n,
-                                           M1MatrixKokkos* out_j)
+                                           double t, M1MatrixKokkos2D* out_n,
+                                           M1MatrixKokkos2D* out_j)
 {
     const int n = quad_1d->nx;
 
@@ -397,7 +500,7 @@ void ComputeM1DoubleIntegrandNotStimulated(MyQuadrature* quad_1d,
     OpacityParams opacity_pars = grey_pars->opacity_pars;
 
     // M1Matrix beta;
-    M1MatrixKokkos pair, brem, inel;
+    M1MatrixKokkos2D pair, brem, inel;
 
     // BetaOpacitiesTable(quad_1d, &my_grey_opacity_params->eos_pars,
     // &grey_pars->opacity_pars, t, &beta);
@@ -578,7 +681,7 @@ void ComputeM1DoubleIntegrandNotStimulated(MyQuadrature* quad_1d,
 KOKKOS_INLINE_FUNCTION
 void ComputeM1DoubleIntegrand(MyQuadrature* quad_1d,
                               GreyOpacityParams* grey_pars, double t,
-                              M1MatrixKokkos* out_n, M1MatrixKokkos* out_j)
+                              M1MatrixKokkos2D* out_n, M1MatrixKokkos2D* out_j)
 {
     const int n = quad_1d->nx;
 
@@ -607,7 +710,7 @@ void ComputeM1DoubleIntegrand(MyQuadrature* quad_1d,
 
 
     // M1Matrix beta;
-    M1MatrixKokkos pair, brem, inel;
+    M1MatrixKokkos2D pair, brem, inel;
 
     // BetaOpacitiesTable(quad_1d, &my_grey_opacity_params->eos_pars,
     // &grey_pars->opacity_pars, t, &beta);
@@ -852,7 +955,7 @@ ComputeM1OpacitiesNotStimulated(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
     MyQuadratureIntegrand integrals_1d =
         GaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s_array);
 
-    M1MatrixKokkos out_n, out_j;
+    M1MatrixKokkos2D out_n, out_j;
     ComputeM1DoubleIntegrandNotStimulated(quad_1d, my_grey_opacity_params, s,
                                           &out_n, &out_j);
     MyQuadratureIntegrand n_integrals_2d =
@@ -1004,12 +1107,16 @@ M1Opacities ComputeM1Opacities(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
     // MyQuadratureIntegrand integrals_1d =
     // GaussLegendreIntegrateFixedSplit1D(quad_1d, &integrand_m1_1d, s);
     //MyQuadratureIntegrand integrals_1d =
-        GaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s_array);
-    MyQuadratureIntegrand integrals_1d = {0};
+        //GaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s_array);
+    //MyQuadratureIntegrand integrals_1d = {0};
+    M1MatrixKokkos1D out = {0};
+
+    M1CoeffsSingleIntegrandMatrix(quad_1d, my_grey_opacity_params, s_array[0], &out);
+    MyQuadratureIntegrand integrals_1d = GaussLegendreIntegrate1DMatrix(quad_1d, &out, s_array[0]);
 
     // MyQuadratureIntegrand integrals_2d =
     // GaussLegendreIntegrateFixedSplit2D(quad_2d, &integrand_m1_2d, s);
-    M1MatrixKokkos out_n, out_j;
+    M1MatrixKokkos2D out_n = {0}, out_j = {0};
     ComputeM1DoubleIntegrand(quad_1d, my_grey_opacity_params, s, &out_n,
                              &out_j);
 

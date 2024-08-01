@@ -483,7 +483,7 @@ GaussLegendreIntegrate1D(MyQuadrature* quad, MyFunctionMultiD* func, double* t)
 
 KOKKOS_INLINE_FUNCTION
 MyQuadratureIntegrand GaussLegendreIntegrate2DMatrix(MyQuadrature* quad,
-                                                     M1MatrixKokkos* mat, double t)
+                                                     M1MatrixKokkos2D* mat, double t)
 {
     const int n              = quad->nx;
     const int num_integrands = 2 * total_num_species;
@@ -538,6 +538,42 @@ MyQuadratureIntegrand GaussLegendreIntegrate2DMatrix(MyQuadrature* quad,
 
     return result;
 }
+
+
+KOKKOS_INLINE_FUNCTION
+MyQuadratureIntegrand GaussLegendreIntegrate1DMatrix(MyQuadrature* quad,
+                                                     M1MatrixKokkos1D* mat, double t)
+{
+    const int n              = quad->nx;
+    const int num_integrands = 12;
+
+    double x_i, w_i, x2_i;
+
+    MyQuadratureIntegrand result = {0};
+
+    for (int idx = 0; idx < num_integrands; idx++)
+    {
+
+        for (int i = 0; i < n; i++)
+        {
+
+            x_i  = quad->points[i];
+            w_i  = quad->w[i];
+            x2_i = x_i * x_i;
+
+            result.integrand[idx] +=
+                quad->points[i] * (mat->m1_mat[idx][i] + mat->m1_mat[idx][n + i] / x2_i);
+        }
+    }
+
+    for (int idx = 0; idx < num_integrands; idx++)
+    {
+        result.integrand[idx] = t * result.integrand[idx];
+    }
+
+    return result;
+}
+
 
 /* Perform 1d integration (finite interval) of multiple functions using a
  * Gauss-Legendre quadrature

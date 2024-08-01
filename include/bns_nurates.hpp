@@ -439,12 +439,18 @@ struct M1Matrix
 };
 typedef struct M1Matrix M1Matrix;
 
-struct M1MatrixKokkos
+struct M1MatrixKokkos2D
 {
     double m1_mat_em[total_num_species][n_max][n_max];
     double m1_mat_ab[total_num_species][n_max][n_max];
 };
-typedef struct M1MatrixKokkos M1MatrixKokkos;
+typedef struct M1MatrixKokkos2D M1MatrixKokkos2D;
+
+struct M1MatrixKokkos1D
+{
+    double m1_mat[12][n_max];
+};
+typedef struct M1MatrixKokkos1D M1MatrixKokkos1D;
 
 /* SpectralOpacities struct
  *
