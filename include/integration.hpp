@@ -479,7 +479,7 @@ GaussLegendreIntegrate1D(MyQuadrature* quad, MyFunctionMultiD* func, double* t)
 }
 
 KOKKOS_INLINE_FUNCTION
-MyQuadratureIntegrand GaussLegendreIntegrate2DMatrix(MyQuadrature* quad,
+MyQuadratureIntegrand GaussLegendreIntegrate2DMatrix(const MyQuadrature* quad,
                                                      M1MatrixKokkos2D* mat, double t)
 {
     const int n              = quad->nx;
@@ -538,7 +538,7 @@ MyQuadratureIntegrand GaussLegendreIntegrate2DMatrix(MyQuadrature* quad,
 
 
 KOKKOS_INLINE_FUNCTION
-MyQuadratureIntegrand GaussLegendreIntegrate1DMatrix(MyQuadrature* quad,
+MyQuadratureIntegrand GaussLegendreIntegrate1DMatrix(const MyQuadrature* quad,
                                                      M1MatrixKokkos1D* mat, double t)
 {
     const int n              = quad->nx;

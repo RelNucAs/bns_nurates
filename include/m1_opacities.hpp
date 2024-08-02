@@ -367,7 +367,7 @@ MyQuadratureIntegrand M1CoeffsSingleIntegrand(double* var, void* p)
 }
 
 KOKKOS_INLINE_FUNCTION
-void M1CoeffsSingleIntegrandMatrix(MyQuadrature* quad_1d,
+void M1CoeffsSingleIntegrandMatrix(const MyQuadrature* quad_1d,
                              GreyOpacityParams* grey_pars, double t,
                              M1MatrixKokkos1D* out)
 {
@@ -695,7 +695,6 @@ void ComputeM1DoubleIntegrand(const MyQuadrature* quad_1d,
         nu_array[n + i] = t / quad_1d->points[i];
     }
 
-
     // compute the neutrino & anti-neutrino distribution function
     double g_nu[total_num_species], g_nu_bar[total_num_species];
     double block_factor_nu[total_num_species],
@@ -709,6 +708,7 @@ void ComputeM1DoubleIntegrand(const MyQuadrature* quad_1d,
     OpacityParams opacity_pars = grey_pars->opacity_pars;
 
 
+
     // M1Matrix beta;
     M1MatrixKokkos2D pair, brem, inel;
 
@@ -720,6 +720,8 @@ void ComputeM1DoubleIntegrand(const MyQuadrature* quad_1d,
     {
         PairKernelsTable(2 * n, nu_array, grey_pars, &pair);
     }
+    
+
 
     //InitializeM1MatrixSingleFlavor(&brem, n, 0);
     if (grey_pars->opacity_flags.use_brem == 1)
@@ -742,6 +744,7 @@ void ComputeM1DoubleIntegrand(const MyQuadrature* quad_1d,
 
     //InitializeM1Matrix(out_n, n);
     //InitializeM1Matrix(out_j, n);
+
 
     for (int i = 0; i < 2 * n; i++)
     {
@@ -910,6 +913,8 @@ ComputeM1OpacitiesNotStimulated(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
     static const double four_pi_hc3_sqr =
         four_pi_hc3 * four_pi_hc3; // [MeV^-6 cm^-6]
 
+
+
     // set up 1d integration
     MyFunctionMultiD integrand_m1_1d;
     MyQuadratureIntegrand integrand_m1_1d_info = {.n = 12};
@@ -949,6 +954,7 @@ ComputeM1OpacitiesNotStimulated(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
     {
         s_array[idx + 8] = J[idx] / n[idx];
     }
+
 
     // MyQuadratureIntegrand integrals_1d =
     // GaussLegendreIntegrateFixedSplit1D(quad_1d, &integrand_m1_1d, s);
@@ -1021,7 +1027,6 @@ KOKKOS_INLINE_FUNCTION
 M1Opacities ComputeM1Opacities(const MyQuadrature* quad_1d, const MyQuadrature* quad_2d,
                                GreyOpacityParams* my_grey_opacity_params)
 {
-
     // compute some constants
     static const double four_pi_hc3 =
         (4. * kPi) / (kHClight * kHClight * kHClight); // [MeV^-3 cm^-3]
@@ -1029,7 +1034,7 @@ M1Opacities ComputeM1Opacities(const MyQuadrature* quad_1d, const MyQuadrature* 
         four_pi_hc3 * four_pi_hc3; // [MeV^-6 cm^-6]
 
     const double temp = my_grey_opacity_params->eos_pars.temp;
-
+    
     // set up 1d integration
     __attribute__((unused))
     MyFunctionMultiD integrand_m1_1d;
