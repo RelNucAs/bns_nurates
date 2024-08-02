@@ -152,7 +152,39 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
   printf("Quadratures generated.\n");
 
   printf("\n");
+  
+  Kokkos::View<int> n_quad("n_quad");
+  Kokkos::View<int>::HostMirror h_n_quad = Kokkos::create_mirror_view(n_quad);
+  
+  h_n_quad() = my_quadrature_1d.nx;
 
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_weights("h_weights", my_quadrature_1d.nx);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_points("h_points", my_quadrature_1d.nx);
+
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> weights("weights", my_quadrature_1d.nx);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> points("points", my_quadrature_1d.nx);
+
+  for (int i = 0; i < my_quadrature_1d.nx; i ++) {
+    h_weights(i) = my_quadrature_1d.w[i];
+    h_points(i) = my_quadrature_1d.points[i];
+  }
+
+  Kokkos::deep_copy(n_quad, h_n_quad);
+  Kokkos::deep_copy(weights, h_weights);
+  Kokkos::deep_copy(points, h_points);
+
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_eta_0("h_eta_0", total_num_species*num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_eta("h_eta", total_num_species*num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_kappa_0_a("h_kappa_0_a", total_num_species*num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_kappa_a("h_kappa_a", total_num_species*num_data);
+  Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_kappa_s("h_kappa_s", total_num_species*num_data);
+
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> eta_0("eta_0", total_num_species*num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> eta("eta", total_num_species*num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> kappa_0_a("kappa_0_a", total_num_species*num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> kappa_a("kappa_a", total_num_species*num_data);
+  Kokkos::View<double*, LayoutWrapper, DevMemSpace> kappa_s("kappa_s", total_num_species*num_data);
+  
   printf("Generated tables:\n");
   printf("r diff_distr j0-nue j0-anue j0-nux j0-anux j-nue j-anue j-nux j-anux kappa0-a-nue kappa0-a-anue kappa0-a-nux kappa0-a-anux kappa-a-nue kappa-a-anue kappa-a-nux kappa-a-anux kappa-s-nue kappa-s-anue kappa-s-nux kappa-s-anux\n");
 
@@ -164,10 +196,25 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
   
   start = clock();
  
+  Kokkos::View<double> diff_distr("diff_distr");
+  Kokkos::View<double>::HostMirror h_diff_distr = Kokkos::create_mirror_view(diff_distr);
+
   Kokkos::parallel_for("loop_over_ccsn", Kokkos::RangePolicy<>(DevExeSpace(), 0, num_data),
   KOKKOS_LAMBDA(const int &i) {
     GreyOpacityParams my_grey_opacity_params;
-    my_grey_opacity_params.opacity_flags = *opacity_flags;
+    //my_grey_opacity_params.opacity_flags = *opacity_flags;
+    my_grey_opacity_params.opacity_flags = {.use_abs_em          = 1,
+                                            .use_pair            = 1,
+                                            .use_brem            = 1,
+                                            .use_inelastic_scatt = 1,
+                                            .use_iso             = 1};
+
+    MyQuadrature my_quad;
+    my_quad.nx = n_quad();
+    for (int idx = 0; idx < my_quad.nx; idx ++) {
+      my_quad.w[idx] = weights(idx);
+      my_quad.points[idx] = points(idx);
+    }
 
     // populate EOS parameters from table
     my_grey_opacity_params.eos_pars.mu_e = mu_e(i);
@@ -179,7 +226,15 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
     my_grey_opacity_params.eos_pars.nb = rho(i) / kMu;
 
     // Opacity parameters (corrections all switched off)
-    my_grey_opacity_params.opacity_pars = *opacity_pars;
+    //my_grey_opacity_params.opacity_pars = *opacity_pars;
+    my_grey_opacity_params.opacity_pars = {.use_dU             = false,
+                                           .use_dm_eff         = false,
+                                           .use_WM_ab          = false,
+                                           .use_WM_sc          = false,
+                                           .use_decay          = false,
+                                           .use_BRT_brem       = false,
+                                           .use_NN_medium_corr = false,
+                                           .neglect_blocking   = false};
 
     // Distribution parameters
     my_grey_opacity_params.distr_pars = NuEquilibriumParams(&my_grey_opacity_params.eos_pars); // consider neutrino distribution function at equilibrium
@@ -195,18 +250,29 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
     double distr_fermi =
         FermiDistr(123.4, my_grey_opacity_params.eos_pars.temp, my_grey_opacity_params.eos_pars.mu_e - my_grey_opacity_params.eos_pars.mu_n + my_grey_opacity_params.eos_pars.mu_p);
     double distr_nuftot = TotalNuF(123.4, &my_grey_opacity_params.distr_pars, 0);
-    double diff_distr = Kokkos::fabs(distr_fermi - distr_nuftot);
+    //double diff_distr = Kokkos::fabs(distr_fermi - distr_nuftot);
+    diff_distr() = Kokkos::fabs(distr_fermi - distr_nuftot);
 
 
-    M1Opacities coeffs = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
-    
-    printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
+    //M1Opacities coeffs = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
+    M1Opacities coeffs = ComputeM1Opacities(&my_quad, &my_quad, &my_grey_opacity_params);
+   
+    for (int j = 0; j < total_num_species; j ++) {
+        eta_0(total_num_species * i + j) = coeffs.eta_0[j]; 
+        eta(total_num_species * i + j) = coeffs.eta[j]; 
+        kappa_0_a(total_num_species * i + j) = coeffs.kappa_0_a[j]; 
+        kappa_a(total_num_species * i + j) = coeffs.kappa_a[j]; 
+        kappa_s(total_num_species * i + j) = coeffs.kappa_s[j];
+    }
+
+    /*printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
             r(i), diff_distr,
             coeffs.eta_0[id_nue], coeffs.eta_0[id_anue], coeffs.eta_0[id_nux], coeffs.eta_0[id_anux],
             coeffs.eta[id_nue], coeffs.eta[id_anue], coeffs.eta[id_nux], coeffs.eta[id_anux],
             coeffs.kappa_0_a[id_nue], coeffs.kappa_0_a[id_anue], coeffs.kappa_0_a[id_nux], coeffs.kappa_0_a[id_anux],
             coeffs.kappa_a[id_nue], coeffs.kappa_a[id_anue], coeffs.kappa_a[id_nux], coeffs.kappa_a[id_anux],
             coeffs.kappa_s[id_nue], coeffs.kappa_s[id_anue], coeffs.kappa_s[id_nux], coeffs.kappa_s[id_anux]);
+    */
     /*fprintf(file, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
             r(i), diff_distr,
             coeffs.eta_0[id_nue], coeffs.eta_0[id_anue], coeffs.eta_0[id_nux], coeffs.eta_0[id_anux],
@@ -218,10 +284,29 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
   });
   
   end = clock();
-
+  
   cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
   
   printf("Elapsed time: %.3lf sec\n", cpu_time_used);
+  
+  Kokkos::deep_copy(h_eta_0, eta_0);
+  Kokkos::deep_copy(h_eta, eta);
+  Kokkos::deep_copy(h_kappa_0_a, kappa_0_a);
+  Kokkos::deep_copy(h_kappa_a, kappa_a);
+  Kokkos::deep_copy(h_kappa_s, kappa_s);
+
+  Kokkos::deep_copy(h_diff_distr, diff_distr);
+
+  for (int i = 0; i < num_data; i ++) {
+    printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
+            h_r(i), h_diff_distr(),
+            h_eta_0(total_num_species * i + id_nue), h_eta_0(total_num_species * i + id_anue), h_eta_0(total_num_species * i + id_nux), h_eta_0(total_num_species * i + id_anux),
+            h_eta(total_num_species * i + id_nue), h_eta(total_num_species * i + id_anue), h_eta(total_num_species * i + id_nux), h_eta(total_num_species * i + id_anux),
+            h_kappa_0_a(total_num_species * i + id_nue), h_kappa_0_a(total_num_species * i + id_anue), h_kappa_0_a(total_num_species * i + id_nux), h_kappa_0_a(total_num_species * i + id_anux),
+            h_kappa_a(total_num_species * i + id_nue), h_kappa_a(total_num_species * i + id_anue), h_kappa_a(total_num_species * i + id_nux), h_kappa_a(total_num_species * i + id_anux),
+            h_kappa_s(total_num_species * i + id_nue), h_kappa_s(total_num_species * i + id_anue), h_kappa_s(total_num_species * i + id_nux), h_kappa_s(total_num_species * i + id_anux));
+  }
+
 
   fclose(file);
 
