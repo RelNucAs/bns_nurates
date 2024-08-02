@@ -4,6 +4,8 @@ project(bns_nurates VERSION 0.1 LANGUAGES C CXX)
 # Kokkos require C++17 standard as minimum
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
 
 # Force flag to denote C++ standard, as deprecated c++1z is not supported by nvcc.
 set(CMAKE_CXX17_STANDARD_COMPILE_OPTION "-std=c++17")

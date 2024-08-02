@@ -161,7 +161,6 @@ void test_distribution() {
   Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_c_f_id_nux("my_nudistributionparams_c_f_id_nux", num_data);
   Kokkos::View<double*, LayoutWrapper, DevMemSpace> my_nudistributionparams_beta_f_id_nux("my_nudistributionparams_beta_f_id_nux", num_data);
 
-  char fileline[1000];
   fptr = fopen(data_filepath, "w");
   if (fptr == NULL) {
     printf("%s: The file %s does not exist!\n", __FILE__, filepath);
@@ -171,10 +170,13 @@ void test_distribution() {
       "#w_t_nue temp_t_nue eta_t_nue w_f_nue temp_f_nue c_f_nue beta_f_nue w_t_anue temp_t_anue eta_t_anue w_f_anue temp_f_anue c_f_anue beta_f_anue w_t_nux temp_t_nux eta_t_nux w_f_nux temp_f_nux c_f_nux beta_f_nux\n");
 
 
-  printf("got here! just before start of loop\n");
+  printf("Test M1 distribution: Enter Kokkos parallel for loop ...\n");
+
   Kokkos::parallel_for("par_for_test_m1_distribution", Kokkos::RangePolicy<>(DevExeSpace(), 0, num_data),
   KOKKOS_LAMBDA(const int &i) {
-    printf("got here! just beginning of loop\n");
+
+    printf("Kokkos parallel for: First line inside loop ...\n");
+
     GreyOpacityParams my_grey_opacity_params;
     my_grey_opacity_params.opacity_flags = {.use_abs_em = 0,
                                             .use_pair = 0,
@@ -199,8 +201,11 @@ void test_distribution() {
     my_grey_opacity_params.m1_pars.J[id_anux] = j_muon(i);
     my_grey_opacity_params.m1_pars.chi[id_anux] = chi_muon(i);
 
-    printf("got here! before calculate distribution params\n");
+    printf("Kokkos parallel for: Now calculate distribution function parameters from M1 ...\n");
+
     NuDistributionParams my_nudistributionparams = CalculateDistrParamsFromM1(&my_grey_opacity_params.m1_pars, &my_grey_opacity_params.eos_pars);
+
+    printf("Kokkos parallel for: Done calculating distribution function parameters from M1 ...\n");
 
     my_nudistributionparams_w_t_id_nue(i) = my_nudistributionparams.w_t[id_nue];
     my_nudistributionparams_temp_t_id_nue(i) = my_nudistributionparams.temp_t[id_nue];
@@ -226,15 +231,7 @@ void test_distribution() {
     my_nudistributionparams_c_f_id_nux(i) = my_nudistributionparams.c_f[id_nux];
     my_nudistributionparams_beta_f_id_nux(i) = my_nudistributionparams.beta_f[id_nux];
 
-    /*
-    printf("%d %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n", i,
-            my_nudistributionparams.w_t[id_nue], my_nudistributionparams.temp_t[id_nue], my_nudistributionparams.eta_t[id_nue], my_nudistributionparams.w_f[id_nue],
-            my_nudistributionparams.temp_f[id_nue], my_nudistributionparams.c_f[id_nue], my_nudistributionparams.beta_f[id_nue],
-            my_nudistributionparams.w_t[id_anue], my_nudistributionparams.temp_t[id_anue], my_nudistributionparams.eta_t[id_anue], my_nudistributionparams.w_f[id_anue],
-            my_nudistributionparams.temp_f[id_anue], my_nudistributionparams.c_f[id_anue], my_nudistributionparams.beta_f[id_anue],
-            my_nudistributionparams.w_t[id_nux], my_nudistributionparams.temp_t[id_nux], my_nudistributionparams.eta_t[id_nux], my_nudistributionparams.w_f[id_nux],
-            my_nudistributionparams.temp_f[id_nux], my_nudistributionparams.c_f[id_nux], my_nudistributionparams.beta_f[id_nux]); */
-    printf("got here! 5\n");
+    printf("Kokkos parallel for: End of iteration for calculating parameters from M1.\n");
   });
 
   Kokkos::deep_copy(h_my_nudistributionparams_w_t_id_nue, my_nudistributionparams_w_t_id_nue);
@@ -259,7 +256,7 @@ void test_distribution() {
   Kokkos::deep_copy(h_my_nudistributionparams_w_f_id_nux, my_nudistributionparams_w_f_id_nux);
   Kokkos::deep_copy(h_my_nudistributionparams_temp_f_id_nux, my_nudistributionparams_temp_f_id_nux);
   Kokkos::deep_copy(h_my_nudistributionparams_c_f_id_nux, my_nudistributionparams_c_f_id_nux);
-  Kokkos::deep_copy(h_my_nudistributionparams_beta_f_id_nue, my_nudistributionparams_beta_f_id_nue);
+  Kokkos::deep_copy(h_my_nudistributionparams_beta_f_id_nux, my_nudistributionparams_beta_f_id_nux);
 
   for (int i = 0; i < num_data; i++) {
     fprintf(fptr, "%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",
