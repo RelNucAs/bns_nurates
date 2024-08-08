@@ -112,7 +112,7 @@ add_library(nurates SHARED
 include_directories(include)
 include_directories(src)
 
-file(GLOB HEADERS_ALL "include/*.h")
+file(GLOB HEADERS_ALL "include/*.hpp")
 set_target_properties(nurates PROPERTIES PUBLIC_HEADER "${HEADERS_ALL}")
 
 target_include_directories(nurates PRIVATE include)

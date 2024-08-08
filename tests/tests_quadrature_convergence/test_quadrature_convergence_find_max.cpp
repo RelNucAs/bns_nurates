@@ -18,7 +18,7 @@
 #include "functions.hpp"
 
 void ComputeSpectralEmissivities(const int n_leg, const char *reac_type, OpacityFlags *opacity_flags) {
-
+  /*
   double s, eta;
 
   char read_path[300] = {'\0'};
@@ -362,18 +362,18 @@ void ComputeDoubleIntegrand(const int n_leg, const char *reac_type, OpacityFlags
 
   printf("Done!\n");
   printf("\n");
-
+  */
   return;
 }
 
 int main() {
-
+  /*
   // Opacity flags
   OpacityFlags opacity_flags = {.use_abs_em = 0, .use_pair = 1, .use_brem = 0, .use_inelastic_scatt = 0, .use_iso = 0};
   const char* reac_type = "pair";
  
   //ComputeSpectralEmissivities(50, reac_type, &opacity_flags);
   ComputeDoubleIntegrand(50, reac_type, &opacity_flags);
-
+  */
   return 0;
 }

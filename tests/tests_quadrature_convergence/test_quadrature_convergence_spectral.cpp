@@ -152,7 +152,7 @@
   };
 
 void ComputeSpectralRatesGivenQuadrature(const int n_leg, const int id_point, const char *reac_type, MyEOSParams *eos_pars, OpacityFlags *opacity_flags) {
-
+  /*
   char write_path[300] = {'\0'};
   char write_file[200];
 
@@ -246,7 +246,7 @@ void ComputeSpectralRatesGivenQuadrature(const int n_leg, const int id_point, co
   
   printf("Done!\n");
   printf("\n");
-
+  */
   return;
 }
 

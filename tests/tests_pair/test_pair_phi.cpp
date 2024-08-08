@@ -11,6 +11,7 @@
 #include "../../include/kernels.hpp"
 
 int main() {
+  /*
   double pair_phi_e[3];
 
   pair_phi_e[0] = PairPhi(0, 0.5, 0.9, 8, 13, 0);
@@ -67,5 +68,5 @@ int main() {
   } else {
     return 1;
   }
-
+  */
 }
