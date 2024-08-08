@@ -18,18 +18,44 @@ cmake_policy(SET CMP0079 NEW)
 
 find_package(GSL)
 
-# set OpenMP macro (true/false)
-set(ENABLE_OPENMP OFF)
-find_package(OpenMP COMPONENTS CXX)
-if (NOT OpenMP_FOUND)
-  message(FATAL_ERROR "OpenMP package is required but could not be found.")
- endif()
-set(Kokkos_ENABLE_OPENMP OFF CACHE BOOL "Compile Kokkos with OpenMP")
+# set OpenMP macro to OFF my default
+set(ENABLE_OPENMP ON CACHE BOOL "Enable OpenMP support")
+
+if (ENABLE_OPENMP)
+	message(STATUS "ENABLE_OPENMP set to ${ENABLE_OPENMP}: Compiling with OpenMP package.")
+	find_package(OpenMP COMPONENTS CXX)
+	if (OpenMP_CXX_FOUND)
+        message(STATUS "OpenMP package found.")
+    else()
+        message(FATAL_ERROR "OpenMP package is required but could not be found.")
+    endif()
+else()
+	message(STATUS "ENABLE_OPENMP set to ${ENABLE_OPENMP}: Not compiling with OpenMP package.")
+endif()
+
+set(ENABLE_KOKKOS ON CACHE BOOL "Enable Kokkos support")
+if (ENABLE_KOKKOS)
+	message(STATUS "ENABLE_KOKKOS set to ${ENABLE_KOKKOS}: Compiling with Kokkos package.")
+else()
+	message(STATUS "ENABLE_KOKKOS set to ${ENABLE_KOKKOS}: Not compiling with Kokkos package.")
+endif()
+
+if(ENABLE_KOKKOS AND ENABLE_OPENMP)
+	set(Kokkos_ENABLE_OPENMP ON CACHE BOOL "Compile Kokkos with OpenMP")
+endif()
+
+if(ENABLE_KOKKOS)
+	add_subdirectory(kokkos)
+	include_directories(${Kokkos_INCLUDE_DIRS_RET})
+endif ()
+
+
 if (ENABLE_OPENMP)
   set(OPENMP_PARALLEL_ENABLED 1)
 else()
   set(OPENMP_PARALLEL_ENABLED 0)
 endif()
+
 
 if (${GSL_FOUND})
 	add_compile_definitions(GSL_INCLUDES_H_)
@@ -58,10 +84,12 @@ add_executable(bns_nurates
 		include/kernel_nes.hpp
 		include/kernel_brem.hpp)
 
-add_subdirectory(kokkos)
-include_directories(${Kokkos_INCLUDE_DIRS_RET})
-target_link_libraries(bns_nurates Kokkos::kokkos)
-target_link_libraries(bns_nurates OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(bns_nurates Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(bns_nurates OpenMP::OpenMP_CXX)
+endif()
 
 #target_compile_options(bns_nurates PRIVATE -Wall -Wextra)
 target_include_directories(bns_nurates PRIVATE include)
@@ -78,9 +106,7 @@ add_library(nurates SHARED
 		tests/tests_quadrature_integrate/gsl_routines/mnewt_GSL.cpp
 		tests/tests_quadrature_integrate/gsl_routines/integration_GSL.cpp
 		src/integration/integration_quadrature_schemes.cpp
-		src/integration/integration_quadrature_io.cpp
-		include/kernel_pair.hpp
-		include/kernel_nes.hpp)
+		src/integration/integration_quadrature_io.cpp)
 
 #set_target_properties(nurates PROPERTIES PUBLIC_HEADER include/*.h)
 include_directories(include)
@@ -96,8 +122,12 @@ if (${GSL_FOUND})
 	target_link_libraries(nurates GSL::gsl GSL::gslcblas)
 endif()
 target_link_libraries(nurates m)
-target_link_libraries(nurates Kokkos::kokkos)
-target_link_libraries(nurates OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(nurates Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(nurates OpenMP::OpenMP_CXX)
+endif ()
 
 include(GNUInstallDirs)
 install(TARGETS nurates LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nurates)
@@ -108,8 +138,12 @@ add_executable(test_pair_t
 		include/constants.hpp
 		include/kernels.hpp
 		include/kernel_pair.hpp)
-target_link_libraries(test_pair_t Kokkos::kokkos)
-target_link_libraries(test_pair_t OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_pair_t Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_pair_t OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_pair_t GSL::gsl GSL::gslcblas)
 endif()
@@ -121,9 +155,12 @@ add_executable(test_pair_f
 		include/constants.hpp
 		include/kernels.hpp
 		include/kernel_pair.hpp)
-
-target_link_libraries(test_pair_f Kokkos::kokkos)
-target_link_libraries(test_pair_f OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_pair_f Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_pair_f OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_pair_f GSL::gsl GSL::gslcblas)
 endif()
@@ -135,8 +172,12 @@ add_executable(test_pair_psi
 		include/constants.hpp
 		include/kernels.hpp
 		include/kernel_pair.hpp)
-target_link_libraries(test_pair_psi Kokkos::kokkos)
-target_link_libraries(test_pair_psi OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_pair_psi Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_pair_psi OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_pair_psi GSL::gsl GSL::gslcblas)
 endif()
@@ -149,8 +190,12 @@ add_executable(test_pair_phi
 		include/kernels.hpp
 		include/kernel_pair.hpp
 )
-target_link_libraries(test_pair_phi Kokkos::kokkos)
-target_link_libraries(test_pair_phi OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_pair_phi Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_pair_phi OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_pair_phi GSL::gsl GSL::gslcblas)
 endif()
@@ -164,8 +209,12 @@ add_executable(test_pair_kernels
 		include/kernels.hpp
 		include/kernel_pair.hpp
 )
-target_link_libraries(test_pair_kernels Kokkos::kokkos)
-target_link_libraries(test_pair_kernels OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_pair_kernels Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_pair_kernels OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_pair_kernels GSL::gsl GSL::gslcblas)
 endif()
@@ -179,8 +228,12 @@ add_executable(test_beta
 		include/weak_magnetism.hpp
 )
 
-target_link_libraries(test_beta Kokkos::kokkos)
-target_link_libraries(test_beta OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_beta Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_beta OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_beta GSL::gsl GSL::gslcblas)
 endif()
@@ -194,9 +247,12 @@ add_executable(test_iso
 		include/opacities.hpp
 		include/weak_magnetism.hpp
 )
-
-target_link_libraries(test_iso Kokkos::kokkos)
-target_link_libraries(test_iso OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_iso Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_iso OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_iso GSL::gsl GSL::gslcblas)
 endif()
@@ -209,9 +265,12 @@ add_executable(test_brem
 		include/bns_nurates.hpp
 		include/kernel_brem.hpp
 )
-
-target_link_libraries(test_brem Kokkos::kokkos)
-target_link_libraries(test_brem OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_brem Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_brem OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_brem GSL::gsl GSL::gslcblas)
 endif()
@@ -227,9 +286,12 @@ add_executable(test_gauss_legendre_1d
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 )
-
-target_link_libraries(test_gauss_legendre_1d Kokkos::kokkos)
-target_link_libraries(test_gauss_legendre_1d OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_gauss_legendre_1d Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_gauss_legendre_1d OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_gauss_legendre_1d GSL::gsl GSL::gslcblas)
 endif()
@@ -245,9 +307,12 @@ add_executable(test_gauss_legendre_2d
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 )
-
-target_link_libraries(test_gauss_legendre_2d Kokkos::kokkos)
-target_link_libraries(test_gauss_legendre_2d OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_gauss_legendre_2d Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_gauss_legendre_2d OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_gauss_legendre_2d GSL::gsl GSL::gslcblas)
 endif()
@@ -263,9 +328,12 @@ add_executable(test_gauss_legendre_3d
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 )
-
-target_link_libraries(test_gauss_legendre_3d Kokkos::kokkos)
-target_link_libraries(test_gauss_legendre_3d OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_gauss_legendre_3d Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_gauss_legendre_3d OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_gauss_legendre_3d GSL::gsl GSL::gslcblas)
 endif()
@@ -281,9 +349,12 @@ add_executable(test_gauss_laguerre_1d
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 )
-
-target_link_libraries(test_gauss_laguerre_1d Kokkos::kokkos)
-target_link_libraries(test_gauss_laguerre_1d OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_gauss_laguerre_1d Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_gauss_laguerre_1d OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_gauss_laguerre_1d GSL::gsl GSL::gslcblas)
 endif()
@@ -299,8 +370,12 @@ add_executable(test_quadrature_io
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 )
-target_link_libraries(test_quadrature_io Kokkos::kokkos)
-target_link_libraries(test_quadrature_io OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_quadrature_io Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_quadrature_io OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_quadrature_io GSL::gsl GSL::gslcblas)
 endif()
@@ -318,9 +393,12 @@ add_executable(test_integration_1d
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 )
-
-target_link_libraries(test_integration_1d Kokkos::kokkos)
-target_link_libraries(test_integration_1d OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_integration_1d Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_integration_1d OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_integration_1d GSL::gsl GSL::gslcblas)
 endif()
@@ -338,9 +416,12 @@ add_executable(test_integration_2d
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 )
-
-target_link_libraries(test_integration_2d Kokkos::kokkos)
-target_link_libraries(test_integration_2d OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_integration_2d Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_integration_2d OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_integration_2d GSL::gsl GSL::gslcblas)
 endif()
@@ -358,9 +439,12 @@ add_executable(test_integration_3d
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 )
-
-target_link_libraries(test_integration_3d Kokkos::kokkos)
-target_link_libraries(test_integration_3d OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_integration_3d Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_integration_3d OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_integration_3d GSL::gsl GSL::gslcblas)
 endif()
@@ -378,9 +462,12 @@ add_executable(test_integration_special
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 )
-
-target_link_libraries(test_integration_special Kokkos::kokkos)
-target_link_libraries(test_integration_special OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_integration_special Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_integration_special OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_integration_special GSL::gsl GSL::gslcblas)
 endif()
@@ -398,9 +485,12 @@ add_executable(test_integration_multi_func_1d
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 )
-
-target_link_libraries(test_integration_multi_func_1d Kokkos::kokkos)
-target_link_libraries(test_integration_multi_func_1d OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_integration_multi_func_1d Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_integration_multi_func_1d OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_integration_multi_func_1d GSL::gsl GSL::gslcblas)
 endif()
@@ -418,9 +508,12 @@ add_executable(test_integration_multi_func_2d
 		src/integration/integration_quadrature_schemes.cpp
 		src/integration/integration_quadrature_io.cpp
 )
-
-target_link_libraries(test_integration_multi_func_2d Kokkos::kokkos)
-target_link_libraries(test_integration_multi_func_2d OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_integration_multi_func_2d Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_integration_multi_func_2d OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_integration_multi_func_2d GSL::gsl GSL::gslcblas)
 endif()
@@ -449,8 +542,12 @@ add_executable(test_opacities_electron_capture
         tests/tests_opacities_m1/test_m1_opacities.cpp
 		tests/tests.hpp
 )
-target_link_libraries(test_opacities_electron_capture Kokkos::kokkos)
-target_link_libraries(test_opacities_electron_capture OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_opacities_electron_capture Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_opacities_electron_capture OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_opacities_electron_capture GSL::gsl GSL::gslcblas)
 endif()
@@ -479,8 +576,12 @@ add_executable(test_opacities_pair
         tests/tests_opacities_m1/test_m1_opacities.cpp
 		tests/tests.hpp
 )
-target_link_libraries(test_opacities_pair Kokkos::kokkos)
-target_link_libraries(test_opacities_pair OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_opacities_pair Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_opacities_pair OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_opacities_pair GSL::gsl GSL::gslcblas)
 endif()
@@ -510,9 +611,12 @@ add_executable(test_opacities_brem
 		tests/tests.hpp
 		include/kernel_brem.hpp
 )
-
-target_link_libraries(test_opacities_brem Kokkos::kokkos)
-target_link_libraries(test_opacities_brem OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_opacities_brem Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_opacities_brem OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_opacities_brem GSL::gsl GSL::gslcblas)
 endif()
@@ -541,8 +645,12 @@ add_executable(test_opacities_inelastic_scatt
         tests/tests_opacities_m1/test_m1_opacities.cpp
 		tests/tests.hpp
 )
-target_link_libraries(test_opacities_inelastic_scatt Kokkos::kokkos)
-target_link_libraries(test_opacities_inelastic_scatt OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_opacities_inelastic_scatt Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_opacities_inelastic_scatt OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_opacities_inelastic_scatt GSL::gsl GSL::gslcblas)
 endif()
@@ -571,8 +679,12 @@ add_executable(test_opacities_isoscatt
         tests/tests_opacities_m1/test_m1_opacities.cpp
 		tests/tests.hpp
 )
-target_link_libraries(test_opacities_isoscatt Kokkos::kokkos)
-target_link_libraries(test_opacities_isoscatt OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_opacities_isoscatt Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_opacities_isoscatt OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_opacities_isoscatt GSL::gsl GSL::gslcblas)
 endif()
@@ -598,8 +710,12 @@ add_executable(test_opacities_all_reactions
         tests/tests_opacities_m1/test_m1_opacities.cpp
 		tests/tests.hpp
 )
-target_link_libraries(test_opacities_all_reactions Kokkos::kokkos)
-target_link_libraries(test_opacities_all_reactions OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_opacities_all_reactions Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_opacities_all_reactions OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_opacities_all_reactions GSL::gsl GSL::gslcblas)
 endif()
@@ -624,8 +740,12 @@ add_executable(test_opacities_thc
         tests/tests_opacities_m1/test_m1_opacities.cpp
 		tests/tests.hpp
 )
-target_link_libraries(test_opacities_thc Kokkos::kokkos)
-target_link_libraries(test_opacities_thc OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_opacities_thc Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_opacities_thc OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_opacities_thc GSL::gsl GSL::gslcblas)
 endif()
@@ -638,9 +758,12 @@ add_executable(test_m1_distribution
 		include/distribution.hpp
 		tests/tests_distribution/test_m1_distribution.cpp
 )
-
-target_link_libraries(test_m1_distribution Kokkos::kokkos)
-target_link_libraries(test_m1_distribution OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_m1_distribution Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_m1_distribution OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_m1_distribution GSL::gsl GSL::gslcblas)
 endif()
@@ -665,8 +788,12 @@ add_executable(test_quadrature_convergence_spectral
 		tests/tests_quadrature_convergence/test_quadrature_convergence_spectral.cpp
 		tests/tests.hpp
 )
-target_link_libraries(test_quadrature_convergence_spectral Kokkos::kokkos)
-target_link_libraries(test_quadrature_convergence_spectral OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_quadrature_convergence_spectral Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_quadrature_convergence_spectral OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_quadrature_convergence_spectral GSL::gsl GSL::gslcblas)
 endif()
@@ -691,8 +818,12 @@ add_executable(test_quadrature_convergence_integrated
 		tests/tests_quadrature_convergence/test_quadrature_convergence_integrated.cpp
 		tests/tests.hpp
 )
-target_link_libraries(test_quadrature_convergence_integrated Kokkos::kokkos)
-target_link_libraries(test_quadrature_convergence_integrated OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_quadrature_convergence_integrated Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_quadrature_convergence_integrated OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_quadrature_convergence_integrated GSL::gsl GSL::gslcblas)
 endif()
@@ -717,8 +848,12 @@ add_executable(test_quadrature_convergence_find_max
 		tests/tests_quadrature_convergence/test_quadrature_convergence_find_max.cpp
 		tests/tests.hpp
 )
-target_link_libraries(test_quadrature_convergence_find_max Kokkos::kokkos)
-target_link_libraries(test_quadrature_convergence_find_max OpenMP::OpenMP_CXX)
+if(ENABLE_KOKKOS)
+	target_link_libraries(test_quadrature_convergence_find_max Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+	target_link_libraries(test_quadrature_convergence_find_max OpenMP::OpenMP_CXX)
+endif()
 if (${GSL_FOUND})
 	target_link_libraries(test_quadrature_convergence_find_max GSL::gsl GSL::gslcblas)
 endif()

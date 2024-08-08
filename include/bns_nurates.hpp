@@ -11,6 +11,14 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#ifndef KOKKOS_INLINE_FUNCTION
+  #ifdef ENABLE_KOKKOS
+    #include <Kokkos_Core.hpp>
+  #else
+    #define KOKKOS_INLINE_FUNCTION inline
+  #endif
+#endif
+
 // Define indices of neutrino species
 #define id_nue 0
 #define id_anue 1

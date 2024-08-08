@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-
-#include <Kokkos_Core.hpp>
+#include <cassert>
+#include <cfloat>
 
 #include "bns_nurates.hpp"
 #include "constants.hpp"

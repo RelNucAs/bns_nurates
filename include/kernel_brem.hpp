@@ -14,7 +14,6 @@
 
 #include <math.h>
 #include <assert.h>
-#include <Kokkos_Core.hpp>
 
 #include "bns_nurates.hpp"
 #include "constants.hpp"

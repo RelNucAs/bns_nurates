@@ -8,8 +8,6 @@
 //! \file  m1_opacities.hpp
 //  \brief header file for all integration routines
 
-#include <Kokkos_Core.hpp>
-
 #include "bns_nurates.hpp"
 #include "opacities.hpp"
 #include "kernels.hpp"

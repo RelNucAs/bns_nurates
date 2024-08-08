@@ -12,7 +12,6 @@
 #define BNS_NURATES_SRC_DISTRIBUTION_DISTRIBUTION_H_
 
 #include <math.h>
-#include <Kokkos_Core.hpp>
 
 #include "bns_nurates.hpp"
 #include "constants.hpp"
