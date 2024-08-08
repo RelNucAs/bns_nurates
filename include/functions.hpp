@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <cassert>
-#include <cfloat>
+#include <assert.h>
+#include <float.h>
 
 #include "bns_nurates.hpp"
 #include "constants.hpp"
