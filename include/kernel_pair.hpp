@@ -200,11 +200,11 @@ double PairFOptimized(int k, double eta, double x1)
 
         double sum = 0.;
         tmp        = 1.;
-        sum += PairTWithAlpha0(2) / Kokkos::tgamma(k); // l=0
+        sum += PairTWithAlpha0(2) / tgamma(k); // l=0
         for (int l = 1; l <= (int)((k - 1.) / 2.); l++)
         {
             tmp = tmp / (eta * eta);
-            sum += PairTWithAlpha0(2 * l + 2) * tmp / Kokkos::tgamma(k - 1 - 2 * l + 1);
+            sum += PairTWithAlpha0(2 * l + 2) * tmp / tgamma(k - 1 - 2 * l + 1);
         }
 
         double sum_2 = 0.;
