@@ -12,7 +12,7 @@
 #include <stddef.h>
 
 #ifndef KOKKOS_INLINE_FUNCTION
-  #ifdef ENABLE_KOKKOS
+  #ifdef KOKKOS_FLAG
     #include <Kokkos_Core.hpp>
   #else
     #define KOKKOS_INLINE_FUNCTION inline
