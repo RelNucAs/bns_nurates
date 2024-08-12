@@ -32,11 +32,6 @@ void GaussLegendre(MyQuadrature* quad)
     assert(quad->dim == 1);
     assert(quad->type == kGauleg);
 
-    quad->points = NULL;
-    quad->w      = NULL;
-    quad->points = (double*)malloc(quad->nx * sizeof(double));
-    quad->w      = (double*)malloc(quad->nx * sizeof(double));
-
     double z1, z, xm, xl, pp, p3, p2, p1;
 
     int n = quad->nx;
@@ -91,11 +86,12 @@ void GaussLegendre(MyQuadrature* quad)
  * each.
  *
  * Inputs:
- *      quad: A MyQuadrature structure to hold quadratures.
+ *      quad: A MyQuadratureOld structure to hold quadratures.
  *            This already contains metadata for the quadrature, the routine
  *            only populates the quadrature points and weights
  */
-void GaussLegendreMultiD(MyQuadrature* quad)
+/*
+void GaussLegendreMultiD(MyQuadratureOld* quad)
 {
 
     // perform checks
@@ -119,7 +115,7 @@ void GaussLegendreMultiD(MyQuadrature* quad)
     }
 
     // local quadrature which contain 1d quadrature along each variable
-    MyQuadrature quad_local = quadrature_default;
+    MyQuadratureOld quad_local = quadrature_default;
 
     if (quad->dim >= 1)
     {
@@ -166,17 +162,19 @@ void GaussLegendreMultiD(MyQuadrature* quad)
         }
     }
 }
+*/
 
 /* Generate Gauss-Laguerre quadratures in [0,inf).
  * For this routine to generate data successfully, quad struct
  * must have dim, type, nx, alpha metadata populated.
  *
  * Inputs:
- *      quad:   A MyQuadrature structure to hold quadratures.
+ *      quad:   A MyQuadratureOld structure to hold quadratures.
  *              This already contains metadata for the quadrature, the routine
  *              only populates the quadrature points and weights
  */
-void GaussLaguerre(MyQuadrature* quad)
+/*
+void GaussLaguerre(MyQuadratureOld* quad)
 {
 
     const int kMaxIt  = 10;
@@ -248,3 +246,4 @@ void GaussLaguerre(MyQuadrature* quad)
             -exp(Gammln(quad->alpha + n) - Gammln(((double)n))) / (pp * n * p2);
     }
 }
+*/

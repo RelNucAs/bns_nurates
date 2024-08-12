@@ -19,7 +19,8 @@
  *    filedir:  location of save directory
  *    quad:     quadrature struct with proper metadata populated
  */
-void SaveQuadrature(char* filedir, MyQuadrature* quad)
+/*
+void SaveQuadrature(char* filedir, MyQuadratureOld* quad)
 {
 
     char fileHeader[100];
@@ -75,6 +76,7 @@ void SaveQuadrature(char* filedir, MyQuadrature* quad)
 
     fclose(fptr);
 }
+*/
 
 /* Load quadrature from disk to struct quad. If not present on disk,
  * generate and save to disk as well.
@@ -83,7 +85,8 @@ void SaveQuadrature(char* filedir, MyQuadrature* quad)
  *    filedir:  location of save directory
  *    quad:     quadrature struct with proper metadata populated
  */
-void LoadQuadrature(char* filedir, MyQuadrature* quad)
+/*
+void LoadQuadrature(char* filedir, MyQuadratureOld* quad)
 {
 
     char fileHeader[100];
@@ -149,3 +152,4 @@ void LoadQuadrature(char* filedir, MyQuadrature* quad)
         fclose(fptr);
     }
 }
+*/
