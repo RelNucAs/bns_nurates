@@ -8,8 +8,6 @@
 //! \file  integration.h
 //  \brief header file for all integration routines
 
-#include <Kokkos_Core.hpp>
-
 #include "bns_nurates.hpp"
 #include "functions.hpp"
 

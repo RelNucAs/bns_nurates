@@ -1,4 +1,6 @@
-# NuO-BNSlib
+# bns_nurates: A performance portable library for neutrino opacities in Kokkos and C++
+
+By default, bns_nurates compiles with OpenMP and Kokkos. To prevent this, add flags -DENABLE_KOKKOS=OFF and -DENABLE_OPENMP=OFF to cmake.
 
 ##### A C library for neutrino opacities in the context of binary neutron star mergers.
 

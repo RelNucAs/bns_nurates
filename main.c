@@ -25,6 +25,7 @@
 #define n_bins 128
 
 void save_rates_to_file(const int id_point, const char* reac_type, const int n_leg, MyEOSParams *eos_pars, OpacityFlags *opacity_flags, const double rho, const double Abar, const double Zbar, const double mu_hat, const bool neglect_blocking) {
+  /*
   const char folder[200] = "/home/leonardo/Desktop/PhD_work/BNS_muons/bns_refactor/bns_nurates/tests/tests_code_comparison/";
   char filename[300], full_path[300];
   char file_type[100];
@@ -329,12 +330,12 @@ void save_rates_to_file(const int id_point, const char* reac_type, const int n_l
   fprintf(fp, "\n");
 
   fclose(fp);
-
+  */
   return;
 }
 
 int main() {
-
+  /*
   // Thermodynamic points for comparison
   const double rho_array[n_points]   = {1435091918127104.0, 993097437675520.00, 511017121480704.00, 23989367865344.000}; // [g cm-3]
   const double temp_array[n_points]  = {51.150005340576172, 43.034099578857422, 31.396757125854492, 5.8661994934082031}; // [MeV]
@@ -381,7 +382,7 @@ int main() {
     }
 
   }
-
+  */
   return 0;
 }
 

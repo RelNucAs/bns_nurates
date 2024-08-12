@@ -10,8 +10,6 @@
 
 #include <stdbool.h>
 
-#include <Kokkos_Core.hpp>
-
 #include "bns_nurates.hpp"
 #include "functions.hpp"
 #include "constants.hpp"

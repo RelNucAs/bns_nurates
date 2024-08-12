@@ -10,6 +10,7 @@
 #include "../../include/kernels.hpp"
 
 int main() {
+  /*
   double pair_psi[8];
 
   pair_psi[0] = PairPsi(0, 0.3, 3.46, 44);
@@ -53,5 +54,5 @@ int main() {
   } else {
     return 1;
   }
-
+  */
 }

@@ -11,7 +11,6 @@
 // https://ui.adsabs.harvard.edu/abs/1993ApJ...410..740M/abstract
 
 #include "math.h"
-#include <Kokkos_Core.hpp>
 
 #include "bns_nurates.hpp"
 #include "functions.hpp"

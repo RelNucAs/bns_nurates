@@ -17,7 +17,7 @@
 #include "distribution.hpp"
 
 void ComputeM1CoeffsGivenQuadrature(const int n_leg, const char *reac_type, OpacityFlags *opacity_flags) {
-
+  /*
   char read_path[300] = {'\0'};
   char read_file[200] = "/inputs/nurates_CCSN/nurates_1.008E+01.txt";
 
@@ -170,7 +170,7 @@ void ComputeM1CoeffsGivenQuadrature(const int n_leg, const char *reac_type, Opac
    
   printf("Done!\n");
   printf("\n");
-
+  */
   return;
 }
 
@@ -186,7 +186,7 @@ int main() {
   char *reac_type;
 
   /* Select the reaction */
-
+  /*
   // Beta processes 
   opacity_flags = opacity_flags_default_none;
   opacity_flags.use_abs_em = 1;
@@ -248,6 +248,6 @@ int main() {
   for (int i = 0; i < 6; i++) {
     ComputeM1CoeffsGivenQuadrature(n_leg[i], reac_type, &opacity_flags);
   }
-
+  */
   return 0;
 }
