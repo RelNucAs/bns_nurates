@@ -28,10 +28,10 @@
 #define total_num_species 4
 
 // Define dimension of tabulated PairT function
-#define dim_pair_t 10000
+#define dim_pair_t 100
 
 // Define maximum number of quadrature points
-#define n_max 120
+#define n_max 25
 
 /* ==================================================================================
  * Integration structures
@@ -69,6 +69,29 @@ typedef enum Quadrature Quadrature;
  * which is unused is populated with 1 in the weight and points arrays.
  *
  */
+struct MyQuadratureOld
+{
+    enum Quadrature type; // type of quadrature (for the integration in the
+                          // points variable, others are always kGauleg)
+    double alpha;         // parameter for Gauss-Laguerre quadrature (optional)
+    int dim;              // dimension of quadrature, can be 1,2,3
+    int nx; // number of points in the quadrature scheme in the points direction
+    int ny; // number of points in the quadrature scheme in the y direction, set
+            // to 1 if not needed
+    int nz; // number of points in the quadrature scheme in the z direction, set
+            // to 1 if not needed
+    double x1;      // lower limit of points, set to -42 if unused
+    double x2;      // upper limit of points, set to -42 if unused
+    double y1;      // lower limit of y, set to -42 if unused
+    double y2;      // upper limit of y, set to -42 if unused
+    double z1;      // lower limit of z, set to -42 if unused
+    double z2;      // upper limit of z, set to -42 if unused
+    double *points; // points for the quadrature scheme (store points in the
+                    // points direction, then y and z in one flat array)
+    double *w; // weights for the quadrature scheme (store points in the points
+               // direction, then y and z in one flat array)
+};
+typedef struct MyQuadratureOld MyQuadratureOld;
 struct MyQuadrature
 {
     enum Quadrature type; // type of quadrature (for the integration in the
@@ -86,9 +109,9 @@ struct MyQuadrature
     double y2;      // upper limit of y, set to -42 if unused
     double z1;      // lower limit of z, set to -42 if unused
     double z2;      // upper limit of z, set to -42 if unused
-    double* points; // points for the quadrature scheme (store points in the
+    double points[n_max]; // points for the quadrature scheme (store points in the
                     // points direction, then y and z in one flat array)
-    double* w; // weights for the quadrature scheme (store points in the points
+    double w[n_max]; // weights for the quadrature scheme (store points in the points
                // direction, then y and z in one flat array)
 };
 typedef struct MyQuadrature MyQuadrature;
@@ -105,8 +128,8 @@ __attribute__((unused)) static MyQuadrature quadrature_default = {.type =
                                                                   .y2    = -42.,
                                                                   .z1    = -42.,
                                                                   .z2 = -42.,
-                                                                  .points = NULL,
-                                                                  .w = NULL};
+                                                                  .points = {0},
+                                                                  .w = {0}};
 
 /* MyFunction struct
  *
@@ -183,8 +206,8 @@ struct PairKernelParams
     double mu_prime;    // cosine of anti-neutrino polar angle
     double lmax;        // maximum value of l for Legendre expansion
     double filter;      // filter parameter for pair kernel positivity
-    double alpha[dim_pair_t];
-    double pair_t[6][dim_pair_t];
+    //double alpha[dim_pair_t];
+    //double pair_t[6][dim_pair_t];
 };
 typedef struct PairKernelParams PairKernelParams;
 

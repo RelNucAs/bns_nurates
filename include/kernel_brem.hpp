@@ -351,10 +351,8 @@ void BremKernelsTable(const int n, double* nu_array,
 
     for (int i = 0; i < n; i++)
     {
-
         for (int j = i; j < n; j++)
         {
-
             // compute the brem kernels
             grey_pars->kernel_pars.brem_kernel_params.omega       = nu_array[i];
             grey_pars->kernel_pars.brem_kernel_params.omega_prime = nu_array[j];

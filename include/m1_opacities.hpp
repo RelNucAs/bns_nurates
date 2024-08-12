@@ -14,170 +14,6 @@
 #include "integration.hpp"
 #include "distribution.hpp"
 
-/* Compute the 2d integrands for all reactions from Leonardo's notes [Eqns. (51)
- * & (52)] There are a total of two expressions for 'e' and 'x' neutrinos, so 4
- * integrands in total
- *
- * 1. Contribution to emissivity: (4 pi)^2/(hc)^6 nu^3 nubar^2 [R^prod(pair) +
- * R^prod(brem)][1 - g_nubar]
- * 2. Contribution to absorption coefficient: (1/(c J)) *(4 pi)^2/(hc)^6 * (nu^3
- * nubar^2 [R_pro(Pair) + R_pro(Brem)][1 - g_nubar] g_nu
- *                                                                        + nu^3
- * nubar^2 [R_abs(Pair) + R_abs(Brem)]g_nubar g_nu)
- *
- * Note that there are no double integrals for the computation of the scattering
- * coefficient.
- */
-KOKKOS_INLINE_FUNCTION
-MyQuadratureIntegrand M1CoeffsDoubleIntegrand(double* var, void* p)
-{
-
-    // energies and parameters
-    double nu     = var[0]; // [MeV]
-    double nu_bar = var[1]; // [MeV]
-
-    GreyOpacityParams* my_grey_opacity_params = (GreyOpacityParams*)p;
-    OpacityFlags opacity_flags = my_grey_opacity_params->opacity_flags;
-
-    // compute the neutrino & anti-neutrino distribution function
-    double g_nu[total_num_species];
-    double g_nu_bar[total_num_species];
-
-    for (int idx = 0; idx < total_num_species; idx++)
-    {
-        g_nu[idx] = TotalNuF(nu, &my_grey_opacity_params->distr_pars, idx);
-        g_nu_bar[idx] =
-            TotalNuF(nu_bar, &my_grey_opacity_params->distr_pars, idx);
-    }
-
-    // compute the pair kernels
-    MyKernelOutput pair_kernels_m1 = {
-        0}; //{.em_e = 0., .abs_e = 0., .em_x = 0., .abs_x = 0.};
-    if (opacity_flags.use_pair)
-    {
-        my_grey_opacity_params->kernel_pars.pair_kernel_params.omega = nu;
-        my_grey_opacity_params->kernel_pars.pair_kernel_params.omega_prime =
-            nu_bar;
-        my_grey_opacity_params->kernel_pars.pair_kernel_params.cos_theta = 1.;
-        my_grey_opacity_params->kernel_pars.pair_kernel_params.filter    = 0.;
-        my_grey_opacity_params->kernel_pars.pair_kernel_params.lmax      = 0;
-        my_grey_opacity_params->kernel_pars.pair_kernel_params.mu        = 1.;
-        my_grey_opacity_params->kernel_pars.pair_kernel_params.mu_prime  = 1.;
-        // pair_kernels_m1 = PairKernelsM1(&my_grey_opacity_params->eos_pars,
-        // &my_grey_opacity_params->kernel_pars.pair_kernel_params);
-        pair_kernels_m1 = PairKernelsOptimized(
-            &my_grey_opacity_params->eos_pars,
-            &my_grey_opacity_params->kernel_pars.pair_kernel_params);
-    }
-
-    // compute the bremsstrahlung kernels
-    MyKernelOutput brem_kernels_m1 = {0};
-    if (opacity_flags.use_brem)
-    {
-        my_grey_opacity_params->kernel_pars.brem_kernel_params.omega = nu;
-        my_grey_opacity_params->kernel_pars.brem_kernel_params.omega_prime =
-            nu_bar;
-        my_grey_opacity_params->kernel_pars.brem_kernel_params.l = 0;
-        brem_kernels_m1 = BremKernelsLegCoeff(
-            &my_grey_opacity_params->kernel_pars.brem_kernel_params,
-            &my_grey_opacity_params->eos_pars);
-    }
-
-    // compute the inelastic NES/NPS kernels
-    MyKernelOutput inelastic_kernels_m1 = {0};
-    if (opacity_flags.use_inelastic_scatt)
-    {
-        my_grey_opacity_params->kernel_pars.inelastic_kernel_params.omega = nu;
-        my_grey_opacity_params->kernel_pars.inelastic_kernel_params
-            .omega_prime     = nu_bar;
-        inelastic_kernels_m1 = InelasticScattKernels(
-            &my_grey_opacity_params->kernel_pars.inelastic_kernel_params,
-            &my_grey_opacity_params->eos_pars);
-    }
-
-    double pro_term[total_num_species];
-
-    pro_term[id_nue] =
-        (pair_kernels_m1.em[id_nue] + brem_kernels_m1.em[id_nue]) *
-            (1. - g_nu_bar[id_anue]) +
-        inelastic_kernels_m1.em[id_nue] * g_nu_bar[id_nue];
-    pro_term[id_anue] =
-        (pair_kernels_m1.em[id_anue] + brem_kernels_m1.em[id_anue]) *
-            (1. - g_nu_bar[id_nue]) +
-        inelastic_kernels_m1.em[id_anue] * g_nu_bar[id_anue];
-    pro_term[id_nux] =
-        (pair_kernels_m1.em[id_nux] + brem_kernels_m1.em[id_nux]) *
-            (1. - g_nu_bar[id_anux]) +
-        inelastic_kernels_m1.em[id_nux] * g_nu_bar[id_nux];
-    pro_term[id_anux] =
-        (pair_kernels_m1.em[id_anux] + brem_kernels_m1.em[id_anux]) *
-            (1. - g_nu_bar[id_nux]) +
-        inelastic_kernels_m1.em[id_anux] * g_nu_bar[id_anux];
-
-    // pro_term[id_nue] = (pair_kernels_m1.em_e + brem_kernels_m1.em[id_nue]) +
-    // inelastic_kernels_m1.em[id_nue] * g_nu_bar[id_nue]; pro_term[id_anue] =
-    // (pair_kernels_m1.em_e + brem_kernels_m1.em[id_anue]) +
-    // inelastic_kernels_m1.em[id_anue] * g_nu_bar[id_anue]; pro_term[id_nux] =
-    // (pair_kernels_m1.em_x + brem_kernels_m1.em[id_nux]) +
-    // inelastic_kernels_m1.em[id_nux] * g_nu_bar[id_nux]; pro_term[id_anux] =
-    // (pair_kernels_m1.em_x + brem_kernels_m1.em[id_anux]) +
-    // inelastic_kernels_m1.em[id_anux] * g_nu_bar[id_anux];
-
-    double ann_term[total_num_species];
-
-    ann_term[id_nue] =
-        (pair_kernels_m1.abs[id_nue] + brem_kernels_m1.abs[id_nue]) *
-            g_nu_bar[id_anue] +
-        inelastic_kernels_m1.abs[id_nue] * (1. - g_nu_bar[id_nue]);
-    ann_term[id_anue] =
-        (pair_kernels_m1.abs[id_anue] + brem_kernels_m1.abs[id_anue]) *
-            g_nu_bar[id_nue] +
-        inelastic_kernels_m1.abs[id_anue] * (1. - g_nu_bar[id_anue]);
-    ann_term[id_nux] =
-        (pair_kernels_m1.abs[id_nux] + brem_kernels_m1.abs[id_nux]) *
-            g_nu_bar[id_anux] +
-        inelastic_kernels_m1.abs[id_nux] * (1. - g_nu_bar[id_nux]);
-    ann_term[id_anux] =
-        (pair_kernels_m1.abs[id_anux] + brem_kernels_m1.abs[id_anux]) *
-            g_nu_bar[id_nux] +
-        inelastic_kernels_m1.abs[id_anux] * (1. - g_nu_bar[id_anux]);
-
-    double n_integrand_1[total_num_species], e_integrand_1[total_num_species];
-    double n_integrand_2[total_num_species], e_integrand_2[total_num_species];
-
-    for (int idx = 0; idx < total_num_species; idx++)
-    {
-        n_integrand_1[idx] = nu * nu * nu_bar * nu_bar * pro_term[idx];
-        e_integrand_1[idx] = nu * n_integrand_1[idx];
-
-        n_integrand_2[idx] = g_nu[idx] * nu * nu * nu_bar * nu_bar *
-                             (pro_term[idx] + ann_term[idx]);
-        // n_integrand_2[idx] = g_nu[idx] * nu * nu * nu_bar * nu_bar *
-        // ann_term[idx];
-        e_integrand_2[idx] = nu * n_integrand_2[idx];
-    }
-
-    MyQuadratureIntegrand result = {.n = 16};
-
-    result.integrand[0]  = n_integrand_1[id_nue];
-    result.integrand[1]  = n_integrand_1[id_anue];
-    result.integrand[2]  = n_integrand_1[id_nux];
-    result.integrand[3]  = n_integrand_1[id_anux];
-    result.integrand[4]  = n_integrand_2[id_nue];
-    result.integrand[5]  = n_integrand_2[id_anue];
-    result.integrand[6]  = n_integrand_2[id_nux];
-    result.integrand[7]  = n_integrand_2[id_anux];
-    result.integrand[8]  = e_integrand_1[id_nue];
-    result.integrand[9]  = e_integrand_1[id_anue];
-    result.integrand[10] = e_integrand_1[id_nux];
-    result.integrand[11] = e_integrand_1[id_anux];
-    result.integrand[12] = e_integrand_2[id_nue];
-    result.integrand[13] = e_integrand_2[id_anue];
-    result.integrand[14] = e_integrand_2[id_nux];
-    result.integrand[15] = e_integrand_2[id_anux];
-
-    return result;
-}
 
 /* Computes the integrand for all single integrals from Leonardo's notes
  *
@@ -384,6 +220,9 @@ void M1CoeffsSingleIntegrandMatrix(const MyQuadrature* quad_1d,
     // compute the neutrino distribution function
     double g_nu[total_num_species];
 
+    double tmp_0, tmp_1;
+
+
     if (grey_pars->opacity_flags.use_abs_em == 1)
     {
         MyOpacity abs_em_beta;
@@ -397,17 +236,21 @@ void M1CoeffsSingleIntegrandMatrix(const MyQuadrature* quad_1d,
                 StimAbsOpacity(nu, &grey_pars->opacity_pars,
                                &grey_pars->eos_pars); // [s^-1]
 
-            out->m1_mat[0][i] = nu * nu * abs_em_beta.em[0];
-            out->m1_mat[1][i] = nu * nu * abs_em_beta.em[1];
+            tmp_0 = nu * nu * abs_em_beta.em[0];
+            tmp_1 = nu * nu * abs_em_beta.em[1];
+           
+            out->m1_mat[0][i] = tmp_0;
+            out->m1_mat[1][i] = tmp_1;
+            out->m1_mat[4][i] = nu * tmp_0;
+            out->m1_mat[5][i] = nu * tmp_1;
 
-            out->m1_mat[2][i] = nu * nu * g_nu[0] * abs_em_beta.abs[0]; // ab = em + ab (stimulated absorption)
-            out->m1_mat[3][i] = nu * nu * g_nu[1] * abs_em_beta.abs[1];
-
-            out->m1_mat[4][i] = nu * out->m1_mat[0][i];
-            out->m1_mat[5][i] = nu * out->m1_mat[1][i];
-
-            out->m1_mat[6][i] = nu * out->m1_mat[2][i];
-            out->m1_mat[7][i] = nu * out->m1_mat[3][i];
+            tmp_0 = nu * nu * g_nu[0] * abs_em_beta.abs[0]; // ab = em + ab (stimulated absorption)
+            tmp_1 = nu * nu * g_nu[1] * abs_em_beta.abs[1];
+            
+            out->m1_mat[2][i] = tmp_0;
+            out->m1_mat[3][i] = tmp_1;
+            out->m1_mat[6][i] = nu * tmp_0;
+            out->m1_mat[7][i] = nu * tmp_1;
 
             nu = nu_array[n + i];
             for (int idx = 0; idx < total_num_species; idx++)
@@ -418,20 +261,25 @@ void M1CoeffsSingleIntegrandMatrix(const MyQuadrature* quad_1d,
                 StimAbsOpacity(nu, &grey_pars->opacity_pars,
                                &grey_pars->eos_pars); // [s^-1]
 
-            out->m1_mat[0][n + i] = nu * nu * abs_em_beta.em[0];
-            out->m1_mat[1][n + i] = nu * nu * abs_em_beta.em[1];
+            
+            tmp_0 = nu * nu * abs_em_beta.em[0];
+            tmp_1 = nu * nu * abs_em_beta.em[1];
 
-            out->m1_mat[2][n + i] = nu * nu * g_nu[0] * abs_em_beta.abs[0]; // ab = em + ab (stimulated absorption)
-            out->m1_mat[3][n + i] = nu * nu * g_nu[1] * abs_em_beta.abs[1];
+            out->m1_mat[0][n + i] = tmp_0;
+            out->m1_mat[1][n + i] = tmp_1;
+            out->m1_mat[4][n + i] = nu * tmp_0;
+            out->m1_mat[5][n + i] = nu * tmp_1;
 
-            out->m1_mat[4][n + i] = nu * out->m1_mat[0][n + i];
-            out->m1_mat[5][n + i] = nu * out->m1_mat[1][n + i];
-
-            out->m1_mat[6][n + i] = nu * out->m1_mat[2][n + i];
-            out->m1_mat[7][n + i] = nu * out->m1_mat[3][n + i];
-
+            tmp_0 = nu * nu * g_nu[0] * abs_em_beta.abs[0]; // ab = em + ab (stimulated absorption)
+            tmp_1 = nu * nu * g_nu[1] * abs_em_beta.abs[1];
+            
+            out->m1_mat[2][n + i] = tmp_0;
+            out->m1_mat[3][n + i] = tmp_1;
+            out->m1_mat[6][n + i] = nu * tmp_0;
+            out->m1_mat[7][n + i] = nu * tmp_1;
         }
     }
+    
 
     if (grey_pars->opacity_flags.use_iso == 1)
     {
@@ -463,9 +311,25 @@ void M1CoeffsSingleIntegrandMatrix(const MyQuadrature* quad_1d,
             }
         }   
     }
-
+    
     return;
 }
+
+/* Compute the 2d integrands for all reactions from Leonardo's notes [Eqns. (51)
+ * & (52)] There are a total of two expressions for 'e' and 'x' neutrinos, so 4
+ * integrands in total
+ *
+ * 1. Contribution to emissivity: (4 pi)^2/(hc)^6 nu^3 nubar^2 [R^prod(pair) +
+ * R^prod(brem)][1 - g_nubar]
+ * 2. Contribution to absorption coefficient: (1/(c J)) *(4 pi)^2/(hc)^6 * (nu^3
+ * nubar^2 [R_pro(Pair) + R_pro(Brem)][1 - g_nubar] g_nu
+ *                                                                        + nu^3
+ * nubar^2 [R_abs(Pair) + R_abs(Brem)]g_nubar g_nu)
+ *
+ * Note that there are no double integrals for the computation of the scattering
+ * coefficient.
+ */
+
 
 KOKKOS_INLINE_FUNCTION
 void ComputeM1DoubleIntegrandNotStimulated(MyQuadrature* quad_1d,
@@ -743,7 +607,6 @@ void ComputeM1DoubleIntegrand(const MyQuadrature* quad_1d,
     //InitializeM1Matrix(out_n, n);
     //InitializeM1Matrix(out_j, n);
 
-
     for (int i = 0; i < 2 * n; i++)
     {
         nu = nu_array[i];
@@ -895,6 +758,285 @@ void ComputeM1DoubleIntegrand(const MyQuadrature* quad_1d,
     return;
 }
 
+KOKKOS_INLINE_FUNCTION
+void ComputeM1DoubleIntegrandTest(const MyQuadrature* quad_1d,
+                                  GreyOpacityParams* grey_pars, double t,
+                                  M1MatrixKokkos2D* out_n, M1MatrixKokkos2D* out_j)
+{
+    const int n = quad_1d->nx;
+
+    double nu, nu_bar;
+
+    double nu_array[n_max];
+
+    for (int i = 0; i < n; i++)
+    {
+        nu_array[i]     = t * quad_1d->points[i];
+        nu_array[n + i] = t / quad_1d->points[i];
+    }
+
+    // compute the neutrino & anti-neutrino distribution function
+    double g_nu[total_num_species], g_nu_bar[total_num_species];
+    double block_factor_nu[total_num_species],
+        block_factor_nu_bar[total_num_species];
+
+    if (grey_pars->opacity_flags.use_pair == 1)
+    {
+      MyKernelOutput pair_1, pair_2;
+
+      grey_pars->kernel_pars.pair_kernel_params.cos_theta = 1.;
+      grey_pars->kernel_pars.pair_kernel_params.filter    = 0.;
+      grey_pars->kernel_pars.pair_kernel_params.lmax      = 0;
+      grey_pars->kernel_pars.pair_kernel_params.mu        = 1.;
+      grey_pars->kernel_pars.pair_kernel_params.mu_prime  = 1.;
+
+      for (int i = 0; i < 2 * n; i++)
+      {
+        grey_pars->kernel_pars.pair_kernel_params.omega = nu_array[i];
+
+        for (int j = i; j < 2 * n; j++)
+        {
+            grey_pars->kernel_pars.pair_kernel_params.omega_prime = nu_array[j];
+
+            PairKernelsM1Test(&grey_pars->eos_pars,
+                              &grey_pars->kernel_pars.pair_kernel_params,
+                              &pair_1, &pair_2);
+
+            for (int idx = 0; idx < total_num_species; idx++)
+            {
+                out_n->m1_mat_em[idx][i][j] = pair_1.em[idx];
+                out_n->m1_mat_em[idx][j][i] = pair_2.em[idx];
+
+                out_n->m1_mat_ab[idx][i][j] = pair_1.abs[idx];
+                out_n->m1_mat_ab[idx][j][i] = pair_2.abs[idx];
+            }
+        }
+    }
+  }
+
+    if (grey_pars->opacity_flags.use_brem == 1)
+    {
+        if (grey_pars->opacity_pars.use_BRT_brem == true)
+        {
+          MyKernelOutput brem_ker;
+
+          for (int i = 0; i < 2 * n; i++)
+          {
+
+            for (int j = i; j < 2 * n; j++)
+            {
+
+              // compute the brem kernels
+              grey_pars->kernel_pars.brem_kernel_params.omega       = nu_array[i];
+              grey_pars->kernel_pars.brem_kernel_params.omega_prime = nu_array[j];
+            
+              brem_ker = BremKernelsBRT06(&grey_pars->kernel_pars.brem_kernel_params, &grey_pars->eos_pars);
+            
+              out_n->m1_mat_em[0][i][j] = brem_ker.em[0];
+              out_n->m1_mat_em[0][j][i] = brem_ker.em[0];
+            
+              out_n->m1_mat_ab[0][i][j] = brem_ker.abs[0];
+              out_n->m1_mat_ab[0][j][i] = brem_ker.abs[0];
+            }
+          }            
+        }
+        else
+        {
+          MyKernelOutput brem_ker;
+
+          grey_pars->kernel_pars.brem_kernel_params.l = 0;
+          grey_pars->kernel_pars.brem_kernel_params.use_NN_medium_corr =
+             grey_pars->opacity_pars.use_NN_medium_corr;
+
+          for (int i = 0; i < 2 * n; i++)
+          {
+
+            for (int j = i; j < 2 * n; j++)
+             {
+              // compute the brem kernels
+              grey_pars->kernel_pars.brem_kernel_params.omega       = nu_array[i];
+              grey_pars->kernel_pars.brem_kernel_params.omega_prime = nu_array[j];
+              brem_ker = BremKernelsLegCoeff(&grey_pars->kernel_pars.brem_kernel_params, &grey_pars->eos_pars);
+            
+              out_n->m1_mat_em[0][i][j] += brem_ker.em[0];
+              out_n->m1_mat_em[0][j][i] += brem_ker.em[0];
+            
+              out_n->m1_mat_ab[0][i][j] += brem_ker.abs[0];
+              out_n->m1_mat_ab[0][j][i] += brem_ker.abs[0];
+             }
+          }
+       }   
+    }
+    
+    for (int i = 0; i < 2 * n; i++)
+    {
+        nu = nu_array[i];
+
+        for (int j = i; j < 2 * n; j++)
+        {
+            nu_bar = nu_array[j];
+
+            for (int idx = 0; idx < total_num_species; idx++)
+            {
+                g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, idx);
+                g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
+
+                if (grey_pars->opacity_pars.neglect_blocking == false)
+                {
+                    block_factor_nu[idx]     = 1. - g_nu[idx];
+                    block_factor_nu_bar[idx] = 1. - g_nu_bar[idx];
+                }
+                else
+                {
+                    block_factor_nu[idx]     = 1.;
+                    block_factor_nu_bar[idx] = 1.;
+                }
+            }
+
+            out_n->m1_mat_em[id_nue][i][j] *= block_factor_nu_bar[id_anue];
+            out_n->m1_mat_em[id_anue][i][j] *= block_factor_nu_bar[id_nue];
+            out_n->m1_mat_em[id_nux][i][j] *= block_factor_nu_bar[id_anux];
+            out_n->m1_mat_em[id_anux][i][j] *= block_factor_nu_bar[id_nux];
+
+            out_n->m1_mat_em[id_nue][j][i] *= block_factor_nu[id_anue];
+            out_n->m1_mat_em[id_anue][j][i] *= block_factor_nu[id_nue];
+            out_n->m1_mat_em[id_nux][j][i] *= block_factor_nu[id_anux];
+            out_n->m1_mat_em[id_anux][j][i] *= block_factor_nu[id_nux];
+
+            out_n->m1_mat_ab[id_nue][i][j] *= g_nu_bar[id_anue];
+            out_n->m1_mat_ab[id_anue][i][j] *= g_nu_bar[id_nue];
+            out_n->m1_mat_ab[id_nux][i][j] *= g_nu_bar[id_anux];
+            out_n->m1_mat_ab[id_anux][i][j] *= g_nu_bar[id_nux];
+
+            out_n->m1_mat_ab[id_nue][j][i] *= g_nu_bar[id_anue];
+            out_n->m1_mat_ab[id_anue][j][i] *= g_nu_bar[id_nue];
+            out_n->m1_mat_ab[id_nux][j][i] *= g_nu_bar[id_anux];
+            out_n->m1_mat_ab[id_anux][j][i] *= g_nu_bar[id_nux];
+         }
+    }
+
+    if (grey_pars->opacity_flags.use_inelastic_scatt == 1)
+    {
+       MyKernelOutput inel_1, inel_2;
+
+       InelasticScattKernelParams inelastic_pars =
+           grey_pars->kernel_pars.inelastic_kernel_params;
+    
+       for (int i = 0; i < 2 * n; i++)
+       {
+         nu = nu_array[i];
+
+         for (int j = i; j < 2 * n; j++)
+         {
+           nu_bar = nu_array[j];
+           
+           for (int idx = 0; idx < total_num_species; idx++)
+            {
+                g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, idx);
+                g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
+                
+                if (grey_pars->opacity_pars.neglect_blocking == false)
+                {
+                    block_factor_nu[idx]     = 1. - g_nu[idx];
+                    block_factor_nu_bar[idx] = 1. - g_nu_bar[idx];
+                }
+                else
+                {
+                    block_factor_nu[idx]     = 1.;
+                    block_factor_nu_bar[idx] = 1.;
+                }
+            }
+           
+           // compute the pair kernels
+           inelastic_pars.omega       = nu;
+           inelastic_pars.omega_prime = nu_bar;
+           
+           inel_1 = InelasticScattKernels(&inelastic_pars, &grey_pars->eos_pars);
+           
+           inelastic_pars.omega       = nu_bar;
+           inelastic_pars.omega_prime = nu;
+   
+           inel_2 = InelasticScattKernels(&inelastic_pars, &grey_pars->eos_pars);
+           
+           for (int idx = 0; idx < total_num_species; idx++)
+            {
+                out_n->m1_mat_em[idx][i][j] += inel_1.em[idx] * g_nu_bar[idx];
+                out_n->m1_mat_em[idx][j][i] += inel_2.em[idx] * g_nu[idx];
+                
+                out_n->m1_mat_ab[idx][i][j] += inel_1.abs[idx] * block_factor_nu_bar[idx];
+                out_n->m1_mat_ab[idx][j][i] += inel_2.abs[idx] * block_factor_nu[idx];
+            }
+          }
+       }
+    } 
+            /*
+            //////////////////////////////////////////////
+            ////// ONLY FOR COMPARISON WITH NULIB ////////
+            //////////////////////////////////////////////
+            if (kirchoff_flag)
+            {
+                ann_term_ij[id_nue] +=
+                    (pair.m1_mat_em[id_nue][i][j] + brem.m1_mat_em[0][i][j]) *
+                    g_nu_bar[id_anue] / g_nu[id_nue];
+                ann_term_ij[id_anue] +=
+                    (pair.m1_mat_em[id_anue][i][j] + brem.m1_mat_em[0][i][j]) *
+                    g_nu_bar[id_nue] / g_nu[id_anue];
+                ann_term_ij[id_nux] +=
+                    (pair.m1_mat_em[id_nux][i][j] + brem.m1_mat_em[0][i][j]) *
+                    g_nu_bar[id_anux] / g_nu[id_nux];
+                ann_term_ij[id_anux] +=
+                    (pair.m1_mat_em[id_anux][i][j] + brem.m1_mat_em[0][i][j]) *
+                    g_nu_bar[id_nux] / g_nu[id_anux];
+
+                ann_term_ji[id_nue] +=
+                    (pair.m1_mat_em[id_nue][j][i] + brem.m1_mat_em[0][j][i]) *
+                    g_nu[id_anue] / g_nu_bar[id_nue];
+                ann_term_ji[id_anue] +=
+                    (pair.m1_mat_em[id_anue][j][i] + brem.m1_mat_em[0][j][i]) *
+                    g_nu[id_nue] / g_nu_bar[id_anue];
+                ann_term_ji[id_nux] +=
+                    (pair.m1_mat_em[id_nux][j][i] + brem.m1_mat_em[0][j][i]) *
+                    g_nu[id_anux] / g_nu_bar[id_nux];
+                ann_term_ji[id_anux] +=
+                    (pair.m1_mat_em[id_anux][j][i] + brem.m1_mat_em[0][j][i]) *
+                    g_nu[id_nux] / g_nu_bar[id_anux];
+            }
+            */
+
+            //////////////////////////////////////////////
+     for (int i = 0; i < 2 * n; i++)
+       {
+         nu = nu_array[i];
+
+         for (int j = i; j < 2 * n; j++)
+         {
+            nu_bar = nu_array[j];
+
+            for (int idx = 0; idx < total_num_species; idx++)
+            {
+                g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, idx);
+                g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
+                
+                out_n->m1_mat_em[idx][i][j] *= nu * nu * nu_bar * nu_bar;
+                out_n->m1_mat_em[idx][j][i] *= nu_bar * nu_bar * nu * nu;
+
+                out_n->m1_mat_ab[idx][i][j] = nu * nu * g_nu[idx] * nu_bar * nu_bar *
+                    (out_n->m1_mat_em[idx][i][j] + out_n->m1_mat_ab[idx][i][j]);
+                out_n->m1_mat_ab[idx][j][i] =
+                    nu_bar * nu_bar * g_nu_bar[idx] * nu * nu *
+                    (out_n->m1_mat_em[idx][j][i] + out_n->m1_mat_ab[idx][j][i]);
+
+                out_j->m1_mat_em[idx][i][j] = nu * out_n->m1_mat_em[idx][i][j];
+                out_j->m1_mat_em[idx][j][i] = nu_bar * out_n->m1_mat_em[idx][j][i];
+
+                out_j->m1_mat_ab[idx][i][j] = nu * out_n->m1_mat_ab[idx][i][j];
+                out_j->m1_mat_ab[idx][j][i] = nu_bar * out_n->m1_mat_ab[idx][j][i];
+            }
+        }
+    }
+
+    return;
+}
 
 /* Computes the opacities for the M1 code
  *
@@ -953,20 +1095,21 @@ ComputeM1OpacitiesNotStimulated(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
         s_array[idx + 8] = J[idx] / n[idx];
     }
 
-
+    
     // MyQuadratureIntegrand integrals_1d =
     // GaussLegendreIntegrateFixedSplit1D(quad_1d, &integrand_m1_1d, s);
-    MyQuadratureIntegrand integrals_1d =
-        GaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s_array);
+    MyQuadratureIntegrand integrals_1d = {0};
+        //GaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s_array);
 
-    M1MatrixKokkos2D out_n, out_j;
-    ComputeM1DoubleIntegrandNotStimulated(quad_1d, my_grey_opacity_params, s,
-                                          &out_n, &out_j);
-    MyQuadratureIntegrand n_integrals_2d =
-        GaussLegendreIntegrate2DMatrix(quad_1d, &out_n, s);
-    MyQuadratureIntegrand e_integrals_2d =
-        GaussLegendreIntegrate2DMatrix(quad_1d, &out_j, s);
+    //M1MatrixKokkos2D out_n, out_j;
+    //ComputeM1DoubleIntegrandNotStimulated(quad_1d, my_grey_opacity_params, s,
+    //                                      &out_n, &out_j);
+    MyQuadratureIntegrand n_integrals_2d = {0};
+        //GaussLegendreIntegrate2DMatrix(quad_1d, &out_n, s);
+    MyQuadratureIntegrand e_integrals_2d = {0};
+        //GaussLegendreIntegrate2DMatrix(quad_1d, &out_j, s);
 
+    
     M1Opacities m1_opacities;
 
     m1_opacities.eta_0[id_nue] =
@@ -1025,6 +1168,7 @@ KOKKOS_INLINE_FUNCTION
 M1Opacities ComputeM1Opacities(const MyQuadrature* quad_1d, const MyQuadrature* quad_2d,
                                GreyOpacityParams* my_grey_opacity_params)
 {
+
     // compute some constants
     static const double four_pi_hc3 =
         (4. * kPi) / (kHClight * kHClight * kHClight); // [MeV^-3 cm^-3]
@@ -1032,6 +1176,7 @@ M1Opacities ComputeM1Opacities(const MyQuadrature* quad_1d, const MyQuadrature* 
         four_pi_hc3 * four_pi_hc3; // [MeV^-6 cm^-6]
 
     const double temp = my_grey_opacity_params->eos_pars.temp;
+    
     
     // set up 1d integration
     __attribute__((unused))
@@ -1049,6 +1194,7 @@ M1Opacities ComputeM1Opacities(const MyQuadrature* quad_1d, const MyQuadrature* 
     //integrand_m1_2d.dim                        = 2;
     //integrand_m1_2d.params                     = my_grey_opacity_params;
     //integrand_m1_2d.my_quadrature_integrand    = integrand_m1_2d_info;
+
 
     double n[total_num_species];
     double J[total_num_species];
@@ -1094,7 +1240,6 @@ M1Opacities ComputeM1Opacities(const MyQuadrature* quad_1d, const MyQuadrature* 
     {
         s_array[idx + 8] = J[idx] / n[idx];
     }
-
     /*
     s_array[0] = temp * FDI_p5(eta_e) / FDI_p4(eta_e);
     s_array[1] = temp * FDI_p5(-eta_e) / FDI_p4(-eta_e);
@@ -1115,23 +1260,25 @@ M1Opacities ComputeM1Opacities(const MyQuadrature* quad_1d, const MyQuadrature* 
         //GaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s_array);
     //MyQuadratureIntegrand integrals_1d = {0};
     M1MatrixKokkos1D out = {0};
-
     M1CoeffsSingleIntegrandMatrix(quad_1d, my_grey_opacity_params, s_array[0], &out);
     MyQuadratureIntegrand integrals_1d = GaussLegendreIntegrate1DMatrix(quad_1d, &out, s_array[0]);
 
-    // MyQuadratureIntegrand integrals_2d =
-    // GaussLegendreIntegrateFixedSplit2D(quad_2d, &integrand_m1_2d, s);
+    //MyQuadratureIntegrand integrals_2d =
+    //GaussLegendreIntegrateFixedSplit2D(quad_2d, &integrand_m1_2d, s);
     M1MatrixKokkos2D out_n = {0}, out_j = {0};
-    ComputeM1DoubleIntegrand(quad_1d, my_grey_opacity_params, s, &out_n,
+    ComputeM1DoubleIntegrandTest(quad_1d, my_grey_opacity_params, s, &out_n,
                              &out_j);
 
+    //printf("%.5e\n", out_n.m1_mat_em[0][10][10]);
     MyQuadratureIntegrand n_integrals_2d =
         GaussLegendreIntegrate2DMatrix(quad_1d, &out_n, s);
     MyQuadratureIntegrand e_integrals_2d =
         GaussLegendreIntegrate2DMatrix(quad_1d, &out_j, s);
+    //MyQuadratureIntegrand n_integrals_2d = {0};
+    //MyQuadratureIntegrand e_integrals_2d = {0};
 
-    M1Opacities m1_opacities;
-
+    M1Opacities m1_opacities = {0};
+    
     m1_opacities.eta_0[id_nue] =
         four_pi_hc3 *
         (four_pi_hc3 * n_integrals_2d.integrand[0] + integrals_1d.integrand[0]);
@@ -1204,7 +1351,7 @@ M1Opacities ComputeM1Opacities(const MyQuadrature* quad_1d, const MyQuadrature* 
         n[id_anux] == 0. ?
             0. :
             four_pi_hc3 / (kClight * J[id_anux]) * integrals_1d.integrand[11];
-
+ 
     return m1_opacities;
 }
 
