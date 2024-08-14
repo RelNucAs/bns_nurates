@@ -1136,6 +1136,753 @@ void ComputeM1DoubleIntegrandTest(const MyQuadrature* quad_1d,
     return;
 }
 
+
+KOKKOS_INLINE_FUNCTION
+void ComputeM1DoubleIntegrandTestOnlyNumber(const MyQuadrature* quad_1d,
+                                  GreyOpacityParams* grey_pars, double t,
+                                  M1MatrixKokkos2D* out)
+{
+    const int n = quad_1d->nx;
+
+    double nu, nu_bar;
+
+    double nu_array[n_max];
+
+    for (int i = 0; i < n; i++)
+    {
+        nu_array[i]     = t * quad_1d->points[i];
+        nu_array[n + i] = t / quad_1d->points[i];
+    }
+
+    // compute the neutrino & anti-neutrino distribution function
+    double g_nu[total_num_species], g_nu_bar[total_num_species];
+    double block_factor_nu[total_num_species],
+        block_factor_nu_bar[total_num_species];
+
+    if (grey_pars->opacity_flags.use_pair == 1)
+    {
+      MyKernelOutput pair_1, pair_2;
+
+      grey_pars->kernel_pars.pair_kernel_params.cos_theta = 1.;
+      grey_pars->kernel_pars.pair_kernel_params.filter    = 0.;
+      grey_pars->kernel_pars.pair_kernel_params.lmax      = 0;
+      grey_pars->kernel_pars.pair_kernel_params.mu        = 1.;
+      grey_pars->kernel_pars.pair_kernel_params.mu_prime  = 1.;
+
+      for (int i = 0; i < 2 * n; i++)
+      {
+        grey_pars->kernel_pars.pair_kernel_params.omega = nu_array[i];
+
+        for (int j = i; j < 2 * n; j++)
+        {
+            grey_pars->kernel_pars.pair_kernel_params.omega_prime = nu_array[j];
+
+            PairKernelsM1Test(&grey_pars->eos_pars,
+                              &grey_pars->kernel_pars.pair_kernel_params,
+                              &pair_1, &pair_2);
+
+            for (int idx = 0; idx < total_num_species; idx++)
+            {
+                out->m1_mat_em[idx][i][j] = pair_1.em[idx];
+                out->m1_mat_em[idx][j][i] = pair_2.em[idx];
+
+                out->m1_mat_ab[idx][i][j] = pair_1.abs[idx];
+                out->m1_mat_ab[idx][j][i] = pair_2.abs[idx];
+            }
+        }
+    }
+  }
+
+
+    if (grey_pars->opacity_flags.use_brem == 1)
+    {
+        if (grey_pars->opacity_pars.use_BRT_brem == true)
+        {
+          MyKernelOutput brem_ker;
+
+          for (int i = 0; i < 2 * n; i++)
+          {
+
+            grey_pars->kernel_pars.brem_kernel_params.omega       = nu_array[i];
+            grey_pars->kernel_pars.brem_kernel_params.omega_prime = nu_array[i];
+            
+            // compute the brem kernels
+            brem_ker = BremKernelsBRT06(&grey_pars->kernel_pars.brem_kernel_params, &grey_pars->eos_pars);
+            
+            for (int idx = 0; idx < total_num_species; idx++)
+            {
+              out->m1_mat_em[idx][i][i] += brem_ker.em[0];
+              out->m1_mat_ab[idx][i][i] += brem_ker.abs[0];
+            }
+            
+            for (int j = i + 1; j < 2 * n; j++)
+            {
+              grey_pars->kernel_pars.brem_kernel_params.omega_prime = nu_array[j];
+            
+              // compute the brem kernels
+              brem_ker = BremKernelsBRT06(&grey_pars->kernel_pars.brem_kernel_params, &grey_pars->eos_pars);
+            
+              for (int idx = 0; idx < total_num_species; idx++)
+              {
+                out->m1_mat_em[idx][i][j] += brem_ker.em[0];
+                out->m1_mat_em[idx][j][i] += brem_ker.em[0];
+            
+                out->m1_mat_ab[idx][i][j] += brem_ker.abs[0];
+                out->m1_mat_ab[idx][j][i] += brem_ker.abs[0];
+              }
+            }
+          }            
+        }
+        else
+        {
+          MyKernelOutput brem_ker;
+
+          grey_pars->kernel_pars.brem_kernel_params.l = 0;
+          grey_pars->kernel_pars.brem_kernel_params.use_NN_medium_corr =
+             grey_pars->opacity_pars.use_NN_medium_corr;
+
+          for (int i = 0; i < 2 * n; i++)
+          {
+
+            grey_pars->kernel_pars.brem_kernel_params.omega       = nu_array[i];
+            grey_pars->kernel_pars.brem_kernel_params.omega_prime = nu_array[i];
+            
+            // compute the brem kernels
+            brem_ker = BremKernelsLegCoeff(&grey_pars->kernel_pars.brem_kernel_params, &grey_pars->eos_pars);
+            
+            for (int idx = 0; idx < total_num_species; idx++)
+            {
+              out->m1_mat_em[idx][i][i] += brem_ker.em[0];
+              out->m1_mat_ab[idx][i][i] += brem_ker.abs[0];
+            }
+
+            for (int j = i + 1; j < 2 * n; j++)
+            {
+              // compute the brem kernels
+              grey_pars->kernel_pars.brem_kernel_params.omega_prime = nu_array[j];
+              brem_ker = BremKernelsLegCoeff(&grey_pars->kernel_pars.brem_kernel_params, &grey_pars->eos_pars);
+            
+              for (int idx = 0; idx < total_num_species; idx++)
+              {
+                out->m1_mat_em[idx][i][j] += brem_ker.em[0];
+                out->m1_mat_em[idx][j][i] += brem_ker.em[0];
+            
+                out->m1_mat_ab[idx][i][j] += brem_ker.abs[0];
+                out->m1_mat_ab[idx][j][i] += brem_ker.abs[0];
+              }
+            }
+          }
+       }   
+    }
+
+
+    for (int i = 0; i < 2 * n; i++)
+    {
+        nu = nu_array[i];
+
+        for (int idx = 0; idx < total_num_species; idx++)
+        {
+          g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, idx);
+
+            if (grey_pars->opacity_pars.neglect_blocking == false)
+                {
+                    block_factor_nu[idx] = 1. - g_nu[idx];
+                }
+                else
+                {
+                    block_factor_nu[idx] = 1.;
+                }
+         }
+            
+            out->m1_mat_em[id_nue][i][i] *= block_factor_nu[id_anue];
+            out->m1_mat_em[id_anue][i][i] *= block_factor_nu[id_nue];
+            out->m1_mat_em[id_nux][i][i] *= block_factor_nu[id_anux];
+            out->m1_mat_em[id_anux][i][i] *= block_factor_nu[id_nux];
+
+            out->m1_mat_ab[id_nue][i][i] *= g_nu[id_anue];
+            out->m1_mat_ab[id_anue][i][i] *= g_nu[id_nue];
+            out->m1_mat_ab[id_nux][i][i] *= g_nu[id_anux];
+            out->m1_mat_ab[id_anux][i][i] *= g_nu[id_nux];
+
+        for (int j = i + 1; j < 2 * n; j++)
+        {
+            nu_bar = nu_array[j];
+
+            for (int idx = 0; idx < total_num_species; idx++)
+            {
+                g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
+
+                if (grey_pars->opacity_pars.neglect_blocking == false)
+                {
+                    block_factor_nu_bar[idx] = 1. - g_nu_bar[idx];
+                }
+                else
+                {
+                    block_factor_nu_bar[idx] = 1.;
+                }
+            }
+
+            out->m1_mat_em[id_nue][i][j] *= block_factor_nu_bar[id_anue];
+            out->m1_mat_em[id_anue][i][j] *= block_factor_nu_bar[id_nue];
+            out->m1_mat_em[id_nux][i][j] *= block_factor_nu_bar[id_anux];
+            out->m1_mat_em[id_anux][i][j] *= block_factor_nu_bar[id_nux];
+
+            out->m1_mat_em[id_nue][j][i] *= block_factor_nu[id_anue];
+            out->m1_mat_em[id_anue][j][i] *= block_factor_nu[id_nue];
+            out->m1_mat_em[id_nux][j][i] *= block_factor_nu[id_anux];
+            out->m1_mat_em[id_anux][j][i] *= block_factor_nu[id_nux];
+
+            out->m1_mat_ab[id_nue][i][j] *= g_nu_bar[id_anue];
+            out->m1_mat_ab[id_anue][i][j] *= g_nu_bar[id_nue];
+            out->m1_mat_ab[id_nux][i][j] *= g_nu_bar[id_anux];
+            out->m1_mat_ab[id_anux][i][j] *= g_nu_bar[id_nux];
+
+            out->m1_mat_ab[id_nue][j][i] *= g_nu[id_anue];
+            out->m1_mat_ab[id_anue][j][i] *= g_nu[id_nue];
+            out->m1_mat_ab[id_nux][j][i] *= g_nu[id_anux];
+            out->m1_mat_ab[id_anux][j][i] *= g_nu[id_nux];
+         }
+    }
+       
+
+
+    if (grey_pars->opacity_flags.use_inelastic_scatt == 1)
+    {
+       MyKernelOutput inel_1, inel_2;
+
+       InelasticScattKernelParams inelastic_pars =
+           grey_pars->kernel_pars.inelastic_kernel_params;
+    
+       for (int i = 0; i < 2 * n; i++)
+       {
+         nu = nu_array[i];
+
+         for (int idx = 0; idx < total_num_species; idx++)
+            {
+                g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, idx);
+                
+                if (grey_pars->opacity_pars.neglect_blocking == false)
+                {
+                    block_factor_nu[idx]     = 1. - g_nu[idx];
+                }
+                else
+                {
+                    block_factor_nu[idx]     = 1.;
+                }
+            }
+
+           // compute the pair kernels
+           inelastic_pars.omega       = nu;
+           inelastic_pars.omega_prime = nu;
+           
+           inel_1 = InelasticScattKernels(&inelastic_pars, &grey_pars->eos_pars);
+           
+           for (int idx = 0; idx < total_num_species; idx++)
+            {
+                out->m1_mat_em[idx][i][i] += inel_1.em[idx] * g_nu[idx];
+                out->m1_mat_ab[idx][i][i] += inel_1.abs[idx] * block_factor_nu[idx];
+            }
+          
+
+         for (int j = i + 1; j < 2 * n; j++)
+         {
+           nu_bar = nu_array[j];
+           
+           for (int idx = 0; idx < total_num_species; idx++)
+            {
+                g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
+                
+                if (grey_pars->opacity_pars.neglect_blocking == false)
+                {
+                    block_factor_nu_bar[idx] = 1. - g_nu_bar[idx];
+                }
+                else
+                {
+                    block_factor_nu_bar[idx] = 1.;
+                }
+            }
+           
+           // compute the pair kernels
+           inelastic_pars.omega       = nu;
+           inelastic_pars.omega_prime = nu_bar;
+           
+           inel_1 = InelasticScattKernels(&inelastic_pars, &grey_pars->eos_pars);
+           
+           inelastic_pars.omega       = nu_bar;
+           inelastic_pars.omega_prime = nu;
+   
+           inel_2 = InelasticScattKernels(&inelastic_pars, &grey_pars->eos_pars);
+           
+           for (int idx = 0; idx < total_num_species; idx++)
+            {
+                out->m1_mat_em[idx][i][j] += inel_1.em[idx] * g_nu_bar[idx];
+                out->m1_mat_em[idx][j][i] += inel_2.em[idx] * g_nu[idx];
+                
+                out->m1_mat_ab[idx][i][j] += inel_1.abs[idx] * block_factor_nu_bar[idx];
+                out->m1_mat_ab[idx][j][i] += inel_2.abs[idx] * block_factor_nu[idx];
+            }
+          }
+       }
+    } 
+            /*
+            //////////////////////////////////////////////
+            ////// ONLY FOR COMPARISON WITH NULIB ////////
+            //////////////////////////////////////////////
+            if (kirchoff_flag)
+            {
+                ann_term_ij[id_nue] +=
+                    (pair.m1_mat_em[id_nue][i][j] + brem.m1_mat_em[0][i][j]) *
+                    g_nu_bar[id_anue] / g_nu[id_nue];
+                ann_term_ij[id_anue] +=
+                    (pair.m1_mat_em[id_anue][i][j] + brem.m1_mat_em[0][i][j]) *
+                    g_nu_bar[id_nue] / g_nu[id_anue];
+                ann_term_ij[id_nux] +=
+                    (pair.m1_mat_em[id_nux][i][j] + brem.m1_mat_em[0][i][j]) *
+                    g_nu_bar[id_anux] / g_nu[id_nux];
+                ann_term_ij[id_anux] +=
+                    (pair.m1_mat_em[id_anux][i][j] + brem.m1_mat_em[0][i][j]) *
+                    g_nu_bar[id_nux] / g_nu[id_anux];
+
+                ann_term_ji[id_nue] +=
+                    (pair.m1_mat_em[id_nue][j][i] + brem.m1_mat_em[0][j][i]) *
+                    g_nu[id_anue] / g_nu_bar[id_nue];
+                ann_term_ji[id_anue] +=
+                    (pair.m1_mat_em[id_anue][j][i] + brem.m1_mat_em[0][j][i]) *
+                    g_nu[id_nue] / g_nu_bar[id_anue];
+                ann_term_ji[id_nux] +=
+                    (pair.m1_mat_em[id_nux][j][i] + brem.m1_mat_em[0][j][i]) *
+                    g_nu[id_anux] / g_nu_bar[id_nux];
+                ann_term_ji[id_anux] +=
+                    (pair.m1_mat_em[id_anux][j][i] + brem.m1_mat_em[0][j][i]) *
+                    g_nu[id_nux] / g_nu_bar[id_anux];
+            }
+            */
+
+            //////////////////////////////////////////////
+     for (int i = 0; i < 2 * n; i++)
+       {
+         nu = nu_array[i];
+         
+         for (int idx = 0; idx < total_num_species; idx++)
+         {
+            g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, idx);
+                
+            out->m1_mat_ab[idx][i][i] = nu * nu * g_nu[idx] * nu * nu *
+                    (out->m1_mat_em[idx][i][i] + out->m1_mat_ab[idx][i][i]);
+            out->m1_mat_em[idx][i][i] *= nu * nu * nu * nu;
+          }
+
+         for (int j = i + 1; j < 2 * n; j++)
+         {
+            nu_bar = nu_array[j];
+
+            for (int idx = 0; idx < total_num_species; idx++)
+            {
+                g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
+                
+                out->m1_mat_ab[idx][i][j] = nu * nu * g_nu[idx] * nu_bar * nu_bar *
+                    (out->m1_mat_em[idx][i][j] + out->m1_mat_ab[idx][i][j]);
+                out->m1_mat_ab[idx][j][i] =
+                    nu_bar * nu_bar * g_nu_bar[idx] * nu * nu *
+                    (out->m1_mat_em[idx][j][i] + out->m1_mat_ab[idx][j][i]);
+                
+                out->m1_mat_em[idx][i][j] *= nu * nu * nu_bar * nu_bar;
+                out->m1_mat_em[idx][j][i] *= nu_bar * nu_bar * nu * nu;
+            }
+        }
+    }
+
+    /*    
+    for (int i = 0; i < 2 * n; i ++) {
+           printf("i = %d:  ", i);
+           for (int j = 0; j < 2 * n; j ++) {
+                printf("%.8e  ", out_n->m1_mat_em[0][i][j]);
+            }
+         printf("\n");
+    }
+    */
+
+
+    return;
+}
+
+KOKKOS_INLINE_FUNCTION
+void ComputeM1DoubleIntegrandTestFlatten(const MyQuadrature* quad_1d,
+                                  GreyOpacityParams* grey_pars, double t,
+                                  M1MatrixKokkos2DFlatten* out_n, M1MatrixKokkos2DFlatten* out_j)
+{
+    const int n = quad_1d->nx;
+
+    double nu, nu_bar;
+
+    double nu_array[n_max];
+
+    for (int i = 0; i < n; i++)
+    {
+        nu_array[i]     = t * quad_1d->points[i];
+        nu_array[n + i] = t / quad_1d->points[i];
+    }
+
+    // compute the neutrino & anti-neutrino distribution function
+    double g_nu[total_num_species], g_nu_bar[total_num_species];
+    double block_factor_nu[total_num_species],
+        block_factor_nu_bar[total_num_species];
+
+    if (grey_pars->opacity_flags.use_pair == 1)
+    {
+      MyKernelOutput pair_1, pair_2;
+
+      grey_pars->kernel_pars.pair_kernel_params.cos_theta = 1.;
+      grey_pars->kernel_pars.pair_kernel_params.filter    = 0.;
+      grey_pars->kernel_pars.pair_kernel_params.lmax      = 0;
+      grey_pars->kernel_pars.pair_kernel_params.mu        = 1.;
+      grey_pars->kernel_pars.pair_kernel_params.mu_prime  = 1.;
+
+      for (int i = 0; i < 2 * n; i++)
+      {
+        grey_pars->kernel_pars.pair_kernel_params.omega = nu_array[i];
+
+        for (int j = i; j < 2 * n; j++)
+        {
+            grey_pars->kernel_pars.pair_kernel_params.omega_prime = nu_array[j];
+
+            PairKernelsM1Test(&grey_pars->eos_pars,
+                              &grey_pars->kernel_pars.pair_kernel_params,
+                              &pair_1, &pair_2);
+
+            for (int idx = 0; idx < total_num_species; idx++)
+            {
+                out_n->m1_mat_em[idx][n_max * i + j] = pair_1.em[idx];
+                out_n->m1_mat_em[idx][n_max * j + i] = pair_2.em[idx];
+
+                out_n->m1_mat_ab[idx][n_max * i + j] = pair_1.abs[idx];
+                out_n->m1_mat_ab[idx][n_max * j + i] = pair_2.abs[idx];
+            }
+        }
+    }
+  }
+
+
+    if (grey_pars->opacity_flags.use_brem == 1)
+    {
+        if (grey_pars->opacity_pars.use_BRT_brem == true)
+        {
+          MyKernelOutput brem_ker;
+
+          for (int i = 0; i < 2 * n; i++)
+          {
+
+            grey_pars->kernel_pars.brem_kernel_params.omega       = nu_array[i];
+            grey_pars->kernel_pars.brem_kernel_params.omega_prime = nu_array[i];
+            
+            // compute the brem kernels
+            brem_ker = BremKernelsBRT06(&grey_pars->kernel_pars.brem_kernel_params, &grey_pars->eos_pars);
+            
+            for (int idx = 0; idx < total_num_species; idx++)
+            {
+              out_n->m1_mat_em[idx][n_max * i + i] += brem_ker.em[0];
+              out_n->m1_mat_ab[idx][n_max * i + i] += brem_ker.abs[0];
+            }
+            
+            for (int j = i + 1; j < 2 * n; j++)
+            {
+              grey_pars->kernel_pars.brem_kernel_params.omega_prime = nu_array[j];
+            
+              // compute the brem kernels
+              brem_ker = BremKernelsBRT06(&grey_pars->kernel_pars.brem_kernel_params, &grey_pars->eos_pars);
+            
+              for (int idx = 0; idx < total_num_species; idx++)
+              {
+                out_n->m1_mat_em[idx][n_max * i + j] += brem_ker.em[0];
+                out_n->m1_mat_em[idx][n_max * j + i] += brem_ker.em[0];
+            
+                out_n->m1_mat_ab[idx][n_max * i + j] += brem_ker.abs[0];
+                out_n->m1_mat_ab[idx][n_max * j + i] += brem_ker.abs[0];
+              }
+            }
+          }            
+        }
+        else
+        {
+          MyKernelOutput brem_ker;
+
+          grey_pars->kernel_pars.brem_kernel_params.l = 0;
+          grey_pars->kernel_pars.brem_kernel_params.use_NN_medium_corr =
+             grey_pars->opacity_pars.use_NN_medium_corr;
+
+          for (int i = 0; i < 2 * n; i++)
+          {
+
+            grey_pars->kernel_pars.brem_kernel_params.omega       = nu_array[i];
+            grey_pars->kernel_pars.brem_kernel_params.omega_prime = nu_array[i];
+            
+            // compute the brem kernels
+            brem_ker = BremKernelsLegCoeff(&grey_pars->kernel_pars.brem_kernel_params, &grey_pars->eos_pars);
+            
+            for (int idx = 0; idx < total_num_species; idx++)
+            {
+              out_n->m1_mat_em[idx][n_max * i + i] += brem_ker.em[0];
+              out_n->m1_mat_ab[idx][n_max * i + i] += brem_ker.abs[0];
+            }
+
+            for (int j = i + 1; j < 2 * n; j++)
+            {
+              // compute the brem kernels
+              grey_pars->kernel_pars.brem_kernel_params.omega_prime = nu_array[j];
+              brem_ker = BremKernelsLegCoeff(&grey_pars->kernel_pars.brem_kernel_params, &grey_pars->eos_pars);
+            
+              for (int idx = 0; idx < total_num_species; idx++)
+              {
+                out_n->m1_mat_em[idx][n_max * i + j] += brem_ker.em[0];
+                out_n->m1_mat_em[idx][n_max * j + i] += brem_ker.em[0];
+            
+                out_n->m1_mat_ab[idx][n_max * i + j] += brem_ker.abs[0];
+                out_n->m1_mat_ab[idx][n_max * j + i] += brem_ker.abs[0];
+              }
+            }
+          }
+       }   
+    }
+
+
+    for (int i = 0; i < 2 * n; i++)
+    {
+        nu = nu_array[i];
+
+        for (int idx = 0; idx < total_num_species; idx++)
+        {
+          g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, idx);
+
+            if (grey_pars->opacity_pars.neglect_blocking == false)
+                {
+                    block_factor_nu[idx] = 1. - g_nu[idx];
+                }
+                else
+                {
+                    block_factor_nu[idx] = 1.;
+                }
+         }
+            
+            out_n->m1_mat_em[id_nue][n_max * i + i] *= block_factor_nu[id_anue];
+            out_n->m1_mat_em[id_anue][n_max * i + i] *= block_factor_nu[id_nue];
+            out_n->m1_mat_em[id_nux][n_max * i + i] *= block_factor_nu[id_anux];
+            out_n->m1_mat_em[id_anux][n_max * i + i] *= block_factor_nu[id_nux];
+
+            out_n->m1_mat_ab[id_nue][n_max * i + i] *= g_nu[id_anue];
+            out_n->m1_mat_ab[id_anue][n_max * i + i] *= g_nu[id_nue];
+            out_n->m1_mat_ab[id_nux][n_max * i + i] *= g_nu[id_anux];
+            out_n->m1_mat_ab[id_anux][n_max * i + i] *= g_nu[id_nux];
+
+        for (int j = i + 1; j < 2 * n; j++)
+        {
+            nu_bar = nu_array[j];
+
+            for (int idx = 0; idx < total_num_species; idx++)
+            {
+                g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
+
+                if (grey_pars->opacity_pars.neglect_blocking == false)
+                {
+                    block_factor_nu_bar[idx] = 1. - g_nu_bar[idx];
+                }
+                else
+                {
+                    block_factor_nu_bar[idx] = 1.;
+                }
+            }
+
+            out_n->m1_mat_em[id_nue][n_max * i + j] *= block_factor_nu_bar[id_anue];
+            out_n->m1_mat_em[id_anue][n_max * i + j] *= block_factor_nu_bar[id_nue];
+            out_n->m1_mat_em[id_nux][n_max * i + j] *= block_factor_nu_bar[id_anux];
+            out_n->m1_mat_em[id_anux][n_max * i + j] *= block_factor_nu_bar[id_nux];
+
+            out_n->m1_mat_em[id_nue][n_max * j + i] *= block_factor_nu[id_anue];
+            out_n->m1_mat_em[id_anue][n_max * j + i] *= block_factor_nu[id_nue];
+            out_n->m1_mat_em[id_nux][n_max * j + i] *= block_factor_nu[id_anux];
+            out_n->m1_mat_em[id_anux][n_max * j + i] *= block_factor_nu[id_nux];
+
+            out_n->m1_mat_ab[id_nue][n_max * i + j] *= g_nu_bar[id_anue];
+            out_n->m1_mat_ab[id_anue][n_max * i + j] *= g_nu_bar[id_nue];
+            out_n->m1_mat_ab[id_nux][n_max * i + j] *= g_nu_bar[id_anux];
+            out_n->m1_mat_ab[id_anux][n_max * i + j] *= g_nu_bar[id_nux];
+
+            out_n->m1_mat_ab[id_nue][n_max * j + i] *= g_nu[id_anue];
+            out_n->m1_mat_ab[id_anue][n_max * j + i] *= g_nu[id_nue];
+            out_n->m1_mat_ab[id_nux][n_max * j + i] *= g_nu[id_anux];
+            out_n->m1_mat_ab[id_anux][n_max * j + i] *= g_nu[id_nux];
+         }
+    }
+       
+
+
+    if (grey_pars->opacity_flags.use_inelastic_scatt == 1)
+    {
+       MyKernelOutput inel_1, inel_2;
+
+       InelasticScattKernelParams inelastic_pars =
+           grey_pars->kernel_pars.inelastic_kernel_params;
+    
+       for (int i = 0; i < 2 * n; i++)
+       {
+         nu = nu_array[i];
+
+         for (int idx = 0; idx < total_num_species; idx++)
+            {
+                g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, idx);
+                
+                if (grey_pars->opacity_pars.neglect_blocking == false)
+                {
+                    block_factor_nu[idx]     = 1. - g_nu[idx];
+                }
+                else
+                {
+                    block_factor_nu[idx]     = 1.;
+                }
+            }
+
+           // compute the pair kernels
+           inelastic_pars.omega       = nu;
+           inelastic_pars.omega_prime = nu;
+           
+           inel_1 = InelasticScattKernels(&inelastic_pars, &grey_pars->eos_pars);
+           
+           for (int idx = 0; idx < total_num_species; idx++)
+            {
+                out_n->m1_mat_em[idx][n_max * i + i] += inel_1.em[idx] * g_nu[idx];
+                out_n->m1_mat_ab[idx][n_max * i + i] += inel_1.abs[idx] * block_factor_nu[idx];
+            }
+          
+
+         for (int j = i + 1; j < 2 * n; j++)
+         {
+           nu_bar = nu_array[j];
+           
+           for (int idx = 0; idx < total_num_species; idx++)
+            {
+                g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
+                
+                if (grey_pars->opacity_pars.neglect_blocking == false)
+                {
+                    block_factor_nu_bar[idx] = 1. - g_nu_bar[idx];
+                }
+                else
+                {
+                    block_factor_nu_bar[idx] = 1.;
+                }
+            }
+           
+           // compute the pair kernels
+           inelastic_pars.omega       = nu;
+           inelastic_pars.omega_prime = nu_bar;
+           
+           inel_1 = InelasticScattKernels(&inelastic_pars, &grey_pars->eos_pars);
+           
+           inelastic_pars.omega       = nu_bar;
+           inelastic_pars.omega_prime = nu;
+   
+           inel_2 = InelasticScattKernels(&inelastic_pars, &grey_pars->eos_pars);
+           
+           for (int idx = 0; idx < total_num_species; idx++)
+            {
+                out_n->m1_mat_em[idx][n_max * i + j] += inel_1.em[idx] * g_nu_bar[idx];
+                out_n->m1_mat_em[idx][n_max * j + i] += inel_2.em[idx] * g_nu[idx];
+                
+                out_n->m1_mat_ab[idx][n_max * i + j] += inel_1.abs[idx] * block_factor_nu_bar[idx];
+                out_n->m1_mat_ab[idx][n_max * j + i] += inel_2.abs[idx] * block_factor_nu[idx];
+            }
+          }
+       }
+    } 
+            /*
+            //////////////////////////////////////////////
+            ////// ONLY FOR COMPARISON WITH NULIB ////////
+            //////////////////////////////////////////////
+            if (kirchoff_flag)
+            {
+                ann_term_ij[id_nue] +=
+                    (pair.m1_mat_em[id_nue][n_max * i + j] + brem.m1_mat_em[0][n_max * i + j]) *
+                    g_nu_bar[id_anue] / g_nu[id_nue];
+                ann_term_ij[id_anue] +=
+                    (pair.m1_mat_em[id_anue][n_max * i + j] + brem.m1_mat_em[0][n_max * i + j]) *
+                    g_nu_bar[id_nue] / g_nu[id_anue];
+                ann_term_ij[id_nux] +=
+                    (pair.m1_mat_em[id_nux][n_max * i + j] + brem.m1_mat_em[0][n_max * i + j]) *
+                    g_nu_bar[id_anux] / g_nu[id_nux];
+                ann_term_ij[id_anux] +=
+                    (pair.m1_mat_em[id_anux][n_max * i + j] + brem.m1_mat_em[0][n_max * i + j]) *
+                    g_nu_bar[id_nux] / g_nu[id_anux];
+
+                ann_term_ji[id_nue] +=
+                    (pair.m1_mat_em[id_nue][n_max * j + i] + brem.m1_mat_em[0][n_max * j + i]) *
+                    g_nu[id_anue] / g_nu_bar[id_nue];
+                ann_term_ji[id_anue] +=
+                    (pair.m1_mat_em[id_anue][n_max * j + i] + brem.m1_mat_em[0][n_max * j + i]) *
+                    g_nu[id_nue] / g_nu_bar[id_anue];
+                ann_term_ji[id_nux] +=
+                    (pair.m1_mat_em[id_nux][n_max * j + i] + brem.m1_mat_em[0][n_max * j + i]) *
+                    g_nu[id_anux] / g_nu_bar[id_nux];
+                ann_term_ji[id_anux] +=
+                    (pair.m1_mat_em[id_anux][n_max * j + i] + brem.m1_mat_em[0][n_max * j + i]) *
+                    g_nu[id_nux] / g_nu_bar[id_anux];
+            }
+            */
+
+            //////////////////////////////////////////////
+     for (int i = 0; i < 2 * n; i++)
+       {
+         nu = nu_array[i];
+         
+         for (int idx = 0; idx < total_num_species; idx++)
+         {
+            g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, idx);
+                
+            out_n->m1_mat_ab[idx][n_max * i + i] = nu * nu * g_nu[idx] * nu * nu *
+                    (out_n->m1_mat_em[idx][n_max * i + i] + out_n->m1_mat_ab[idx][n_max * i + i]);
+            out_n->m1_mat_em[idx][n_max * i + i] *= nu * nu * nu * nu;
+
+            out_j->m1_mat_em[idx][n_max * i + i] = nu * out_n->m1_mat_em[idx][n_max * i + i];
+            out_j->m1_mat_ab[idx][n_max * i + i] = nu * out_n->m1_mat_ab[idx][n_max * i + i];
+          }
+
+         for (int j = i + 1; j < 2 * n; j++)
+         {
+            nu_bar = nu_array[j];
+
+            for (int idx = 0; idx < total_num_species; idx++)
+            {
+                g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
+                
+                out_n->m1_mat_ab[idx][n_max * i + j] = nu * nu * g_nu[idx] * nu_bar * nu_bar *
+                    (out_n->m1_mat_em[idx][n_max * i + j] + out_n->m1_mat_ab[idx][n_max * i + j]);
+                out_n->m1_mat_ab[idx][n_max * j + i] =
+                    nu_bar * nu_bar * g_nu_bar[idx] * nu * nu *
+                    (out_n->m1_mat_em[idx][n_max * j + i] + out_n->m1_mat_ab[idx][n_max * j + i]);
+                
+                out_n->m1_mat_em[idx][n_max * i + j] *= nu * nu * nu_bar * nu_bar;
+                out_n->m1_mat_em[idx][n_max * j + i] *= nu_bar * nu_bar * nu * nu;
+
+                out_j->m1_mat_em[idx][n_max * i + j] = nu * out_n->m1_mat_em[idx][n_max * i + j];
+                out_j->m1_mat_em[idx][n_max * j + i] = nu_bar * out_n->m1_mat_em[idx][n_max * j + i];
+
+                out_j->m1_mat_ab[idx][n_max * i + j] = nu * out_n->m1_mat_ab[idx][n_max * i + j];
+                out_j->m1_mat_ab[idx][n_max * j + i] = nu_bar * out_n->m1_mat_ab[idx][n_max * j + i];
+            }
+        }
+    }
+
+    /*    
+    for (int i = 0; i < 2 * n; i ++) {
+           printf("i = %d:  ", i);
+           for (int j = 0; j < 2 * n; j ++) {
+                printf("%.8e  ", out_n->m1_mat_em[0][n_max * i + j]);
+            }
+         printf("\n");
+    }
+    */
+
+
+    return;
+}
 /* Computes the opacities for the M1 code
  *
  */
@@ -1275,16 +2022,6 @@ M1Opacities ComputeM1Opacities(const MyQuadrature* quad_1d,
 
     const double temp = my_grey_opacity_params->eos_pars.temp;
     
-    
-    // set up 1d integration
-    __attribute__((unused))
-    MyFunctionMultiD integrand_m1_1d;
-    MyQuadratureIntegrand integrand_m1_1d_info = {.n = 12};
-    integrand_m1_1d.function                   = &M1CoeffsSingleIntegrand;
-    integrand_m1_1d.dim                        = 1;
-    integrand_m1_1d.params                     = my_grey_opacity_params;
-    integrand_m1_1d.my_quadrature_integrand    = integrand_m1_1d_info;
-
     double n[total_num_species];
     double J[total_num_species];
 
@@ -1296,27 +2033,9 @@ M1Opacities ComputeM1Opacities(const MyQuadrature* quad_1d,
 
         J[idx] = J[idx] / kMeV; // erg cm-3 -> MeV cm-3 conversion
     }
-
-    // double s_2d_x[12];
-    // double s_2d_y[12];
-
-    // for (int i=0; i<11; i++) {
-    // s_2d_x[i] = 1.5 * my_grey_opacity_params->eos_pars.temp;
-    // s_2d_y[i] = s_2d_x[i];
-    //}
+    
     // @TODO: choose this appropriately
-
-    // double s_1d[11];
-    // for (int i=0; i<11; i++) {
-    // s_1d[i] = 1.5 * my_grey_opacity_params->eos_pars.temp;
-    //}
-
-    //const double eta_e = my_grey_opacity_params->eos_pars.mu_e / temp;
-
-    // const double s = 1.5 * temp;
     const double s = 0.5 * 4.364 * temp;
-    // const double s = 0.5 * temp * (FDI_p4(eta_e) / FDI_p3(eta_e) +
-    // FDI_p4(-eta_e) / FDI_p3(-eta_e));
 
     __attribute__((unused))
     double s_array[12] = {0};
@@ -1343,25 +2062,26 @@ M1Opacities ComputeM1Opacities(const MyQuadrature* quad_1d,
     s_array[5] = temp * fmax(-eta_e, 5.) + kQ;
     */
 
-    // MyQuadratureIntegrand integrals_1d =
-    // GaussLegendreIntegrateFixedSplit1D(quad_1d, &integrand_m1_1d, s);
-    //MyQuadratureIntegrand integrals_1d =
-        //GaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s_array);
     //MyQuadratureIntegrand integrals_1d = {0};
     M1MatrixKokkos1D out = {0};
     M1CoeffsSingleIntegrandMatrix(quad_1d, my_grey_opacity_params, s_array[0], &out);
     MyQuadratureIntegrand integrals_1d = GaussLegendreIntegrate1DMatrix(quad_1d, &out, s_array[0]);
 
-    M1MatrixKokkos2D out_n = {0}, out_j = {0};
-    ComputeM1DoubleIntegrandTest(quad_1d, my_grey_opacity_params, s, &out_n,
-                             &out_j);
+    //M1MatrixKokkos2D out_n = {0}, out_j = {0};
+    //M1MatrixKokkos2DFlatten out_n = {0}, out_j = {0};
+    M1MatrixKokkos2D out_n = {0};
+    //ComputeM1DoubleIntegrandTestFlatten(quad_1d, my_grey_opacity_params, s, &out_n,
+    //ComputeM1DoubleIntegrand(quad_1d, my_grey_opacity_params, s, &out_n,
+                             //&out_j);
+    ComputeM1DoubleIntegrandTestOnlyNumber(quad_1d, my_grey_opacity_params, s, &out_n);
 
-    MyQuadratureIntegrand n_integrals_2d =
-        GaussLegendreIntegrate2DMatrix(quad_1d, &out_n, s);
-    MyQuadratureIntegrand e_integrals_2d =
-        GaussLegendreIntegrate2DMatrix(quad_1d, &out_j, s);
-    //MyQuadratureIntegrand n_integrals_2d = {0};
-    //MyQuadratureIntegrand e_integrals_2d = {0};
+    //MyQuadratureIntegrand n_integrals_2d =
+        //GaussLegendreIntegrate2DMatrixFlatten(quad_1d, &out_n, s);
+    //MyQuadratureIntegrand e_integrals_2d =
+        //GaussLegendreIntegrate2DMatrixFlatten(quad_1d, &out_j, s);
+    MyQuadratureIntegrand n_integrals_2d = {0};
+    MyQuadratureIntegrand e_integrals_2d = {0};
+    GaussLegendreIntegrate2DMatrixOnlyNumber(quad_1d, &out_n, s, &n_integrals_2d, &e_integrals_2d);
 
     M1Opacities m1_opacities = {0};
     

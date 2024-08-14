@@ -31,7 +31,7 @@
 #define dim_pair_t 100
 
 // Define maximum number of quadrature points
-#define n_max 25
+#define n_max 40
 
 /* ==================================================================================
  * Integration structures
@@ -476,6 +476,14 @@ struct M1MatrixKokkos2D
     double m1_mat_ab[total_num_species][n_max][n_max];
 };
 typedef struct M1MatrixKokkos2D M1MatrixKokkos2D;
+
+struct M1MatrixKokkos2DFlatten
+{
+     double m1_mat_em[total_num_species][n_max *n_max];
+    double m1_mat_ab[total_num_species][n_max * n_max];
+};
+typedef struct M1MatrixKokkos2DFlatten M1MatrixKokkos2DFlatten;
+
 
 struct M1MatrixKokkos1D
 {
