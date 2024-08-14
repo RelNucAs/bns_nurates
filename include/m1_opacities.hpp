@@ -814,6 +814,7 @@ void ComputeM1DoubleIntegrandTest(const MyQuadrature* quad_1d,
     }
   }
 
+
     if (grey_pars->opacity_flags.use_brem == 1)
     {
         if (grey_pars->opacity_pars.use_BRT_brem == true)
@@ -823,20 +824,33 @@ void ComputeM1DoubleIntegrandTest(const MyQuadrature* quad_1d,
           for (int i = 0; i < 2 * n; i++)
           {
 
-            for (int j = i; j < 2 * n; j++)
+            grey_pars->kernel_pars.brem_kernel_params.omega       = nu_array[i];
+            grey_pars->kernel_pars.brem_kernel_params.omega_prime = nu_array[i];
+            
+            // compute the brem kernels
+            brem_ker = BremKernelsBRT06(&grey_pars->kernel_pars.brem_kernel_params, &grey_pars->eos_pars);
+            
+            for (int idx = 0; idx < total_num_species; idx++)
             {
-
-              // compute the brem kernels
-              grey_pars->kernel_pars.brem_kernel_params.omega       = nu_array[i];
+              out_n->m1_mat_em[idx][i][i] += brem_ker.em[0];
+              out_n->m1_mat_ab[idx][i][i] += brem_ker.abs[0];
+            }
+            
+            for (int j = i + 1; j < 2 * n; j++)
+            {
               grey_pars->kernel_pars.brem_kernel_params.omega_prime = nu_array[j];
             
+              // compute the brem kernels
               brem_ker = BremKernelsBRT06(&grey_pars->kernel_pars.brem_kernel_params, &grey_pars->eos_pars);
             
-              out_n->m1_mat_em[0][i][j] = brem_ker.em[0];
-              out_n->m1_mat_em[0][j][i] = brem_ker.em[0];
+              for (int idx = 0; idx < total_num_species; idx++)
+              {
+                out_n->m1_mat_em[idx][i][j] += brem_ker.em[0];
+                out_n->m1_mat_em[idx][j][i] += brem_ker.em[0];
             
-              out_n->m1_mat_ab[0][i][j] = brem_ker.abs[0];
-              out_n->m1_mat_ab[0][j][i] = brem_ker.abs[0];
+                out_n->m1_mat_ab[idx][i][j] += brem_ker.abs[0];
+                out_n->m1_mat_ab[idx][j][i] += brem_ker.abs[0];
+              }
             }
           }            
         }
@@ -851,44 +865,80 @@ void ComputeM1DoubleIntegrandTest(const MyQuadrature* quad_1d,
           for (int i = 0; i < 2 * n; i++)
           {
 
-            for (int j = i; j < 2 * n; j++)
-             {
+            grey_pars->kernel_pars.brem_kernel_params.omega       = nu_array[i];
+            grey_pars->kernel_pars.brem_kernel_params.omega_prime = nu_array[i];
+            
+            // compute the brem kernels
+            brem_ker = BremKernelsLegCoeff(&grey_pars->kernel_pars.brem_kernel_params, &grey_pars->eos_pars);
+            
+            for (int idx = 0; idx < total_num_species; idx++)
+            {
+              out_n->m1_mat_em[idx][i][i] += brem_ker.em[0];
+              out_n->m1_mat_ab[idx][i][i] += brem_ker.abs[0];
+            }
+
+            for (int j = i + 1; j < 2 * n; j++)
+            {
               // compute the brem kernels
-              grey_pars->kernel_pars.brem_kernel_params.omega       = nu_array[i];
               grey_pars->kernel_pars.brem_kernel_params.omega_prime = nu_array[j];
               brem_ker = BremKernelsLegCoeff(&grey_pars->kernel_pars.brem_kernel_params, &grey_pars->eos_pars);
             
-              out_n->m1_mat_em[0][i][j] += brem_ker.em[0];
-              out_n->m1_mat_em[0][j][i] += brem_ker.em[0];
+              for (int idx = 0; idx < total_num_species; idx++)
+              {
+                out_n->m1_mat_em[idx][i][j] += brem_ker.em[0];
+                out_n->m1_mat_em[idx][j][i] += brem_ker.em[0];
             
-              out_n->m1_mat_ab[0][i][j] += brem_ker.abs[0];
-              out_n->m1_mat_ab[0][j][i] += brem_ker.abs[0];
-             }
+                out_n->m1_mat_ab[idx][i][j] += brem_ker.abs[0];
+                out_n->m1_mat_ab[idx][j][i] += brem_ker.abs[0];
+              }
+            }
           }
        }   
     }
-    
+
+
     for (int i = 0; i < 2 * n; i++)
     {
         nu = nu_array[i];
 
-        for (int j = i; j < 2 * n; j++)
+        for (int idx = 0; idx < total_num_species; idx++)
+        {
+          g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, idx);
+
+            if (grey_pars->opacity_pars.neglect_blocking == false)
+                {
+                    block_factor_nu[idx] = 1. - g_nu[idx];
+                }
+                else
+                {
+                    block_factor_nu[idx] = 1.;
+                }
+         }
+            
+            out_n->m1_mat_em[id_nue][i][i] *= block_factor_nu[id_anue];
+            out_n->m1_mat_em[id_anue][i][i] *= block_factor_nu[id_nue];
+            out_n->m1_mat_em[id_nux][i][i] *= block_factor_nu[id_anux];
+            out_n->m1_mat_em[id_anux][i][i] *= block_factor_nu[id_nux];
+
+            out_n->m1_mat_ab[id_nue][i][i] *= g_nu[id_anue];
+            out_n->m1_mat_ab[id_anue][i][i] *= g_nu[id_nue];
+            out_n->m1_mat_ab[id_nux][i][i] *= g_nu[id_anux];
+            out_n->m1_mat_ab[id_anux][i][i] *= g_nu[id_nux];
+
+        for (int j = i + 1; j < 2 * n; j++)
         {
             nu_bar = nu_array[j];
 
             for (int idx = 0; idx < total_num_species; idx++)
             {
-                g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, idx);
                 g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
 
                 if (grey_pars->opacity_pars.neglect_blocking == false)
                 {
-                    block_factor_nu[idx]     = 1. - g_nu[idx];
                     block_factor_nu_bar[idx] = 1. - g_nu_bar[idx];
                 }
                 else
                 {
-                    block_factor_nu[idx]     = 1.;
                     block_factor_nu_bar[idx] = 1.;
                 }
             }
@@ -908,12 +958,14 @@ void ComputeM1DoubleIntegrandTest(const MyQuadrature* quad_1d,
             out_n->m1_mat_ab[id_nux][i][j] *= g_nu_bar[id_anux];
             out_n->m1_mat_ab[id_anux][i][j] *= g_nu_bar[id_nux];
 
-            out_n->m1_mat_ab[id_nue][j][i] *= g_nu_bar[id_anue];
-            out_n->m1_mat_ab[id_anue][j][i] *= g_nu_bar[id_nue];
-            out_n->m1_mat_ab[id_nux][j][i] *= g_nu_bar[id_anux];
-            out_n->m1_mat_ab[id_anux][j][i] *= g_nu_bar[id_nux];
+            out_n->m1_mat_ab[id_nue][j][i] *= g_nu[id_anue];
+            out_n->m1_mat_ab[id_anue][j][i] *= g_nu[id_nue];
+            out_n->m1_mat_ab[id_nux][j][i] *= g_nu[id_anux];
+            out_n->m1_mat_ab[id_anux][j][i] *= g_nu[id_nux];
          }
     }
+       
+
 
     if (grey_pars->opacity_flags.use_inelastic_scatt == 1)
     {
@@ -926,23 +978,47 @@ void ComputeM1DoubleIntegrandTest(const MyQuadrature* quad_1d,
        {
          nu = nu_array[i];
 
-         for (int j = i; j < 2 * n; j++)
+         for (int idx = 0; idx < total_num_species; idx++)
+            {
+                g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, idx);
+                
+                if (grey_pars->opacity_pars.neglect_blocking == false)
+                {
+                    block_factor_nu[idx]     = 1. - g_nu[idx];
+                }
+                else
+                {
+                    block_factor_nu[idx]     = 1.;
+                }
+            }
+
+           // compute the pair kernels
+           inelastic_pars.omega       = nu;
+           inelastic_pars.omega_prime = nu;
+           
+           inel_1 = InelasticScattKernels(&inelastic_pars, &grey_pars->eos_pars);
+           
+           for (int idx = 0; idx < total_num_species; idx++)
+            {
+                out_n->m1_mat_em[idx][i][i] += inel_1.em[idx] * g_nu[idx];
+                out_n->m1_mat_ab[idx][i][i] += inel_1.abs[idx] * block_factor_nu[idx];
+            }
+          
+
+         for (int j = i + 1; j < 2 * n; j++)
          {
            nu_bar = nu_array[j];
            
            for (int idx = 0; idx < total_num_species; idx++)
             {
-                g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, idx);
                 g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
                 
                 if (grey_pars->opacity_pars.neglect_blocking == false)
                 {
-                    block_factor_nu[idx]     = 1. - g_nu[idx];
                     block_factor_nu_bar[idx] = 1. - g_nu_bar[idx];
                 }
                 else
                 {
-                    block_factor_nu[idx]     = 1.;
                     block_factor_nu_bar[idx] = 1.;
                 }
             }
@@ -1007,24 +1083,35 @@ void ComputeM1DoubleIntegrandTest(const MyQuadrature* quad_1d,
      for (int i = 0; i < 2 * n; i++)
        {
          nu = nu_array[i];
+         
+         for (int idx = 0; idx < total_num_species; idx++)
+         {
+            g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, idx);
+                
+            out_n->m1_mat_ab[idx][i][i] = nu * nu * g_nu[idx] * nu * nu *
+                    (out_n->m1_mat_em[idx][i][i] + out_n->m1_mat_ab[idx][i][i]);
+            out_n->m1_mat_em[idx][i][i] *= nu * nu * nu * nu;
 
-         for (int j = i; j < 2 * n; j++)
+            out_j->m1_mat_em[idx][i][i] = nu * out_n->m1_mat_em[idx][i][i];
+            out_j->m1_mat_ab[idx][i][i] = nu * out_n->m1_mat_ab[idx][i][i];
+          }
+
+         for (int j = i + 1; j < 2 * n; j++)
          {
             nu_bar = nu_array[j];
 
             for (int idx = 0; idx < total_num_species; idx++)
             {
-                g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, idx);
                 g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
                 
-                out_n->m1_mat_em[idx][i][j] *= nu * nu * nu_bar * nu_bar;
-                out_n->m1_mat_em[idx][j][i] *= nu_bar * nu_bar * nu * nu;
-
                 out_n->m1_mat_ab[idx][i][j] = nu * nu * g_nu[idx] * nu_bar * nu_bar *
                     (out_n->m1_mat_em[idx][i][j] + out_n->m1_mat_ab[idx][i][j]);
                 out_n->m1_mat_ab[idx][j][i] =
                     nu_bar * nu_bar * g_nu_bar[idx] * nu * nu *
                     (out_n->m1_mat_em[idx][j][i] + out_n->m1_mat_ab[idx][j][i]);
+                
+                out_n->m1_mat_em[idx][i][j] *= nu * nu * nu_bar * nu_bar;
+                out_n->m1_mat_em[idx][j][i] *= nu_bar * nu_bar * nu * nu;
 
                 out_j->m1_mat_em[idx][i][j] = nu * out_n->m1_mat_em[idx][i][j];
                 out_j->m1_mat_em[idx][j][i] = nu_bar * out_n->m1_mat_em[idx][j][i];
@@ -1034,6 +1121,17 @@ void ComputeM1DoubleIntegrandTest(const MyQuadrature* quad_1d,
             }
         }
     }
+
+    /*    
+    for (int i = 0; i < 2 * n; i ++) {
+           printf("i = %d:  ", i);
+           for (int j = 0; j < 2 * n; j ++) {
+                printf("%.8e  ", out_n->m1_mat_em[0][i][j]);
+            }
+         printf("\n");
+    }
+    */
+
 
     return;
 }

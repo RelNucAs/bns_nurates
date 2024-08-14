@@ -224,14 +224,14 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
  
     printf("Computing M1 coefficients\n");
   
-    const int n = gpu_quad.nx;
-    double t = 1.5 * d_T(i);
-    double nu_array[n_max];
-    for (int i = 0; i < n; i++)
-    {
-        nu_array[i]     = t * gpu_quad.points[i];
-        nu_array[n + i] = t / gpu_quad.points[i];
-    }
+    //const int n = gpu_quad.nx;
+    //double t = 1.5 * d_T(i);
+    //double nu_array[n_max];
+    //for (int i = 0; i < n; i++)
+    //{
+        //nu_array[i]     = t * gpu_quad.points[i];
+        //nu_array[n + i] = t / gpu_quad.points[i];
+    //}
     //OpacityParams opacity_pars = grey_pars->opacity_pars;
     /* 
     M1MatrixKokkos2D pair = {0};
