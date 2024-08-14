@@ -15,6 +15,13 @@
 #include "distribution.h"
 #include "opacities.h"
 
+/* Thresholds on the neutrino energy number and energy density. If values are
+below the thresholds, absorption opacities or scattering opacities are set to 0.
+*/
+static const double THRESHOLD_N = 1e0;
+static const double THRESHOLD_J = 1e-4;
+
+
 /* Compute the 2d integrands for all reactions from Leonardo's notes [Eqns. (51)
  * & (52)] There are a total of two expressions for 'e' and 'x' neutrinos, so 4
  * integrands in total
@@ -585,8 +592,7 @@ void ComputeM1DoubleIntegrand(MyQuadrature* quad_1d,
 
     double nu, nu_bar;
 
-    double* nu_array;
-    nu_array = (double*)malloc(sizeof(double) * 2 * n);
+    double nu_array[2 * n];
 
     for (int i = 0; i < n; i++)
     {
@@ -982,7 +988,7 @@ M1Opacities ComputeM1Opacities(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
 
     for (int idx = 0; idx < total_num_species; idx++)
     {
-        s_array[idx + 8] = J[idx] / n[idx];
+        s_array[idx + 8] = (n[idx] > THRESHOLD_N) ? (J[idx] / n[idx]) : 0.;
     }
 
     /*
@@ -1016,78 +1022,103 @@ M1Opacities ComputeM1Opacities(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
 
     M1Opacities m1_opacities;
 
+    /* Set all opacities to zero. They'll be left as 0 if the neutrino
+    number/energy density is too low (to avoid inf/nan, since the number/energy
+    density appears in the denominator). Note that emissivities do no need this
+    precaution (and it also make sense physically: you can produce neutrinos
+    even if there are none to start with). */
+    for (int idx = 0; idx < total_num_species; idx++)
+    {
+        m1_opacities.kappa_0_a[idx] = 0.;
+        m1_opacities.kappa_a[idx]   = 0.;
+        m1_opacities.kappa_s[idx]   = 0.;
+    }
+
+    /* Electron neutrinos */
     m1_opacities.eta_0[id_nue] =
         four_pi_hc3 *
         (four_pi_hc3 * n_integrals_2d.integrand[0] + integrals_1d.integrand[0]);
-    m1_opacities.eta_0[id_anue] =
-        four_pi_hc3 *
-        (four_pi_hc3 * n_integrals_2d.integrand[1] + integrals_1d.integrand[1]);
-    m1_opacities.eta_0[id_nux]  = four_pi_hc3_sqr * n_integrals_2d.integrand[2];
-    m1_opacities.eta_0[id_anux] = four_pi_hc3_sqr * n_integrals_2d.integrand[3];
-
-    m1_opacities.kappa_0_a[id_nue] =
-        n[id_nue] == 0. ? 0. :
-                          four_pi_hc3 / (kClight * n[id_nue]) *
-                              (four_pi_hc3 * n_integrals_2d.integrand[4] +
-                               integrals_1d.integrand[2]);
-    m1_opacities.kappa_0_a[id_anue] =
-        n[id_anue] == 0. ? 0. :
-                           four_pi_hc3 / (kClight * n[id_anue]) *
-                               (four_pi_hc3 * n_integrals_2d.integrand[5] +
-                                integrals_1d.integrand[3]);
-    m1_opacities.kappa_0_a[id_nux] =
-        n[id_nux] == 0. ? 0. :
-                          four_pi_hc3_sqr / (kClight * n[id_nux]) *
-                              n_integrals_2d.integrand[6];
-    m1_opacities.kappa_0_a[id_anux] =
-        n[id_anux] == 0. ? 0. :
-                           four_pi_hc3_sqr / (kClight * n[id_anux]) *
-                               n_integrals_2d.integrand[7];
-
     m1_opacities.eta[id_nue] =
         four_pi_hc3 *
         (four_pi_hc3 * e_integrals_2d.integrand[0] + integrals_1d.integrand[4]);
+    if (n[id_nue] > THRESHOLD_N)
+    {
+        m1_opacities.kappa_0_a[id_nue] =
+            four_pi_hc3 / (kClight * n[id_nue]) *
+            (four_pi_hc3 * n_integrals_2d.integrand[4] +
+             integrals_1d.integrand[2]);
+    }
+    if (J[id_nue] > THRESHOLD_J)
+    {
+        m1_opacities.kappa_a[id_nue] =
+            n[id_nue] == 0. ? 0. :
+                              four_pi_hc3 / (kClight * J[id_nue]) *
+                                  (four_pi_hc3 * e_integrals_2d.integrand[4] +
+                                   integrals_1d.integrand[6]);
+        m1_opacities.kappa_s[id_nue] =
+            four_pi_hc3 / (kClight * J[id_nue]) * integrals_1d.integrand[8];
+    }
+
+    /* Electron anti-neutrinos */
+    m1_opacities.eta_0[id_anue] =
+        four_pi_hc3 *
+        (four_pi_hc3 * n_integrals_2d.integrand[1] + integrals_1d.integrand[1]);
     m1_opacities.eta[id_anue] =
         four_pi_hc3 *
         (four_pi_hc3 * e_integrals_2d.integrand[1] + integrals_1d.integrand[5]);
-    m1_opacities.eta[id_nux]  = four_pi_hc3_sqr * e_integrals_2d.integrand[2];
-    m1_opacities.eta[id_anux] = four_pi_hc3_sqr * e_integrals_2d.integrand[3];
-
-    m1_opacities.kappa_a[id_nue] =
-        n[id_nue] == 0. ? 0. :
-                          four_pi_hc3 / (kClight * J[id_nue]) *
-                              (four_pi_hc3 * e_integrals_2d.integrand[4] +
-                               integrals_1d.integrand[6]);
-    m1_opacities.kappa_a[id_anue] =
-        n[id_anue] == 0. ? 0. :
-                           four_pi_hc3 / (kClight * J[id_anue]) *
-                               (four_pi_hc3 * e_integrals_2d.integrand[5] +
-                                integrals_1d.integrand[7]);
-    m1_opacities.kappa_a[id_nux] = n[id_nux] == 0. ?
-                                       0. :
-                                       four_pi_hc3_sqr / (kClight * J[id_nux]) *
-                                           e_integrals_2d.integrand[6];
-    m1_opacities.kappa_a[id_anux] =
-        n[id_anux] == 0. ? 0. :
-                           four_pi_hc3_sqr / (kClight * J[id_anux]) *
-                               e_integrals_2d.integrand[7];
-
-    m1_opacities.kappa_s[id_nue] =
-        n[id_nue] == 0. ?
-            0. :
-            four_pi_hc3 / (kClight * J[id_nue]) * integrals_1d.integrand[8];
-    m1_opacities.kappa_s[id_anue] =
-        n[id_anue] == 0. ?
-            0. :
+    if (n[id_anue] > THRESHOLD_N)
+    {
+        m1_opacities.kappa_0_a[id_anue] =
+            four_pi_hc3 / (kClight * n[id_anue]) *
+            (four_pi_hc3 * n_integrals_2d.integrand[5] +
+             integrals_1d.integrand[3]);
+    }
+    if (J[id_anue] > THRESHOLD_J)
+    {
+        m1_opacities.kappa_a[id_anue] =
+            four_pi_hc3 / (kClight * J[id_anue]) *
+            (four_pi_hc3 * e_integrals_2d.integrand[5] +
+             integrals_1d.integrand[7]);
+        m1_opacities.kappa_s[id_anue] =
             four_pi_hc3 / (kClight * J[id_anue]) * integrals_1d.integrand[9];
-    m1_opacities.kappa_s[id_nux] =
-        n[id_nux] == 0. ?
-            0. :
+    }
+
+    /* Heavy neutrinos */
+    m1_opacities.eta_0[id_nux] = four_pi_hc3_sqr * n_integrals_2d.integrand[2];
+    m1_opacities.eta[id_nux]   = four_pi_hc3_sqr * e_integrals_2d.integrand[2];
+    if (n[id_nux] > THRESHOLD_N)
+    {
+        m1_opacities.kappa_0_a[id_nux] = four_pi_hc3_sqr /
+                                         (kClight * n[id_nux]) *
+                                         n_integrals_2d.integrand[6];
+    }
+    if (J[id_nux] > THRESHOLD_J)
+    {
+        m1_opacities.kappa_a[id_nux] = four_pi_hc3_sqr / (kClight * J[id_nux]) *
+                                       e_integrals_2d.integrand[6];
+        m1_opacities.kappa_s[id_nux] =
             four_pi_hc3 / (kClight * J[id_nux]) * integrals_1d.integrand[10];
-    m1_opacities.kappa_s[id_anux] =
-        n[id_anux] == 0. ?
-            0. :
+    }
+
+    /* Heavy anti-neutrinos */
+    m1_opacities.eta_0[id_anux] = four_pi_hc3_sqr * n_integrals_2d.integrand[3];
+    m1_opacities.eta[id_anux]   = four_pi_hc3_sqr * e_integrals_2d.integrand[3];
+    if (n[id_anux] > THRESHOLD_N)
+    {
+        m1_opacities.kappa_0_a[id_anux] =
+            n[id_anux] == 0. ? 0. :
+                               four_pi_hc3_sqr / (kClight * n[id_anux]) *
+                                   n_integrals_2d.integrand[7];
+    }
+    if (J[id_anux] > THRESHOLD_J)
+    {
+        m1_opacities.kappa_a[id_anux] = four_pi_hc3_sqr /
+                                        (kClight * J[id_anux]) *
+                                        e_integrals_2d.integrand[7];
+
+        m1_opacities.kappa_s[id_anux] =
             four_pi_hc3 / (kClight * J[id_anux]) * integrals_1d.integrand[11];
+    }
 
     return m1_opacities;
 }

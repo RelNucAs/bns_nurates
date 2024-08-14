@@ -814,11 +814,9 @@ void PairPsiOptimized(int l, double y, double z, double eta, double* psi_out)
     principle go to 0 automatically, however in some cases numerical
     cancellation results in small but negative (and so unphysical) rates. This
     check fixes that. */
-    /* TODO: in principle the check should also depend on the neutrino energy,
-    something like "if (eta - y - z > 200.)" would be more physically motivated.
-    Also, the threshold of 200. is somewhat arbitrary, can we find some better
+    /* TODO: The threshold of 200 is somewhat arbitrary, can we find some better
     motivated number? */
-    if (eta > 200.)
+    if (eta - y - z > 200.)
     {
         psi_out[0] = 0.;
         psi_out[1] = 0.;
