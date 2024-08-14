@@ -274,7 +274,7 @@ void save_rates_to_file(const int id_point, const char* reac_type, const int n_l
   fprintf(fp, "\n");
 
   // Compute M1 source coefficients
-  M1Opacities coeffs = ComputeM1Opacities(&quad_1d, &quad_2d, &grey_pars);
+  M1Opacities coeffs = ComputeM1Opacities(&quad_1d, &grey_pars);
   M1Opacities stim_coeffs = ComputeM1OpacitiesNotStimulated(&quad_1d, &quad_2d, &grey_pars);
   
   // Print M1 source coefficients

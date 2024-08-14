@@ -143,7 +143,7 @@ void ComputeM1CoeffsGivenQuadrature(const int n_leg, const char *reac_type, Opac
                                    .m1_pars = m1_pars,
                                    .opacity_flags = *opacity_flags };
 
-    M1Opacities m1_coeffs = ComputeM1Opacities(&quad_1d, &quad_1d, &grey_pars);
+    M1Opacities m1_coeffs = ComputeM1Opacities(&quad_1d, &grey_pars);
 
     fprintf(fw, "%.10e ", r[i]);
     fprintf(fw, "%.10e ", rho[i]);

@@ -1263,7 +1263,7 @@ ComputeM1OpacitiesNotStimulated(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
 }
 
 KOKKOS_INLINE_FUNCTION
-M1Opacities ComputeM1Opacities(const MyQuadrature* quad_1d, const MyQuadrature* quad_2d,
+M1Opacities ComputeM1Opacities(const MyQuadrature* quad_1d,
                                GreyOpacityParams* my_grey_opacity_params)
 {
 
@@ -1284,15 +1284,6 @@ M1Opacities ComputeM1Opacities(const MyQuadrature* quad_1d, const MyQuadrature* 
     integrand_m1_1d.dim                        = 1;
     integrand_m1_1d.params                     = my_grey_opacity_params;
     integrand_m1_1d.my_quadrature_integrand    = integrand_m1_1d_info;
-
-    // set up 2d integration
-    //MyFunctionMultiD integrand_m1_2d;
-    //MyQuadratureIntegrand integrand_m1_2d_info = {.n = 16};
-    //integrand_m1_2d.function                   = &M1CoeffsDoubleIntegrand;
-    //integrand_m1_2d.dim                        = 2;
-    //integrand_m1_2d.params                     = my_grey_opacity_params;
-    //integrand_m1_2d.my_quadrature_integrand    = integrand_m1_2d_info;
-
 
     double n[total_num_species];
     double J[total_num_species];
@@ -1361,13 +1352,10 @@ M1Opacities ComputeM1Opacities(const MyQuadrature* quad_1d, const MyQuadrature* 
     M1CoeffsSingleIntegrandMatrix(quad_1d, my_grey_opacity_params, s_array[0], &out);
     MyQuadratureIntegrand integrals_1d = GaussLegendreIntegrate1DMatrix(quad_1d, &out, s_array[0]);
 
-    //MyQuadratureIntegrand integrals_2d =
-    //GaussLegendreIntegrateFixedSplit2D(quad_2d, &integrand_m1_2d, s);
     M1MatrixKokkos2D out_n = {0}, out_j = {0};
     ComputeM1DoubleIntegrandTest(quad_1d, my_grey_opacity_params, s, &out_n,
                              &out_j);
 
-    //printf("%.5e\n", out_n.m1_mat_em[0][10][10]);
     MyQuadratureIntegrand n_integrals_2d =
         GaussLegendreIntegrate2DMatrix(quad_1d, &out_n, s);
     MyQuadratureIntegrand e_integrals_2d =

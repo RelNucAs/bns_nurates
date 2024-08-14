@@ -151,7 +151,7 @@ int main() {
     my_grey_opacity_params.m1_pars.chi[id_nux] = 1.;
     
     // compute opacities
-    M1Opacities opacities = ComputeM1Opacities(&my_quadrature_1d, &my_quadrature_2d, &my_grey_opacity_params);
+    M1Opacities opacities = ComputeM1Opacities(&my_quadrature_1d, &my_grey_opacity_params);
 
     // extract emissivities
     double R_nue = opacities.eta_0[id_nue];

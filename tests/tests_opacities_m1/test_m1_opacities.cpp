@@ -279,7 +279,7 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
     printf("%.5e\n", out_j.m1_mat_em[0][10][10]);
     */
 
-    M1Opacities coeffs = ComputeM1Opacities(&gpu_quad, &gpu_quad, &my_grey_opacity_params);
+    M1Opacities coeffs = ComputeM1Opacities(&gpu_quad, &my_grey_opacity_params);
 
     printf("Copying M1 coefficients to Kokkos view on device\n");
     d_diff_distribution(i) = diff_distr;

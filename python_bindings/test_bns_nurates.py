@@ -98,6 +98,6 @@ print("Integrated rates -> non stimulated")
 bns.print_integrated_rates(int_opacities)
 
 # Compute stimulated integrated opacities
-int_opacities_stim = bns.ComputeM1Opacities(quad, quad, grey_pars)
+int_opacities_stim = bns.ComputeM1Opacities(quad, grey_pars)
 print("Integrated rates -> stimulated")
 bns.print_integrated_rates(int_opacities_stim)
