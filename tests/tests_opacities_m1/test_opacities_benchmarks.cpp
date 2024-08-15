@@ -217,6 +217,9 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx) {
     auto testval = coeffs.eta[id_nue];
 
   });
+
+  Kokkos::fence();
+
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> duration = end - start;
   double time_taken_seconds = duration.count();
