@@ -162,7 +162,7 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
   printf("r diff_distr j0-nue j0-anue j0-nux j0-anux j-nue j-anue j-nux j-anux kappa0-a-nue kappa0-a-anue kappa0-a-nux kappa0-a-anux kappa-a-nue kappa-a-anue kappa-a-nux kappa-a-anux kappa-s-nue kappa-s-anue kappa-s-nux kappa-s-anux\n");
 
   printf("Entering Kokkos parallel_for loop\n");
-  
+
   Kokkos::parallel_for("loop_over_ccsn", Kokkos::RangePolicy<>(DevExeSpace(), 0, num_data),
   KOKKOS_LAMBDA(const int &i) {
     printf("Entered in Kokkos parallel_for loop\n");

@@ -870,6 +870,37 @@ else()
 	endif()
 	target_link_libraries(test_quadrature_convergence_find_max m)
 
+		# test opacities all reactions
+	add_executable(test_opacities_benchmarks
+			include/constants.hpp
+			include/bns_nurates.hpp
+			include/distribution.hpp
+			include/functions.hpp
+			include/integration.hpp
+			include/kernels.hpp
+			include/weak_magnetism.hpp
+			include/opacities.hpp
+			src/output/outputs.hpp
+			include/eos.hpp
+			src/integration/integration_quadrature_schemes.cpp
+			src/integration/integration_quadrature_io.cpp
+			include/kernel_pair.hpp
+			include/kernel_nes.hpp
+			tests/tests_opacities_m1/test_opacities_benchmarks.cpp
+			tests/tests_opacities_m1/test_m1_opacities.cpp
+			tests/tests.hpp
+	)
+	if(ENABLE_KOKKOS)
+		target_compile_definitions(test_opacities_benchmarks PRIVATE KOKKOS_FLAG=1)
+		target_link_libraries(test_opacities_benchmarks Kokkos::kokkos)
+	endif()
+	if (ENABLE_OPENMP)
+		target_link_libraries(test_opacities_benchmarks OpenMP::OpenMP_CXX)
+	endif()
+	if (${GSL_FOUND})
+		target_link_libraries(test_opacities_benchmarks GSL::gsl GSL::gslcblas)
+	endif()
+	target_link_libraries(test_opacities_benchmarks m)
 
 	enable_testing()
 
@@ -918,4 +949,6 @@ else()
 			COMMAND $<TARGET_FILE:test_m1_distribution>)
 	add_test(NAME test_opacities_thc
 			COMMAND $<TARGET_FILE:test_opacities_thc>)
+	add_test(NAME test_opacities_benchmarks
+			COMMAND $<TARGET_FILE:test_opacities_benchmarks>)
 endif()
