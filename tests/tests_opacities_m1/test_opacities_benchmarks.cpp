@@ -213,7 +213,7 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx) {
 
     //printf("Computing M1 coefficients\n");
 
-    M1Opacities coeffs = ComputeM1Opacities(&my_quad, &my_grey_opacity_params);
+    M1Opacities coeffs = ComputeM1Opacities(&my_quad, &my_quad, &my_grey_opacity_params);
     auto testval = coeffs.eta[id_nue];
 
   });

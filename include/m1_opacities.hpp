@@ -703,7 +703,7 @@ M1MatrixKokkos2D ComputeDoubleIntegrand(const MyQuadrature* quad, double t,
  */
 KOKKOS_INLINE_FUNCTION
 M1Opacities 
-ComputeM1OpacitiesGenericFormalism(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
+ComputeM1OpacitiesGenericFormalism(const MyQuadrature* quad_1d, const MyQuadrature* quad_2d,
                                 GreyOpacityParams* my_grey_opacity_params, const int stim_abs)
 {
 
@@ -877,7 +877,7 @@ ComputeM1OpacitiesNotStimulated(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
 
 KOKKOS_INLINE_FUNCTION
 M1Opacities 
-ComputeM1Opacities(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
+ComputeM1Opacities(const MyQuadrature* quad_1d, const MyQuadrature* quad_2d,
                                 GreyOpacityParams* my_grey_opacity_params) {
     return ComputeM1OpacitiesGenericFormalism(quad_1d, quad_2d, my_grey_opacity_params, 1);
                                 }
