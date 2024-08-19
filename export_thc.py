@@ -1,7 +1,15 @@
+"""
+Script to perform macro substitutions to the source code for bns_nurates
+and export the resulting files for use with Weakrates2 thorn
+
+Usage: python export_thc.py /path/to/bns_nurates /path/to/destination
+"""
+
 import re
 import os
 import shutil
 import numpy as np
+import subprocess
 import argparse
 
 # Function to define macro for KOKKOS_INLINE_FUNCTION as normal inline in bns_nurates.hpp
@@ -56,8 +64,15 @@ def replace_macro_kernel_pair_hpp(input_filepath, output_filepath):
             file.write(line)
             idx = idx + 1
 
+# Compute the diff between a file in the source and destination
+def diff_files(source_filepath, destination_filepath):
+
+    filediff = subprocess.run(['git', 'diff', '--no-index', source_filepath, destination_filepath], capture_output=True, text=True)
+
+    return filediff.stdout
+
 # function to copy hpp and cpp files into a destination directory fixing the macros
-# Need full path of top level bns_nurates directory and the destination directory
+# Needs full path of top level bns_nurates directory and the destination directory
 def refactor_and_copy(source_dir, destination_dir):
     
     files_include = os.listdir(source_dir + '/include/')
@@ -66,7 +81,8 @@ def refactor_and_copy(source_dir, destination_dir):
     files_src_integration_full = np.array([os.path.join(source_dir + '/src/integration/', file) for file in files_src_integration])
     files = np.concatenate((files_include, files_src_integration))
     files_full = np.concatenate((files_include_full, files_src_integration_full))
-    
+    diff_stdout = []
+
     for i in range(0,len(files)):
     
         file = files[i]
@@ -80,7 +96,15 @@ def refactor_and_copy(source_dir, destination_dir):
         elif(file == "kernel_pair.hpp"):
             replace_macro_kernel_pair_hpp(file_full, destination_file)
         else:    
-            shutil.copy(file_full, file)
+            shutil.copy(file_full, destination_file)
+
+        diff_stdout.append(diff_files(file_full, destination_file))
+
+    print("=============")
+    print("Changes made:")
+    print("=============")
+    for diff in diff_stdout:
+        print(diff)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Prepare include and src files from bns_nurates for THC")
