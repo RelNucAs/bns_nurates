@@ -1,6 +1,49 @@
-# bns_nurates: A performance portable library for neutrino opacities in Kokkos and C++
+# bns_nurates: A GPU friendly library for neutrino opacities in C++ and Kokkos
 
-By default, bns_nurates compiles with OpenMP and Kokkos. To prevent this, add flags -DENABLE_KOKKOS=OFF and -DENABLE_OPENMP=OFF to cmake.
+bns_nurates requires the following dependencies:
+- A C++ compiler
+- The GNU scientific library
+- Kokkos
+- OpenMP
+
+Clone the repository recursively to also clone Kokkos which is available as a submodule:
+```
+git clone --recursive https://github.com/RelNucAs/bns_nurates.git
+cd bns_nurates
+```
+Create a build directory:
+```
+mkdir build
+cd build
+```
+By default Kokkos and OpenMP are enabled. To compile for a CPU based system run
+```
+cmake ../
+```
+and build nurates
+```
+cmake --build . --target nurates
+```
+If the code is intended for Nvidia GPUs (say, A100 in this case), enable CUDA during compilation
+```
+cmake -DKokkos_ENABLE_CUDA=ON -DKokkos_ARCH_AMPERE80=ON ../
+```
+
+To install the library without Kokkos as a dependency, use
+```
+cmake -DENABLE_KOKKOS=OFF -DBUILD_NURATES_THC=ON ../
+```
+
+Similarly, to disable OpenMP, add the flag ```-DENABLE_OPENMP=OFF``` to cmake.
+
+#### Using bns_nurates as a thorn for the Einsten Toolkit
+bns_nurates is also meant for use as a thorn ```Weakrates2``` for Cactus with THC. To do this, one must export these files:
+
+```
+python export_thc.py /path/to/bns_nurates/ /path/to/destination/
+```
+
+Here ```/path/to/bns_nurates/``` is the full path for the top-level bns_nurates directory and ```/path/to/destination/``` is the full path to the ```src``` folder insider ```Weakrates2```
 
 ##### A C library for neutrino opacities in the context of binary neutron star mergers.
 
