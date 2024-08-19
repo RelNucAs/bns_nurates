@@ -535,9 +535,10 @@ MyQuadratureIntegrand GaussLegendreIntegrate2DMatrix(const MyQuadrature* quad,
 }
 
 
+
 KOKKOS_INLINE_FUNCTION
-MyQuadratureIntegrand GaussLegendreIntegrate2DMatrixFlatten(const MyQuadrature* quad,
-                                                     const M1MatrixKokkos2DFlatten* mat, double t)
+void GaussLegendreIntegrate2DMatrixForM1Coeffs(const MyQuadrature* quad,
+                                               const M1MatrixKokkos2D* mat, double t, MyQuadratureIntegrand* result_1, MyQuadratureIntegrand* result_2)
 {
     const int n              = quad->nx;
     const int num_integrands = 2 * total_num_species;
@@ -547,8 +548,7 @@ MyQuadratureIntegrand GaussLegendreIntegrate2DMatrixFlatten(const MyQuadrature* 
     double w_i, w_j, w_ij;
     double x_i, x_j;
     double x2_i, x2_j, x2_ij;
-
-    MyQuadratureIntegrand result = {0};
+    double aux_1, aux_2, aux_3, aux_4;
 
     for (int idx = 0; idx < total_num_species; idx++)
     {
@@ -560,6 +560,9 @@ MyQuadratureIntegrand GaussLegendreIntegrate2DMatrixFlatten(const MyQuadrature* 
             w_i  = quad->w[i];
             x2_i = x_i * x_i;
 
+            aux_1 = t * x_i;
+            aux_2 = t / (x_i * x2_i);
+  
             for (int j = 0; j < n; j++)
             {
 
@@ -570,62 +573,8 @@ MyQuadratureIntegrand GaussLegendreIntegrate2DMatrixFlatten(const MyQuadrature* 
                 x2_j  = x_j * x_j;
                 x2_ij = x2_i * x2_j;
 
-                result.integrand[0 + idx] +=
-                    w_ij * (mat->m1_mat_em[idx][n_max * i + j] +
-                            mat->m1_mat_em[idx][n_max * (n + i) + j] / x2_i +
-                            mat->m1_mat_em[idx][n_max * i + n + j] / x2_j +
-                            mat->m1_mat_em[idx][n_max * (n + i) + n + j] / x2_ij);
-
-                result.integrand[total_num_species + idx] +=
-                    w_ij * (mat->m1_mat_ab[idx][n_max * i + j] +
-                            mat->m1_mat_ab[idx][n_max * (n + i) + j] / x2_i +
-                            mat->m1_mat_ab[idx][n_max * i + n + j] / x2_j +
-                            mat->m1_mat_ab[idx][n_max * (n + i) + n + j] / x2_ij);
-            }
-        }
-    }
-
-    for (int idx = 0; idx < num_integrands; idx++)
-    {
-        result.integrand[idx] = t_sqr * result.integrand[idx];
-    }
-
-    return result;
-}
-
-
-KOKKOS_INLINE_FUNCTION
-void GaussLegendreIntegrate2DMatrixOnlyNumber(const MyQuadrature* quad,
-                                                     const M1MatrixKokkos2D* mat, double t, MyQuadratureIntegrand* result_1, MyQuadratureIntegrand* result_2)
-{
-    const int n              = quad->nx;
-    const int num_integrands = 2 * total_num_species;
-
-    const double t_sqr = t * t;
-
-    double w_i, w_j, w_ij;
-    double x_i, x_j;
-    double x2_i, x2_j, x2_ij;
-
-    for (int idx = 0; idx < total_num_species; idx++)
-    {
-
-        for (int i = 0; i < n; i++)
-        {
-
-            x_i  = quad->points[i];
-            w_i  = quad->w[i];
-            x2_i = x_i * x_i;
-
-            for (int j = 0; j < n; j++)
-            {
-
-                x_j = quad->points[j];
-                w_j = quad->w[j];
-
-                w_ij  = w_i * w_j;
-                x2_j  = x_j * x_j;
-                x2_ij = x2_i * x2_j;
+                aux_3 = aux_1 / x2_j;
+                aux_4 = aux_2 / x2_j;
 
                 result_1->integrand[0 + idx] +=
                     w_ij * (mat->m1_mat_em[idx][i][j] +
@@ -640,37 +589,35 @@ void GaussLegendreIntegrate2DMatrixOnlyNumber(const MyQuadrature* quad,
                             mat->m1_mat_ab[idx][n + i][n + j] / x2_ij);
                 
                 result_2->integrand[0 + idx] +=
-                    w_ij * (mat->m1_mat_em[idx][i][j] * t * x_i +
-                            mat->m1_mat_em[idx][n + i][j] * (t / x_i) / x2_i +
-                            mat->m1_mat_em[idx][i][n + j] * t * x_i / x2_j +
-                            mat->m1_mat_em[idx][n + i][n + j] * (t / x_i) / x2_ij);
+                    w_ij * (mat->m1_mat_em[idx][i][j] * aux_1 +
+                            mat->m1_mat_em[idx][n + i][j] * aux_2 +
+                            mat->m1_mat_em[idx][i][n + j] * aux_3 +
+                            mat->m1_mat_em[idx][n + i][n + j] * aux_4);
 
                 result_2->integrand[total_num_species + idx] +=
-                    w_ij * (mat->m1_mat_ab[idx][i][j] * t * x_i +
-                            mat->m1_mat_ab[idx][n + i][j] * (t / x_i) / x2_i +
-                            mat->m1_mat_ab[idx][i][n + j] * t * x_i / x2_j +
-                            mat->m1_mat_ab[idx][n + i][n + j] * (t / x_i) / x2_ij);
+                    w_ij * (mat->m1_mat_ab[idx][i][j] * aux_1 +
+                            mat->m1_mat_ab[idx][n + i][j] * aux_2 +
+                            mat->m1_mat_ab[idx][i][n + j] * aux_3 +
+                            mat->m1_mat_ab[idx][n + i][n + j] * aux_4);
             }
         }
     }
 
     for (int idx = 0; idx < num_integrands; idx++)
     {
-        result_1->integrand[idx] = t_sqr * result_1->integrand[idx];
-        result_2->integrand[idx] = t_sqr * result_2->integrand[idx];
+        result_1->integrand[idx] *= t_sqr;
+        result_2->integrand[idx] *= t_sqr;
     }
 
-    return; // result;
+    return;
 }
+
 KOKKOS_INLINE_FUNCTION
-MyQuadratureIntegrand GaussLegendreIntegrate1DMatrix(const MyQuadrature* quad,
-                                                     const M1MatrixKokkos1D *mat, double t)
+MyQuadratureIntegrand GaussLegendreIntegrate1DMatrix(const MyQuadrature* quad, const int num_integrands,
+                                                     const double mat[][n_max], double* t)
 {
     const int n              = quad->nx;
-    const int num_integrands = 12;
-
     double x_i, w_i, x2_i;
-    double tmp_0, tmp_1;
 
     MyQuadratureIntegrand result = {0};
 
@@ -684,22 +631,49 @@ MyQuadratureIntegrand GaussLegendreIntegrate1DMatrix(const MyQuadrature* quad,
             w_i  = quad->w[i];
             x2_i = x_i * x_i;
 
-            //tmp_0 = mat[idx * n_max + i];
-            //tmp_1 = mat[idx * n_max + n + i];
-
             result.integrand[idx] +=
-                quad->w[i] * (mat->m1_mat[idx][i] + mat->m1_mat[idx][n + i] / x2_i);
+                w_i * (mat[idx][i] + mat[idx][n + i] / x2_i);
         }
     }
 
     for (int idx = 0; idx < num_integrands; idx++)
     {
-        result.integrand[idx] = t * result.integrand[idx];
+        result.integrand[idx] *= t[idx];
     }
 
     return result;
 }
 
+
+KOKKOS_INLINE_FUNCTION
+void GaussLegendreIntegrate1DMatrixOnlyNumber(const MyQuadrature* quad, const int num_integrands,
+                                                     const double mat[][n_max], double* t, MyQuadratureIntegrand *out_n, MyQuadratureIntegrand *out_j)
+{
+    const int n              = quad->nx;
+    double x_i, w_i, x2_i;
+
+    for (int idx = 0; idx < num_integrands; idx++)
+    {
+
+        for (int i = 0; i < n; i++)
+        {
+
+            x_i  = quad->points[i];
+            w_i  = quad->w[i];
+            x2_i = x_i * x_i;
+
+            out_n->integrand[idx] +=
+                w_i * (mat[idx][i] + mat[idx][n + i] / x2_i);
+            out_j->integrand[idx] +=
+                w_i * (mat[idx][i] * t[idx] * x_i + mat[idx][n + i] * (t[idx] / x_i) / x2_i);
+        }
+
+        out_n->integrand[idx] *= t[idx];
+        out_j->integrand[idx] *= t[idx];
+    }
+
+    return;
+}
 
 /* Perform 1d integration (finite interval) of multiple functions using a
  * Gauss-Legendre quadrature

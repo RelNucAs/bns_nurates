@@ -224,62 +224,7 @@ void TestM1Opacities(char filename[200], OpacityFlags *opacity_flags, OpacityPar
  
     printf("Computing M1 coefficients\n");
   
-    //const int n = gpu_quad.nx;
-    //double t = 1.5 * d_T(i);
-    //double nu_array[n_max];
-    //for (int i = 0; i < n; i++)
-    //{
-        //nu_array[i]     = t * gpu_quad.points[i];
-        //nu_array[n + i] = t / gpu_quad.points[i];
-    //}
-    //OpacityParams opacity_pars = grey_pars->opacity_pars;
-    /* 
-    M1MatrixKokkos2D pair = {0};
-    if (my_grey_opacity_params.opacity_flags.use_pair == 1)
-    {
-        PairKernelsTable(2 * n, nu_array, &my_grey_opacity_params, &pair);
-    }
-
-    
-    M1MatrixKokkos2D brem = {0};
-    if (my_grey_opacity_params.opacity_flags.use_brem == 1)
-    {
-        if (my_grey_opacity_params.opacity_pars.use_BRT_brem == true)
-        {
-            BremKernelsTableBRT06(2 * n, nu_array, &my_grey_opacity_params, &brem);
-        }
-        else
-        {
-            BremKernelsTable(2 * n, nu_array, &my_grey_opacity_params, &brem);
-	}
-    }
-   
-
-    
-    M1MatrixKokkos2D inel = {0};
-    if (my_grey_opacity_params.opacity_flags.use_inelastic_scatt == 1)
-    {
-        InelasticKernelsTable(2 * n, nu_array, &my_grey_opacity_params, &inel);
-    }
-    
-
-    printf("%.5e\n", pair.m1_mat_em[0][10][10]);
-    printf("%.5e\n", brem.m1_mat_em[0][10][10]);
-    printf("%.5e\n", inel.m1_mat_em[0][10][10]);
-    */
-
-    /*
-    M1MatrixKokkos2D out_n = {0}, out_j = {0};
-
-    ComputeM1DoubleIntegrandTest(&gpu_quad, &my_grey_opacity_params, 0.5 * 4.364 * d_T(i), &out_n, &out_j);
-
-    printf("%.5e\n", out_n.m1_mat_em[0][10][10]);
-    printf("%.5e\n", out_n.m1_mat_em[0][10][10]);
-    printf("%.5e\n", out_j.m1_mat_em[0][10][10]);
-    printf("%.5e\n", out_j.m1_mat_em[0][10][10]);
-    */
-
-    M1Opacities coeffs = ComputeM1Opacities(&gpu_quad, &my_grey_opacity_params);
+    M1Opacities coeffs = ComputeM1Opacities(&gpu_quad, &gpu_quad, &my_grey_opacity_params);
 
     printf("Copying M1 coefficients to Kokkos view on device\n");
     d_diff_distribution(i) = diff_distr;
