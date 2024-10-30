@@ -729,7 +729,8 @@ ComputeM1OpacitiesGenericFormalism(const MyQuadrature* quad_1d, const MyQuadratu
     const double eta_e = my_grey_opacity_params->eos_pars.mu_e / temp;
 
     // @TODO: choose this appropriately
-    const double s_pair = 0.5 * 4.364 * temp;
+    //const double s_pair = 0.5 * 4.364 * temp;
+    const double s_pair = temp * (FDI_p4(eta_e) / FDI_p3(eta_e) + FDI_p4(-eta_e) / FDI_p3(-eta_e));
     const double s_nux  = 1.5 * temp;
     double s_beta[total_num_species] = {0}, s_iso[total_num_species] = {0};
 
