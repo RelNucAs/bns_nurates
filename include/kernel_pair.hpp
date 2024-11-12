@@ -12,9 +12,9 @@
 #include "constants.hpp"
 
 #ifdef KOKKOS_FLAG
-  #define func_tgamma(x) Kokkos::tgamma(x)
+#define func_tgamma(x) Kokkos::tgamma(x)
 #else
-  #define func_tgamma(x) tgamma(x)
+#define func_tgamma(x) tgamma(x)
 #endif
 
 #ifdef GSL_INCLUDES_H_
@@ -210,7 +210,8 @@ double PairFOptimized(int k, double eta, double x1)
         for (int l = 1; l <= (int)((k - 1.) / 2.); l++)
         {
             tmp = tmp / (eta * eta);
-            sum += PairTWithAlpha0(2 * l + 2) * tmp / func_tgamma(k - 1 - 2 * l + 1);
+            sum += PairTWithAlpha0(2 * l + 2) * tmp /
+                   func_tgamma(k - 1 - 2 * l + 1);
         }
 
         double sum_2 = 0.;

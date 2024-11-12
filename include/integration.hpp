@@ -53,8 +53,8 @@ double DoIntegration(const int n, const double* wtarray, const double* fnarray)
  * x2 = 1. func: The function struct to be integrated t:    The value of points
  * at which to break the integral into two
  */
-inline double GaussLegendreIntegrateZeroInf(MyQuadrature* quad, MyFunction* func,
-                                     double t)
+inline double GaussLegendreIntegrateZeroInf(MyQuadrature* quad,
+                                            MyFunction* func, double t)
 {
 
     double f1_x[quad->nx], f2_x[quad->nx], f_y[quad->ny], f_z[quad->nz];
@@ -103,9 +103,9 @@ inline double GaussLegendreIntegrateZeroInf(MyQuadrature* quad, MyFunction* func
  *      the emissivities and absoptivities for e and points neutrinos (take care
  * of constant multiplications separately outside)
  */
-inline MyKernelQuantity GaussLegendreIntegrateZeroInfSpecial(MyQuadrature* quad,
-                                                      MyFunctionSpecial* func,
-                                                      double t)
+inline MyKernelQuantity
+GaussLegendreIntegrateZeroInfSpecial(MyQuadrature* quad,
+                                     MyFunctionSpecial* func, double t)
 {
 
     double f1_em_e[quad->nx], f2_em_e[quad->nx];   // emissivity e neutrino
@@ -186,7 +186,8 @@ inline MyKernelQuantity GaussLegendreIntegrateZeroInfSpecial(MyQuadrature* quad,
  *    quad: A properly populated Gauss-Laguerre quadrature struct
  *    func:    The function struct to be integrated
  */
-inline double GaussLaguerreIntegrateZeroInf(MyQuadrature* quad, MyFunction* func)
+inline double GaussLaguerreIntegrateZeroInf(MyQuadrature* quad,
+                                            MyFunction* func)
 {
 
     double f[quad->nx];
@@ -219,10 +220,9 @@ inline double GaussLaguerreIntegrateZeroInf(MyQuadrature* quad, MyFunction* func
  * t:       the value at which to break the integral into two
  */
 // @TODO: rewrite loops in row-wise order
-inline
-MyQuadratureIntegrand GaussLegendreIntegrateFixedSplit2D(MyQuadrature* quad,
-                                                         MyFunctionMultiD* func,
-                                                         double t)
+inline MyQuadratureIntegrand
+GaussLegendreIntegrateFixedSplit2D(MyQuadrature* quad, MyFunctionMultiD* func,
+                                   double t)
 {
 
     int num_integrands = func->my_quadrature_integrand.n;
@@ -312,10 +312,9 @@ MyQuadratureIntegrand GaussLegendreIntegrateFixedSplit2D(MyQuadrature* quad,
  * t:       the value at which to break the integral into two
  */
 // @TODO: rewrite loops in row-wise order
-inline
-MyQuadratureIntegrand GaussLegendreIntegrateFixedSplit1D(MyQuadrature* quad,
-                                                         MyFunctionMultiD* func,
-                                                         double t)
+inline MyQuadratureIntegrand
+GaussLegendreIntegrateFixedSplit1D(MyQuadrature* quad, MyFunctionMultiD* func,
+                                   double t)
 {
 
     int num_integrands = func->my_quadrature_integrand.n;
@@ -361,10 +360,9 @@ MyQuadratureIntegrand GaussLegendreIntegrateFixedSplit1D(MyQuadrature* quad,
  * func:    the function(s) to be integrated
  * t:       the value at which to break the integral into two
  */
-inline
-MyQuadratureIntegrand GaussLegendreIntegrate2D(MyQuadrature* quad,
-                                               MyFunctionMultiD* func,
-                                               double* tx, double* ty)
+inline MyQuadratureIntegrand GaussLegendreIntegrate2D(MyQuadrature* quad,
+                                                      MyFunctionMultiD* func,
+                                                      double* tx, double* ty)
 {
 
     int num_integrands = func->my_quadrature_integrand.n;
@@ -440,8 +438,7 @@ MyQuadratureIntegrand GaussLegendreIntegrate2D(MyQuadrature* quad,
  * func:    the function(s) to be integrated
  * t:       the value at which to break the integral into two
  */
-inline
-MyQuadratureIntegrand
+inline MyQuadratureIntegrand
 GaussLegendreIntegrate1D(MyQuadrature* quad, MyFunctionMultiD* func, double* t)
 {
 
@@ -477,8 +474,9 @@ GaussLegendreIntegrate1D(MyQuadrature* quad, MyFunctionMultiD* func, double* t)
 }
 
 KOKKOS_INLINE_FUNCTION
-MyQuadratureIntegrand GaussLegendreIntegrate2DMatrix(const MyQuadrature* quad,
-                                                     const M1MatrixKokkos2D* mat, double t)
+MyQuadratureIntegrand
+GaussLegendreIntegrate2DMatrix(const MyQuadrature* quad,
+                               const M1MatrixKokkos2D* mat, double t)
 {
     const int n              = quad->nx;
     const int num_integrands = 2 * total_num_species;
@@ -535,10 +533,12 @@ MyQuadratureIntegrand GaussLegendreIntegrate2DMatrix(const MyQuadrature* quad,
 }
 
 
-
 KOKKOS_INLINE_FUNCTION
 void GaussLegendreIntegrate2DMatrixForM1Coeffs(const MyQuadrature* quad,
-                                               const M1MatrixKokkos2D* mat, double t, MyQuadratureIntegrand* result_1, MyQuadratureIntegrand* result_2)
+                                               const M1MatrixKokkos2D* mat,
+                                               double t,
+                                               MyQuadratureIntegrand* result_1,
+                                               MyQuadratureIntegrand* result_2)
 {
     const int n              = quad->nx;
     const int num_integrands = 2 * total_num_species;
@@ -562,7 +562,7 @@ void GaussLegendreIntegrate2DMatrixForM1Coeffs(const MyQuadrature* quad,
 
             aux_1 = t * x_i;
             aux_2 = t / (x_i * x2_i);
-  
+
             for (int j = 0; j < n; j++)
             {
 
@@ -587,7 +587,7 @@ void GaussLegendreIntegrate2DMatrixForM1Coeffs(const MyQuadrature* quad,
                             mat->m1_mat_ab[idx][n + i][j] / x2_i +
                             mat->m1_mat_ab[idx][i][n + j] / x2_j +
                             mat->m1_mat_ab[idx][n + i][n + j] / x2_ij);
-                
+
                 result_2->integrand[0 + idx] +=
                     w_ij * (mat->m1_mat_em[idx][i][j] * aux_1 +
                             mat->m1_mat_em[idx][n + i][j] * aux_2 +
@@ -613,10 +613,12 @@ void GaussLegendreIntegrate2DMatrixForM1Coeffs(const MyQuadrature* quad,
 }
 
 KOKKOS_INLINE_FUNCTION
-MyQuadratureIntegrand GaussLegendreIntegrate1DMatrix(const MyQuadrature* quad, const int num_integrands,
-                                                     const double mat[][n_max], double* t)
+MyQuadratureIntegrand GaussLegendreIntegrate1DMatrix(const MyQuadrature* quad,
+                                                     const int num_integrands,
+                                                     const double mat[][n_max],
+                                                     double* t)
 {
-    const int n              = quad->nx;
+    const int n = quad->nx;
     double x_i, w_i, x2_i;
 
     MyQuadratureIntegrand result = {0};
@@ -646,10 +648,14 @@ MyQuadratureIntegrand GaussLegendreIntegrate1DMatrix(const MyQuadrature* quad, c
 
 
 KOKKOS_INLINE_FUNCTION
-void GaussLegendreIntegrate1DMatrixOnlyNumber(const MyQuadrature* quad, const int num_integrands,
-                                                     const double mat[][n_max], double* t, MyQuadratureIntegrand *out_n, MyQuadratureIntegrand *out_j)
+void GaussLegendreIntegrate1DMatrixOnlyNumber(const MyQuadrature* quad,
+                                              const int num_integrands,
+                                              const double mat[][n_max],
+                                              double* t,
+                                              MyQuadratureIntegrand* out_n,
+                                              MyQuadratureIntegrand* out_j)
 {
-    const int n              = quad->nx;
+    const int n = quad->nx;
     double x_i, w_i, x2_i;
 
     for (int idx = 0; idx < num_integrands; idx++)
@@ -665,7 +671,8 @@ void GaussLegendreIntegrate1DMatrixOnlyNumber(const MyQuadrature* quad, const in
             out_n->integrand[idx] +=
                 w_i * (mat[idx][i] + mat[idx][n + i] / x2_i);
             out_j->integrand[idx] +=
-                w_i * (mat[idx][i] * t[idx] * x_i + mat[idx][n + i] * (t[idx] / x_i) / x2_i);
+                w_i * (mat[idx][i] * t[idx] * x_i +
+                       mat[idx][n + i] * (t[idx] / x_i) / x2_i);
         }
 
         out_n->integrand[idx] *= t[idx];
@@ -681,8 +688,7 @@ void GaussLegendreIntegrate1DMatrixOnlyNumber(const MyQuadrature* quad, const in
  * quad:    must be a properly populated 1d quadrature generated from between
  * interval of integration func:    the function(s) to be integrated
  */
-inline
-MyQuadratureIntegrand
+inline MyQuadratureIntegrand
 GaussLegendreIntegrate1DFiniteInterval(MyQuadrature* quad,
                                        MyFunctionMultiD* func, double* t)
 {
@@ -719,8 +725,7 @@ GaussLegendreIntegrate1DFiniteInterval(MyQuadrature* quad,
  * quad:    must be a properly populated 2d quadrature generated from between
  * interval of integration func:    the function(s) to be integrated
  */
-inline
-MyQuadratureIntegrand GaussLegendreIntegrate2DFiniteInterval(
+inline MyQuadratureIntegrand GaussLegendreIntegrate2DFiniteInterval(
     MyQuadrature* quad, MyFunctionMultiD* func, double* tx, double* ty)
 {
     (void)tx;

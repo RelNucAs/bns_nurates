@@ -453,4 +453,4 @@ void BremKernelsTableBRT06(const int n, double* nu_array,
     return;
 }
 
-#endif //BNS_NURATES_INCLUDE_KERNEL_BREM_HPP_
+#endif // BNS_NURATES_INCLUDE_KERNEL_BREM_HPP_

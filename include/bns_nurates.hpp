@@ -12,11 +12,11 @@
 #include <stddef.h>
 
 #ifndef KOKKOS_INLINE_FUNCTION
-  #ifdef KOKKOS_FLAG
-    #include <Kokkos_Core.hpp>
-  #else
-    #define KOKKOS_INLINE_FUNCTION inline
-  #endif
+#ifdef KOKKOS_FLAG
+#include <Kokkos_Core.hpp>
+#else
+#define KOKKOS_INLINE_FUNCTION inline
+#endif
 #endif
 
 // Define indices of neutrino species
@@ -86,9 +86,9 @@ struct MyQuadratureOld
     double y2;      // upper limit of y, set to -42 if unused
     double z1;      // lower limit of z, set to -42 if unused
     double z2;      // upper limit of z, set to -42 if unused
-    double *points; // points for the quadrature scheme (store points in the
+    double* points; // points for the quadrature scheme (store points in the
                     // points direction, then y and z in one flat array)
-    double *w; // weights for the quadrature scheme (store points in the points
+    double* w; // weights for the quadrature scheme (store points in the points
                // direction, then y and z in one flat array)
 };
 typedef struct MyQuadratureOld MyQuadratureOld;
@@ -103,16 +103,17 @@ struct MyQuadrature
             // to 1 if not needed
     int nz; // number of points in the quadrature scheme in the z direction, set
             // to 1 if not needed
-    double x1;      // lower limit of points, set to -42 if unused
-    double x2;      // upper limit of points, set to -42 if unused
-    double y1;      // lower limit of y, set to -42 if unused
-    double y2;      // upper limit of y, set to -42 if unused
-    double z1;      // lower limit of z, set to -42 if unused
-    double z2;      // upper limit of z, set to -42 if unused
-    double points[n_max]; // points for the quadrature scheme (store points in the
-                    // points direction, then y and z in one flat array)
-    double w[n_max]; // weights for the quadrature scheme (store points in the points
-               // direction, then y and z in one flat array)
+    double x1; // lower limit of points, set to -42 if unused
+    double x2; // upper limit of points, set to -42 if unused
+    double y1; // lower limit of y, set to -42 if unused
+    double y2; // upper limit of y, set to -42 if unused
+    double z1; // lower limit of z, set to -42 if unused
+    double z2; // upper limit of z, set to -42 if unused
+    double
+        points[n_max]; // points for the quadrature scheme (store points in the
+                       // points direction, then y and z in one flat array)
+    double w[n_max];   // weights for the quadrature scheme (store points in the
+                     // points direction, then y and z in one flat array)
 };
 typedef struct MyQuadrature MyQuadrature;
 __attribute__((unused)) static MyQuadrature quadrature_default = {.type =
@@ -127,7 +128,7 @@ __attribute__((unused)) static MyQuadrature quadrature_default = {.type =
                                                                   .y1    = -42.,
                                                                   .y2    = -42.,
                                                                   .z1    = -42.,
-                                                                  .z2 = -42.,
+                                                                  .z2    = -42.,
                                                                   .points = {0},
                                                                   .w = {0}};
 
@@ -206,8 +207,8 @@ struct PairKernelParams
     double mu_prime;    // cosine of anti-neutrino polar angle
     double lmax;        // maximum value of l for Legendre expansion
     double filter;      // filter parameter for pair kernel positivity
-    //double alpha[dim_pair_t];
-    //double pair_t[6][dim_pair_t];
+    // double alpha[dim_pair_t];
+    // double pair_t[6][dim_pair_t];
 };
 typedef struct PairKernelParams PairKernelParams;
 
@@ -479,7 +480,7 @@ typedef struct M1MatrixKokkos2D M1MatrixKokkos2D;
 
 struct M1MatrixKokkos2DFlatten
 {
-     double m1_mat_em[total_num_species][n_max *n_max];
+    double m1_mat_em[total_num_species][n_max * n_max];
     double m1_mat_ab[total_num_species][n_max * n_max];
 };
 typedef struct M1MatrixKokkos2DFlatten M1MatrixKokkos2DFlatten;

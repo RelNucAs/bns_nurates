@@ -21,8 +21,8 @@
 /*
 #ifndef _USENRERRORCLASS_
 #define throw(message)                                                         \
-    //}                                                                          //\
-        //printf("ERROR: %s\n     in file %s at line %d\n", message, __FILE__,   \
+    //} //\
+        //printf("ERROR: %s\n     in file %s at line %d\n", message, __FILE__, \
                __LINE__);
                                                                      \
         //exit(1);
@@ -3924,10 +3924,11 @@ double Gammln(const double xx)
         -.210264441724104883e-3, .217439618115212643e-3,
         -.164318106536763890e-3, .844182239838527433e-4,
         -.261908384015814087e-4, .368991826595316234e-5};
-    if (xx <= 0) {
-        //throw("bad arg in gammln");
+    if (xx <= 0)
+    {
+        // throw("bad arg in gammln");
         printf("bad arg in gammln");
-        //exit(1);
+        // exit(1);
     }
     y = x = xx;
     tmp   = x + 5.24218750000000000;
@@ -4027,7 +4028,7 @@ double MNewt1d(double guess, double x1, double x2, double f0, MyFunction* func,
         printf("xh = %.3e, fh = %.3e\n", x2, fh);
         printf("Root must be bracketed in rtsafe");
         exit(1);
-        //throw("Root must be bracketed in rtsafe");
+        // throw("Root must be bracketed in rtsafe");
     }
 
     if (fl == 0.0)
@@ -4090,10 +4091,9 @@ double MNewt1d(double guess, double x1, double x2, double f0, MyFunction* func,
             xh = rts;
         }
     }
-    //throw("Maximum number of iterations exceeded in rtsafe");
+    // throw("Maximum number of iterations exceeded in rtsafe");
     printf("Maximum number of iterations exceeded in rtsafe");
     exit(1);
-    
 }
 
 /*===========================================================================*/

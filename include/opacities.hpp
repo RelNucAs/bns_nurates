@@ -333,7 +333,8 @@ MyOpacity StimAbsOpacity(const double omega, OpacityParams* opacity_pars,
 
 KOKKOS_INLINE_FUNCTION
 void BetaOpacitiesTable(MyQuadrature* quad, MyEOSParams* eos_pars,
-                        OpacityParams* opacity_pars, double t, M1MatrixKokkos2D* out)
+                        OpacityParams* opacity_pars, double t,
+                        M1MatrixKokkos2D* out)
 {
     const int n = quad->nx;
 
