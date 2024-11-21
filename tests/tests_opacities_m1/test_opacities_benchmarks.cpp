@@ -181,7 +181,7 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx) {
     my_grey_opacity_params.eos_pars.temp = mb_d_T(i);
     my_grey_opacity_params.eos_pars.yp = mb_d_Yp(i);
     my_grey_opacity_params.eos_pars.yn = mb_d_Yn(i);
-    my_grey_opacity_params.eos_pars.nb = mb_d_rho(i) / kBS_Mu;
+    my_grey_opacity_params.eos_pars.nb = mb_d_rho(i) / kBS_Mu * 1e-21;
 
 
     // Opacity parameters (corrections all switched off)
