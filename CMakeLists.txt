@@ -68,7 +68,8 @@ set(BUILD_NURATES_THC OFF CACHE BOOL "Build nurates for THC")
 include_directories(include)
 include_directories(src)
 
-add_executable(point_check_cm
+################################################################################
+add_executable(point_check
 			include/constants.hpp
 			include/bns_nurates.hpp
 			include/distribution.hpp
@@ -82,21 +83,24 @@ add_executable(point_check_cm
 			src/integration/integration_quadrature_io.cpp
 			include/kernel_pair.hpp
 			include/kernel_nes.hpp
-      point_check_cm.cpp
+      point_check.cpp
 )
 if(ENABLE_KOKKOS)
-		target_compile_definitions(point_check_cm PRIVATE KOKKOS_FLAG=1)
-		target_link_libraries(point_check_cm Kokkos::kokkos)
+		target_compile_definitions(point_check PRIVATE KOKKOS_FLAG=1)
+		target_link_libraries(point_check Kokkos::kokkos)
 endif()
 if (ENABLE_OPENMP)
-		target_link_libraries(point_check_cm OpenMP::OpenMP_CXX)
+		target_link_libraries(point_check OpenMP::OpenMP_CXX)
 endif()
 if (${GSL_FOUND})
-		target_link_libraries(point_check_cm GSL::gsl GSL::gslcblas)
+		target_link_libraries(point_check GSL::gsl GSL::gslcblas)
 endif()
-target_link_libraries(point_check_cm m)
+target_link_libraries(point_check m)
+################################################################################
 
-add_executable(point_check_nm
+
+################################################################################
+add_executable(test_opacities_benchmarks
 			include/constants.hpp
 			include/bns_nurates.hpp
 			include/distribution.hpp
@@ -110,16 +114,17 @@ add_executable(point_check_nm
 			src/integration/integration_quadrature_io.cpp
 			include/kernel_pair.hpp
 			include/kernel_nes.hpp
-      point_check_nm.cpp
+      tests/tests_opacities_m1/test_opacities_benchmarks.cpp
 )
 if(ENABLE_KOKKOS)
-		target_compile_definitions(point_check_nm PRIVATE KOKKOS_FLAG=1)
-		target_link_libraries(point_check_nm Kokkos::kokkos)
+		target_compile_definitions(test_opacities_benchmarks PRIVATE KOKKOS_FLAG=1)
+		target_link_libraries(test_opacities_benchmarks Kokkos::kokkos)
 endif()
 if (ENABLE_OPENMP)
-		target_link_libraries(point_check_nm OpenMP::OpenMP_CXX)
+		target_link_libraries(test_opacities_benchmarks OpenMP::OpenMP_CXX)
 endif()
 if (${GSL_FOUND})
-		target_link_libraries(point_check_nm GSL::gsl GSL::gslcblas)
+		target_link_libraries(test_opacities_benchmarks GSL::gsl GSL::gslcblas)
 endif()
-target_link_libraries(point_check_nm m)
+target_link_libraries(test_opacities_benchmarks m)
+################################################################################

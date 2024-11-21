@@ -16,7 +16,6 @@
 #include <Kokkos_Core.hpp>
 
 #include "../tests.hpp"
-#include "opacities.hpp"
 #include "m1_opacities.hpp"
 #include "integration.hpp"
 #include "distribution.hpp"
@@ -178,11 +177,11 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx) {
     // populate EOS parameters from table
     my_grey_opacity_params.eos_pars.mu_e = mb_d_mu_e(i);
     my_grey_opacity_params.eos_pars.mu_p = 0.;
-    my_grey_opacity_params.eos_pars.mu_n = mb_d_mu_hat(i) + kQ;
+    my_grey_opacity_params.eos_pars.mu_n = mb_d_mu_hat(i) + kBS_Q;
     my_grey_opacity_params.eos_pars.temp = mb_d_T(i);
     my_grey_opacity_params.eos_pars.yp = mb_d_Yp(i);
     my_grey_opacity_params.eos_pars.yn = mb_d_Yn(i);
-    my_grey_opacity_params.eos_pars.nb = mb_d_rho(i) / kMu;
+    my_grey_opacity_params.eos_pars.nb = mb_d_rho(i) / kBS_Mu;
 
 
     // Opacity parameters (corrections all switched off)
@@ -208,7 +207,7 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx) {
     for (int idx = 0; idx < total_num_species; idx++) {
       my_grey_opacity_params.m1_pars.chi[idx] = 1. / 3.;
       my_grey_opacity_params.m1_pars.J[idx] =
-          my_grey_opacity_params.m1_pars.J[idx] * kMeV;
+          my_grey_opacity_params.m1_pars.J[idx] * kBS_MeV;
     }
 
     //printf("Computing M1 coefficients\n");
