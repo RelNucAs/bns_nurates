@@ -76,10 +76,9 @@ add_executable(point_check_cm
 			include/integration.hpp
 			include/kernels.hpp
 			include/weak_magnetism.hpp
-			include/opacities.hpp
+			include/kernel_beta_iso.hpp
 			src/output/outputs.hpp
 			include/eos.hpp
-			src/integration/integration_quadrature_schemes.cpp
 			src/integration/integration_quadrature_io.cpp
 			include/kernel_pair.hpp
 			include/kernel_nes.hpp
@@ -96,3 +95,31 @@ if (${GSL_FOUND})
 		target_link_libraries(point_check_cm GSL::gsl GSL::gslcblas)
 endif()
 target_link_libraries(point_check_cm m)
+
+add_executable(point_check_nm
+			include/constants.hpp
+			include/bns_nurates.hpp
+			include/distribution.hpp
+			include/functions.hpp
+			include/integration.hpp
+			include/kernels.hpp
+			include/weak_magnetism.hpp
+			include/kernel_beta_iso.hpp
+			src/output/outputs.hpp
+			include/eos.hpp
+			src/integration/integration_quadrature_io.cpp
+			include/kernel_pair.hpp
+			include/kernel_nes.hpp
+      point_check_nm.cpp
+)
+if(ENABLE_KOKKOS)
+		target_compile_definitions(point_check_nm PRIVATE KOKKOS_FLAG=1)
+		target_link_libraries(point_check_nm Kokkos::kokkos)
+endif()
+if (ENABLE_OPENMP)
+		target_link_libraries(point_check_nm OpenMP::OpenMP_CXX)
+endif()
+if (${GSL_FOUND})
+		target_link_libraries(point_check_nm GSL::gsl GSL::gslcblas)
+endif()
+target_link_libraries(point_check_nm m)

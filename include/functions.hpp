@@ -5,12 +5,6 @@
 #ifndef BNS_NURATES_SRC_FUNCTIONS_FUNCTIONS_H_
 #define BNS_NURATES_SRC_FUNCTIONS_FUNCTIONS_H_
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <assert.h>
-#include <float.h>
-
 #include "bns_nurates.hpp"
 #include "constants.hpp"
 
@@ -26,7 +20,7 @@
                __LINE__);
                                                                      \
         //exit(1);
-        //double dummy_var = -42.;
+        //bs_real dummy_var = -42.;
         printf("Throw function here");
                                                                       \
     //}
@@ -54,19 +48,11 @@ void NRcatch(NRerror err)
 
 // safe_exp.c
 
-// Cut-off parameter for exponential evaluation
-// Warning: this value was tuned on the previous version of the code
-//          (with C++ math functions)
-const double fExpUppLim =
-    700.; // possible alternative choice: const*DBL_MAX_EXP
-const double fExpLowLim =
-    -fExpUppLim; //                              const*DBL_MIN_EXP
-
 // Safe exp function to avoid underflow/overflow
 KOKKOS_INLINE_FUNCTION
-double SafeExp(const double x)
+bs_real SafeExp(const bs_real x)
 {
-    return exp(fmin(fmax(x, fExpLowLim), fExpUppLim));
+    return exp(fmin(fmax(x, kBS_ExpLowLim), kBS_ExpUppLim));
 }
 
 /*===========================================================================*/
@@ -92,13 +78,13 @@ Description:
 
 // static
 KOKKOS_INLINE_FUNCTION
-double bessi1(const double x)
+bs_real bessi1(const bs_real x)
 /*------------------------------------------------------------*/
 /* PURPOSE: Evaluate modified Bessel function In(x) and n=1.  */
 /*------------------------------------------------------------*/
 {
-    double ax, ans;
-    double y;
+    bs_real ax, ans;
+    bs_real y;
 
 
     if ((ax = fabs(x)) < 3.75)
@@ -128,12 +114,12 @@ double bessi1(const double x)
 
 // static
 KOKKOS_INLINE_FUNCTION
-double bessk1(const double x)
+bs_real bessk1(const bs_real x)
 /*------------------------------------------------------------*/
 /* PURPOSE: Evaluate modified Bessel function Kn(x) and n=1.  */
 /*------------------------------------------------------------*/
 {
-    double y, ans;
+    bs_real y, ans;
 
     if (x <= 2.0)
     {
@@ -164,36 +150,36 @@ double bessk1(const double x)
 
 /* Numerical recipes code
 
-const double k1pi[]={0.5,5.598072040178741e-2,1.818666382168295e-3,
+const bs_real k1pi[]={0.5,5.598072040178741e-2,1.818666382168295e-3,
 2.397509908859959e-5,1.239567816344855e-7};
-const double k1qi[]={9.870202601341150e-1,1.292092053534579e-2,
+const bs_real k1qi[]={9.870202601341150e-1,1.292092053534579e-2,
 5.881933053917096e-5};
-const double k1p[]={-3.079657578292062e-1,-8.109417631822442e-2,
+const bs_real k1p[]={-3.079657578292062e-1,-8.109417631822442e-2,
 -3.477550948593604e-3,-5.385594871975406e-5,-3.110372465429008e-7};
-const double k1q[]={9.861813171751389e-1,1.375094061153160e-2,
+const bs_real k1q[]={9.861813171751389e-1,1.375094061153160e-2,
 6.774221332947002e-5};
-const double k1pp[]={1.253314137315502,1.457171340220454e1,
+const bs_real k1pp[]={1.253314137315502,1.457171340220454e1,
 6.063161173098803e1,1.147386690867892e2,1.040442011439181e2,
 4.356596656837691e1,7.265230396353690,3.144418558991021e-1};
-const double k1qq[]={1.0,1.125154514806458e1,4.427488496597630e1,
+const bs_real k1qq[]={1.0,1.125154514806458e1,4.427488496597630e1,
 7.616113213117645e1,5.863377227890893e1,1.850303673841586e1,
 1.857244676566022,2.538540887654872e-2};
 
-double k1(const double x) {
+bs_real k1(const bs_real x) {
     // Returns the modiﬁed Bessel function K1(x) for positive real x.
     if (x <= 1.0) {  // Use two rational approximations.
-        const double z=x*x;
-        const double term = poly(k1pi,4,z)*log(x)/poly(k1qi,2,1.-z);
+        const bs_real z=x*x;
+        const bs_real term = poly(k1pi,4,z)*log(x)/poly(k1qi,2,1.-z);
         return x*(poly(k1p,4,z)/poly(k1q,2,1.-z)+term)+1./x;
     } else {         // Rational approximation with e^{-x}/sqrt(x) factored out.
-        const double z=1.0/x;
+        const bs_real z=1.0/x;
         return exp(-x)*poly(k1pp,7,z)/(poly(k1qq,7,z)*sqrt(x));
     }
 }
 
-inline double poly(const double *cof, const int n, const double x) {
+inline bs_real poly(const bs_real *cof, const int n, const bs_real x) {
     // Common code: Evaluate a polynomial.
-    double ans = cof[n];
+    bs_real ans = cof[n];
     for (int i=n-1;i>=0;i--) ans = ans*x+cof[i];
     return ans;
 }
@@ -226,22 +212,22 @@ inline double poly(const double *cof, const int n, const double x) {
 
 typedef struct
 {
-    double val;
-    double err;
+    bs_real val;
+    bs_real err;
 } SFResult;
 
 struct cheb_series_struct
 {
-    double* c;    /* coefficients                */
+    bs_real* c;   /* coefficients                */
     int order;    /* order of expansion          */
-    double a;     /* lower interval point        */
-    double b;     /* upper interval point        */
+    bs_real a;    /* lower interval point        */
+    bs_real b;    /* upper interval point        */
     int order_sp; /* effective single precision order */
 };
 
 typedef struct cheb_series_struct ChebSeries;
 
-static double psics_data[23] = {
+static bs_real psics_data[23] = {
     -.038057080835217922, .491415393029387130,  -.056815747821244730,
     .008357821225914313,  -.001333232857994342, .000220313287069308,
     -.000037040238178456, .000006283793654854,  -.000001071263908506,
@@ -253,7 +239,7 @@ static double psics_data[23] = {
 
 static ChebSeries psi_cs = {psics_data, 22, -1, 1, 17};
 
-static double apsics_data[16] = {
+static bs_real apsics_data[16] = {
     -.0204749044678185, -.0101801271534859, .0000559718725387,
     -.0000012917176570, .0000000572858606,  -.0000000038213539,
     .0000000003397434,  -.0000000000374838, .0000000000048990,
@@ -265,28 +251,28 @@ static ChebSeries apsi_cs = {apsics_data, 15, -1, 1, 9};
 
 // Evaluation of the Chebyshev series cs at a given point x
 KOKKOS_INLINE_FUNCTION
-void ChebEvalE(const ChebSeries* cs, const double x, SFResult* result)
+void ChebEvalE(const ChebSeries* cs, const bs_real x, SFResult* result)
 {
     int j;
-    double d  = 0.0;
-    double dd = 0.0;
+    bs_real d  = 0.0;
+    bs_real dd = 0.0;
 
-    double y  = (2.0 * x - cs->a - cs->b) / (cs->b - cs->a);
-    double y2 = 2.0 * y;
+    bs_real y  = (2.0 * x - cs->a - cs->b) / (cs->b - cs->a);
+    bs_real y2 = 2.0 * y;
 
-    double e = 0.0;
+    bs_real e = 0.0;
 
     for (j = cs->order; j >= 1; j--)
     {
-        double temp = d;
-        d           = y2 * d - dd + cs->c[j];
+        bs_real temp = d;
+        d            = y2 * d - dd + cs->c[j];
         e += fabs(y2 * temp) + fabs(dd) + fabs(cs->c[j]);
         dd = temp;
     }
 
     {
-        double temp = d;
-        d           = y * d - dd + 0.5 * cs->c[0];
+        bs_real temp = d;
+        d            = y * d - dd + 0.5 * cs->c[0];
         e += fabs(y * temp) + fabs(dd) + 0.5 * fabs(cs->c[0]);
     }
 
@@ -304,9 +290,9 @@ void ChebEvalE(const ChebSeries* cs, const double x, SFResult* result)
  */
 /*
 KOKKOS_INLINE_FUNCTION
-void SFPsiOutput(const double x, SFResult* result)
+void SFPsiOutput(const bs_real x, SFResult* result)
 {
-    const double y = fabs(x);
+    const bs_real y = fabs(x);
 
     if (x == 0.0 || x == -1.0 || x == -2.0)
     {
@@ -317,13 +303,13 @@ void SFPsiOutput(const double x, SFResult* result)
     }
     else if (y >= 2.0)
     {
-        const double t = 8.0 / (y * y) - 1.0;
+        const bs_real t = 8.0 / (y * y) - 1.0;
         SFResult result_c;
         ChebEvalE(&apsi_cs, t, &result_c);
         if (x < 0.0)
         {
-            const double s = sin(kPi * x);
-            const double c = cos(kPi * x);
+            const bs_real s = sin(kBS_Pi * x);
+            const bs_real c = cos(kBS_Pi * x);
             if (fabs(s) < 2.0 * sqrt(DBL_MIN))
             {
                 // result->val = std::nan;
@@ -333,8 +319,8 @@ void SFPsiOutput(const double x, SFResult* result)
             }
             else
             {
-                result->val = log(y) - 0.5 / x + result_c.val - kPi * c / s;
-                result->err = kPi * fabs(x) * DBL_EPSILON / (s * s);
+                result->val = log(y) - 0.5 / x + result_c.val - kBS_Pi * c / s;
+                result->err = kBS_Pi * fabs(x) * DBL_EPSILON / (s * s);
                 result->err += result_c.err;
                 result->err += DBL_EPSILON * fabs(result->val);
                 return; // GSL_SUCCESS;
@@ -354,10 +340,10 @@ void SFPsiOutput(const double x, SFResult* result)
 
         if (x < -1.0)
         { // x = -2 + v
-            const double v  = x + 2.0;
-            const double t1 = 1.0 / x;
-            const double t2 = 1.0 / (x + 1.0);
-            const double t3 = 1.0 / v;
+            const bs_real v  = x + 2.0;
+            const bs_real t1 = 1.0 / x;
+            const bs_real t2 = 1.0 / (x + 1.0);
+            const bs_real t3 = 1.0 / v;
             ChebEvalE(&psi_cs, 2.0 * v - 1.0, &result_c);
 
             result->val = -(t1 + t2 + t3) + result_c.val;
@@ -369,9 +355,9 @@ void SFPsiOutput(const double x, SFResult* result)
         }
         else if (x < 0.0)
         { // x = -1 + v
-            const double v  = x + 1.0;
-            const double t1 = 1.0 / x;
-            const double t2 = 1.0 / v;
+            const bs_real v  = x + 1.0;
+            const bs_real t1 = 1.0 / x;
+            const bs_real t2 = 1.0 / v;
             ChebEvalE(&psi_cs, 2.0 * v - 1.0, &result_c);
 
             result->val = -(t1 + t2) + result_c.val;
@@ -382,7 +368,7 @@ void SFPsiOutput(const double x, SFResult* result)
         }
         else if (x < 1.0)
         { // x = v
-            const double t1 = 1.0 / x;
+            const bs_real t1 = 1.0 / x;
             ChebEvalE(&psi_cs, 2.0 * x - 1.0, &result_c);
 
             result->val = -t1 + result_c.val;
@@ -393,7 +379,7 @@ void SFPsiOutput(const double x, SFResult* result)
         }
         else
         { // x = 1 + v
-            const double v = x - 1.0;
+            const bs_real v = x - 1.0;
             ChebEvalE(&psi_cs, 2.0 * v - 1.0, result);
             return;
         }
@@ -404,7 +390,7 @@ void SFPsiOutput(const double x, SFResult* result)
 // Evaluation of Psi (Digamma) function (only result)
 /*
 KOKKOS_INLINE_FUNCTION
-double SFPsi(const double x)
+bs_real SFPsi(const bs_real x)
 {
     SFResult result;
     SFPsiOutput(x, &result);
@@ -416,14 +402,14 @@ double SFPsi(const double x)
 
 // fermi_integrals.c
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = -9/2 */
 KOKKOS_INLINE_FUNCTION
-double FDI_m92(const double x)
+bs_real FDI_m92(const bs_real x)
 {
-    const double factor = -2. / 7.; // = 1/(k+1)
-    double ex, t, w, s;
-    double fd = 0.;
+    const bs_real factor = -2. / 7.; // = 1/(k+1)
+    bs_real ex, t, w, s;
+    bs_real fd = 0.;
 
     if (x < -2.)
     {
@@ -629,14 +615,14 @@ double FDI_m92(const double x)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = -7/2 */
 KOKKOS_INLINE_FUNCTION
-double FDI_m72(const double x)
+bs_real FDI_m72(const bs_real x)
 {
-    const double factor = -2. / 5.; // = 1/(k+1)
-    double ex, t, w, s;
-    double fd = 0.;
+    const bs_real factor = -2. / 5.; // = 1/(k+1)
+    bs_real ex, t, w, s;
+    bs_real fd = 0.;
 
     if (x < -2.)
     {
@@ -833,14 +819,14 @@ double FDI_m72(const double x)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k=-5/2 */
 KOKKOS_INLINE_FUNCTION
-double FDI_m52(const double x)
+bs_real FDI_m52(const bs_real x)
 {
-    const double factor = -2. / 3.; // = 1/(k+1)
-    double ex, t, w, s;
-    double fd = 0.;
+    const bs_real factor = -2. / 3.; // = 1/(k+1)
+    bs_real ex, t, w, s;
+    bs_real fd = 0.;
 
     if (x < -2.)
     {
@@ -1021,14 +1007,14 @@ double FDI_m52(const double x)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = -3/2 */
 KOKKOS_INLINE_FUNCTION
-double FDI_m32(const double x)
+bs_real FDI_m32(const bs_real x)
 {
-    const double factor = -2.; // = 1/(k+1)
-    double ex, t, w, s;
-    double fd = 0.;
+    const bs_real factor = -2.; // = 1/(k+1)
+    bs_real ex, t, w, s;
+    bs_real fd = 0.;
 
     if (x < -2.)
     {
@@ -1198,14 +1184,14 @@ double FDI_m32(const double x)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = -1/2 */
 KOKKOS_INLINE_FUNCTION
-double FDI_m12(const double x)
+bs_real FDI_m12(const bs_real x)
 {
-    const double factor = 2.; // = 1/(k+1)
-    double ex, t, w, s;
-    double fd = 0.;
+    const bs_real factor = 2.; // = 1/(k+1)
+    bs_real ex, t, w, s;
+    bs_real fd = 0.;
 
     if (x < -2.)
     {
@@ -1361,13 +1347,13 @@ double FDI_m12(const double x)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 0 */
 KOKKOS_INLINE_FUNCTION
-double FDI_0(const double y)
+bs_real FDI_0(const bs_real y)
 {
-    double x, ex, t, s;
-    double fd = 0.;
+    bs_real x, ex, t, s;
+    bs_real fd = 0.;
 
     x = -fabs(y);
 
@@ -1418,13 +1404,13 @@ double FDI_0(const double y)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 1/2 */
 KOKKOS_INLINE_FUNCTION
-double FDI_p12(const double x)
+bs_real FDI_p12(const bs_real x)
 {
-    double ex, t, w, s;
-    double fd = 0.;
+    bs_real ex, t, w, s;
+    bs_real fd = 0.;
 
     if (x < -2.)
     {
@@ -1583,13 +1569,13 @@ double FDI_p12(const double x)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 1 */
 KOKKOS_INLINE_FUNCTION
-double FDI_p1(const double y)
+bs_real FDI_p1(const bs_real y)
 {
-    double x, ex, t, s;
-    double fd = 0.;
+    bs_real x, ex, t, s;
+    bs_real fd = 0.;
 
     x = -fabs(y);
 
@@ -1641,14 +1627,14 @@ double FDI_p1(const double y)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 3/2 */
 KOKKOS_INLINE_FUNCTION
-double FDI_p32(const double x)
+bs_real FDI_p32(const bs_real x)
 {
-    const double factor = 2. / 5.; // = 1/(k+1)
-    double ex, t, w, s;
-    double fd = 0.;
+    const bs_real factor = 2. / 5.; // = 1/(k+1)
+    bs_real ex, t, w, s;
+    bs_real fd = 0.;
 
     if (x < -2.)
     {
@@ -1810,13 +1796,13 @@ double FDI_p32(const double x)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 2 */
 KOKKOS_INLINE_FUNCTION
-double FDI_p2(const double y)
+bs_real FDI_p2(const bs_real y)
 {
-    double x, ex, t, s;
-    double fd = 0.;
+    bs_real x, ex, t, s;
+    bs_real fd = 0.;
 
     x = -fabs(y);
 
@@ -1866,14 +1852,14 @@ double FDI_p2(const double y)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 5/2 */
 KOKKOS_INLINE_FUNCTION
-double FDI_p52(const double x)
+bs_real FDI_p52(const bs_real x)
 {
-    const double factor = 2. / 7.; // = 1/(k+1)
-    double ex, t, w, s;
-    double fd = 0.;
+    const bs_real factor = 2. / 7.; // = 1/(k+1)
+    bs_real ex, t, w, s;
+    bs_real fd = 0.;
 
     if (x < -2.)
     {
@@ -2029,13 +2015,13 @@ double FDI_p52(const double x)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 3 */
 KOKKOS_INLINE_FUNCTION
-double FDI_p3(const double y)
+bs_real FDI_p3(const bs_real y)
 {
-    double x, ex, t, s, y2;
-    double fd = 0.;
+    bs_real x, ex, t, s, y2;
+    bs_real fd = 0.;
 
     x = -fabs(y);
 
@@ -2083,14 +2069,14 @@ double FDI_p3(const double y)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 7/2 */
 KOKKOS_INLINE_FUNCTION
-double FDI_p72(const double x)
+bs_real FDI_p72(const bs_real x)
 {
-    const double factor = 2. / 9.; // = 1/(k+1)
-    double ex, t, w, s;
-    double fd = 0.;
+    const bs_real factor = 2. / 9.; // = 1/(k+1)
+    bs_real ex, t, w, s;
+    bs_real fd = 0.;
 
     if (x < -2.)
     {
@@ -2247,13 +2233,13 @@ double FDI_p72(const double x)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 4 */
 KOKKOS_INLINE_FUNCTION
-double FDI_p4(const double y)
+bs_real FDI_p4(const bs_real y)
 {
-    double x, ex, t, s, y2;
-    double fd = 0.;
+    bs_real x, ex, t, s, y2;
+    bs_real fd = 0.;
 
     x = -fabs(y);
 
@@ -2302,14 +2288,14 @@ double FDI_p4(const double y)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 9/2 */
 KOKKOS_INLINE_FUNCTION
-double FDI_p92(const double x)
+bs_real FDI_p92(const bs_real x)
 {
-    const double factor = 2. / 11.; // = 1/(k+1)
-    double ex, t, w, s;
-    double fd = 0.;
+    const bs_real factor = 2. / 11.; // = 1/(k+1)
+    bs_real ex, t, w, s;
+    bs_real fd = 0.;
 
     if (x < -2.)
     {
@@ -2466,13 +2452,13 @@ double FDI_p92(const double x)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 5 */
 KOKKOS_INLINE_FUNCTION
-double FDI_p5(const double y)
+bs_real FDI_p5(const bs_real y)
 {
-    double x, ex, t, s, y2;
-    double fd = 0.;
+    bs_real x, ex, t, s, y2;
+    bs_real fd = 0.;
 
     x = -fabs(y);
 
@@ -2523,14 +2509,14 @@ double FDI_p5(const double y)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 11/2 */
 KOKKOS_INLINE_FUNCTION
-double FDI_p112(const double x)
+bs_real FDI_p112(const bs_real x)
 {
-    const double factor = 2. / 13.; // = 1/(k+1)
-    double ex, t, w, s;
-    double fd = 0.;
+    const bs_real factor = 2. / 13.; // = 1/(k+1)
+    bs_real ex, t, w, s;
+    bs_real fd = 0.;
 
     if (x < -2.)
     {
@@ -2691,13 +2677,13 @@ double FDI_p112(const double x)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 6 */
 KOKKOS_INLINE_FUNCTION
-double FDI_p6(const double y)
+bs_real FDI_p6(const bs_real y)
 {
-    double x, ex, t, s, y2;
-    double fd = 0.;
+    bs_real x, ex, t, s, y2;
+    bs_real fd = 0.;
 
     x = -fabs(y);
 
@@ -2750,14 +2736,14 @@ double FDI_p6(const double y)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 13/2 */
 KOKKOS_INLINE_FUNCTION
-double FDI_p132(const double x)
+bs_real FDI_p132(const bs_real x)
 {
-    const double factor = 2. / 15.; // = 1/(k+1)
-    double ex, t, w, s;
-    double fd = 0.;
+    const bs_real factor = 2. / 15.; // = 1/(k+1)
+    bs_real ex, t, w, s;
+    bs_real fd = 0.;
 
     if (x < -2.)
     {
@@ -2930,13 +2916,13 @@ double FDI_p132(const double x)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 7 */
 KOKKOS_INLINE_FUNCTION
-double FDI_p7(const double y)
+bs_real FDI_p7(const bs_real y)
 {
-    double x, ex, t, s, y2;
-    double fd = 0.;
+    bs_real x, ex, t, s, y2;
+    bs_real fd = 0.;
 
     x = -fabs(y);
 
@@ -2988,14 +2974,14 @@ double FDI_p7(const double y)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 15/2 */
 KOKKOS_INLINE_FUNCTION
-double FDI_p152(const double x)
+bs_real FDI_p152(const bs_real x)
 {
-    const double factor = 2. / 17.; // = 1/(k+1)
-    double ex, t, w, s;
-    double fd = 0.;
+    const bs_real factor = 2. / 17.; // = 1/(k+1)
+    bs_real ex, t, w, s;
+    bs_real fd = 0.;
 
     if (x < -2.)
     {
@@ -3165,13 +3151,13 @@ double FDI_p152(const double x)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 8 */
 KOKKOS_INLINE_FUNCTION
-double FDI_p8(const double y)
+bs_real FDI_p8(const bs_real y)
 {
-    double x, ex, t, s, y2;
-    double fd = 0.;
+    bs_real x, ex, t, s, y2;
+    bs_real fd = 0.;
 
     x = -fabs(y);
 
@@ -3220,14 +3206,14 @@ double FDI_p8(const double y)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 17/2 */
 KOKKOS_INLINE_FUNCTION
-double FDI_p172(const double x)
+bs_real FDI_p172(const bs_real x)
 {
-    const double factor = 2. / 19.; // = 1/(k+1)
-    double ex, t, w, s;
-    double fd = 0.;
+    const bs_real factor = 2. / 19.; // = 1/(k+1)
+    bs_real ex, t, w, s;
+    bs_real fd = 0.;
 
     if (x < -2.)
     {
@@ -3397,13 +3383,13 @@ double FDI_p172(const double x)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 9 */
 KOKKOS_INLINE_FUNCTION
-double FDI_p9(const double y)
+bs_real FDI_p9(const bs_real y)
 {
-    double x, ex, t, s, y2;
-    double fd = 0.;
+    bs_real x, ex, t, s, y2;
+    bs_real fd = 0.;
 
     x = -fabs(y);
 
@@ -3450,14 +3436,14 @@ double FDI_p9(const double y)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 19/2 */
 KOKKOS_INLINE_FUNCTION
-double FDI_p192(const double x)
+bs_real FDI_p192(const bs_real x)
 {
-    const double factor = 2. / 21.; // = 1/(k+1)
-    double ex, t, w, s;
-    double fd = 0.;
+    const bs_real factor = 2. / 21.; // = 1/(k+1)
+    bs_real ex, t, w, s;
+    bs_real fd = 0.;
 
     if (x < -2.)
     {
@@ -3634,13 +3620,13 @@ double FDI_p192(const double x)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 10 */
 KOKKOS_INLINE_FUNCTION
-double FDI_p10(const double y)
+bs_real FDI_p10(const bs_real y)
 {
-    double x, ex, t, s, y2;
-    double fd = 0.;
+    bs_real x, ex, t, s, y2;
+    bs_real fd = 0.;
 
     x = -fabs(y);
 
@@ -3691,14 +3677,14 @@ double FDI_p10(const double y)
     return fd;
 }
 
-/* double precision rational minimax approximation of non-relativistic */
+/* bs_real precision rational minimax approximation of non-relativistic */
 /* Fermi-Dirac integral of order k = 21/2 */
 KOKKOS_INLINE_FUNCTION
-double FDI_p212(const double x)
+bs_real FDI_p212(const bs_real x)
 {
-    const double factor = 2. / 23.; // = 1/(k+1)
-    double ex, t, w, s;
-    double fd = 0.;
+    const bs_real factor = 2. / 23.; // = 1/(k+1)
+    bs_real ex, t, w, s;
+    bs_real fd = 0.;
 
     if (x < -2.)
     {
@@ -3887,10 +3873,10 @@ double FDI_p212(const double x)
  * 	mu    [MeV] : chemical potential
  */
 KOKKOS_INLINE_FUNCTION
-double FermiDistr(const double e, const double temp, const double mu)
+bs_real FermiDistr(const bs_real e, const bs_real temp, const bs_real mu)
 {
-    const double arg = (e - mu) / temp;
-    double tmp;
+    const bs_real arg = (e - mu) / temp;
+    bs_real tmp;
 
     // Handle differently arg>0 and arg<0 cases
     if (arg > 0.)
@@ -3907,16 +3893,30 @@ double FermiDistr(const double e, const double temp, const double mu)
 
 /*===========================================================================*/
 
+// Calculates the exponential-dependent factors in the denominator of the NEPS
+// kernel
+KOKKOS_INLINE_FUNCTION
+bs_real NEPSExpFunc(bs_real x)
+{
+    const bs_real exp_ = SafeExp(-fabs(x));
+    const int is_x_neg = signbit(x);
+
+    return (is_x_neg - (! is_x_neg) * exp_) / (1. - exp_ + (x == 0.));
+}
+
+
+/*===========================================================================*/
+
 // gamma.c
 
 // Computation of gamma function
 // Taken from Numerical Recipes ("numerical.recipes/book/book.html")
 KOKKOS_INLINE_FUNCTION
-double Gammln(const double xx)
+bs_real Gammln(const bs_real xx)
 {
     int j;
-    double x, tmp, y, ser;
-    static const double cof[14] = {
+    bs_real x, tmp, y, ser;
+    static const bs_real cof[14] = {
         57.1562356658629235,     -59.5979603554754912,
         14.1360979747417471,     -0.491913816097620199,
         .339946499848118887e-4,  .465236289270485756e-4,
@@ -3941,12 +3941,12 @@ double Gammln(const double xx)
 
 // Compute the Gamma function using Serling's approximation
 KOKKOS_INLINE_FUNCTION
-double GammaStirling(const double x)
+bs_real GammaStirling(const bs_real x)
 {
-    static const double e     = 2.718281828459045235360287471352;
-    static const double twopi = 6.283185307179586;
+    static const bs_real e     = 2.718281828459045235360287471352;
+    static const bs_real twopi = 6.283185307179586;
 
-    assert(x > 0.);
+    BS_ASSERT(x > 0.);
 
     return sqrt(twopi / x) * pow(x / e, x);
 }
@@ -3962,19 +3962,19 @@ double GammaStirling(const double x)
 
 // Recursive formula for W0 real branch of Lambert function
 KOKKOS_INLINE_FUNCTION
-double W0(const double x)
+bs_real W0(const bs_real x)
 {
-    static const double e  = 2.718281828459045235360287471352;
-    static const double ie = 1. / e;
-    double beta;
+    static const bs_real e  = 2.718281828459045235360287471352;
+    static const bs_real ie = 1. / e;
+    bs_real beta;
 
-    assert(x > -ie);
+    BS_ASSERT(x > -ie);
 
     // Initial guess for recursion
     if (x > e)
     {
-        double log_x = log(x);
-        beta         = log_x - log(log_x);
+        bs_real log_x = log(x);
+        beta          = log_x - log(log_x);
     }
     else if (x > 0.)
     {
@@ -3982,10 +3982,10 @@ double W0(const double x)
     }
     else
     { // if(x > -ie)
-        double tmp_1 = e * x;
-        double tmp_2 = sqrt(1 + tmp_1);
-        double tmp_3 = 1. + tmp_2;
-        beta         = tmp_1 * log(tmp_3) / (tmp_2 * tmp_3);
+        bs_real tmp_1 = e * x;
+        bs_real tmp_2 = sqrt(1 + tmp_1);
+        bs_real tmp_3 = 1. + tmp_2;
+        beta          = tmp_1 * log(tmp_3) / (tmp_2 * tmp_3);
     }
 
     beta = beta / (1. + beta) * (1. + log(x / beta));
@@ -4004,13 +4004,13 @@ double W0(const double x)
 
 // 1D root-finding parameters
 // @TODO: find suitable values for the following parameters
-const int ntrial_1d  = 150;     // Maximum allowed number of iterations.
-const double xacc_1d = 1.0E-07; // Set the accuracy for Newton Raphson
+const int ntrial_1d   = 150;     // Maximum allowed number of iterations.
+const bs_real xacc_1d = 1.0E-07; // Set the accuracy for Newton Raphson
 
 // 1D Newton-Raphson with analytic derivative
 KOKKOS_INLINE_FUNCTION
-double MNewt1d(double guess, double x1, double x2, double f0, MyFunction* func,
-               MyFunction* dfunc)
+bs_real MNewt1d(bs_real guess, bs_real x1, bs_real x2, bs_real f0,
+                MyFunction* func, MyFunction* dfunc)
 {
     // Using a combination of Newton-Raphson and bisection, return the solution
     // of f(x) = f0 bracketed between x1 and x2. The root will be refined
@@ -4018,9 +4018,9 @@ double MNewt1d(double guess, double x1, double x2, double f0, MyFunction* func,
     // that returns the function value at the point x. df is a user-supplied
     // struct that returns the value of the function first derivative at the
     // point x.
-    double xh, xl;
-    double fl = func->function(&x1, func->params) - f0;
-    double fh = func->function(&x2, func->params) - f0;
+    bs_real xh, xl;
+    bs_real fl = func->function(&x1, func->params) - f0;
+    bs_real fh = func->function(&x2, func->params) - f0;
 
     if ((fl > 0.0 && fh > 0.0) || (fl < 0.0 && fh < 0.0))
     {
@@ -4047,12 +4047,12 @@ double MNewt1d(double guess, double x1, double x2, double f0, MyFunction* func,
         xl = x2;
     }
 
-    double rts   = guess; // 0.5*(x1+x2);  // Initialize the guess for root,
-    double dxold = fabs(x2 - x1); // the “stepsize before last,”
-    double dx    = dxold;         // and the last step.
+    bs_real rts   = guess; // 0.5*(x1+x2);  // Initialize the guess for root,
+    bs_real dxold = fabs(x2 - x1); // the “stepsize before last,”
+    bs_real dx    = dxold;         // and the last step.
 
-    double f  = func->function(&rts, func->params) - f0;
-    double df = dfunc->function(&rts, dfunc->params);
+    bs_real f  = func->function(&rts, func->params) - f0;
+    bs_real df = dfunc->function(&rts, dfunc->params);
 
     for (int j = 0; j < ntrial_1d; j++)
     { // Loop over allowed iterations.
@@ -4067,9 +4067,9 @@ double MNewt1d(double guess, double x1, double x2, double f0, MyFunction* func,
         }
         else
         { // Change in root is negligible. Newton step acceptable. Take it.
-            dxold       = dx;
-            dx          = f / df;
-            double temp = rts;
+            dxold        = dx;
+            dx           = f / df;
+            bs_real temp = rts;
             rts -= dx;
             if (temp == rts)
                 return rts;
@@ -4112,13 +4112,13 @@ double MNewt1d(double guess, double x1, double x2, double f0, MyFunction* func,
  *	3 --> [1,1]
  */
 KOKKOS_INLINE_FUNCTION
-void Invert2DMat(double* in, double* out)
+void Invert2DMat(bs_real* in, bs_real* out)
 {
-    const double den = in[0] * in[3] - in[1] * in[2];
-    out[0]           = in[3] / den;
-    out[1]           = -in[1] / den;
-    out[2]           = -in[2] / den;
-    out[3]           = in[0] / den;
+    const bs_real den = in[0] * in[3] - in[1] * in[2];
+    out[0]            = in[3] / den;
+    out[1]            = -in[1] / den;
+    out[2]            = -in[2] / den;
+    out[3]            = in[0] / den;
     return;
 }
 
@@ -4141,23 +4141,23 @@ void Invert2DMat(double* in, double* out)
 
 // 2D root-finding parameters
 // @TODO: do some tests and optimize the following parameters
-const int ntrial_2d  = 1000;  // Max number of NR iterations
-const double tolx_2d = 1.e-5; // Accuracy level on the variable
-const double tolf_2d = 1.e-7; // Accuracy level on the functions
+const int ntrial_2d   = 1000;  // Max number of NR iterations
+const bs_real tolx_2d = 1.e-5; // Accuracy level on the variable
+const bs_real tolf_2d = 1.e-7; // Accuracy level on the functions
 
 KOKKOS_INLINE_FUNCTION
-void MNewt2d(double* x, double C[2],
-             void (*fdf)(double*, double*, double*, double*))
+void MNewt2d(bs_real* x, bs_real C[2],
+             void (*fdf)(bs_real*, bs_real*, bs_real*, bs_real*))
 {
     const int n = 2; // Matrix dimension
     int i;
-    double p[n], fvec[n];
-    double fjac[n * n]; // Jacobian matrix
-    double finv[n * n]; // Inverse of Jacobian matrix
+    bs_real p[n], fvec[n];
+    bs_real fjac[n * n]; // Jacobian matrix
+    bs_real finv[n * n]; // Inverse of Jacobian matrix
     for (int k = 0; k < ntrial_2d; k++)
     {
         fdf(x, C, fvec, fjac);
-        double errf = 0.0;
+        bs_real errf = 0.0;
         for (i = 0; i < n; i++)
             errf += fabs(fvec[i]);
         if (errf <= tolf_2d)
@@ -4166,7 +4166,7 @@ void MNewt2d(double* x, double C[2],
         for (i = 0; i < n; i++)
             p[i] = -(finv[i * n] * fvec[0] +
                      finv[i * n + 1] * fvec[1]); //-fvec[i];
-        double errx = 0.0;
+        bs_real errx = 0.0;
         for (i = 0; i < n; i++)
         {
             errx += fabs(p[i]);
@@ -4191,7 +4191,7 @@ void MNewt2d(double* x, double C[2],
 
 // Implementation with if statement
 KOKKOS_INLINE_FUNCTION
-double HeavisidePiecewise(const double x)
+bs_real HeavisidePiecewise(const bs_real x)
 {
     if (x < 0.)
     {
@@ -4205,7 +4205,7 @@ double HeavisidePiecewise(const double x)
 
 // Continuous approximation with tanh - (Eq.5)
 KOKKOS_INLINE_FUNCTION
-double HeavisideTanhApprox(const double x)
+bs_real HeavisideTanhApprox(const bs_real x)
 {
     return 0.5 * (1. + tanh(2. * a_heaviside * x /
                             (fabs(x) + DBL_MIN))); // DBL_TRUE_MIN
@@ -4218,13 +4218,13 @@ double HeavisideTanhApprox(const double x)
 KOKKOS_INLINE_FUNCTION
 void InitializeM1MatrixSingleFlavor(M1Matrix* mat, const int n, const int idx)
 {
-    mat->m1_mat_ab[idx] = (double**)malloc(sizeof(double*) * 2 * n);
-    mat->m1_mat_em[idx] = (double**)malloc(sizeof(double*) * 2 * n);
+    mat->m1_mat_ab[idx] = (bs_real**)malloc(sizeof(bs_real*) * 2 * n);
+    mat->m1_mat_em[idx] = (bs_real**)malloc(sizeof(bs_real*) * 2 * n);
 
     for (int i = 0; i < 2 * n; i++)
     {
-        mat->m1_mat_ab[idx][i] = (double*)malloc(sizeof(double) * 2 * n);
-        mat->m1_mat_em[idx][i] = (double*)malloc(sizeof(double) * 2 * n);
+        mat->m1_mat_ab[idx][i] = (bs_real*)malloc(sizeof(bs_real) * 2 * n);
+        mat->m1_mat_em[idx][i] = (bs_real*)malloc(sizeof(bs_real) * 2 * n);
 
         for (int j = 0; j < 2 * n; j++)
         {

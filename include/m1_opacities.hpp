@@ -9,7 +9,6 @@
 //  \brief header file for all integration routines
 
 #include "bns_nurates.hpp"
-#include "opacities.hpp"
 #include "kernels.hpp"
 #include "integration.hpp"
 #include "distribution.hpp"
@@ -17,8 +16,8 @@
 /* Thresholds on the neutrino energy number and energy density. If values are
 below the thresholds, absorption opacities or scattering opacities are set to 0.
 */
-static const double THRESHOLD_N = 1e0;
-static const double THRESHOLD_J = 1e-4;
+static const bs_real THRESHOLD_N = 1e-21;
+static const bs_real THRESHOLD_J = 1e-25;
 
 /* Computes the integrand for all single integrals from Leonardo's notes
  *
@@ -39,20 +38,20 @@ static const double THRESHOLD_J = 1e-4;
 
 KOKKOS_INLINE_FUNCTION
 void Scattering1DIntegrand(const MyQuadrature* quad,
-                           GreyOpacityParams* grey_pars, const double* t,
-                           double out[][n_max])
+                           GreyOpacityParams* grey_pars, const bs_real* t,
+                           bs_real out[][n_max])
 {
-    static const double four_pi = 4. * kPi;
+    static const bs_real four_pi = 4. * kBS_Pi;
 
     const int n = quad->nx;
 
-    double nu, iso_scatt, aux;
+    bs_real nu, iso_scatt, aux;
 
-    double g_nu[total_num_species];
+    bs_real g_nu[total_num_species];
 
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n; ++i)
     {
-        for (int idx = 0; idx < total_num_species; idx++)
+        for (int idx = 0; idx < total_num_species; ++idx)
         {
             nu = t[idx] * quad->points[i];
 
@@ -62,7 +61,7 @@ void Scattering1DIntegrand(const MyQuadrature* quad,
             iso_scatt = IsoScattTotal(nu, &grey_pars->opacity_pars,
                                       &grey_pars->eos_pars);
 
-            aux = four_pi * nu * nu * nu * nu * nu * iso_scatt;
+            aux = four_pi * POW2(nu) * POW2(nu) * nu * iso_scatt;
 
             out[idx][i] = g_nu[idx] * aux;
 
@@ -74,7 +73,7 @@ void Scattering1DIntegrand(const MyQuadrature* quad,
             iso_scatt = IsoScattTotal(nu, &grey_pars->opacity_pars,
                                       &grey_pars->eos_pars);
 
-            aux = four_pi * nu * nu * nu * nu * nu * iso_scatt;
+            aux = four_pi * POW2(nu) * POW2(nu) * nu * iso_scatt;
 
             out[idx][n + i] = g_nu[idx] * aux;
         }
@@ -85,19 +84,19 @@ void Scattering1DIntegrand(const MyQuadrature* quad,
 
 KOKKOS_INLINE_FUNCTION
 void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
-                     const double* t, double out_em[][n_max],
-                     double out_ab[][n_max], const int stim_abs)
+                     const bs_real* t, bs_real out_em[][n_max],
+                     bs_real out_ab[][n_max], const int stim_abs)
 {
     const int n = quad->nx;
-    double nu, nu_sqr, g_nu;
+    bs_real nu, nu_sqr, g_nu;
     MyOpacity abs_em_beta;
 
     if (stim_abs == 1)
     {
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < n; ++i)
         {
             nu     = t[id_nue] * quad->points[i];
-            nu_sqr = nu * nu;
+            nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_nue);
 
             abs_em_beta = StimAbsOpacity(nu, &grey_pars->opacity_pars,
@@ -105,55 +104,53 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
 
 
             out_em[id_nue][i] = nu_sqr * abs_em_beta.em[id_nue];
-            out_ab[id_nue][i] =
-                nu_sqr * g_nu *
-                abs_em_beta.abs[id_nue]; // ab = em + ab (stimulated absorption)
+
+            // ab = em + ab (stimulated absorption)
+            out_ab[id_nue][i] = nu_sqr * g_nu * abs_em_beta.abs[id_nue];
 
             nu     = t[id_anue] * quad->points[i];
-            nu_sqr = nu * nu;
+            nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anue);
 
             abs_em_beta = StimAbsOpacity(nu, &grey_pars->opacity_pars,
                                          &grey_pars->eos_pars); // [s^-1]
 
             out_em[id_anue][i] = nu_sqr * abs_em_beta.em[id_anue];
-            out_ab[id_anue][i] =
-                nu_sqr * g_nu *
-                abs_em_beta
-                    .abs[id_anue]; // ab = em + ab (stimulated absorption)
+
+            // ab = em + ab (stimulated absorption)
+            out_ab[id_anue][i] = nu_sqr * g_nu * abs_em_beta.abs[id_anue];
 
             nu     = t[id_nue] / quad->points[i];
-            nu_sqr = nu * nu;
+            nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_nue);
 
             abs_em_beta = StimAbsOpacity(nu, &grey_pars->opacity_pars,
                                          &grey_pars->eos_pars); // [s^-1]
 
             out_em[id_nue][n + i] = nu_sqr * abs_em_beta.em[id_nue];
-            out_ab[id_nue][n + i] =
-                nu_sqr * g_nu *
-                abs_em_beta.abs[id_nue]; // ab = em + ab (stimulated absorption)
+
+            // ab = em + ab (stimulated absorption)
+            out_ab[id_nue][n + i] = nu_sqr * g_nu * abs_em_beta.abs[id_nue];
 
             nu     = t[id_anue] / quad->points[i];
-            nu_sqr = nu * nu;
+            nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anue);
 
             abs_em_beta = StimAbsOpacity(nu, &grey_pars->opacity_pars,
                                          &grey_pars->eos_pars); // [s^-1]
 
             out_em[id_anue][n + i] = nu_sqr * abs_em_beta.em[id_anue];
-            out_ab[id_anue][n + i] =
-                nu_sqr * g_nu *
-                abs_em_beta
-                    .abs[id_anue]; // ab = em + ab (stimulated absorption)
+
+            // ab = em + ab (stimulated absorption)
+            out_ab[id_anue][n + i] = nu_sqr * g_nu * abs_em_beta.abs[id_anue];
         }
     }
     else
     {
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < n; ++i)
         {
             nu     = t[id_nue] * quad->points[i];
-            nu_sqr = nu * nu;
+            nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_nue);
 
             abs_em_beta = AbsOpacity(nu, &grey_pars->opacity_pars,
@@ -161,47 +158,37 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
 
 
             out_em[id_nue][i] = nu_sqr * abs_em_beta.em[id_nue];
-            out_ab[id_nue][i] =
-                nu_sqr * g_nu *
-                abs_em_beta.abs[id_nue]; // ab = em + ab (stimulated absorption)
+            out_ab[id_nue][i] = nu_sqr * g_nu * abs_em_beta.abs[id_nue];
 
             nu     = t[id_anue] * quad->points[i];
-            nu_sqr = nu * nu;
+            nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anue);
 
             abs_em_beta = AbsOpacity(nu, &grey_pars->opacity_pars,
                                      &grey_pars->eos_pars); // [s^-1]
 
             out_em[id_anue][i] = nu_sqr * abs_em_beta.em[id_anue];
-            out_ab[id_anue][i] =
-                nu_sqr * g_nu *
-                abs_em_beta
-                    .abs[id_anue]; // ab = em + ab (stimulated absorption)
+            out_ab[id_anue][i] = nu_sqr * g_nu * abs_em_beta.abs[id_anue];
 
             nu     = t[id_nue] / quad->points[i];
-            nu_sqr = nu * nu;
+            nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_nue);
 
             abs_em_beta = AbsOpacity(nu, &grey_pars->opacity_pars,
                                      &grey_pars->eos_pars); // [s^-1]
 
             out_em[id_nue][n + i] = nu_sqr * abs_em_beta.em[id_nue];
-            out_ab[id_nue][n + i] =
-                nu_sqr * g_nu *
-                abs_em_beta.abs[id_nue]; // ab = em + ab (stimulated absorption)
+            out_ab[id_nue][n + i] = nu_sqr * g_nu * abs_em_beta.abs[id_nue];
 
             nu     = t[id_anue] / quad->points[i];
-            nu_sqr = nu * nu;
+            nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anue);
 
             abs_em_beta = AbsOpacity(nu, &grey_pars->opacity_pars,
                                      &grey_pars->eos_pars); // [s^-1]
 
             out_em[id_anue][n + i] = nu_sqr * abs_em_beta.em[id_anue];
-            out_ab[id_anue][n + i] =
-                nu_sqr * g_nu *
-                abs_em_beta
-                    .abs[id_anue]; // ab = em + ab (stimulated absorption)
+            out_ab[id_anue][n + i] = nu_sqr * g_nu * abs_em_beta.abs[id_anue];
         }
     }
 
@@ -209,51 +196,48 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
 }
 
 KOKKOS_INLINE_FUNCTION
-void AddBetaReactionToIntegrand(int n, double* nu_array,
+void AddBetaReactionToIntegrand(int n, bs_real* nu_array,
                                 GreyOpacityParams* grey_pars,
                                 M1MatrixKokkos2D* out, const int stim_abs)
 {
-    double nu;
+    bs_real nu;
     MyOpacity abs_em_beta;
 
     if (stim_abs == 1)
     {
-        for (int i = 0; i < 2 * n; i++)
+        for (int i = 0; i < 2 * n; ++i)
         {
             nu = nu_array[i];
 
             abs_em_beta = StimAbsOpacity(nu, &grey_pars->opacity_pars,
                                          &grey_pars->eos_pars); // [s^-1]
 
-            for (int j = 0; i < 2 * n; j++)
+            for (int j = 0; i < 2 * n; ++j)
             {
                 out->m1_mat_em[id_nue][i][j] += abs_em_beta.em[id_nue];
                 out->m1_mat_em[id_anue][i][j] += abs_em_beta.em[id_anue];
 
-                out->m1_mat_ab[id_nue][i][j] +=
-                    abs_em_beta
-                        .abs[id_nue]; // ab = em + ab (stimulated absorption)
+                // ab = em + ab (stimulated absorption)
+                out->m1_mat_ab[id_nue][i][j] += abs_em_beta.abs[id_nue];
                 out->m1_mat_ab[id_anue][i][j] += abs_em_beta.abs[id_anue];
             }
         }
     }
     else
     {
-        for (int i = 0; i < 2 * n; i++)
+        for (int i = 0; i < 2 * n; ++i)
         {
             nu = nu_array[i];
 
             abs_em_beta = AbsOpacity(nu, &grey_pars->opacity_pars,
                                      &grey_pars->eos_pars); // [s^-1]
 
-            for (int j = 0; i < 2 * n; j++)
+            for (int j = 0; i < 2 * n; ++j)
             {
                 out->m1_mat_em[id_nue][i][j] += abs_em_beta.em[id_nue];
                 out->m1_mat_em[id_anue][i][j] += abs_em_beta.em[id_anue];
 
-                out->m1_mat_ab[id_nue][i][j] +=
-                    abs_em_beta
-                        .abs[id_nue]; // ab = ab (not stimulated absorption)
+                out->m1_mat_ab[id_nue][i][j] += abs_em_beta.abs[id_nue];
                 out->m1_mat_ab[id_anue][i][j] += abs_em_beta.abs[id_anue];
             }
         }
@@ -262,7 +246,7 @@ void AddBetaReactionToIntegrand(int n, double* nu_array,
 }
 
 KOKKOS_INLINE_FUNCTION
-void AddPairKernelsToIntegrand(int n, double* nu_array,
+void AddPairKernelsToIntegrand(int n, bs_real* nu_array,
                                GreyOpacityParams* grey_pars,
                                M1MatrixKokkos2D* out)
 {
@@ -274,30 +258,30 @@ void AddPairKernelsToIntegrand(int n, double* nu_array,
     grey_pars->kernel_pars.pair_kernel_params.mu        = 1.;
     grey_pars->kernel_pars.pair_kernel_params.mu_prime  = 1.;
 
-    for (int i = 0; i < 2 * n; i++)
+    for (int i = 0; i < 2 * n; ++i)
     {
         grey_pars->kernel_pars.pair_kernel_params.omega       = nu_array[i];
         grey_pars->kernel_pars.pair_kernel_params.omega_prime = nu_array[i];
 
-        PairKernelsM1Test(&grey_pars->eos_pars,
-                          &grey_pars->kernel_pars.pair_kernel_params, &pair_1,
-                          &pair_2);
+        PairKernels(&grey_pars->eos_pars,
+                    &grey_pars->kernel_pars.pair_kernel_params, &pair_1,
+                    &pair_2);
 
-        for (int idx = 0; idx < total_num_species; idx++)
+        for (int idx = 0; idx < total_num_species; ++idx)
         {
             out->m1_mat_em[idx][i][i] += pair_1.em[idx];
             out->m1_mat_ab[idx][i][i] += pair_1.abs[idx];
         }
 
-        for (int j = i + 1; j < 2 * n; j++)
+        for (int j = i + 1; j < 2 * n; ++j)
         {
             grey_pars->kernel_pars.pair_kernel_params.omega_prime = nu_array[j];
 
-            PairKernelsM1Test(&grey_pars->eos_pars,
-                              &grey_pars->kernel_pars.pair_kernel_params,
-                              &pair_1, &pair_2);
+            PairKernels(&grey_pars->eos_pars,
+                        &grey_pars->kernel_pars.pair_kernel_params, &pair_1,
+                        &pair_2);
 
-            for (int idx = 0; idx < total_num_species; idx++)
+            for (int idx = 0; idx < total_num_species; ++idx)
             {
                 out->m1_mat_em[idx][i][j] += pair_1.em[idx];
                 out->m1_mat_em[idx][j][i] += pair_2.em[idx];
@@ -312,7 +296,7 @@ void AddPairKernelsToIntegrand(int n, double* nu_array,
 
 
 KOKKOS_INLINE_FUNCTION
-void AddBremKernelsToIntegrand(int n, double* nu_array,
+void AddBremKernelsToIntegrand(int n, bs_real* nu_array,
                                GreyOpacityParams* grey_pars,
                                M1MatrixKokkos2D* out)
 {
@@ -320,7 +304,7 @@ void AddBremKernelsToIntegrand(int n, double* nu_array,
 
     if (grey_pars->opacity_pars.use_BRT_brem == true)
     {
-        for (int i = 0; i < 2 * n; i++)
+        for (int i = 0; i < 2 * n; ++i)
         {
 
             grey_pars->kernel_pars.brem_kernel_params.omega       = nu_array[i];
@@ -331,13 +315,13 @@ void AddBremKernelsToIntegrand(int n, double* nu_array,
                 BremKernelsBRT06(&grey_pars->kernel_pars.brem_kernel_params,
                                  &grey_pars->eos_pars);
 
-            for (int idx = 0; idx < total_num_species; idx++)
+            for (int idx = 0; idx < total_num_species; ++idx)
             {
                 out->m1_mat_em[idx][i][i] += brem_ker.em[0];
                 out->m1_mat_ab[idx][i][i] += brem_ker.abs[0];
             }
 
-            for (int j = i + 1; j < 2 * n; j++)
+            for (int j = i + 1; j < 2 * n; ++j)
             {
                 grey_pars->kernel_pars.brem_kernel_params.omega_prime =
                     nu_array[j];
@@ -347,7 +331,7 @@ void AddBremKernelsToIntegrand(int n, double* nu_array,
                     BremKernelsBRT06(&grey_pars->kernel_pars.brem_kernel_params,
                                      &grey_pars->eos_pars);
 
-                for (int idx = 0; idx < total_num_species; idx++)
+                for (int idx = 0; idx < total_num_species; ++idx)
                 {
                     out->m1_mat_em[idx][i][j] += brem_ker.em[0];
                     out->m1_mat_em[idx][j][i] += brem_ker.em[0];
@@ -364,7 +348,7 @@ void AddBremKernelsToIntegrand(int n, double* nu_array,
         grey_pars->kernel_pars.brem_kernel_params.use_NN_medium_corr =
             grey_pars->opacity_pars.use_NN_medium_corr;
 
-        for (int i = 0; i < 2 * n; i++)
+        for (int i = 0; i < 2 * n; ++i)
         {
 
             grey_pars->kernel_pars.brem_kernel_params.omega       = nu_array[i];
@@ -375,13 +359,13 @@ void AddBremKernelsToIntegrand(int n, double* nu_array,
                 BremKernelsLegCoeff(&grey_pars->kernel_pars.brem_kernel_params,
                                     &grey_pars->eos_pars);
 
-            for (int idx = 0; idx < total_num_species; idx++)
+            for (int idx = 0; idx < total_num_species; ++idx)
             {
                 out->m1_mat_em[idx][i][i] += brem_ker.em[0];
                 out->m1_mat_ab[idx][i][i] += brem_ker.abs[0];
             }
 
-            for (int j = i + 1; j < 2 * n; j++)
+            for (int j = i + 1; j < 2 * n; ++j)
             {
                 // compute the brem kernels
                 grey_pars->kernel_pars.brem_kernel_params.omega_prime =
@@ -390,7 +374,7 @@ void AddBremKernelsToIntegrand(int n, double* nu_array,
                     &grey_pars->kernel_pars.brem_kernel_params,
                     &grey_pars->eos_pars);
 
-                for (int idx = 0; idx < total_num_species; idx++)
+                for (int idx = 0; idx < total_num_species; ++idx)
                 {
                     out->m1_mat_em[idx][i][j] += brem_ker.em[0];
                     out->m1_mat_em[idx][j][i] += brem_ker.em[0];
@@ -405,21 +389,21 @@ void AddBremKernelsToIntegrand(int n, double* nu_array,
 }
 
 KOKKOS_INLINE_FUNCTION
-void AddInelKernelsToIntegrand(int n, double* nu_array,
+void AddInelKernelsToIntegrand(int n, bs_real* nu_array,
                                GreyOpacityParams* grey_pars,
                                M1MatrixKokkos2D* out)
 {
-    double nu, nu_bar;
-    double g_nu[total_num_species], g_nu_bar[total_num_species];
-    double block_factor_nu[total_num_species],
+    bs_real nu, nu_bar;
+    bs_real g_nu[total_num_species], g_nu_bar[total_num_species];
+    bs_real block_factor_nu[total_num_species],
         block_factor_nu_bar[total_num_species];
     MyKernelOutput inel_1, inel_2;
 
-    for (int i = 0; i < 2 * n; i++)
+    for (int i = 0; i < 2 * n; ++i)
     {
         nu = nu_array[i];
 
-        for (int idx = 0; idx < total_num_species; idx++)
+        for (int idx = 0; idx < total_num_species; ++idx)
         {
             g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, idx);
 
@@ -441,18 +425,18 @@ void AddInelKernelsToIntegrand(int n, double* nu_array,
             &grey_pars->kernel_pars.inelastic_kernel_params,
             &grey_pars->eos_pars);
 
-        for (int idx = 0; idx < total_num_species; idx++)
+        for (int idx = 0; idx < total_num_species; ++idx)
         {
             out->m1_mat_em[idx][i][i] += inel_1.em[idx] * g_nu[idx];
             out->m1_mat_ab[idx][i][i] += inel_1.abs[idx] * block_factor_nu[idx];
         }
 
 
-        for (int j = i + 1; j < 2 * n; j++)
+        for (int j = i + 1; j < 2 * n; ++j)
         {
             nu_bar = nu_array[j];
 
-            for (int idx = 0; idx < total_num_species; idx++)
+            for (int idx = 0; idx < total_num_species; ++idx)
             {
                 g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
 
@@ -481,7 +465,7 @@ void AddInelKernelsToIntegrand(int n, double* nu_array,
                 &grey_pars->kernel_pars.inelastic_kernel_params,
                 &grey_pars->eos_pars);
 
-            for (int idx = 0; idx < total_num_species; idx++)
+            for (int idx = 0; idx < total_num_species; ++idx)
             {
                 out->m1_mat_em[idx][i][j] += inel_1.em[idx] * g_nu_bar[idx];
                 out->m1_mat_em[idx][j][i] += inel_2.em[idx] * g_nu[idx];
@@ -497,20 +481,20 @@ void AddInelKernelsToIntegrand(int n, double* nu_array,
 }
 
 KOKKOS_INLINE_FUNCTION
-void WeightNuNuBarReactionsWithDistr(int n, double* nu_array,
+void WeightNuNuBarReactionsWithDistr(int n, bs_real* nu_array,
                                      GreyOpacityParams* grey_pars,
                                      M1MatrixKokkos2D* out)
 {
-    double nu, nu_bar;
-    double g_nu[total_num_species], g_nu_bar[total_num_species];
-    double block_factor_nu[total_num_species],
+    bs_real nu, nu_bar;
+    bs_real g_nu[total_num_species], g_nu_bar[total_num_species];
+    bs_real block_factor_nu[total_num_species],
         block_factor_nu_bar[total_num_species];
 
-    for (int i = 0; i < 2 * n; i++)
+    for (int i = 0; i < 2 * n; ++i)
     {
         nu = nu_array[i];
 
-        for (int idx = 0; idx < total_num_species; idx++)
+        for (int idx = 0; idx < total_num_species; ++idx)
         {
             g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, idx);
 
@@ -534,11 +518,11 @@ void WeightNuNuBarReactionsWithDistr(int n, double* nu_array,
         out->m1_mat_ab[id_nux][i][i] *= g_nu[id_anux];
         out->m1_mat_ab[id_anux][i][i] *= g_nu[id_nux];
 
-        for (int j = i + 1; j < 2 * n; j++)
+        for (int j = i + 1; j < 2 * n; ++j)
         {
             nu_bar = nu_array[j];
 
-            for (int idx = 0; idx < total_num_species; idx++)
+            for (int idx = 0; idx < total_num_species; ++idx)
             {
                 g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
 
@@ -577,24 +561,24 @@ void WeightNuNuBarReactionsWithDistr(int n, double* nu_array,
 }
 
 KOKKOS_INLINE_FUNCTION
-void AddCommonWeightsToIntegrand(int n, double* nu_array,
+void AddCommonWeightsToIntegrand(int n, bs_real* nu_array,
                                  GreyOpacityParams* grey_pars,
                                  M1MatrixKokkos2D* out, int stim_abs)
 {
-    double nu, nu_bar, nu_squared, nu_fourth;
-    double g_nu[total_num_species], g_nu_bar[total_num_species];
+    bs_real nu, nu_bar, nu_squared, nu_fourth;
+    bs_real g_nu[total_num_species], g_nu_bar[total_num_species];
 
-    assert((stim_abs == 0) || (stim_abs == 1));
+    BS_ASSERT((stim_abs == 0) || (stim_abs == 1));
 
     if (stim_abs == 1)
     {
-        for (int i = 0; i < 2 * n; i++)
+        for (int i = 0; i < 2 * n; ++i)
         {
             nu         = nu_array[i];
-            nu_squared = nu * nu;
+            nu_squared = POW2(nu);
             nu_fourth  = nu_squared * nu_squared;
 
-            for (int idx = 0; idx < total_num_species; idx++)
+            for (int idx = 0; idx < total_num_species; ++idx)
             {
                 g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, idx);
 
@@ -604,12 +588,12 @@ void AddCommonWeightsToIntegrand(int n, double* nu_array,
                 out->m1_mat_em[idx][i][i] *= nu_fourth;
             }
 
-            for (int j = i + 1; j < 2 * n; j++)
+            for (int j = i + 1; j < 2 * n; ++j)
             {
                 nu_bar    = nu_array[j];
                 nu_fourth = nu_squared * nu_bar * nu_bar;
 
-                for (int idx = 0; idx < total_num_species; idx++)
+                for (int idx = 0; idx < total_num_species; ++idx)
                 {
                     g_nu_bar[idx] =
                         TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
@@ -629,13 +613,13 @@ void AddCommonWeightsToIntegrand(int n, double* nu_array,
     }
     else
     {
-        for (int i = 0; i < 2 * n; i++)
+        for (int i = 0; i < 2 * n; ++i)
         {
             nu         = nu_array[i];
-            nu_squared = nu * nu;
+            nu_squared = POW2(nu);
             nu_fourth  = nu_squared * nu_squared;
 
-            for (int idx = 0; idx < total_num_species; idx++)
+            for (int idx = 0; idx < total_num_species; ++idx)
             {
                 g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, idx);
 
@@ -643,12 +627,12 @@ void AddCommonWeightsToIntegrand(int n, double* nu_array,
                 out->m1_mat_em[idx][i][i] *= nu_fourth * (1. - g_nu[idx]);
             }
 
-            for (int j = i + 1; j < 2 * n; j++)
+            for (int j = i + 1; j < 2 * n; ++j)
             {
                 nu_bar    = nu_array[j];
                 nu_fourth = nu_squared * nu_bar * nu_bar;
 
-                for (int idx = 0; idx < total_num_species; idx++)
+                for (int idx = 0; idx < total_num_species; ++idx)
                 {
                     g_nu_bar[idx] =
                         TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
@@ -677,28 +661,28 @@ void AddCommonWeightsToIntegrand(int n, double* nu_array,
  *                                                                        + nu^3
  * nubar^2 [R_abs(Pair) + R_abs(Brem)]g_nubar g_nu)
  *
- * Note that there are no double integrals for the computation of the scattering
- * coefficient.
+ * Note that there are no bs_real integrals for the computation of the
+ * scattering coefficient.
  */
 KOKKOS_INLINE_FUNCTION
-M1MatrixKokkos2D ComputeDoubleIntegrand(const MyQuadrature* quad, double t,
+M1MatrixKokkos2D ComputeDoubleIntegrand(const MyQuadrature* quad, bs_real t,
                                         GreyOpacityParams* grey_pars,
                                         const int stim_abs)
 {
     const int n = quad->nx;
-    double nu, nu_bar;
-    double nu_array[n_max];
+    bs_real nu, nu_bar;
+    bs_real nu_array[n_max];
     M1MatrixKokkos2D out = {0};
 
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n; ++i)
     {
         nu_array[i]     = t * quad->points[i];
         nu_array[n + i] = t / quad->points[i];
     }
 
     // compute the neutrino & anti-neutrino distribution function
-    double g_nu[total_num_species], g_nu_bar[total_num_species];
-    double block_factor_nu[total_num_species],
+    bs_real g_nu[total_num_species], g_nu_bar[total_num_species];
+    bs_real block_factor_nu[total_num_species],
         block_factor_nu_bar[total_num_species];
 
     if (grey_pars->opacity_flags.use_pair == 1)
@@ -781,39 +765,34 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     const MyQuadrature* quad_1d, const MyQuadrature* quad_2d,
     GreyOpacityParams* my_grey_opacity_params, const int stim_abs)
 {
+    bs_real n[total_num_species];
+    bs_real J[total_num_species];
 
-    // compute some constants
-    static const double four_pi_hc3 =
-        (4. * kPi) / (kHClight * kHClight * kHClight); // [MeV^-3 cm^-3]
-    static const double four_pi_hc3_sqr =
-        four_pi_hc3 * four_pi_hc3; // [MeV^-6 cm^-6]
-
-    double n[total_num_species];
-    double J[total_num_species];
-
-    for (int idx = 0; idx < total_num_species; idx++)
+    for (int idx = 0; idx < total_num_species; ++idx)
     {
-        // m1_pars.n and m1_pars.J are assumed to be parsed in cgs
+        // m1_pars.n and m1_pars.J are assumed to be parsed in [nm^-3]
+        // and [g nm^-1 s^-2]
         n[idx] = my_grey_opacity_params->m1_pars.n[idx];
         J[idx] = my_grey_opacity_params->m1_pars.J[idx];
 
-        J[idx] = J[idx] / kMeV; // erg cm-3 -> MeV cm-3 conversion
+        // g nm-1 s^-1 -> MeV nm-3 conversion
+        J[idx] = J[idx] / kBS_MeV;
     }
 
-    const double temp  = my_grey_opacity_params->eos_pars.temp;
-    const double eta_e = my_grey_opacity_params->eos_pars.mu_e / temp;
+    const bs_real temp  = my_grey_opacity_params->eos_pars.temp;
+    const bs_real eta_e = my_grey_opacity_params->eos_pars.mu_e / temp;
 
     // @TODO: choose this appropriately
-    const double s_pair = 0.5 * 4.364 * temp;
-    // const double s_pair = temp * (FDI_p4(eta_e) / FDI_p3(eta_e) +
-    // FDI_p4(-eta_e) / FDI_p3(-eta_e));
-    const double s_nux               = 1.5 * temp;
-    double s_beta[total_num_species] = {0}, s_iso[total_num_species] = {0};
+    const bs_real s_pair = 0.5 * 4.364 * temp;
+    // const bs_real s_pair              = temp * (FDI_p4(eta_e) / FDI_p3(eta_e)
+    // + FDI_p4(-eta_e) / FDI_p3(-eta_e));
+    const bs_real s_nux               = 1.5 * temp;
+    bs_real s_beta[total_num_species] = {0}, s_iso[total_num_species] = {0};
 
     s_beta[id_nue]  = temp * FDI_p5(eta_e) / FDI_p4(eta_e);
     s_beta[id_anue] = temp * FDI_p5(-eta_e) / FDI_p4(-eta_e);
 
-    for (int idx = 0; idx < total_num_species; idx++)
+    for (int idx = 0; idx < total_num_species; ++idx)
     {
         s_iso[idx] = (n[idx] > THRESHOLD_N) ? (J[idx] / n[idx]) : s_nux;
     }
@@ -822,22 +801,25 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     MyQuadratureIntegrand iso_integrals = {0};
     if (my_grey_opacity_params->opacity_flags.use_iso == 1)
     {
-        double out_iso[total_num_species][n_max];
+        bs_real out_iso[total_num_species][n_max];
         Scattering1DIntegrand(quad_1d, my_grey_opacity_params, s_iso, out_iso);
         iso_integrals = GaussLegendreIntegrate1DMatrix(
             quad_1d, total_num_species, out_iso, s_iso);
     }
 
-    MyQuadratureIntegrand beta_n_em_integrals = {0}, beta_j_em_integrals = {0};
-    MyQuadratureIntegrand beta_n_abs_integrals = {0},
-                          beta_j_abs_integrals = {0};
+    MyQuadratureIntegrand beta_n_em_integrals  = {0};
+    MyQuadratureIntegrand beta_j_em_integrals  = {0};
+    MyQuadratureIntegrand beta_n_abs_integrals = {0};
+    MyQuadratureIntegrand beta_j_abs_integrals = {0};
 
     if (my_grey_opacity_params->opacity_flags.use_abs_em == 1)
     {
-        double out_beta_em[total_num_species][n_max],
-            out_beta_ab[total_num_species][n_max];
+        bs_real out_beta_em[total_num_species][n_max];
+        bs_real out_beta_ab[total_num_species][n_max];
+
         Beta1DIntegrand(quad_1d, my_grey_opacity_params, s_beta, out_beta_em,
                         out_beta_ab, stim_abs);
+
         GaussLegendreIntegrate1DMatrixOnlyNumber(quad_1d, 2, out_beta_em,
                                                  s_beta, &beta_n_em_integrals,
                                                  &beta_j_em_integrals);
@@ -861,7 +843,7 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     density appears in the denominator). Note that emissivities do no need this
     precaution (and it also make sense physically: you can produce neutrinos
     even if there are none to start with). */
-    for (int idx = 0; idx < total_num_species; idx++)
+    for (int idx = 0; idx < total_num_species; ++idx)
     {
         m1_opacities.kappa_0_a[idx] = 0.;
         m1_opacities.kappa_a[idx]   = 0.;
@@ -870,87 +852,96 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
 
     /* Electron neutrinos */
     m1_opacities.eta_0[id_nue] =
-        four_pi_hc3 * (four_pi_hc3 * n_integrals_2d.integrand[0] +
-                       beta_n_em_integrals.integrand[id_nue]);
+        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * n_integrals_2d.integrand[0] +
+                          beta_n_em_integrals.integrand[id_nue]);
     m1_opacities.eta[id_nue] =
-        four_pi_hc3 * (four_pi_hc3 * e_integrals_2d.integrand[0] +
-                       beta_j_em_integrals.integrand[id_nue]);
+        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * e_integrals_2d.integrand[0] +
+                          beta_j_em_integrals.integrand[id_nue]);
     if (n[id_nue] > THRESHOLD_N)
     {
         m1_opacities.kappa_0_a[id_nue] =
-            four_pi_hc3 / (kClight * n[id_nue]) *
-            (four_pi_hc3 * n_integrals_2d.integrand[4] +
+            kBS_FourPi_hc3 / (kBS_Clight * n[id_nue]) *
+            (kBS_FourPi_hc3 * n_integrals_2d.integrand[4] +
              beta_n_abs_integrals.integrand[id_nue]);
     }
     if (J[id_nue] > THRESHOLD_J)
     {
         m1_opacities.kappa_a[id_nue] =
-            n[id_nue] == 0. ? 0. :
-                              four_pi_hc3 / (kClight * J[id_nue]) *
-                                  (four_pi_hc3 * e_integrals_2d.integrand[4] +
-                                   beta_j_abs_integrals.integrand[id_nue]);
-        m1_opacities.kappa_s[id_nue] = four_pi_hc3 / (kClight * J[id_nue]) *
+            n[id_nue] == 0. ?
+                0. :
+                kBS_FourPi_hc3 / (kBS_Clight * J[id_nue]) *
+                    (kBS_FourPi_hc3 * e_integrals_2d.integrand[4] +
+                     beta_j_abs_integrals.integrand[id_nue]);
+        m1_opacities.kappa_s[id_nue] = kBS_FourPi_hc3 /
+                                       (kBS_Clight * J[id_nue]) *
                                        iso_integrals.integrand[id_nue];
     }
 
     /* Electron anti-neutrinos */
     m1_opacities.eta_0[id_anue] =
-        four_pi_hc3 * (four_pi_hc3 * n_integrals_2d.integrand[1] +
-                       beta_n_em_integrals.integrand[id_anue]);
+        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * n_integrals_2d.integrand[1] +
+                          beta_n_em_integrals.integrand[id_anue]);
     m1_opacities.eta[id_anue] =
-        four_pi_hc3 * (four_pi_hc3 * e_integrals_2d.integrand[1] +
-                       beta_j_em_integrals.integrand[id_anue]);
+        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * e_integrals_2d.integrand[1] +
+                          beta_j_em_integrals.integrand[id_anue]);
     if (n[id_anue] > THRESHOLD_N)
     {
         m1_opacities.kappa_0_a[id_anue] =
-            four_pi_hc3 / (kClight * n[id_anue]) *
-            (four_pi_hc3 * n_integrals_2d.integrand[5] +
+            kBS_FourPi_hc3 / (kBS_Clight * n[id_anue]) *
+            (kBS_FourPi_hc3 * n_integrals_2d.integrand[5] +
              beta_n_abs_integrals.integrand[id_anue]);
     }
     if (J[id_anue] > THRESHOLD_J)
     {
         m1_opacities.kappa_a[id_anue] =
-            four_pi_hc3 / (kClight * J[id_anue]) *
-            (four_pi_hc3 * e_integrals_2d.integrand[5] +
+            kBS_FourPi_hc3 / (kBS_Clight * J[id_anue]) *
+            (kBS_FourPi_hc3 * e_integrals_2d.integrand[5] +
              beta_j_abs_integrals.integrand[id_anue]);
-        m1_opacities.kappa_s[id_anue] = four_pi_hc3 / (kClight * J[id_anue]) *
+        m1_opacities.kappa_s[id_anue] = kBS_FourPi_hc3 /
+                                        (kBS_Clight * J[id_anue]) *
                                         iso_integrals.integrand[id_anue];
     }
 
     /* Heavy neutrinos */
-    m1_opacities.eta_0[id_nux] = four_pi_hc3_sqr * n_integrals_2d.integrand[2];
-    m1_opacities.eta[id_nux]   = four_pi_hc3_sqr * e_integrals_2d.integrand[2];
+    m1_opacities.eta_0[id_nux] =
+        kBS_FourPi_hc3_sqr * n_integrals_2d.integrand[2];
+    m1_opacities.eta[id_nux] = kBS_FourPi_hc3_sqr * e_integrals_2d.integrand[2];
     if (n[id_nux] > THRESHOLD_N)
     {
-        m1_opacities.kappa_0_a[id_nux] = four_pi_hc3_sqr /
-                                         (kClight * n[id_nux]) *
+        m1_opacities.kappa_0_a[id_nux] = kBS_FourPi_hc3_sqr /
+                                         (kBS_Clight * n[id_nux]) *
                                          n_integrals_2d.integrand[6];
     }
     if (J[id_nux] > THRESHOLD_J)
     {
-        m1_opacities.kappa_a[id_nux] = four_pi_hc3_sqr / (kClight * J[id_nux]) *
+        m1_opacities.kappa_a[id_nux] = kBS_FourPi_hc3_sqr /
+                                       (kBS_Clight * J[id_nux]) *
                                        e_integrals_2d.integrand[6];
-        m1_opacities.kappa_s[id_nux] = four_pi_hc3 / (kClight * J[id_nux]) *
+        m1_opacities.kappa_s[id_nux] = kBS_FourPi_hc3 /
+                                       (kBS_Clight * J[id_nux]) *
                                        iso_integrals.integrand[id_nux];
     }
 
     /* Heavy anti-neutrinos */
-    m1_opacities.eta_0[id_anux] = four_pi_hc3_sqr * n_integrals_2d.integrand[3];
-    m1_opacities.eta[id_anux]   = four_pi_hc3_sqr * e_integrals_2d.integrand[3];
+    m1_opacities.eta_0[id_anux] =
+        kBS_FourPi_hc3_sqr * n_integrals_2d.integrand[3];
+    m1_opacities.eta[id_anux] =
+        kBS_FourPi_hc3_sqr * e_integrals_2d.integrand[3];
     if (n[id_anux] > THRESHOLD_N)
     {
         m1_opacities.kappa_0_a[id_anux] =
             n[id_anux] == 0. ? 0. :
-                               four_pi_hc3_sqr / (kClight * n[id_anux]) *
+                               kBS_FourPi_hc3_sqr / (kBS_Clight * n[id_anux]) *
                                    n_integrals_2d.integrand[7];
     }
     if (J[id_anux] > THRESHOLD_J)
     {
-        m1_opacities.kappa_a[id_anux] = four_pi_hc3_sqr /
-                                        (kClight * J[id_anux]) *
+        m1_opacities.kappa_a[id_anux] = kBS_FourPi_hc3_sqr /
+                                        (kBS_Clight * J[id_anux]) *
                                         e_integrals_2d.integrand[7];
 
-        m1_opacities.kappa_s[id_anux] = four_pi_hc3 / (kClight * J[id_anux]) *
+        m1_opacities.kappa_s[id_anux] = kBS_FourPi_hc3 /
+                                        (kBS_Clight * J[id_anux]) *
                                         iso_integrals.integrand[id_anux];
     }
 
@@ -978,24 +969,24 @@ M1Opacities ComputeM1Opacities(const MyQuadrature* quad_1d,
 /* Compute the integrands for the computation of the spectral emissivity and
  * inverse mean free path */
 KOKKOS_INLINE_FUNCTION
-MyQuadratureIntegrand SpectralIntegrand(double* var, void* p)
+MyQuadratureIntegrand SpectralIntegrand(bs_real* var, void* p)
 {
     // energies and parameters
-    double nu_bar = var[0]; // [MeV]
+    bs_real nu_bar = var[0]; // [MeV]
 
     GreyOpacityParams* my_grey_opacity_params = (GreyOpacityParams*)p;
     MyEOSParams my_eos_params  = my_grey_opacity_params->eos_pars;
     OpacityFlags opacity_flags = my_grey_opacity_params->opacity_flags;
     OpacityParams opacity_pars = my_grey_opacity_params->opacity_pars;
 
-    double nu = my_grey_opacity_params->kernel_pars.pair_kernel_params.omega;
+    bs_real nu = my_grey_opacity_params->kernel_pars.pair_kernel_params.omega;
 
-    double block_factor[total_num_species]; // blocking factor
+    bs_real block_factor[total_num_species]; // blocking factor
 
     // compute the neutrino & anti-neutrino distribution function
-    double g_nu[total_num_species], g_nu_bar[total_num_species];
+    bs_real g_nu[total_num_species], g_nu_bar[total_num_species];
 
-    for (int idx = 0; idx < total_num_species; idx++)
+    for (int idx = 0; idx < total_num_species; ++idx)
     {
         g_nu[idx] = TotalNuF(nu, &my_grey_opacity_params->distr_pars, idx);
         g_nu_bar[idx] =
@@ -1014,9 +1005,9 @@ MyQuadratureIntegrand SpectralIntegrand(double* var, void* p)
         my_grey_opacity_params->kernel_pars.pair_kernel_params.lmax      = 0;
         my_grey_opacity_params->kernel_pars.pair_kernel_params.mu        = 1.;
         my_grey_opacity_params->kernel_pars.pair_kernel_params.mu_prime  = 1.;
-        // pair_kernels_m1 = PairKernelsM1(&my_eos_params,
+        // pair_kernels_m1 = PairKernels(&my_eos_params,
         // &my_grey_opacity_params->kernel_pars.pair_kernel_params);
-        pair_kernels_m1 = PairKernelsOptimized(
+        pair_kernels_m1 = PairKernels(
             &my_eos_params,
             &my_grey_opacity_params->kernel_pars.pair_kernel_params);
     }
@@ -1056,18 +1047,18 @@ MyQuadratureIntegrand SpectralIntegrand(double* var, void* p)
             &my_grey_opacity_params->eos_pars);
     }
 
-    double pro_term[total_num_species] = {0};
+    bs_real pro_term[total_num_species] = {0};
 
     if (opacity_pars.neglect_blocking == false)
     {
-        for (int idx = 0; idx < total_num_species; idx++)
+        for (int idx = 0; idx < total_num_species; ++idx)
         {
             block_factor[idx] = 1. - g_nu_bar[idx];
         }
     }
     else
     {
-        for (int idx = 0; idx < total_num_species; idx++)
+        for (int idx = 0; idx < total_num_species; ++idx)
         {
             block_factor[idx] = 1.;
         }
@@ -1086,12 +1077,12 @@ MyQuadratureIntegrand SpectralIntegrand(double* var, void* p)
         (pair_kernels_m1.em[id_anux] + brem_kernels_m1.em[id_anux]) *
         block_factor[id_nux];
 
-    for (int idx = 0; idx < total_num_species; idx++)
+    for (int idx = 0; idx < total_num_species; ++idx)
     {
         pro_term[idx] += inelastic_kernels_m1.em[idx] * g_nu_bar[idx];
     }
 
-    double ann_term[total_num_species] = {0};
+    bs_real ann_term[total_num_species] = {0};
 
     ann_term[id_nue] =
         (pair_kernels_m1.abs[id_nue] + brem_kernels_m1.abs[id_nue]) *
@@ -1122,14 +1113,14 @@ MyQuadratureIntegrand SpectralIntegrand(double* var, void* p)
     }
     //////////////////////////////////////////////
 
-    for (int idx = 0; idx < total_num_species; idx++)
+    for (int idx = 0; idx < total_num_species; ++idx)
     {
         ann_term[idx] += inelastic_kernels_m1.abs[idx] * block_factor[idx];
     }
 
-    double integrand_1[total_num_species], integrand_2[total_num_species];
+    bs_real integrand_1[total_num_species], integrand_2[total_num_species];
 
-    for (int idx = 0; idx < total_num_species; idx++)
+    for (int idx = 0; idx < total_num_species; ++idx)
     {
         integrand_1[idx] = nu_bar * nu_bar * pro_term[idx];
         integrand_2[idx] = nu_bar * nu_bar * ann_term[idx];
@@ -1153,13 +1144,9 @@ MyQuadratureIntegrand SpectralIntegrand(double* var, void* p)
 
 // Version without stimulated absorption
 inline SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
-    const double nu, MyQuadrature* quad_1d,
+    const bs_real nu, MyQuadrature* quad_1d,
     GreyOpacityParams* my_grey_opacity_params)
 {
-    // compute some constants
-    static const double four_pi_hc3 =
-        (4. * kPi) / (kHClight * kHClight * kHClight); // [MeV^-3 cm^-3]
-
     my_grey_opacity_params->kernel_pars.pair_kernel_params.omega      = nu;
     my_grey_opacity_params->kernel_pars.brem_kernel_params.omega      = nu;
     my_grey_opacity_params->kernel_pars.inelastic_kernel_params.omega = nu;
@@ -1173,18 +1160,18 @@ inline SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
     integrand_m1_1d.my_quadrature_integrand    = integrand_m1_1d_info;
 
     // compute the neutrino & anti-neutrino distribution function
-    double g_nu[total_num_species];
+    bs_real g_nu[total_num_species];
 
-    for (int idx = 0; idx < total_num_species; idx++)
+    for (int idx = 0; idx < total_num_species; ++idx)
     {
         g_nu[idx] = TotalNuF(nu, &my_grey_opacity_params->distr_pars, idx);
     }
 
-    const double eta_e = my_grey_opacity_params->eos_pars.mu_e /
-                         my_grey_opacity_params->eos_pars.temp;
+    const bs_real eta_e = my_grey_opacity_params->eos_pars.mu_e /
+                          my_grey_opacity_params->eos_pars.temp;
 
-    double s[8];
-    for (int i = 0; i < 8; i++)
+    bs_real s[8];
+    for (int i = 0; i < 8; ++i)
     {
         // s[i] = 1.5 * my_grey_opacity_params->eos_pars.temp;
         // s[i] = 0.5 * 4.364 * my_grey_opacity_params->eos_pars.temp;
@@ -1205,7 +1192,7 @@ inline SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
                                  &my_grey_opacity_params->eos_pars); // [s^-1]
     }
 
-    double iso_scatt = 0.;
+    bs_real iso_scatt = 0.;
     if (my_grey_opacity_params->opacity_flags.use_iso)
     {
         iso_scatt = IsoScattLegCoeff(nu, &my_grey_opacity_params->opacity_pars,
@@ -1215,40 +1202,44 @@ inline SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
     SpectralOpacities sp_opacities;
 
     sp_opacities.j[id_nue] =
-        abs_em_beta.em[id_nue] + four_pi_hc3 * integrals_1d.integrand[0];
+        abs_em_beta.em[id_nue] + kBS_FourPi_hc3 * integrals_1d.integrand[0];
     sp_opacities.j[id_anue] =
-        abs_em_beta.em[id_anue] + four_pi_hc3 * integrals_1d.integrand[1];
+        abs_em_beta.em[id_anue] + kBS_FourPi_hc3 * integrals_1d.integrand[1];
     sp_opacities.j[id_nux] =
-        abs_em_beta.em[id_nux] + four_pi_hc3 * integrals_1d.integrand[2];
+        abs_em_beta.em[id_nux] + kBS_FourPi_hc3 * integrals_1d.integrand[2];
     sp_opacities.j[id_anux] =
-        abs_em_beta.em[id_anux] + four_pi_hc3 * integrals_1d.integrand[3];
+        abs_em_beta.em[id_anux] + kBS_FourPi_hc3 * integrals_1d.integrand[3];
 
     sp_opacities.kappa[id_nue] =
-        (abs_em_beta.abs[id_nue] + four_pi_hc3 * integrals_1d.integrand[4]) /
-        kClight;
-    sp_opacities.kappa[id_anue] =
-        (abs_em_beta.abs[id_anue] + four_pi_hc3 * integrals_1d.integrand[5]) /
-        kClight;
+        (abs_em_beta.abs[id_nue] + kBS_FourPi_hc3 * integrals_1d.integrand[4]) /
+        kBS_Clight;
+    sp_opacities.kappa[id_anue] = (abs_em_beta.abs[id_anue] +
+                                   kBS_FourPi_hc3 * integrals_1d.integrand[5]) /
+                                  kBS_Clight;
     sp_opacities.kappa[id_nux] =
-        (abs_em_beta.abs[id_nux] + four_pi_hc3 * integrals_1d.integrand[6]) /
-        kClight;
-    sp_opacities.kappa[id_anux] =
-        (abs_em_beta.abs[id_anux] + four_pi_hc3 * integrals_1d.integrand[7]) /
-        kClight;
+        (abs_em_beta.abs[id_nux] + kBS_FourPi_hc3 * integrals_1d.integrand[6]) /
+        kBS_Clight;
+    sp_opacities.kappa[id_anux] = (abs_em_beta.abs[id_anux] +
+                                   kBS_FourPi_hc3 * integrals_1d.integrand[7]) /
+                                  kBS_Clight;
 
-    sp_opacities.j_s[id_nue]  = 4. * kPi * nu * nu * g_nu[id_nue] * iso_scatt;
-    sp_opacities.j_s[id_anue] = 4. * kPi * nu * nu * g_nu[id_anue] * iso_scatt;
-    sp_opacities.j_s[id_nux]  = 4. * kPi * nu * nu * g_nu[id_nux] * iso_scatt;
-    sp_opacities.j_s[id_anux] = 4. * kPi * nu * nu * g_nu[id_anux] * iso_scatt;
+    sp_opacities.j_s[id_nue] =
+        4. * kBS_Pi * POW2(nu) * g_nu[id_nue] * iso_scatt;
+    sp_opacities.j_s[id_anue] =
+        4. * kBS_Pi * POW2(nu) * g_nu[id_anue] * iso_scatt;
+    sp_opacities.j_s[id_nux] =
+        4. * kBS_Pi * POW2(nu) * g_nu[id_nux] * iso_scatt;
+    sp_opacities.j_s[id_anux] =
+        4. * kBS_Pi * POW2(nu) * g_nu[id_anux] * iso_scatt;
 
     sp_opacities.kappa_s[id_nue] =
-        4. * kPi * nu * nu * (1. - g_nu[id_nue]) * iso_scatt / kClight;
+        4. * kBS_Pi * POW2(nu) * (1. - g_nu[id_nue]) * iso_scatt / kBS_Clight;
     sp_opacities.kappa_s[id_anue] =
-        4. * kPi * nu * nu * (1. - g_nu[id_anue]) * iso_scatt / kClight;
+        4. * kBS_Pi * POW2(nu) * (1. - g_nu[id_anue]) * iso_scatt / kBS_Clight;
     sp_opacities.kappa_s[id_nux] =
-        4. * kPi * nu * nu * (1. - g_nu[id_nux]) * iso_scatt / kClight;
+        4. * kBS_Pi * POW2(nu) * (1. - g_nu[id_nux]) * iso_scatt / kBS_Clight;
     sp_opacities.kappa_s[id_anux] =
-        4. * kPi * nu * nu * (1. - g_nu[id_anux]) * iso_scatt / kClight;
+        4. * kBS_Pi * POW2(nu) * (1. - g_nu[id_anux]) * iso_scatt / kBS_Clight;
 
     return sp_opacities;
 }
@@ -1257,18 +1248,18 @@ inline SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
 // Version with stimulated absorption
 KOKKOS_INLINE_FUNCTION
 SpectralOpacities
-ComputeSpectralOpacitiesStimulatedAbs(const double nu, MyQuadrature* quad_1d,
+ComputeSpectralOpacitiesStimulatedAbs(const bs_real nu, MyQuadrature* quad_1d,
                                       GreyOpacityParams* my_grey_opacity_params)
 {
     SpectralOpacities spec_opacs = ComputeSpectralOpacitiesNotStimulatedAbs(
         nu, quad_1d, my_grey_opacity_params);
 
-    for (int idx = 0; idx < total_num_species; idx++)
+    for (int idx = 0; idx < total_num_species; ++idx)
     {
         spec_opacs.kappa[idx] =
-            spec_opacs.j[idx] / kClight + spec_opacs.kappa[idx];
+            spec_opacs.j[idx] / kBS_Clight + spec_opacs.kappa[idx];
         spec_opacs.kappa_s[idx] =
-            spec_opacs.j_s[idx] / kClight + spec_opacs.kappa_s[idx];
+            spec_opacs.j_s[idx] / kBS_Clight + spec_opacs.kappa_s[idx];
     }
 
     return spec_opacs;

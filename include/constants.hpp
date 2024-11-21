@@ -1,6 +1,8 @@
 #ifndef BNS_NURATES_SRC_CONSTANTS_H_
 #define BNS_NURATES_SRC_CONSTANTS_H_
 
+#include "bns_nurates.hpp"
+
 //=================================================
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
@@ -8,71 +10,224 @@
 //! \file constants.h
 //  \brief constants used throughout the code
 
-// @TODO: increase precision in definition of constants when possible
+////////////////////////////////////////////////////////////////////////////////
+// All values are consistent with the CODATA Internationally recommended 2022 //
+// values of the Fundamental Physical Constants                               //
+// (https://pml.nist.gov/cuu/Constants/index.html)                            //
+////////////////////////////////////////////////////////////////////////////////
 
-// Units conversion
-static const double kMeV = 1.602176634e-6; // [erg]
-static const double kCm  = 10e13;          // [fm]
+//////////////////////
+// UNIT CONVERSIONS //
+//////////////////////
+
+// MeV to nm^2 g s^-2
+inline constexpr double kBS_MeV_double = 1.6021766341182763e+8;
+inline constexpr bs_real kBS_MeV       = kBS_MeV_double;
+
+
+////////////////////////
+// PHYSICAL CONSTANTS //
+////////////////////////
 
 // Electron mass
-static const double kMe = 0.510998928; // [MeV]
+inline constexpr double kBS_Me = 0.51099895069; // [MeV]
 
 // Muon mass
-static const double kMmu = 105.6583745; // [MeV]
+inline constexpr double kBS_Mmu = 105.6583755; // [MeV]
 
 // Neutron mass
-static const double kMn = 939.5654133; // [MeV]
+inline constexpr double kBS_Mn = 939.56542194; // [MeV]
 
 // Proton mass
-static const double kMp = 938.2720813; // [MeV]
-static const double kQ  = 1.2935;      // [MeV]
+inline constexpr double kBS_Mp = 938.27208943; // [MeV]
+
+// Neutron-proton mass difference
+inline constexpr double kBS_Q = 1.29333251; // [MeV]
 
 // Atomic mass unit
-static const double kMb = 1.674e-24;   // [g]
-static const double kMu = 1.66054e-24; // [g]
+inline constexpr double kBS_Mu = 1.66053906892e-24; // [g]
 
-static const double kPi = 3.14159265358979323846264338328; // pi
+// Average baryon mass
+inline constexpr double kBS_Mb = 1.6737747126723517e-24; // [g]
 
-// Physical constants
-static const double kHbar = 6.582119569e-22; // [MeV s]
-static const double kH    = 4.1356943e-21;   // [MeV s]
-// static const double kH = 2. * kPi * kHbar;         // [MeV s]
-static const double kClight     = 2.997924562e+10; // [cm s^-1]
-static const double kHClight    = kH * kClight;    // [MeV cm]
-static const double kHbarClight = kHbar * kClight; // [MeV cm]
-static const double kGf0        = 1.1663787E-11;   // [MeV^-2]
-// @TODO: decide how to define the Fermi constant
-static const double kGf =
-    kGf0 * kHbarClight * kHbarClight * kHbarClight; // [MeV cm^3]
-// static const double kGf = 8.957e-44;               // [MeV cm^3]
-static const double kKB = 8.617333262e-11; // [MeV K^-1]
+// pi
+inline constexpr double kBS_Pi = 3.14159265358979323846264338328;
 
-// Coupling constants
-static const double kGa          = 1.23;
-static const double kGv          = 1.;
-static const double kGs          = 0.;
-static const double kSinsqthetaw = 0.2325;
+// Planck's constant
+inline constexpr double kBS_H = 4.135667696e-21; // [MeV s]
 
-// Neutral current nucleon form factors (kQ^2=0)
-static const double kHnv = -0.5;
-static const double kHna = -0.5 * kGa;
-static const double kHpv = 0.5 - 2. * kSinsqthetaw;
-static const double kHpa = 0.5 * kGa;
+// Reduced Planck's constant
+inline constexpr double kBS_Hbar = 0.5 * kBS_H / kBS_Pi; // [MeV s]
 
-// Constants for the pair reaction
-static const double kGSqr =
-    1.55 * 1E-33; // kCm^3 kMeV^-2 s^-1, from Bruenn Eqn. (C51)
-static const double kAlpha1E =
-    1. + 2. * kSinsqthetaw; // Table 1, Pons et. al. (1998)
-static const double kAlpha2E =
-    2. * kSinsqthetaw; // Table 1, Pons et. al. (1998)
-static const double kAlpha1X =
-    -1. + 2. * kSinsqthetaw; // Table 1, Pons et. al. (1998)
-static const double kAlpha2X =
-    2. * kSinsqthetaw; // Table 1, Pons et. al. (1998)
-static const double kAlpha1_0 = kAlpha1E;
-static const double kAlpha1_1 = kAlpha1X;
-static const double kAlpha2_0 = kAlpha2E;
-static const double kAlpha2_1 = kAlpha2X;
+// Speed of light
+inline constexpr double kBS_Clight = 2.99792458e+17; // [nm s^-1]
+
+// Boltzmann's constant
+inline constexpr double kBS_KB = 8.617333262e-11; // [MeV K^-1]
+
+// Reduced Fermi constant and Fermi constant
+inline constexpr double kBS_Gf0 = 1.1663787e-11; // [MeV^-2]
+inline constexpr double kBS_Gf =
+    kBS_Gf0 * POW3(kBS_Hbar * kBS_Clight); // [MeV nm^3]
+
+// Nuclear saturation number density
+inline constexpr bs_real kBS_Saturation_n = 0.15e+18; // [nm^-3]
+
+
+////////////////////////////////////////
+// COUPLING CONSTANTS AND FORM FACTORS//
+////////////////////////////////////////
+
+inline constexpr double kBS_Ga      = 1.23;
+inline constexpr double kBS_Gv      = 1.;
+inline constexpr double kBS_Gs      = 0.;
+inline constexpr double kBS_SinThW2 = 0.2325;
+
+// Neutral current nucleon form factors (kBS_Q^2=0)
+inline constexpr double kBS_Hnv = -0.5;
+inline constexpr double kBS_Hna = -0.5 * kBS_Ga;
+inline constexpr double kBS_Hpv = 0.5 - 2. * kBS_SinThW2;
+inline constexpr double kBS_Hpa = 0.5 * kBS_Ga;
+
+
+//////////////////////////////
+// BETA-PROCESSES CONSTANTS //
+//////////////////////////////
+
+// Constant in Eq.(C13,C15,C19,C20) of Bruenn
+inline constexpr bs_real kBS_Beta_Const =
+    (POW3(kBS_Clight) * POW2(kBS_Gf0 * kBS_Hbar)) *
+    (POW2(kBS_Gv) + 3. * POW2(kBS_Ga)) / kBS_Pi;
+
+
+///////////////////////////////////////////
+// NEUTRINO-NUCLEON SCATTERING CONSTANTS //
+///////////////////////////////////////////
+
+// Constant in Fermi energy calculation
+// The constant 4.78... is 0.5 * (3 * pi^2)^(2./3.)
+inline constexpr bs_real kBS_Iso_eF =
+    4.785390000313652 * POW2(kBS_Hbar) / kBS_Mb * kBS_MeV_double;
+
+inline constexpr double kBS_Iso_Const =
+    2. * kBS_Pi * POW2(kBS_Gf) / kBS_Hbar / POW3(kBS_H * kBS_Clight);
+
+inline constexpr double kBS_Iso_h0_p = POW2(kBS_Hpv) + 3. * POW2(kBS_Hpa);
+inline constexpr double kBS_Iso_h1_p = POW2(kBS_Hpv) - POW2(kBS_Hpa);
+inline constexpr double kBS_Iso_h0_n = POW2(kBS_Hnv) + 3. * POW2(kBS_Hna);
+inline constexpr double kBS_Iso_h1_n = POW2(kBS_Hnv) - POW2(kBS_Hna);
+
+// 0th Legendre coefficient (protons)
+inline constexpr bs_real kBS_Iso_c0_p = kBS_Iso_Const * kBS_Iso_h0_p;
+// 1st Legendre coefficient (protons)
+inline constexpr bs_real kBS_Iso_c1_p = kBS_Iso_Const * kBS_Iso_h1_p;
+// 0th Legendre coefficient (neutrons)
+inline constexpr bs_real kBS_Iso_c0_n = kBS_Iso_Const * kBS_Iso_h0_n;
+// 1st Legendre coefficient (neutrons)
+inline constexpr bs_real kBS_Iso_c1_n = kBS_Iso_Const * kBS_Iso_h1_n;
+
+
+//////////////////////////////////////////////
+// NUCLEON-NUCLEON BREMSSTRAHLUNG CONSTANTS //
+//////////////////////////////////////////////
+
+inline constexpr bs_real kBS_Brem_Xmin   = 1.0e-10;
+inline constexpr bs_real kBS_Brem_Ymin   = 1.0e-10;
+inline constexpr bs_real kBS_Brem_Etamin = 1.0e-10;
+
+inline constexpr bs_real kBS_Brem_Aux1 =
+    0.25 * POW2(kBS_H) * kBS_MeV_double / POW2(kBS_Pi);
+
+// -1.26 / 2
+inline constexpr bs_real kBS_Brem_Ca = -0.63;
+
+inline constexpr bs_real kBS_Brem_Const =
+    POW2(kBS_Brem_Ca) * POW2(kBS_Gf) / kBS_Hbar;
+
+// (3*5*7*11)/2^{11} / 4 (C in BRT06 Eq.143 divided by four)
+inline constexpr bs_real kBS_Brem_C4BRT06 = 0.1409912109375;
+
+
+////////////////////////////
+// PAIR PROCESS CONSTANTS //
+////////////////////////////
+
+// Constant in Bruenn Eq. (C51)
+inline constexpr bs_real kGSqr = 1.55e-12; // [nm^3 MeV^-2 s^-1]
+
+inline constexpr bs_real kBS_Pair_Phi = kGSqr / kBS_Pi;
+
+// Table 1, Pons et. al. (1998)
+inline constexpr bs_real kBS_Pair_Alpha1E = 1. + 2. * kBS_SinThW2;
+// Table 1, Pons et. al. (1998)
+inline constexpr bs_real kBS_Pair_Alpha2E = 2. * kBS_SinThW2;
+// Table 1, Pons et. al. (1998)
+inline constexpr bs_real kBS_Pair_Alpha1X = -1. + 2. * kBS_SinThW2;
+// Table 1, Pons et. al. (1998)
+inline constexpr bs_real kBS_Pair_Alpha2X = 2. * kBS_SinThW2;
+
+inline constexpr bs_real kBS_Pair_Alpha1_0 = kBS_Pair_Alpha1E;
+inline constexpr bs_real kBS_Pair_Alpha1_1 = kBS_Pair_Alpha1X;
+inline constexpr bs_real kBS_Pair_Alpha2_0 = kBS_Pair_Alpha2E;
+inline constexpr bs_real kBS_Pair_Alpha2_1 = kBS_Pair_Alpha2X;
+
+
+/////////////////////////////////////////////////////
+// NEUTRINO-ELECTRON/POSITRON SCATTERING CONSTANTS //
+/////////////////////////////////////////////////////
+
+inline constexpr bs_real kBS_NEPS_Const = 2. * POW2(kBS_Gf0) * kBS_Clight *
+                                          POW2(kBS_Hbar * kBS_Clight) /
+                                          (3. * kBS_Pi);
+
+inline constexpr bs_real kBS_NEPS_BPlus  = POW2(2. * kBS_SinThW2 + 1.);
+inline constexpr bs_real kBS_NEPS_BMinus = POW2(2. * kBS_SinThW2 - 1.);
+inline constexpr bs_real kBS_NEPS_BZero  = 4. * POW2(kBS_SinThW2);
+
+
+/////////////////////////////
+// MISCELLANEOUS CONSTANTS //
+/////////////////////////////
+
+// Cut-off values for safe exponential evaluation
+inline constexpr bs_real kBS_ExpUppLim =
+    log(std::numeric_limits<bs_real>::max()) * 0.999;
+inline constexpr bs_real kBS_ExpLowLim = -kBS_ExpUppLim;
+
+inline constexpr bs_real kBS_HClight6FourPiSquared =
+    POW6(kBS_H * kBS_Clight) / (16. * POW2(kBS_Pi));
+
+// Energy scale for weak magnetism
+inline constexpr bs_real kBS_WM_e_scale =
+    kBS_MeV_double / (kBS_Mb * POW2(kBS_Clight));
+
+static const bs_real kBS_FourPi_hc3 =
+    (4. * kBS_Pi) / POW3(kBS_H * kBS_Clight); // [MeV^-3 nm^-3]
+static const bs_real kBS_FourPi_hc3_sqr =
+    POW2(kBS_FourPi_hc3); // [MeV^-6 nm^-6]
+
+// Neutron mass in grams
+inline constexpr bs_real kBS_MnGrams =
+    kBS_Mn * kBS_MeV_double / POW2(kBS_Clight);
+
+// Proton mass in grams
+inline constexpr bs_real kBS_MpGrams =
+    kBS_Mp * kBS_MeV_double / POW2(kBS_Clight);
+
+// Geometric mean of nucleon masses in grams
+inline constexpr bs_real kBS_MAvgGrams =
+    kBS_MeV_double / POW2(kBS_Clight) * sqrt(kBS_Mn * kBS_Mp);
+
+// sqrt(pi)
+inline constexpr bs_real kBS_SqrtPi = sqrt(kBS_Pi);
+// kBS_Pi * pi
+inline constexpr bs_real kBS_PiSquared = POW2(kBS_Pi);
+// 4 * piSquared
+inline constexpr bs_real kBS_FourPiSquared = 4. * POW2(kBS_Pi);
+// pi^(1/8)
+inline constexpr bs_real kBS_Pi2OneEighth = pow(kBS_Pi, 1. / 8.);
+// (pi / 2)^2.5
+inline constexpr bs_real kBS_PiHalfToFiveHalves = pow(0.5 * kBS_Pi, 2.5);
+
 
 #endif // BNS_NURATES_SRC_CONSTANTS_H_

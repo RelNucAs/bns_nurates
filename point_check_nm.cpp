@@ -78,6 +78,11 @@ int main(int argc, char* argv[])
     for (int CO = 0; CO < 6; ++CO)
     {
 
+#define STRh(X) #X
+#define STR(X) STRh(X)
+        char buf1[100];
+        char buf2[100];
+
         switch (CO)
         {
         case 0:
@@ -85,50 +90,54 @@ int main(int argc, char* argv[])
             my_grey_opacity_params.opacity_pars.use_WM_ab = 0;
             my_grey_opacity_params.opacity_pars.use_WM_sc = 0;
             my_grey_opacity_params.opacity_pars.use_dU    = 0;
-            outfile1 = fopen("cm_eq_none.dat", "w");
-            outfile2 = fopen("cm_m1_none.dat", "w");
+            sprintf(buf1, "nm_eq_none_%s.dat", STR(REAL_TYPE));
+            sprintf(buf1, "nm_eq_none_%s.dat", STR(REAL_TYPE));
+            sprintf(buf2, "nm_m1_none_%s.dat", STR(REAL_TYPE));
             break;
         case 1:
             my_grey_opacity_params.opacity_pars.use_decay = 1;
             my_grey_opacity_params.opacity_pars.use_WM_ab = 0;
             my_grey_opacity_params.opacity_pars.use_WM_sc = 0;
             my_grey_opacity_params.opacity_pars.use_dU    = 0;
-            outfile1 = fopen("cm_eq_decay.dat", "w");
-            outfile2 = fopen("cm_m1_decay.dat", "w");
+            sprintf(buf1, "nm_eq_decay_%s.dat", STR(REAL_TYPE));
+            sprintf(buf2, "nm_m1_decay_%s.dat", STR(REAL_TYPE));
             break;
         case 2:
             my_grey_opacity_params.opacity_pars.use_decay = 0;
             my_grey_opacity_params.opacity_pars.use_WM_ab = 1;
             my_grey_opacity_params.opacity_pars.use_WM_sc = 0;
             my_grey_opacity_params.opacity_pars.use_dU    = 0;
-            outfile1 = fopen("cm_eq_WMab.dat", "w");
-            outfile2 = fopen("cm_m1_WMab.dat", "w");
+            sprintf(buf1, "nm_eq_WMab_%s.dat", STR(REAL_TYPE));
+            sprintf(buf2, "nm_m1_WMab_%s.dat", STR(REAL_TYPE));
             break;
         case 3:
             my_grey_opacity_params.opacity_pars.use_decay = 0;
             my_grey_opacity_params.opacity_pars.use_WM_ab = 0;
             my_grey_opacity_params.opacity_pars.use_WM_sc = 1;
             my_grey_opacity_params.opacity_pars.use_dU    = 0;
-            outfile1 = fopen("cm_eq_WMsc.dat", "w");
-            outfile2 = fopen("cm_m1_WMsc.dat", "w");
+            sprintf(buf1, "nm_eq_WMsc_%s.dat", STR(REAL_TYPE));
+            sprintf(buf2, "nm_m1_WMsc_%s.dat", STR(REAL_TYPE));
             break;
         case 4:
             my_grey_opacity_params.opacity_pars.use_decay = 0;
             my_grey_opacity_params.opacity_pars.use_WM_ab = 0;
             my_grey_opacity_params.opacity_pars.use_WM_sc = 0;
             my_grey_opacity_params.opacity_pars.use_dU    = 1;
-            outfile1 = fopen("cm_eq_dU.dat", "w");
-            outfile2 = fopen("cm_m1_dU.dat", "w");
+            sprintf(buf1, "nm_eq_dU_%s.dat", STR(REAL_TYPE));
+            sprintf(buf2, "nm_m1_dU_%s.dat", STR(REAL_TYPE));
             break;
         case 5:
             my_grey_opacity_params.opacity_pars.use_decay = 1;
             my_grey_opacity_params.opacity_pars.use_WM_ab = 1;
             my_grey_opacity_params.opacity_pars.use_WM_sc = 1;
             my_grey_opacity_params.opacity_pars.use_dU    = 1;
-            outfile1 = fopen("cm_eq_all.dat", "w");
-            outfile2 = fopen("cm_m1_all.dat", "w");
+            sprintf(buf1, "nm_eq_all_%s.dat", STR(REAL_TYPE));
+            sprintf(buf2, "nm_m1_all_%s.dat", STR(REAL_TYPE));
             break;
         }
+
+        outfile1 = fopen(buf1, "w");
+        outfile2 = fopen(buf2, "w");
 
         for (r = 0; r < 6; ++r)
         {
@@ -167,7 +176,7 @@ int main(int argc, char* argv[])
 
             for (i = 0; i < 6; ++i)
             {
-                nb = rho[i] / 1.66053906892e-24;
+                nb = rho[i] / 1.66053906892e-24 * 1e-21;
 
                 // populate EOS quantities
                 my_grey_opacity_params.eos_pars.mu_e = mue[i];
@@ -204,14 +213,14 @@ int main(int argc, char* argv[])
                         "%.17e %.17e %.17e %.17e %.17e "
                         "%.17e %.17e %.17e %.17e %.17e "
                         "%.17e %.17e %.17e %.17e %.17e\n",
-                        opacities.eta_0[0], opacities.eta[0],
-                        opacities.kappa_0_a[0], opacities.kappa_a[0],
-                        opacities.kappa_s[0], opacities.eta_0[1],
-                        opacities.eta[1], opacities.kappa_0_a[1],
-                        opacities.kappa_a[1], opacities.kappa_s[1],
-                        opacities.eta_0[2], opacities.eta[2],
-                        opacities.kappa_0_a[2], opacities.kappa_a[2],
-                        opacities.kappa_s[2]);
+                        opacities.eta_0[0] * 1e21, opacities.eta[0] * 1e21,
+                        opacities.kappa_0_a[0] * 1e7, opacities.kappa_a[0] * 1e7,
+                        opacities.kappa_s[0] * 1e7, opacities.eta_0[1] * 1e21,
+                        opacities.eta[1] * 1e21, opacities.kappa_0_a[1] * 1e7,
+                        opacities.kappa_a[1] * 1e7, opacities.kappa_s[1] * 1e7,
+                        opacities.eta_0[2] * 1e21, opacities.eta[2] * 1e21,
+                        opacities.kappa_0_a[2] * 1e7, opacities.kappa_a[2] * 1e7,
+                        opacities.kappa_s[2] * 1e7);
 
                 n_nue  = ynue[i] * nb;
                 n_anue = yanue[i] * nb;
@@ -243,14 +252,14 @@ int main(int argc, char* argv[])
                         "%.17e %.17e %.17e %.17e %.17e "
                         "%.17e %.17e %.17e %.17e %.17e "
                         "%.17e %.17e %.17e %.17e %.17e\n",
-                        opacities.eta_0[0], opacities.eta[0],
-                        opacities.kappa_0_a[0], opacities.kappa_a[0],
-                        opacities.kappa_s[0], opacities.eta_0[1],
-                        opacities.eta[1], opacities.kappa_0_a[1],
-                        opacities.kappa_a[1], opacities.kappa_s[1],
-                        opacities.eta_0[2], opacities.eta[2],
-                        opacities.kappa_0_a[2], opacities.kappa_a[2],
-                        opacities.kappa_s[2]);
+                        opacities.eta_0[0] * 1e21, opacities.eta[0] * 1e21,
+                        opacities.kappa_0_a[0] * 1e7, opacities.kappa_a[0] * 1e7,
+                        opacities.kappa_s[0] * 1e7, opacities.eta_0[1] * 1e21,
+                        opacities.eta[1] * 1e21, opacities.kappa_0_a[1] * 1e7,
+                        opacities.kappa_a[1] * 1e7, opacities.kappa_s[1] * 1e7,
+                        opacities.eta_0[2] * 1e21, opacities.eta[2] * 1e21,
+                        opacities.kappa_0_a[2] * 1e7, opacities.kappa_a[2] * 1e7,
+                        opacities.kappa_s[2] * 1e7);
             }
         }
 

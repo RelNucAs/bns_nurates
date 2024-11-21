@@ -10,45 +10,24 @@
 // scattering using Eq. (43) from Mezzacappa & Bruenn, ApJ v.410, p.740 (1993)
 // https://ui.adsabs.harvard.edu/abs/1993ApJ...410..740M/abstract
 
-#include "math.h"
-
 #include "bns_nurates.hpp"
 #include "functions.hpp"
 #include "constants.hpp"
 
 // Numerical constants
 //---------------------------------------------------------------------------------------------------------------------
-static const double kTaylorSeriesEpsilon = 1e-3;
+static const bs_real kTaylorSeriesEpsilon = 1e-3;
 
 
 // Physical constats
 //---------------------------------------------------------------------------------------------------------------------
-static const double kSinWeinbergThetaSquared = 0.2229;
-static const double kNes =
-    2. * kGf0 * kGf0 * kClight * kHbarClight * kHbarClight / (3. * kPi);
-static const double kBPlus =
-    (2. * kSinWeinbergThetaSquared + 1.) * (2. * kSinWeinbergThetaSquared + 1.);
-static const double kBMinus =
-    (2. * kSinWeinbergThetaSquared - 1.) * (2. * kSinWeinbergThetaSquared - 1.);
-static const double kBZero =
-    4. * kSinWeinbergThetaSquared * kSinWeinbergThetaSquared;
-
-// Calculates in a safe way the exponential
-KOKKOS_INLINE_FUNCTION
-double KernelExpFunc(double x)
-{
-    const double exp_  = SafeExp(-fabs(x));
-    const int is_x_neg = signbit(x);
-
-    return (is_x_neg - ! is_x_neg * exp_) / (1. - exp_ + (x == 0.));
-}
 
 // Saves the expression that are needed for the unapproximated integral
 KOKKOS_INLINE_FUNCTION
-void ComputeFDIForInelastic(double w, double wp, double eta, double* fdi_diff_w,
-                            double* fdi_diff_abs)
+void ComputeFDIForInelastic(bs_real w, bs_real wp, bs_real eta,
+                            bs_real* fdi_diff_w, bs_real* fdi_diff_abs)
 {
-    double abs_val = fabs(w - wp);
+    bs_real abs_val = fabs(w - wp);
 
     fdi_diff_w[0] = FDI_p1(eta - wp) - FDI_p1(eta - w);
     fdi_diff_w[1] = FDI_p2(eta - wp) - FDI_p2(eta - w);
@@ -66,9 +45,9 @@ void ComputeFDIForInelastic(double w, double wp, double eta, double* fdi_diff_w,
 
 // Not approximated out kernel integral
 KOKKOS_INLINE_FUNCTION
-double MezzacappaIntOut(double w, double wp, double x, double y, int sign,
-                        double b1, double b2, double* fdi_diff_w,
-                        double* fdi_diff_abs)
+bs_real MezzacappaIntOut(bs_real w, bs_real wp, bs_real x, bs_real y, int sign,
+                         bs_real b1, bs_real b2, bs_real* fdi_diff_w,
+                         bs_real* fdi_diff_abs)
 {
     return (((b1 + b2) * (sign * fdi_diff_abs[2] - fdi_diff_w[4]) *
                  0.2 // All G5 terms
@@ -93,8 +72,8 @@ double MezzacappaIntOut(double w, double wp, double x, double y, int sign,
 // Taylor expansion in the lowest energy of the function MezzacappaIntOut and
 // MezzacappaIntIn
 KOKKOS_INLINE_FUNCTION
-double MezzacappaIntOneEnergy(double x, double y, int sign, double b1,
-                              double b2, const double* fdis)
+bs_real MezzacappaIntOneEnergy(bs_real x, bs_real y, int sign, bs_real b1,
+                               bs_real b2, const bs_real* fdis)
 {
     return -sign * y *
            (2. * (b1 + b2) * fdis[0]
@@ -115,8 +94,8 @@ double MezzacappaIntOneEnergy(double x, double y, int sign, double b1,
 // Taylor expansion in both energies of the function MezzacappaIntOut and
 // MezzacappaIntIn
 KOKKOS_INLINE_FUNCTION
-double MezzacappaIntTwoEnergies(double w, double wp, double x, double y,
-                                double b1, double b2, const double* fdis)
+bs_real MezzacappaIntTwoEnergies(bs_real w, bs_real wp, bs_real x, bs_real y,
+                                 bs_real b1, bs_real b2, const bs_real* fdis)
 {
     return y * (w - wp) *
            ((b1 + b2) *
@@ -137,76 +116,85 @@ KOKKOS_INLINE_FUNCTION
 MyKernelOutput NESKernels(InelasticScattKernelParams* kernel_params,
                           MyEOSParams* eos_params)
 {
-    const double t = eos_params->temp, w = kernel_params->omega / t,
-                 wp = kernel_params->omega_prime / t, x = fmax(w, wp),
-                 y = fmin(w, wp), eta_e = eos_params->mu_e / t,
-                 exp_factor           = KernelExpFunc(wp - w),
-                 exp_factor_exchanged = KernelExpFunc(w - wp);
+    const bs_real T                    = eos_params->temp;
+    const bs_real w                    = kernel_params->omega / T;
+    const bs_real wp                   = kernel_params->omega_prime / T;
+    const bs_real x                    = fmax(w, wp);
+    const bs_real y                    = fmin(w, wp);
+    const bs_real eta_e                = eos_params->mu_e / T;
+    const bs_real exp_factor           = NEPSExpFunc(wp - w);
+    const bs_real exp_factor_exchanged = NEPSExpFunc(w - wp);
 
     MyKernelOutput output;
 
     if (y > eta_e * kTaylorSeriesEpsilon)
     {
-        double fdi_diff_abs[3], fdi_diff_w[5];
+        bs_real fdi_diff_abs[3], fdi_diff_w[5];
 
         const int sign = 2 * signbit(wp - w) - 1;
 
         ComputeFDIForInelastic(w, wp, eta_e, fdi_diff_w, fdi_diff_abs);
 
-        output.abs[id_nue] = kNes * t * t *
-                             MezzacappaIntOut(w, wp, x, y, sign, kBPlus, kBZero,
-                                              fdi_diff_w, fdi_diff_abs);
+        output.abs[id_nue] =
+            kBS_NEPS_Const * POW2(T) *
+            MezzacappaIntOut(w, wp, x, y, sign, kBS_NEPS_BPlus, kBS_NEPS_BZero,
+                             fdi_diff_w, fdi_diff_abs);
         output.abs[id_anue] =
-            kNes * t * t *
-            MezzacappaIntOut(w, wp, x, y, sign, kBZero, kBPlus, fdi_diff_w,
-                             fdi_diff_abs);
-        output.abs[id_nux] = kNes * t * t *
-                             MezzacappaIntOut(w, wp, x, y, sign, kBMinus,
-                                              kBZero, fdi_diff_w, fdi_diff_abs);
+            kBS_NEPS_Const * POW2(T) *
+            MezzacappaIntOut(w, wp, x, y, sign, kBS_NEPS_BZero, kBS_NEPS_BPlus,
+                             fdi_diff_w, fdi_diff_abs);
+        output.abs[id_nux] =
+            kBS_NEPS_Const * POW2(T) *
+            MezzacappaIntOut(w, wp, x, y, sign, kBS_NEPS_BMinus, kBS_NEPS_BZero,
+                             fdi_diff_w, fdi_diff_abs);
         output.abs[id_anux] =
-            kNes * t * t *
-            MezzacappaIntOut(w, wp, x, y, sign, kBZero, kBMinus, fdi_diff_w,
-                             fdi_diff_abs);
+            kBS_NEPS_Const * POW2(T) *
+            MezzacappaIntOut(w, wp, x, y, sign, kBS_NEPS_BZero, kBS_NEPS_BMinus,
+                             fdi_diff_w, fdi_diff_abs);
     }
     else if (x > eta_e * kTaylorSeriesEpsilon)
     {
         const int sign = 2 * signbit(wp - w) - 1;
 
-        const double fdis[5] = {
+        const bs_real fdis[5] = {
             FDI_p2(eta_e - x) - FDI_p2(eta_e), FDI_p1(eta_e - x), FDI_p1(eta_e),
-            FDI_0(eta_e - x) + y * FermiDistr(0., 1., eta_e - x) / 6.,
-            FDI_0(eta_e) - y * FermiDistr(0., 1., eta_e) / 6.};
+            FDI_0(eta_e - x) + y * FermiDistr(0., 1., eta_e - x) / 6,
+            FDI_0(eta_e) - y * FermiDistr(0., 1., eta_e) / 6};
 
-        output.abs[id_nue] =
-            kNes * t * t *
-            MezzacappaIntOneEnergy(x, y, sign, kBPlus, kBZero, fdis);
-        output.abs[id_anue] =
-            kNes * t * t *
-            MezzacappaIntOneEnergy(x, y, sign, kBZero, kBPlus, fdis);
-        output.abs[id_nux] =
-            kNes * t * t *
-            MezzacappaIntOneEnergy(x, y, sign, kBMinus, kBZero, fdis);
-        output.abs[id_anux] =
-            kNes * t * t *
-            MezzacappaIntOneEnergy(x, y, sign, kBZero, kBMinus, fdis);
+        output.abs[id_nue] = kBS_NEPS_Const * POW2(T) *
+                             MezzacappaIntOneEnergy(x, y, sign, kBS_NEPS_BPlus,
+                                                    kBS_NEPS_BZero, fdis);
+        output.abs[id_anue] = kBS_NEPS_Const * POW2(T) *
+                              MezzacappaIntOneEnergy(x, y, sign, kBS_NEPS_BZero,
+                                                     kBS_NEPS_BPlus, fdis);
+        output.abs[id_nux] = kBS_NEPS_Const * POW2(T) *
+                             MezzacappaIntOneEnergy(x, y, sign, kBS_NEPS_BMinus,
+                                                    kBS_NEPS_BZero, fdis);
+        output.abs[id_anux] = kBS_NEPS_Const * POW2(T) *
+                              MezzacappaIntOneEnergy(x, y, sign, kBS_NEPS_BZero,
+                                                     kBS_NEPS_BMinus, fdis);
     }
     else
     {
-        const double fdis[3] = {FermiDistr(0., 1., eta_e), FDI_0(eta_e),
-                                FDI_p1(eta_e)};
+        const bs_real fdis[3] = {FermiDistr(0., 1., eta_e), FDI_0(eta_e),
+                                 FDI_p1(eta_e)};
 
         output.abs[id_nue] =
-            kNes * t * t *
-            MezzacappaIntTwoEnergies(w, wp, x, y, kBPlus, kBZero, fdis);
+            kBS_NEPS_Const * POW2(T) *
+            MezzacappaIntTwoEnergies(w, wp, x, y, kBS_NEPS_BPlus,
+                                     kBS_NEPS_BZero, fdis);
         output.abs[id_anue] =
-            kNes * t * t *
-            MezzacappaIntTwoEnergies(w, wp, x, y, kBZero, kBPlus, fdis);
+            kBS_NEPS_Const * POW2(T) *
+            MezzacappaIntTwoEnergies(w, wp, x, y, kBS_NEPS_BZero,
+                                     kBS_NEPS_BPlus, fdis);
         output.abs[id_nux] =
-            kNes * t * t *
-            MezzacappaIntTwoEnergies(w, wp, x, y, kBMinus, kBZero, fdis);
+            kBS_NEPS_Const * POW2(T) *
+            MezzacappaIntTwoEnergies(w, wp, x, y, kBS_NEPS_BMinus,
+                                     kBS_NEPS_BZero, fdis);
         output.abs[id_anux] =
-            kNes * t * t *
-            MezzacappaIntTwoEnergies(w, wp, x, y, kBZero, kBMinus, fdis);
+            kBS_NEPS_Const * POW2(T) *
+            MezzacappaIntTwoEnergies(w, wp, x, y, kBS_NEPS_BZero,
+                                     kBS_NEPS_BMinus, fdis);
     }
 
     for (int idx = 0; idx < total_num_species; ++idx)
@@ -225,77 +213,86 @@ KOKKOS_INLINE_FUNCTION
 MyKernelOutput NPSKernels(InelasticScattKernelParams* kernel_params,
                           MyEOSParams* eos_params)
 {
-    const double t = eos_params->temp, w = kernel_params->omega / t,
-                 wp = kernel_params->omega_prime / t, x = fmax(w, wp),
-                 y = fmin(w, wp), eta_p = -eos_params->mu_e / t,
-                 exp_factor           = KernelExpFunc(wp - w),
-                 exp_factor_exchanged = KernelExpFunc(w - wp);
+    const bs_real T                    = eos_params->temp;
+    const bs_real w                    = kernel_params->omega / T;
+    const bs_real wp                   = kernel_params->omega_prime / T;
+    const bs_real x                    = fmax(w, wp);
+    const bs_real y                    = fmin(w, wp);
+    const bs_real eta_p                = -eos_params->mu_e / T;
+    const bs_real exp_factor           = NEPSExpFunc(wp - w);
+    const bs_real exp_factor_exchanged = NEPSExpFunc(w - wp);
 
     MyKernelOutput output;
 
     if (y > eta_p * kTaylorSeriesEpsilon)
     {
-        double fdi_diff_abs[3], fdi_diff_w[5];
+        bs_real fdi_diff_abs[3], fdi_diff_w[5];
 
         const int sign = 2 * signbit(wp - w) - 1;
 
         ComputeFDIForInelastic(w, wp, eta_p, fdi_diff_w, fdi_diff_abs);
 
-        output.abs[id_nue] = kNes * t * t *
-                             MezzacappaIntOut(w, wp, x, y, sign, kBZero, kBPlus,
-                                              fdi_diff_w, fdi_diff_abs);
+        output.abs[id_nue] =
+            kBS_NEPS_Const * POW2(T) *
+            MezzacappaIntOut(w, wp, x, y, sign, kBS_NEPS_BZero, kBS_NEPS_BPlus,
+                             fdi_diff_w, fdi_diff_abs);
         output.abs[id_anue] =
-            kNes * t * t *
-            MezzacappaIntOut(w, wp, x, y, sign, kBPlus, kBZero, fdi_diff_w,
-                             fdi_diff_abs);
+            kBS_NEPS_Const * POW2(T) *
+            MezzacappaIntOut(w, wp, x, y, sign, kBS_NEPS_BPlus, kBS_NEPS_BZero,
+                             fdi_diff_w, fdi_diff_abs);
         output.abs[id_nux] =
-            kNes * t * t *
-            MezzacappaIntOut(w, wp, x, y, sign, kBZero, kBMinus, fdi_diff_w,
-                             fdi_diff_abs);
+            kBS_NEPS_Const * POW2(T) *
+            MezzacappaIntOut(w, wp, x, y, sign, kBS_NEPS_BZero, kBS_NEPS_BMinus,
+                             fdi_diff_w, fdi_diff_abs);
         output.abs[id_anux] =
-            kNes * t * t *
-            MezzacappaIntOut(w, wp, x, y, sign, kBMinus, kBZero, fdi_diff_w,
-                             fdi_diff_abs);
+            kBS_NEPS_Const * POW2(T) *
+            MezzacappaIntOut(w, wp, x, y, sign, kBS_NEPS_BMinus, kBS_NEPS_BZero,
+                             fdi_diff_w, fdi_diff_abs);
     }
     else if (x > eta_p * kTaylorSeriesEpsilon)
     {
         const int sign = 2 * signbit(wp - w) - 1;
 
-        const double fdis[5] = {
+        const bs_real fdis[5] = {
             FDI_p2(eta_p - x) - FDI_p2(eta_p), FDI_p1(eta_p - x), FDI_p1(eta_p),
-            FDI_0(eta_p - x) + y * FermiDistr(0., 1., eta_p - x) / 6.,
-            FDI_0(eta_p) - y * FermiDistr(0., 1., eta_p) / 6.};
+            FDI_0(eta_p - x) + y * FermiDistr(0., 1., eta_p - x) / 6,
+            FDI_0(eta_p) - y * FermiDistr(0., 1., eta_p) / 6};
 
-        output.abs[id_nue] =
-            kNes * t * t *
-            MezzacappaIntOneEnergy(x, y, sign, kBZero, kBPlus, fdis);
-        output.abs[id_anue] =
-            kNes * t * t *
-            MezzacappaIntOneEnergy(x, y, sign, kBPlus, kBZero, fdis);
-        output.abs[id_nux] =
-            kNes * t * t *
-            MezzacappaIntOneEnergy(x, y, sign, kBZero, kBMinus, fdis);
+        output.abs[id_nue] = kBS_NEPS_Const * POW2(T) *
+                             MezzacappaIntOneEnergy(x, y, sign, kBS_NEPS_BZero,
+                                                    kBS_NEPS_BPlus, fdis);
+        output.abs[id_anue] = kBS_NEPS_Const * POW2(T) *
+                              MezzacappaIntOneEnergy(x, y, sign, kBS_NEPS_BPlus,
+                                                     kBS_NEPS_BZero, fdis);
+        output.abs[id_nux] = kBS_NEPS_Const * POW2(T) *
+                             MezzacappaIntOneEnergy(x, y, sign, kBS_NEPS_BZero,
+                                                    kBS_NEPS_BMinus, fdis);
         output.abs[id_anux] =
-            kNes * t * t *
-            MezzacappaIntOneEnergy(x, y, sign, kBMinus, kBZero, fdis);
+            kBS_NEPS_Const * POW2(T) *
+            MezzacappaIntOneEnergy(x, y, sign, kBS_NEPS_BMinus, kBS_NEPS_BZero,
+                                   fdis);
     }
     else
     {
-        const double fdis[3] = {FermiDistr(0., 1., eta_p), FDI_0(eta_p),
-                                FDI_p1(eta_p)};
+        const bs_real fdis[3] = {FermiDistr(0., 1., eta_p), FDI_0(eta_p),
+                                 FDI_p1(eta_p)};
 
         output.abs[id_nue] =
-            kNes * t * t *
-            MezzacappaIntTwoEnergies(w, wp, x, y, kBZero, kBPlus, fdis);
+            kBS_NEPS_Const * POW2(T) *
+            MezzacappaIntTwoEnergies(w, wp, x, y, kBS_NEPS_BZero,
+                                     kBS_NEPS_BPlus, fdis);
         output.abs[id_anue] =
-            kNes * t * t *
-            MezzacappaIntTwoEnergies(w, wp, x, y, kBPlus, kBZero, fdis);
+            kBS_NEPS_Const * POW2(T) *
+            MezzacappaIntTwoEnergies(w, wp, x, y, kBS_NEPS_BPlus,
+                                     kBS_NEPS_BZero, fdis);
         output.abs[id_nux] =
-            kNes * t * t *
-            MezzacappaIntTwoEnergies(w, wp, x, y, kBZero, kBMinus, fdis);
+            kBS_NEPS_Const * POW2(T) *
+            MezzacappaIntTwoEnergies(w, wp, x, y, kBS_NEPS_BZero,
+                                     kBS_NEPS_BMinus, fdis);
         output.abs[id_anux] =
-            kNes * t * t *
-            MezzacappaIntTwoEnergies(w, wp, x, y, kBMinus, kBZero, fdis);
+            kBS_NEPS_Const * POW2(T) *
+            MezzacappaIntTwoEnergies(w, wp, x, y, kBS_NEPS_BMinus,
+                                     kBS_NEPS_BZero, fdis);
     }
 
     for (int idx = 0; idx < total_num_species; ++idx)
@@ -318,7 +315,7 @@ MyKernelOutput InelasticScattKernels(InelasticScattKernelParams* kernel_params,
 
     MyKernelOutput tot_kernel = {0};
 
-    for (int idx = 0; idx < total_num_species; idx++)
+    for (int idx = 0; idx < total_num_species; ++idx)
     {
         tot_kernel.em[idx]  = nes_kernel.em[idx] + nps_kernel.em[idx];
         tot_kernel.abs[idx] = nes_kernel.abs[idx] + nps_kernel.abs[idx];
@@ -328,17 +325,17 @@ MyKernelOutput InelasticScattKernels(InelasticScattKernelParams* kernel_params,
 }
 
 KOKKOS_INLINE_FUNCTION
-void InelasticKernelsTable(const int n, double* nu_array,
+void InelasticKernelsTable(const int n, bs_real* nu_array,
                            GreyOpacityParams* grey_pars, M1MatrixKokkos2D* out)
 {
     MyKernelOutput inel_1, inel_2;
 
     InelasticScattKernelParams inelastic_pars =
         grey_pars->kernel_pars.inelastic_kernel_params;
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n; ++i)
     {
 
-        for (int j = i; j < n; j++)
+        for (int j = i; j < n; ++j)
         {
 
             // compute the pair kernels
@@ -353,7 +350,7 @@ void InelasticKernelsTable(const int n, double* nu_array,
                 InelasticScattKernels(&inelastic_pars, &grey_pars->eos_pars);
 
 
-            for (int idx = 0; idx < total_num_species; idx++)
+            for (int idx = 0; idx < total_num_species; ++idx)
             {
                 out->m1_mat_em[idx][i][j] = inel_1.em[idx];
                 out->m1_mat_em[idx][j][i] = inel_2.em[idx];
