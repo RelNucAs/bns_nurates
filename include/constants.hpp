@@ -190,8 +190,9 @@ inline constexpr bs_real kBS_NEPS_BZero  = 4. * POW2(kBS_SinThW2);
 /////////////////////////////
 
 // Cut-off values for safe exponential evaluation
-inline constexpr bs_real kBS_ExpUppLim =
-    log(std::numeric_limits<bs_real>::max()) * 0.999;
+inline constexpr bs_real kBS_ExpUppLim = std::is_same_v<bs_real, float> ? 80 :
+                                         std::is_same_v<bs_real, double> ? 700 :
+                                         80;
 inline constexpr bs_real kBS_ExpLowLim = -kBS_ExpUppLim;
 
 inline constexpr bs_real kBS_HClight6FourPiSquared =
@@ -216,18 +217,18 @@ inline constexpr bs_real kBS_MpGrams =
 
 // Geometric mean of nucleon masses in grams
 inline constexpr bs_real kBS_MAvgGrams =
-    kBS_MeV_double / POW2(kBS_Clight) * sqrt(kBS_Mn * kBS_Mp);
+    kBS_MeV_double / POW2(kBS_Clight) * 938.91853299;
 
 // sqrt(pi)
-inline constexpr bs_real kBS_SqrtPi = sqrt(kBS_Pi);
+inline constexpr bs_real kBS_SqrtPi = 1.7724538509055160272981674833411451827975494561223871282138077898;
 // kBS_Pi * pi
 inline constexpr bs_real kBS_PiSquared = POW2(kBS_Pi);
 // 4 * piSquared
 inline constexpr bs_real kBS_FourPiSquared = 4. * POW2(kBS_Pi);
 // pi^(1/8)
-inline constexpr bs_real kBS_Pi2OneEighth = pow(kBS_Pi, 1. / 8.);
+inline constexpr bs_real kBS_Pi2OneEighth = 1.1538350678499894305409652131498819001773888798708246208741;
 // (pi / 2)^2.5
-inline constexpr bs_real kBS_PiHalfToFiveHalves = pow(0.5 * kBS_Pi, 2.5);
+inline constexpr bs_real kBS_PiHalfToFiveHalves = 3.0924286813991435062785446983527430380011013374987549478861;
 
 
 #endif // BNS_NURATES_SRC_CONSTANTS_H_
