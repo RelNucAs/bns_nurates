@@ -190,10 +190,10 @@ inline constexpr BS_REAL kBS_NEPS_BZero  = 4. * POW2(kBS_SinThW2);
 /////////////////////////////
 
 // Cut-off values for safe exponential evaluation
-inline constexpr bs_real kBS_ExpUppLim = std::is_same_v<bs_real, float> ? 80 :
-                                         std::is_same_v<bs_real, double> ? 700 :
-                                         80;
-inline constexpr bs_real kBS_ExpLowLim = -kBS_ExpUppLim;
+inline constexpr BS_REAL kBS_ExpUppLim = std::is_same_v<BS_REAL, float>  ? 80 :
+                                         std::is_same_v<BS_REAL, double> ? 700 :
+                                                                           80;
+inline constexpr BS_REAL kBS_ExpLowLim = -kBS_ExpUppLim;
 
 inline constexpr BS_REAL kBS_HClight6FourPiSquared =
     POW6(kBS_H * kBS_Clight) / (16. * POW2(kBS_Pi));
