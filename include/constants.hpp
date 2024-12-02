@@ -190,9 +190,10 @@ inline constexpr BS_REAL kBS_NEPS_BZero  = 4. * POW2(kBS_SinThW2);
 /////////////////////////////
 
 // Cut-off values for safe exponential evaluation
-inline const BS_REAL kBS_ExpUppLim =
-    log(std::numeric_limits<BS_REAL>::max()) * 0.999;
-inline const BS_REAL kBS_ExpLowLim = -kBS_ExpUppLim;
+inline constexpr bs_real kBS_ExpUppLim = std::is_same_v<bs_real, float> ? 80 :
+                                         std::is_same_v<bs_real, double> ? 700 :
+                                         80;
+inline constexpr bs_real kBS_ExpLowLim = -kBS_ExpUppLim;
 
 inline constexpr BS_REAL kBS_HClight6FourPiSquared =
     POW6(kBS_H * kBS_Clight) / (16. * POW2(kBS_Pi));
@@ -215,7 +216,7 @@ inline constexpr BS_REAL kBS_MpGrams =
     kBS_Mp * kBS_MeV_double / POW2(kBS_Clight);
 
 // Geometric mean of nucleon masses in grams
-inline constexpr BS_REAL kBS_MAvgGrams =
+inline const BS_REAL kBS_MAvgGrams =
     kBS_MeV_double / POW2(kBS_Clight) * sqrt(kBS_Mn * kBS_Mp);
 
 // sqrt(pi)
