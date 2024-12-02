@@ -75,12 +75,8 @@ def diff_files(source_filepath, destination_filepath):
 # Needs full path of top level bns_nurates directory and the destination directory
 def refactor_and_copy(source_dir, destination_dir):
     
-    files_include = os.listdir(source_dir + '/include/')
-    files_include_full = np.array([os.path.join(source_dir + '/include/', file) for file in files_include])
-    files_src_integration = os.listdir(source_dir + '/src/integration/')
-    files_src_integration_full = np.array([os.path.join(source_dir + '/src/integration/', file) for file in files_src_integration])
-    files = np.concatenate((files_include, files_src_integration))
-    files_full = np.concatenate((files_include_full, files_src_integration_full))
+    files = os.listdir(source_dir + '/include/')
+    files_full = np.array([os.path.join(source_dir + '/include/', file) for file in files])
     diff_stdout = []
 
     for i in range(0,len(files)):
@@ -107,7 +103,7 @@ def refactor_and_copy(source_dir, destination_dir):
         print(diff)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Prepare include and src files from bns_nurates for THC")
+    parser = argparse.ArgumentParser(description="Prepare include files from bns_nurates for THC")
     parser.add_argument('source_dir', type=str, help="Full path for the top level bns_nurates directory")
     parser.add_argument('destination_dir', type=str, help="Full path of the destination directory")
 
