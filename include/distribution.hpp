@@ -30,11 +30,11 @@ distribution
  * species:     species of neutrino
  */
 KOKKOS_INLINE_FUNCTION
-bs_real NuFThick(const bs_real omega, const NuDistributionParams* distr_pars,
+BS_REAL NuFThick(const BS_REAL omega, const NuDistributionParams* distr_pars,
                  const int nuid)
 {
-    const bs_real T_t  = distr_pars->temp_t[nuid];
-    const bs_real mu_t = distr_pars->temp_t[nuid] * distr_pars->eta_t[nuid];
+    const BS_REAL T_t  = distr_pars->temp_t[nuid];
+    const BS_REAL mu_t = distr_pars->temp_t[nuid] * distr_pars->eta_t[nuid];
 
     return FermiDistr(omega, T_t, mu_t);
 }
@@ -55,10 +55,10 @@ void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
 
     for (int nuid = 0; nuid < total_num_species; ++nuid)
     {
-        const bs_real n = M1_pars->n[nuid]; // [nm^-3]
+        const BS_REAL n = M1_pars->n[nuid]; // [nm^-3]
         // Convert J from g nm-1 s^-1 to MeV nm-3
-        const bs_real J   = M1_pars->J[nuid] / kBS_MeV;
-        const bs_real chi = M1_pars->chi[nuid];
+        const BS_REAL J   = M1_pars->J[nuid] / kBS_MeV;
+        const BS_REAL chi = M1_pars->chi[nuid];
 
         BS_ASSERT(
             n > 0.,
@@ -69,7 +69,7 @@ void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
 
         out_distribution_pars->w_t[nuid] = 1.5 * (1. - chi);
 
-        const bs_real y = n * POW3(n / J) / kBS_FourPi_hc3;
+        const BS_REAL y = n * POW3(n / J) / kBS_FourPi_hc3;
 
         if (y < 0.005)
         {
@@ -148,12 +148,12 @@ void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
  * species:     species of neutrino
  */
 KOKKOS_INLINE_FUNCTION
-bs_real NuFThin(const bs_real omega, const NuDistributionParams* distr_pars,
+BS_REAL NuFThin(const BS_REAL omega, const NuDistributionParams* distr_pars,
                 const int nuid)
 {
-    const bs_real T_f    = distr_pars->temp_f[nuid];
-    const bs_real c_f    = distr_pars->c_f[nuid];
-    const bs_real beta_f = distr_pars->beta_f[nuid];
+    const BS_REAL T_f    = distr_pars->temp_f[nuid];
+    const BS_REAL c_f    = distr_pars->c_f[nuid];
+    const BS_REAL beta_f = distr_pars->beta_f[nuid];
 
     return beta_f * pow(omega, c_f) * exp(-omega / T_f);
 }
@@ -170,10 +170,10 @@ void CalculateThinParamsFromM1(const M1Quantities* M1_pars,
 {
     for (int nuid = 0; nuid < total_num_species; ++nuid)
     {
-        const bs_real n = M1_pars->n[nuid]; // [nm^-3]
+        const BS_REAL n = M1_pars->n[nuid]; // [nm^-3]
         // Convert J from g nm-1 s^-1 to MeV nm-3
-        const bs_real J   = M1_pars->J[nuid] / kBS_MeV;
-        const bs_real chi = M1_pars->chi[nuid];
+        const BS_REAL J   = M1_pars->J[nuid] / kBS_MeV;
+        const BS_REAL chi = M1_pars->chi[nuid];
 
         BS_ASSERT(
             n > 0.,
@@ -186,7 +186,7 @@ void CalculateThinParamsFromM1(const M1Quantities* M1_pars,
 
         out_distribution_pars->c_f[nuid] = CONST_C_F;
 
-        const bs_real Tnu                   = J / (n * (CONST_C_F + 3.));
+        const BS_REAL Tnu                   = J / (n * (CONST_C_F + 3.));
         out_distribution_pars->temp_f[nuid] = Tnu;
 
         out_distribution_pars->beta_f[nuid] =
@@ -208,13 +208,14 @@ NuDistributionParams NuEquilibriumParams(const MyEOSParams* eos_pars)
 {
     NuDistributionParams out;
 
-    const bs_real T    = eos_pars->temp; // [MeV]
-    const bs_real mu_e = eos_pars->mu_e; // [MeV]
-    const bs_real mu_p = eos_pars->mu_p; // [MeV]
-    const bs_real mu_n = eos_pars->mu_n; // [MeV]
+    const BS_REAL T    = eos_pars->temp; // [MeV]
+    const BS_REAL mu_e = eos_pars->mu_e; // [MeV]
+    const BS_REAL mu_p = eos_pars->mu_p; // [MeV]
+    const BS_REAL mu_n = eos_pars->mu_n; // [MeV]
 
     BS_ASSERT(T > 0. && T < 1e3,
-              "Given temperature is either negative or beyond 1 GeV.");
+              "Given temperature is either negative or beyond 1 GeV (T=%e).",
+              T);
 
     for (int idx = 0; idx < total_num_species; ++idx)
     {
@@ -242,7 +243,7 @@ NuDistributionParams NuEquilibriumParams(const MyEOSParams* eos_pars)
  * species:     species of neutrino
  */
 KOKKOS_INLINE_FUNCTION
-bs_real TotalNuF(const bs_real omega, const NuDistributionParams* distr_pars,
+BS_REAL TotalNuF(const BS_REAL omega, const NuDistributionParams* distr_pars,
                  const int nuid)
 {
 
@@ -250,11 +251,11 @@ bs_real TotalNuF(const bs_real omega, const NuDistributionParams* distr_pars,
     BS_ASSERT(nuid >= 0 && nuid < total_num_species,
               "Invalid neutrino species ID.");
 
-    const bs_real w_t = distr_pars->w_t[nuid];
-    const bs_real w_f = distr_pars->w_f[nuid];
+    const BS_REAL w_t = distr_pars->w_t[nuid];
+    const BS_REAL w_f = distr_pars->w_f[nuid];
 
-    const bs_real f_thick = NuFThick(omega, distr_pars, nuid);
-    const bs_real f_thin  = NuFThin(omega, distr_pars, nuid);
+    const BS_REAL f_thick = NuFThick(omega, distr_pars, nuid);
+    const BS_REAL f_thin  = NuFThin(omega, distr_pars, nuid);
 
     return w_t * f_thick + w_f * f_thin;
 }
@@ -282,7 +283,7 @@ NuDistributionParams CalculateDistrParamsFromM1(const M1Quantities* M1_pars,
  * Computes this for three neutrino species
  */
 KOKKOS_INLINE_FUNCTION
-MyQuadratureIntegrand NuNumberIntegrand(bs_real* x, void* p)
+MyQuadratureIntegrand NuNumberIntegrand(BS_REAL* x, void* p)
 {
     NuDistributionParams* distr_pars = (NuDistributionParams*)p;
 
@@ -314,7 +315,7 @@ inline MyQuadratureIntegrand NuNumber(NuDistributionParams* distr_pars)
 
     GaussLegendreMultiD(&quad);
 
-    bs_real s[total_num_species];
+    BS_REAL s[total_num_species];
 
     s[id_nue]  = fabs(distr_pars->temp_t[id_nue] * distr_pars->eta_t[id_nue]);
     s[id_anue] = fabs(distr_pars->temp_t[id_anue] * distr_pars->eta_t[id_anue]);
@@ -324,7 +325,7 @@ inline MyQuadratureIntegrand NuNumber(NuDistributionParams* distr_pars)
     integrand.function = &NuNumberIntegrand;
     MyQuadratureIntegrand result =
         GaussLegendreIntegrate1D(&quad, &integrand, s);
-    const bs_real result_factor = 4. * kBS_Pi / POW3(kBS_H * kBS_Clight);
+    const BS_REAL result_factor = 4. * kBS_Pi / POW3(kBS_H * kBS_Clight);
 
     for (int species = 0; species < total_num_species; ++species)
     {
@@ -339,7 +340,7 @@ inline MyQuadratureIntegrand NuNumber(NuDistributionParams* distr_pars)
  *
  * Computes this for three neutrino species
  */
-inline MyQuadratureIntegrand NuEnergyIntegrand(bs_real* x, void* p)
+inline MyQuadratureIntegrand NuEnergyIntegrand(BS_REAL* x, void* p)
 {
     MyQuadratureIntegrand result = NuNumberIntegrand(x, p);
 
@@ -368,7 +369,7 @@ inline MyQuadratureIntegrand NuEnergy(NuDistributionParams* distr_pars)
 
     GaussLegendreMultiD(&quad);
 
-    bs_real s[total_num_species];
+    BS_REAL s[total_num_species];
 
     s[id_nue]  = fabs(distr_pars->temp_t[id_nue] * distr_pars->eta_t[id_nue]);
     s[id_anue] = fabs(distr_pars->temp_t[id_anue] * distr_pars->eta_t[id_anue]);
@@ -378,7 +379,7 @@ inline MyQuadratureIntegrand NuEnergy(NuDistributionParams* distr_pars)
     integrand.function = &NuEnergyIntegrand;
     MyQuadratureIntegrand result =
         GaussLegendreIntegrate1D(&quad, &integrand, s);
-    const bs_real result_factor = 4. * kBS_Pi / POW3(kBS_H * kBS_Clight);
+    const BS_REAL result_factor = 4. * kBS_Pi / POW3(kBS_H * kBS_Clight);
 
     for (int species = 0; species < total_num_species; ++species)
     {
@@ -394,8 +395,8 @@ void ComputeM1DensitiesEq(const MyEOSParams* eos_pars,
                           const NuDistributionParams* nu_distribution_params,
                           M1Quantities* m1_pars)
 {
-    const bs_real n_prefactor = kBS_FourPi_hc3 * POW3(eos_pars->temp);
-    const bs_real j_prefactor = n_prefactor * eos_pars->temp;
+    const BS_REAL n_prefactor = kBS_FourPi_hc3 * POW3(eos_pars->temp);
+    const BS_REAL j_prefactor = n_prefactor * eos_pars->temp;
 
     for (int nuid = 0; nuid < total_num_species; ++nuid)
     {

@@ -24,8 +24,8 @@
 //   -> e+ n)
 
 // Nucleon constants
-const bs_real lamp = 1.793;  //  proton magnetic moment?
-const bs_real lamn = -1.913; // neutron magnetic moment
+const BS_REAL lamp = 1.793;  //  proton magnetic moment?
+const BS_REAL lamn = -1.913; // neutron magnetic moment
 
 // Computation of single nucleon form factors for reaction reacflag,
 // given the (anti)neutrino energy
@@ -43,21 +43,21 @@ const bs_real lamn = -1.913; // neutron magnetic moment
  */
 
 KOKKOS_INLINE_FUNCTION
-void NucFrmFac(const bs_real E, bs_real* cv, bs_real* ca, bs_real* F2,
+void NucFrmFac(const BS_REAL E, BS_REAL* cv, BS_REAL* ca, BS_REAL* F2,
                const int reacflag)
 {
     // (Anti)neutrino energy rescaled by the nucleon mass, Eq. 4
-    const bs_real ehor = E * kBS_WM_e_scale; // dimensionless
+    const BS_REAL ehor = E * kBS_WM_e_scale; // dimensionless
 
-    const bs_real tau = 0.5 * POW2(ehor) / (1. + ehor);            // Eq.(B10)
-    const bs_real eta = 1. / (1. + 5.6 * tau);                     // Eq.(B16)
-    const bs_real G   = 1. / pow(1. + 4.97 * tau, 2.);             // Eq.(B17)
-    const bs_real Fp1 = (1. + tau * (1. + lamp)) * G / (1. + tau); // Eq.(B11)
-    const bs_real Fp2 = lamp * G / (1. + tau);                     // Eq.(B12)
-    const bs_real Fn1 = tau * lamn * (1. - eta) * G / (1. + tau);  // Eq.(B13)
-    const bs_real Fn2 = lamn * (1. + tau * eta) * G / (1. + tau);  // Eq.(B14)
+    const BS_REAL tau = 0.5 * POW2(ehor) / (1. + ehor);            // Eq.(B10)
+    const BS_REAL eta = 1. / (1. + 5.6 * tau);                     // Eq.(B16)
+    const BS_REAL G   = 1. / pow(1. + 4.97 * tau, 2.);             // Eq.(B17)
+    const BS_REAL Fp1 = (1. + tau * (1. + lamp)) * G / (1. + tau); // Eq.(B11)
+    const BS_REAL Fp2 = lamp * G / (1. + tau);                     // Eq.(B12)
+    const BS_REAL Fn1 = tau * lamn * (1. - eta) * G / (1. + tau);  // Eq.(B13)
+    const BS_REAL Fn2 = lamn * (1. + tau * eta) * G / (1. + tau);  // Eq.(B14)
 
-    bs_real frm1, frm2, frm3;
+    BS_REAL frm1, frm2, frm3;
 
     /* Different parametrization depending on the reaction */
     if (reacflag == 1)
@@ -108,22 +108,22 @@ void NucFrmFac(const bs_real E, bs_real* cv, bs_real* ca, bs_real* F2,
 // (anu_l + p -> l+ + n) reacflag = 3 (for nuclear form factors) Input: omega ->
 // neutrino energy [MeV]
 KOKKOS_INLINE_FUNCTION
-void WMAbsEm(const bs_real omega, bs_real* R, bs_real* Rbar)
+void WMAbsEm(const BS_REAL omega, BS_REAL* R, BS_REAL* Rbar)
 {
-    bs_real cv, ca, F2;
+    BS_REAL cv, ca, F2;
 
     NucFrmFac(omega, &cv, &ca, &F2, 3); // nuclear form factors
 
-    const bs_real ehor = omega * kBS_WM_e_scale;
+    const BS_REAL ehor = omega * kBS_WM_e_scale;
 
-    const bs_real tmp1 =
+    const BS_REAL tmp1 =
         POW2(cv) * (1. + 4. * ehor + 16. / 3. * POW2(ehor)) +
         3. * ca * ca * POW2(1. + 4. / 3. * ehor) +
         8. / 3. * cv * F2 * POW2(ehor) +
         5. / 3. * POW2(ehor) * (1. + 2. / 5. * ehor) * POW2(F2);
-    const bs_real tmp2 = 4. * (cv + F2) * ca * ehor * (1. + 4. / 3. * ehor);
-    // const bs_real tmp3 = (cv*cv+3.0*ca*ca)*POW3(1.+2.*ehor);
-    const bs_real tmp3 =
+    const BS_REAL tmp2 = 4. * (cv + F2) * ca * ehor * (1. + 4. / 3. * ehor);
+    // const BS_REAL tmp3 = (cv*cv+3.0*ca*ca)*POW3(1.+2.*ehor);
+    const BS_REAL tmp3 =
         (POW2(kBS_Gv) + 3.0 * POW2(kBS_Ga)) * POW3(1. + 2. * ehor);
 
     *R    = (tmp1 + tmp2) / tmp3; // Eq.(22)
@@ -136,10 +136,10 @@ void WMAbsEm(const bs_real omega, bs_real* R, bs_real* Rbar)
 // reacflag = 1 | 2 Input: omega -> neutrino energy [MeV] Output: correction to
 // zeroth (R0) and first Legendre (R1) coefficients of scattering kernel
 KOKKOS_INLINE_FUNCTION
-void WMScatt(const bs_real omega, bs_real* R0, bs_real* R1, const int reacflag)
+void WMScatt(const BS_REAL omega, BS_REAL* R0, BS_REAL* R1, const int reacflag)
 {
-    bs_real cv, ca, F2;
-    bs_real h0, h1;
+    BS_REAL cv, ca, F2;
+    BS_REAL h0, h1;
 
     NucFrmFac(omega, &cv, &ca, &F2, reacflag); // nuclear form factors
     // NucFrmFac(0., &cv_0, &ca_0, &F2_0, reacflag); //nuclear form factors at
@@ -157,7 +157,7 @@ void WMScatt(const bs_real omega, bs_real* R0, bs_real* R1, const int reacflag)
         h1 = POW2(kBS_Hnv) - POW2(kBS_Hna);
     }
 
-    const bs_real ehor = omega * kBS_WM_e_scale;
+    const BS_REAL ehor = omega * kBS_WM_e_scale;
 
     /* Low-energy limit derived from Eq.(12) */
     // correction to zeroth coefficient

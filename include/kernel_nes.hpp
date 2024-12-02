@@ -16,7 +16,7 @@
 
 // Numerical constants
 //---------------------------------------------------------------------------------------------------------------------
-static const bs_real kTaylorSeriesEpsilon = 1e-3;
+static const BS_REAL kTaylorSeriesEpsilon = 1e-3;
 
 
 // Physical constats
@@ -24,10 +24,10 @@ static const bs_real kTaylorSeriesEpsilon = 1e-3;
 
 // Saves the expression that are needed for the unapproximated integral
 KOKKOS_INLINE_FUNCTION
-void ComputeFDIForInelastic(bs_real w, bs_real wp, bs_real eta,
-                            bs_real* fdi_diff_w, bs_real* fdi_diff_abs)
+void ComputeFDIForInelastic(BS_REAL w, BS_REAL wp, BS_REAL eta,
+                            BS_REAL* fdi_diff_w, BS_REAL* fdi_diff_abs)
 {
-    bs_real abs_val = fabs(w - wp);
+    BS_REAL abs_val = fabs(w - wp);
 
     fdi_diff_w[0] = FDI_p1(eta - wp) - FDI_p1(eta - w);
     fdi_diff_w[1] = FDI_p2(eta - wp) - FDI_p2(eta - w);
@@ -45,9 +45,9 @@ void ComputeFDIForInelastic(bs_real w, bs_real wp, bs_real eta,
 
 // Not approximated out kernel integral
 KOKKOS_INLINE_FUNCTION
-bs_real MezzacappaIntOut(bs_real w, bs_real wp, bs_real x, bs_real y, int sign,
-                         bs_real b1, bs_real b2, bs_real* fdi_diff_w,
-                         bs_real* fdi_diff_abs)
+BS_REAL MezzacappaIntOut(BS_REAL w, BS_REAL wp, BS_REAL x, BS_REAL y, int sign,
+                         BS_REAL b1, BS_REAL b2, BS_REAL* fdi_diff_w,
+                         BS_REAL* fdi_diff_abs)
 {
     return (((b1 + b2) * (sign * fdi_diff_abs[2] - fdi_diff_w[4]) *
                  0.2 // All G5 terms
@@ -72,8 +72,8 @@ bs_real MezzacappaIntOut(bs_real w, bs_real wp, bs_real x, bs_real y, int sign,
 // Taylor expansion in the lowest energy of the function MezzacappaIntOut and
 // MezzacappaIntIn
 KOKKOS_INLINE_FUNCTION
-bs_real MezzacappaIntOneEnergy(bs_real x, bs_real y, int sign, bs_real b1,
-                               bs_real b2, const bs_real* fdis)
+BS_REAL MezzacappaIntOneEnergy(BS_REAL x, BS_REAL y, int sign, BS_REAL b1,
+                               BS_REAL b2, const BS_REAL* fdis)
 {
     return -sign * y *
            (2. * (b1 + b2) * fdis[0]
@@ -94,8 +94,8 @@ bs_real MezzacappaIntOneEnergy(bs_real x, bs_real y, int sign, bs_real b1,
 // Taylor expansion in both energies of the function MezzacappaIntOut and
 // MezzacappaIntIn
 KOKKOS_INLINE_FUNCTION
-bs_real MezzacappaIntTwoEnergies(bs_real w, bs_real wp, bs_real x, bs_real y,
-                                 bs_real b1, bs_real b2, const bs_real* fdis)
+BS_REAL MezzacappaIntTwoEnergies(BS_REAL w, BS_REAL wp, BS_REAL x, BS_REAL y,
+                                 BS_REAL b1, BS_REAL b2, const BS_REAL* fdis)
 {
     return y * (w - wp) *
            ((b1 + b2) *
@@ -116,20 +116,20 @@ KOKKOS_INLINE_FUNCTION
 MyKernelOutput NESKernels(InelasticScattKernelParams* kernel_params,
                           MyEOSParams* eos_params)
 {
-    const bs_real T                    = eos_params->temp;
-    const bs_real w                    = kernel_params->omega / T;
-    const bs_real wp                   = kernel_params->omega_prime / T;
-    const bs_real x                    = fmax(w, wp);
-    const bs_real y                    = fmin(w, wp);
-    const bs_real eta_e                = eos_params->mu_e / T;
-    const bs_real exp_factor           = NEPSExpFunc(wp - w);
-    const bs_real exp_factor_exchanged = NEPSExpFunc(w - wp);
+    const BS_REAL T                    = eos_params->temp;
+    const BS_REAL w                    = kernel_params->omega / T;
+    const BS_REAL wp                   = kernel_params->omega_prime / T;
+    const BS_REAL x                    = fmax(w, wp);
+    const BS_REAL y                    = fmin(w, wp);
+    const BS_REAL eta_e                = eos_params->mu_e / T;
+    const BS_REAL exp_factor           = NEPSExpFunc(wp - w);
+    const BS_REAL exp_factor_exchanged = NEPSExpFunc(w - wp);
 
     MyKernelOutput output;
 
     if (y > eta_e * kTaylorSeriesEpsilon)
     {
-        bs_real fdi_diff_abs[3], fdi_diff_w[5];
+        BS_REAL fdi_diff_abs[3], fdi_diff_w[5];
 
         const int sign = 2 * signbit(wp - w) - 1;
 
@@ -156,7 +156,7 @@ MyKernelOutput NESKernels(InelasticScattKernelParams* kernel_params,
     {
         const int sign = 2 * signbit(wp - w) - 1;
 
-        const bs_real fdis[5] = {
+        const BS_REAL fdis[5] = {
             FDI_p2(eta_e - x) - FDI_p2(eta_e), FDI_p1(eta_e - x), FDI_p1(eta_e),
             FDI_0(eta_e - x) + y * FermiDistr(0., 1., eta_e - x) / 6,
             FDI_0(eta_e) - y * FermiDistr(0., 1., eta_e) / 6};
@@ -176,7 +176,7 @@ MyKernelOutput NESKernels(InelasticScattKernelParams* kernel_params,
     }
     else
     {
-        const bs_real fdis[3] = {FermiDistr(0., 1., eta_e), FDI_0(eta_e),
+        const BS_REAL fdis[3] = {FermiDistr(0., 1., eta_e), FDI_0(eta_e),
                                  FDI_p1(eta_e)};
 
         output.abs[id_nue] =
@@ -213,20 +213,20 @@ KOKKOS_INLINE_FUNCTION
 MyKernelOutput NPSKernels(InelasticScattKernelParams* kernel_params,
                           MyEOSParams* eos_params)
 {
-    const bs_real T                    = eos_params->temp;
-    const bs_real w                    = kernel_params->omega / T;
-    const bs_real wp                   = kernel_params->omega_prime / T;
-    const bs_real x                    = fmax(w, wp);
-    const bs_real y                    = fmin(w, wp);
-    const bs_real eta_p                = -eos_params->mu_e / T;
-    const bs_real exp_factor           = NEPSExpFunc(wp - w);
-    const bs_real exp_factor_exchanged = NEPSExpFunc(w - wp);
+    const BS_REAL T                    = eos_params->temp;
+    const BS_REAL w                    = kernel_params->omega / T;
+    const BS_REAL wp                   = kernel_params->omega_prime / T;
+    const BS_REAL x                    = fmax(w, wp);
+    const BS_REAL y                    = fmin(w, wp);
+    const BS_REAL eta_p                = -eos_params->mu_e / T;
+    const BS_REAL exp_factor           = NEPSExpFunc(wp - w);
+    const BS_REAL exp_factor_exchanged = NEPSExpFunc(w - wp);
 
     MyKernelOutput output;
 
     if (y > eta_p * kTaylorSeriesEpsilon)
     {
-        bs_real fdi_diff_abs[3], fdi_diff_w[5];
+        BS_REAL fdi_diff_abs[3], fdi_diff_w[5];
 
         const int sign = 2 * signbit(wp - w) - 1;
 
@@ -253,7 +253,7 @@ MyKernelOutput NPSKernels(InelasticScattKernelParams* kernel_params,
     {
         const int sign = 2 * signbit(wp - w) - 1;
 
-        const bs_real fdis[5] = {
+        const BS_REAL fdis[5] = {
             FDI_p2(eta_p - x) - FDI_p2(eta_p), FDI_p1(eta_p - x), FDI_p1(eta_p),
             FDI_0(eta_p - x) + y * FermiDistr(0., 1., eta_p - x) / 6,
             FDI_0(eta_p) - y * FermiDistr(0., 1., eta_p) / 6};
@@ -274,7 +274,7 @@ MyKernelOutput NPSKernels(InelasticScattKernelParams* kernel_params,
     }
     else
     {
-        const bs_real fdis[3] = {FermiDistr(0., 1., eta_p), FDI_0(eta_p),
+        const BS_REAL fdis[3] = {FermiDistr(0., 1., eta_p), FDI_0(eta_p),
                                  FDI_p1(eta_p)};
 
         output.abs[id_nue] =
@@ -325,7 +325,7 @@ MyKernelOutput InelasticScattKernels(InelasticScattKernelParams* kernel_params,
 }
 
 KOKKOS_INLINE_FUNCTION
-void InelasticKernelsTable(const int n, bs_real* nu_array,
+void InelasticKernelsTable(const int n, BS_REAL* nu_array,
                            GreyOpacityParams* grey_pars, M1MatrixKokkos2D* out)
 {
     MyKernelOutput inel_1, inel_2;

@@ -89,10 +89,10 @@ void LoadQuadrature(char* filedir, MyQuadrature* quad);
  *    fnarray:  array of function values at corresponding quadrature positions
  */
 KOKKOS_INLINE_FUNCTION
-bs_real DoIntegration(const int n, const bs_real* wtarray,
-                      const bs_real* fnarray)
+BS_REAL DoIntegration(const int n, const BS_REAL* wtarray,
+                      const BS_REAL* fnarray)
 {
-    bs_real integral = 0.;
+    BS_REAL integral = 0.;
 
     for (int i = 0; i < n; ++i)
     {
@@ -115,14 +115,14 @@ bs_real DoIntegration(const int n, const bs_real* wtarray,
  * x2 = 1. func: The function struct to be integrated t:    The value of points
  * at which to break the integral into two
  */
-inline bs_real GaussLegendreIntegrateZeroInf(MyQuadrature* quad,
-                                             MyFunction* func, bs_real t)
+inline BS_REAL GaussLegendreIntegrateZeroInf(MyQuadrature* quad,
+                                             MyFunction* func, BS_REAL t)
 {
 
-    bs_real f1_x[quad->nx], f2_x[quad->nx], f_y[quad->ny], f_z[quad->nz];
-    bs_real w_y[quad->ny], w_z[quad->nz];
+    BS_REAL f1_x[quad->nx], f2_x[quad->nx], f_y[quad->ny], f_z[quad->nz];
+    BS_REAL w_y[quad->ny], w_z[quad->nz];
     // var3d var = var3d_default;
-    bs_real var[3];
+    BS_REAL var[3];
 
     for (int k = 0; k < quad->nz; ++k)
     {
@@ -167,27 +167,27 @@ inline bs_real GaussLegendreIntegrateZeroInf(MyQuadrature* quad,
  */
 inline MyKernelQuantity
 GaussLegendreIntegrateZeroInfSpecial(MyQuadrature* quad,
-                                     MyFunctionSpecial* func, bs_real t)
+                                     MyFunctionSpecial* func, BS_REAL t)
 {
 
-    bs_real f1_em_e[quad->nx], f2_em_e[quad->nx];   // emissivity e neutrino
-    bs_real f1_abs_e[quad->nx], f2_abs_e[quad->nx]; // absoptivity e neutrino
-    bs_real f1_em_x[quad->nx], f2_em_x[quad->nx]; // emissivity mu/tau neutrino
-    bs_real f1_abs_x[quad->nx],
+    BS_REAL f1_em_e[quad->nx], f2_em_e[quad->nx];   // emissivity e neutrino
+    BS_REAL f1_abs_e[quad->nx], f2_abs_e[quad->nx]; // absoptivity e neutrino
+    BS_REAL f1_em_x[quad->nx], f2_em_x[quad->nx]; // emissivity mu/tau neutrino
+    BS_REAL f1_abs_x[quad->nx],
         f2_abs_x[quad->nx]; // absorptivity mu/tau neutrino
 
-    bs_real f_em_e_y[quad->ny];  // emissivity e neutrino
-    bs_real f_abs_e_y[quad->ny]; // absoptivity e neutrino
-    bs_real f_em_x_y[quad->ny];  // emissivity mu/tau neutrino
-    bs_real f_abs_x_y[quad->ny]; // absorptivity mu/tau neutrino
+    BS_REAL f_em_e_y[quad->ny];  // emissivity e neutrino
+    BS_REAL f_abs_e_y[quad->ny]; // absoptivity e neutrino
+    BS_REAL f_em_x_y[quad->ny];  // emissivity mu/tau neutrino
+    BS_REAL f_abs_x_y[quad->ny]; // absorptivity mu/tau neutrino
 
-    bs_real f_em_e_z[quad->ny];  // emissivity e neutrino
-    bs_real f_abs_e_z[quad->ny]; // absoptivity e neutrino
-    bs_real f_em_x_z[quad->ny];  // emissivity mu/tau neutrino
-    bs_real f_abs_x_z[quad->ny]; // absorptivity mu/tau neutrino
+    BS_REAL f_em_e_z[quad->ny];  // emissivity e neutrino
+    BS_REAL f_abs_e_z[quad->ny]; // absoptivity e neutrino
+    BS_REAL f_em_x_z[quad->ny];  // emissivity mu/tau neutrino
+    BS_REAL f_abs_x_z[quad->ny]; // absorptivity mu/tau neutrino
 
-    bs_real w_y[quad->ny], w_z[quad->nz];
-    bs_real var[3];
+    BS_REAL w_y[quad->ny], w_z[quad->nz];
+    BS_REAL var[3];
 
     for (int k = 0; k < quad->nz; ++k)
     {
@@ -248,11 +248,11 @@ GaussLegendreIntegrateZeroInfSpecial(MyQuadrature* quad,
  *    quad: A properly populated Gauss-Laguerre quadrature struct
  *    func:    The function struct to be integrated
  */
-inline bs_real GaussLaguerreIntegrateZeroInf(MyQuadrature* quad,
+inline BS_REAL GaussLaguerreIntegrateZeroInf(MyQuadrature* quad,
                                              MyFunction* func)
 {
 
-    bs_real f[quad->nx];
+    BS_REAL f[quad->nx];
 
     if (quad->alpha == 0.)
     {
@@ -284,16 +284,16 @@ inline bs_real GaussLaguerreIntegrateZeroInf(MyQuadrature* quad,
 // @TODO: rewrite loops in row-wise order
 inline MyQuadratureIntegrand
 GaussLegendreIntegrateFixedSplit2D(MyQuadrature* quad, MyFunctionMultiD* func,
-                                   bs_real t)
+                                   BS_REAL t)
 {
 
     int num_integrands = func->my_quadrature_integrand.n;
 
-    bs_real f1_x[num_integrands][quad->nx], f2_x[num_integrands][quad->nx];
-    bs_real f1_y[num_integrands][quad->ny], f2_y[num_integrands][quad->ny];
+    BS_REAL f1_x[num_integrands][quad->nx], f2_x[num_integrands][quad->nx];
+    BS_REAL f1_y[num_integrands][quad->ny], f2_y[num_integrands][quad->ny];
 
-    bs_real w_y[quad->ny];
-    bs_real var[2];
+    BS_REAL w_y[quad->ny];
+    BS_REAL var[2];
 
     MyQuadratureIntegrand f1_vals, f2_vals;
     MyQuadratureIntegrand result;
@@ -376,12 +376,12 @@ GaussLegendreIntegrateFixedSplit2D(MyQuadrature* quad, MyFunctionMultiD* func,
 // @TODO: rewrite loops in row-wise order
 inline MyQuadratureIntegrand
 GaussLegendreIntegrateFixedSplit1D(MyQuadrature* quad, MyFunctionMultiD* func,
-                                   bs_real t)
+                                   BS_REAL t)
 {
 
     int num_integrands = func->my_quadrature_integrand.n;
-    bs_real f1_x[num_integrands][quad->nx], f2_x[num_integrands][quad->nx];
-    bs_real var[2];
+    BS_REAL f1_x[num_integrands][quad->nx], f2_x[num_integrands][quad->nx];
+    BS_REAL var[2];
 
     MyQuadratureIntegrand f1_vals, f2_vals;
 
@@ -424,16 +424,16 @@ GaussLegendreIntegrateFixedSplit1D(MyQuadrature* quad, MyFunctionMultiD* func,
  */
 inline MyQuadratureIntegrand GaussLegendreIntegrate2D(MyQuadrature* quad,
                                                       MyFunctionMultiD* func,
-                                                      bs_real* tx, bs_real* ty)
+                                                      BS_REAL* tx, BS_REAL* ty)
 {
 
     int num_integrands = func->my_quadrature_integrand.n;
 
-    bs_real f1_x[num_integrands][quad->nx], f2_x[num_integrands][quad->nx];
-    bs_real f1_y[num_integrands][quad->ny], f2_y[num_integrands][quad->ny];
+    BS_REAL f1_x[num_integrands][quad->nx], f2_x[num_integrands][quad->nx];
+    BS_REAL f1_y[num_integrands][quad->ny], f2_y[num_integrands][quad->ny];
 
-    bs_real w_y[quad->ny];
-    bs_real var[2];
+    BS_REAL w_y[quad->ny];
+    BS_REAL var[2];
 
     MyQuadratureIntegrand result;
 
@@ -501,12 +501,12 @@ inline MyQuadratureIntegrand GaussLegendreIntegrate2D(MyQuadrature* quad,
  * t:       the value at which to break the integral into two
  */
 inline MyQuadratureIntegrand
-GaussLegendreIntegrate1D(MyQuadrature* quad, MyFunctionMultiD* func, bs_real* t)
+GaussLegendreIntegrate1D(MyQuadrature* quad, MyFunctionMultiD* func, BS_REAL* t)
 {
 
     int num_integrands = func->my_quadrature_integrand.n;
-    bs_real f1_x[num_integrands][quad->nx], f2_x[num_integrands][quad->nx];
-    bs_real var[2];
+    BS_REAL f1_x[num_integrands][quad->nx], f2_x[num_integrands][quad->nx];
+    BS_REAL var[2];
     MyQuadratureIntegrand result;
 
     result.n = num_integrands;
@@ -538,16 +538,16 @@ GaussLegendreIntegrate1D(MyQuadrature* quad, MyFunctionMultiD* func, bs_real* t)
 KOKKOS_INLINE_FUNCTION
 MyQuadratureIntegrand
 GaussLegendreIntegrate2DMatrix(const MyQuadrature* quad,
-                               const M1MatrixKokkos2D* mat, bs_real t)
+                               const M1MatrixKokkos2D* mat, BS_REAL t)
 {
     const int n              = quad->nx;
     const int num_integrands = 2 * total_num_species;
 
-    const bs_real t_sqr = t * t;
+    const BS_REAL t_sqr = t * t;
 
-    bs_real w_i, w_j, w_ij;
-    bs_real x_i, x_j;
-    bs_real x2_i, x2_j, x2_ij;
+    BS_REAL w_i, w_j, w_ij;
+    BS_REAL x_i, x_j;
+    BS_REAL x2_i, x2_j, x2_ij;
 
     MyQuadratureIntegrand result = {0};
 
@@ -598,19 +598,19 @@ GaussLegendreIntegrate2DMatrix(const MyQuadrature* quad,
 KOKKOS_INLINE_FUNCTION
 void GaussLegendreIntegrate2DMatrixForM1Coeffs(const MyQuadrature* quad,
                                                const M1MatrixKokkos2D* mat,
-                                               bs_real t,
+                                               BS_REAL t,
                                                MyQuadratureIntegrand* result_1,
                                                MyQuadratureIntegrand* result_2)
 {
     const int n              = quad->nx;
     const int num_integrands = 2 * total_num_species;
 
-    const bs_real t_sqr = t * t;
+    const BS_REAL t_sqr = t * t;
 
-    bs_real w_i, w_j, w_ij;
-    bs_real x_i, x_j;
-    bs_real x2_i, x2_j, x2_ij;
-    bs_real aux_1, aux_2, aux_3, aux_4;
+    BS_REAL w_i, w_j, w_ij;
+    BS_REAL x_i, x_j;
+    BS_REAL x2_i, x2_j, x2_ij;
+    BS_REAL aux_1, aux_2, aux_3, aux_4;
 
     for (int idx = 0; idx < total_num_species; ++idx)
     {
@@ -677,11 +677,11 @@ void GaussLegendreIntegrate2DMatrixForM1Coeffs(const MyQuadrature* quad,
 KOKKOS_INLINE_FUNCTION
 MyQuadratureIntegrand GaussLegendreIntegrate1DMatrix(const MyQuadrature* quad,
                                                      const int num_integrands,
-                                                     const bs_real mat[][n_max],
-                                                     bs_real* t)
+                                                     const BS_REAL mat[][n_max],
+                                                     BS_REAL* t)
 {
     const int n = quad->nx;
-    bs_real x_i, w_i, x2_i;
+    BS_REAL x_i, w_i, x2_i;
 
     MyQuadratureIntegrand result = {0};
 
@@ -712,13 +712,13 @@ MyQuadratureIntegrand GaussLegendreIntegrate1DMatrix(const MyQuadrature* quad,
 KOKKOS_INLINE_FUNCTION
 void GaussLegendreIntegrate1DMatrixOnlyNumber(const MyQuadrature* quad,
                                               const int num_integrands,
-                                              const bs_real mat[][n_max],
-                                              bs_real* t,
+                                              const BS_REAL mat[][n_max],
+                                              BS_REAL* t,
                                               MyQuadratureIntegrand* out_n,
                                               MyQuadratureIntegrand* out_j)
 {
     const int n = quad->nx;
-    bs_real x_i, w_i, x2_i;
+    BS_REAL x_i, w_i, x2_i;
 
     for (int idx = 0; idx < num_integrands; ++idx)
     {
@@ -758,13 +758,13 @@ void GaussLegendreIntegrate1DMatrixOnlyNumber(const MyQuadrature* quad,
  */
 inline MyQuadratureIntegrand
 GaussLegendreIntegrate1DFiniteInterval(MyQuadrature* quad,
-                                       MyFunctionMultiD* func, bs_real* t)
+                                       MyFunctionMultiD* func, BS_REAL* t)
 {
     (void)t;
 
     int num_integrands = func->my_quadrature_integrand.n;
-    bs_real f_x[num_integrands][quad->nx];
-    bs_real var[2];
+    BS_REAL f_x[num_integrands][quad->nx];
+    BS_REAL var[2];
     MyQuadratureIntegrand result;
 
     result.n = num_integrands;
@@ -794,17 +794,17 @@ GaussLegendreIntegrate1DFiniteInterval(MyQuadrature* quad,
  * interval of integration func:    the function(s) to be integrated
  */
 inline MyQuadratureIntegrand GaussLegendreIntegrate2DFiniteInterval(
-    MyQuadrature* quad, MyFunctionMultiD* func, bs_real* tx, bs_real* ty)
+    MyQuadrature* quad, MyFunctionMultiD* func, BS_REAL* tx, BS_REAL* ty)
 {
     (void)tx;
 
     int num_integrands = func->my_quadrature_integrand.n;
 
-    bs_real f1_x[num_integrands][quad->nx];
-    bs_real f1_y[num_integrands][quad->ny], f2_y[num_integrands][quad->ny];
+    BS_REAL f1_x[num_integrands][quad->nx];
+    BS_REAL f1_y[num_integrands][quad->ny], f2_y[num_integrands][quad->ny];
 
-    bs_real w_y[quad->ny];
-    bs_real var[2];
+    BS_REAL w_y[quad->ny];
+    BS_REAL var[2];
 
     MyQuadratureIntegrand result;
 

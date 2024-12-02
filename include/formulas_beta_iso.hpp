@@ -62,8 +62,8 @@
  *  Output: j [nm^-3]
  */
 KOKKOS_INLINE_FUNCTION
-bs_real EtaNNAbs(const bs_real n_in, const bs_real n_out, const bs_real mu_hat,
-                 const bs_real T)
+BS_REAL EtaNNAbs(const BS_REAL n_in, const BS_REAL n_out, const BS_REAL mu_hat,
+                 const BS_REAL T)
 {
     // if no nucleons, enforce zero rates
     // if (n_in == 0.)
@@ -78,7 +78,7 @@ bs_real EtaNNAbs(const bs_real n_in, const bs_real n_out, const bs_real mu_hat,
     }
 
     // Eq.(C14), [nm-3]
-    const bs_real etanp = (n_out - n_in) / (SafeExp(-mu_hat / T) - 1.);
+    const BS_REAL etanp = (n_out - n_in) / (SafeExp(-mu_hat / T) - 1.);
 
     BS_ASSERT(isfinite(etanp),
               "etanp factor in beta-process kernel is not finite.")
@@ -100,8 +100,8 @@ bs_real EtaNNAbs(const bs_real n_in, const bs_real n_out, const bs_real mu_hat,
  *      Eta_np from Bruenn (C14) [nm^-3]
  */
 KOKKOS_INLINE_FUNCTION
-bs_real EtaNP(const bs_real nn, const bs_real np, const bs_real mu_hat,
-              const bs_real T)
+BS_REAL EtaNP(const BS_REAL nn, const BS_REAL np, const BS_REAL mu_hat,
+              const BS_REAL T)
 {
     return EtaNNAbs(nn, np, mu_hat, T);
 }
@@ -114,8 +114,8 @@ bs_real EtaNP(const bs_real nn, const bs_real np, const bs_real mu_hat,
  *      Eta_pn [nm^-3]
  */
 KOKKOS_INLINE_FUNCTION
-bs_real EtaPN(const bs_real nn, const bs_real np, const bs_real mu_hat,
-              const bs_real T)
+BS_REAL EtaPN(const BS_REAL nn, const BS_REAL np, const BS_REAL mu_hat,
+              const BS_REAL T)
 {
     return EtaNNAbs(np, nn, -mu_hat, T);
 }
@@ -134,30 +134,30 @@ bs_real EtaPN(const bs_real nn, const bs_real np, const bs_real mu_hat,
  * out[3]: 1/lamda_anue [s^-1]
  */
 KOKKOS_INLINE_FUNCTION
-void AbsOpacitySingleLep(const bs_real omega, OpacityParams* opacity_pars,
-                         MyEOSParams* eos_pars, const bs_real mass_lepton,
-                         const bs_real mu_lepton, bs_real* out)
+void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
+                         MyEOSParams* eos_pars, const BS_REAL mass_lepton,
+                         const BS_REAL mu_lepton, BS_REAL* out)
 {
-    const bs_real mass_lepton_squared = POW2(mass_lepton);
+    const BS_REAL mass_lepton_squared = POW2(mass_lepton);
 
-    bs_real Qprime, mu_np;
-    bs_real etanp, etapn;
-    bs_real E_e, E_p;
-    bs_real E_e_squared, E_p_squared;
-    bs_real cap_term = 0., dec_term = 0.;
-    bs_real fd_e, fd_p;
-    bs_real R = 1., Rbar = 1.;
-    bs_real dU = 0., dQ = kBS_Q;
+    BS_REAL Qprime, mu_np;
+    BS_REAL etanp, etapn;
+    BS_REAL E_e, E_p;
+    BS_REAL E_e_squared, E_p_squared;
+    BS_REAL cap_term = 0., dec_term = 0.;
+    BS_REAL fd_e, fd_p;
+    BS_REAL R = 1., Rbar = 1.;
+    BS_REAL dU = 0., dQ = kBS_Q;
 
-    const bs_real nb   = eos_pars->nb;   // Number baryon density [nm-3]
-    const bs_real T    = eos_pars->temp; // Temperature [MeV]
-    const bs_real yp   = eos_pars->yp;   // Proton fraction
-    const bs_real yn   = eos_pars->yn;   // Neutron fraction
-    const bs_real mu_p = eos_pars->mu_p; // Proton chemical potential [MeV]
-    const bs_real mu_n = eos_pars->mu_n; // Neutron chemical potential [MeV]
+    const BS_REAL nb   = eos_pars->nb;   // Number baryon density [nm-3]
+    const BS_REAL T    = eos_pars->temp; // Temperature [MeV]
+    const BS_REAL yp   = eos_pars->yp;   // Proton fraction
+    const BS_REAL yn   = eos_pars->yn;   // Neutron fraction
+    const BS_REAL mu_p = eos_pars->mu_p; // Proton chemical potential [MeV]
+    const BS_REAL mu_n = eos_pars->mu_n; // Neutron chemical potential [MeV]
 
-    const bs_real nn = nb * yn; // Neutron number density [nm-3]
-    const bs_real np = nb * yp; // Proton number density  [nm-3]
+    const BS_REAL nn = nb * yn; // Neutron number density [nm-3]
+    const BS_REAL np = nb * yp; // Proton number density  [nm-3]
 
     // Mean field corrections
     if (opacity_pars->use_dU)
@@ -166,7 +166,7 @@ void AbsOpacitySingleLep(const bs_real omega, OpacityParams* opacity_pars,
         dQ = eos_pars->dm_eff; // [MeV]
 
     // Neutron minus proton chem. potentials (corrected for the mass difference)
-    const bs_real mu_hat = mu_n - mu_p - dQ; // [MeV]
+    const BS_REAL mu_hat = mu_n - mu_p - dQ; // [MeV]
 
     Qprime = dQ + dU;     // [MeV], Eq.(79) in Hempel
     mu_np  = mu_hat - dU; // [MeV], Eq.(80,86) in Hempel
@@ -217,7 +217,7 @@ void AbsOpacitySingleLep(const bs_real omega, OpacityParams* opacity_pars,
 
     // without detailed balance
     // out[0] = kAbsEmConst * etanp * (cap_term * (1. - fd_e) + dec_term *
-    // fd_p); // Neutrino absorptivity [s-1], Eq.(C13) bs_real mu_nue =
+    // fd_p); // Neutrino absorptivity [s-1], Eq.(C13) BS_REAL mu_nue =
     // (eos_pars->mu_e - eos_pars->mu_n + eos_pars->mu_p) / temp; out[0] =
     // kAbsEmConst * etanp * cap_term / (1. + exp(eos_pars->mu_e / temp -
     // FDI_p5(mu_nue)/FDI_p4(mu_nue)));
@@ -284,13 +284,13 @@ void AbsOpacitySingleLep(const bs_real omega, OpacityParams* opacity_pars,
  * @TODO: add support for muons
  */
 KOKKOS_INLINE_FUNCTION
-MyOpacity AbsOpacity(const bs_real omega, OpacityParams* opacity_pars,
+MyOpacity AbsOpacity(const BS_REAL omega, OpacityParams* opacity_pars,
                      MyEOSParams* eos_pars)
 {
     MyOpacity MyOut = {0}; // initialize to zero
 
     // Electron (anti)neutrino
-    bs_real el_out[4] = {0.0};
+    BS_REAL el_out[4] = {0.0};
     AbsOpacitySingleLep(omega, opacity_pars, eos_pars, kBS_Me, eos_pars->mu_e,
                         el_out);
 
@@ -301,7 +301,7 @@ MyOpacity AbsOpacity(const bs_real omega, OpacityParams* opacity_pars,
 
     // Uncomment the following when considering also muons
     // // Muon (anti)neutrino
-    // bs_real mu_out[4] = {0.0};
+    // BS_REAL mu_out[4] = {0.0};
     // AbsOpacitySingleLep(omega, opacity_pars, eos_pars, kBS_Mmu,
     // eos_pars->mu_mu, mu_out);
 
@@ -323,7 +323,7 @@ MyOpacity AbsOpacity(const bs_real omega, OpacityParams* opacity_pars,
  * @TODO: add support for muons
  */
 KOKKOS_INLINE_FUNCTION
-MyOpacity StimAbsOpacity(const bs_real omega, OpacityParams* opacity_pars,
+MyOpacity StimAbsOpacity(const BS_REAL omega, OpacityParams* opacity_pars,
                          MyEOSParams* eos_pars)
 {
     MyOpacity abs_opacity = AbsOpacity(omega, opacity_pars, eos_pars);
@@ -337,7 +337,7 @@ MyOpacity StimAbsOpacity(const bs_real omega, OpacityParams* opacity_pars,
 
 KOKKOS_INLINE_FUNCTION
 void BetaOpacitiesTable(MyQuadrature* quad, MyEOSParams* eos_pars,
-                        OpacityParams* opacity_pars, bs_real t,
+                        OpacityParams* opacity_pars, BS_REAL t,
                         M1MatrixKokkos2D* out)
 {
     const int n = quad->nx;
@@ -365,16 +365,16 @@ void BetaOpacitiesTable(MyQuadrature* quad, MyEOSParams* eos_pars,
 
 /*
 // (Anti)neutrino absorption on nucleons
-MyOpacity AbsOpacity(const bs_real omega, OpacityParams* opacity_pars,
+MyOpacity AbsOpacity(const BS_REAL omega, OpacityParams* opacity_pars,
                      MyEOSParams* eos_pars);
 
 // Stimulated absoption version
-MyOpacity StimAbsOpacity(const bs_real omega, OpacityParams* opacity_pars,
+MyOpacity StimAbsOpacity(const BS_REAL omega, OpacityParams* opacity_pars,
                          MyEOSParams* eos_pars);
 
 // Build matrix for integration
 void BetaOpacitiesTable(MyQuadrature* quad, MyEOSParams* eos_pars,
-                        OpacityParams* opacity_pars, bs_real t, M1Matrix* out);
+                        OpacityParams* opacity_pars, BS_REAL t, M1Matrix* out);
 
 */
 /*===========================================================================*/
@@ -396,7 +396,7 @@ void BetaOpacitiesTable(MyQuadrature* quad, MyEOSParams* eos_pars,
 
 
 /**
- * @fn bs_real EtaNNSc(const bs_real nb, const bs_real temp, const bs_real yN)
+ * @fn BS_REAL EtaNNSc(const BS_REAL nb, const BS_REAL temp, const BS_REAL yN)
  * @brief Computes degeneracy parameter \f$\eta_{NN}\f$ from Eqn. (C37) of
  * Bruenn.
  *
@@ -406,10 +406,10 @@ void BetaOpacitiesTable(MyQuadrature* quad, MyEOSParams* eos_pars,
  * @return      The degeneracy parameter \f$\eta_{NN} [nm^-3]\f$
  */
 KOKKOS_INLINE_FUNCTION
-bs_real EtaNNSc(const bs_real nb, const bs_real temp, const bs_real yN)
+BS_REAL EtaNNSc(const BS_REAL nb, const BS_REAL temp, const BS_REAL yN)
 {
     // nucleon (neutron/proton) number density
-    const bs_real nN = yN * nb; // [nm^-3]
+    const BS_REAL nN = yN * nb; // [nm^-3]
 
     // Enforce zero rates if no nucleons are present
     if (nN <= 0.)
@@ -420,15 +420,15 @@ bs_real EtaNNSc(const bs_real nb, const bs_real temp, const bs_real yN)
     // Linear interpolation between degenerate and non-degnerate limit in
     // Eq.(C37)
     // Fermi energy computation
-    const bs_real eFN = kBS_Iso_eF * pow(nN, 2. / 3.); // [MeV]
-    const bs_real aux = 1.5 * temp / eFN;
+    const BS_REAL eFN = kBS_Iso_eF * pow(nN, 2. / 3.); // [MeV]
+    const BS_REAL aux = 1.5 * temp / eFN;
 
     return nN * aux / sqrt(1. + POW2(aux)); // [nm-3]
 }
 
 /**
- * @fn bs_real IsoScattNucleon(const bs_real omega, OpacityParams *opacity_pars,
- * MyEOSParams *eos_pars, const bs_real yN, const int reacflag)
+ * @fn BS_REAL IsoScattNucleon(const BS_REAL omega, OpacityParams *opacity_pars,
+ * MyEOSParams *eos_pars, const BS_REAL yN, const int reacflag)
  * @brief Computes Spectral scattering opacity for iso-energetic scattering on
  * nucleons (protons/neutrons)
  * @param omega         neutrino energy \f$[MeV]\f$
@@ -441,20 +441,20 @@ bs_real EtaNNSc(const bs_real nb, const bs_real temp, const bs_real yN)
  * @return              "Eq.(A41)" \f$[MeV nm^{3} s^{-1}]\f$
  */
 KOKKOS_INLINE_FUNCTION
-bs_real IsoScattNucleon(const bs_real omega, OpacityParams* opacity_pars,
-                        MyEOSParams* eos_pars, const bs_real yN,
+BS_REAL IsoScattNucleon(const BS_REAL omega, OpacityParams* opacity_pars,
+                        MyEOSParams* eos_pars, const BS_REAL yN,
                         const int reacflag)
 {
-    bs_real R0 = 1., R1 = 1.;
-    bs_real leg_0, leg_1;
+    BS_REAL R0 = 1., R1 = 1.;
+    BS_REAL leg_0, leg_1;
 
     // Number baryon density
-    const bs_real nb = eos_pars->nb; // [nm^-3]
+    const BS_REAL nb = eos_pars->nb; // [nm^-3]
     // Temperature
-    const bs_real temp = eos_pars->temp; // [MeV]
+    const BS_REAL temp = eos_pars->temp; // [MeV]
 
     // Degeneracy parameter eta_NN [nm^-3] from Eqn. (C37) of Bruen
-    const bs_real etaNN = EtaNNSc(nb, temp, yN);
+    const BS_REAL etaNN = EtaNNSc(nb, temp, yN);
 
     // Phase space, recoil and weak magnetism corrections
     // R0 (R1) is the correction to the zeroth (first) Legendre coefficient
@@ -481,7 +481,7 @@ bs_real IsoScattNucleon(const bs_real omega, OpacityParams* opacity_pars,
 }
 
 /**
- * @fn bs_real IsoScattProton(bs_real omega, OpacityParams *opacity_pars,
+ * @fn BS_REAL IsoScattProton(BS_REAL omega, OpacityParams *opacity_pars,
  * MyEOSParams *eos_pars)
  * @brief Computes the spectral scattering opacity for scattering of neutrinos
  * on protons
@@ -491,14 +491,14 @@ bs_real IsoScattNucleon(const bs_real omega, OpacityParams* opacity_pars,
  * @return              "Eq.(A41)" \f$[MeV nm{^3} s^{-1}]\f$
  */
 KOKKOS_INLINE_FUNCTION
-bs_real IsoScattProton(const bs_real omega, OpacityParams* opacity_pars,
+BS_REAL IsoScattProton(const BS_REAL omega, OpacityParams* opacity_pars,
                        MyEOSParams* eos_pars)
 {
     return IsoScattNucleon(omega, opacity_pars, eos_pars, eos_pars->yp, 1);
 }
 
 /**
- * @fn bs_real IsoScattNeutron(bs_real omega, OpacityParams *opacity_pars,
+ * @fn BS_REAL IsoScattNeutron(BS_REAL omega, OpacityParams *opacity_pars,
  * MyEOSParams *eos_pars)
  * @brief Computes the spectral scattering opacity for scattering of neutrinos
  * on neutrons
@@ -508,14 +508,14 @@ bs_real IsoScattProton(const bs_real omega, OpacityParams* opacity_pars,
  * @return              "Eq.(A41)" \f$[MeV nm{^3} s^{-1}]\f$
  */
 KOKKOS_INLINE_FUNCTION
-bs_real IsoScattNeutron(const bs_real omega, OpacityParams* opacity_pars,
+BS_REAL IsoScattNeutron(const BS_REAL omega, OpacityParams* opacity_pars,
                         MyEOSParams* eos_pars)
 {
     return IsoScattNucleon(omega, opacity_pars, eos_pars, eos_pars->yn, 2);
 }
 
 /**
- * @fn bs_real IsoScattTotal(bs_real omega, OpacityParams *opacity_pars,
+ * @fn BS_REAL IsoScattTotal(BS_REAL omega, OpacityParams *opacity_pars,
  * MyEOSParams *eos_pars)
  * @brief Computes the total spectral scattering opacity for scattering of
  * neutrinos on protons and neutrons
@@ -525,20 +525,20 @@ bs_real IsoScattNeutron(const bs_real omega, OpacityParams* opacity_pars,
  * @return              "Eq.(A41)" \f$[MeV nm{^3} s^{-1}]\f$
  */
 KOKKOS_INLINE_FUNCTION
-bs_real IsoScattTotal(const bs_real omega, OpacityParams* opacity_pars,
+BS_REAL IsoScattTotal(const BS_REAL omega, OpacityParams* opacity_pars,
                       MyEOSParams* eos_pars)
 {
     // proton contribution
-    const bs_real iso_nu_p = IsoScattProton(omega, opacity_pars, eos_pars);
+    const BS_REAL iso_nu_p = IsoScattProton(omega, opacity_pars, eos_pars);
     // neutron contribution
-    const bs_real iso_nu_n = IsoScattNeutron(omega, opacity_pars, eos_pars);
+    const BS_REAL iso_nu_n = IsoScattNeutron(omega, opacity_pars, eos_pars);
 
     return iso_nu_p + iso_nu_n;
 }
 
 
 /**
- * @fn bs_real IsoScattLegCoeff(const bs_real omega, OpacityParams
+ * @fn BS_REAL IsoScattLegCoeff(const BS_REAL omega, OpacityParams
  * *opacity_pars, MyEOSParams *eos_pars, const int l)
  * @brief Computes Spectral scattering opacity for iso-energetic scattering on
  * nucleons (protons/neutrons)
@@ -551,24 +551,24 @@ bs_real IsoScattTotal(const bs_real omega, OpacityParams* opacity_pars,
  * kernel
  */
 KOKKOS_INLINE_FUNCTION
-bs_real IsoScattLegCoeff(const bs_real omega, OpacityParams* opacity_pars,
+BS_REAL IsoScattLegCoeff(const BS_REAL omega, OpacityParams* opacity_pars,
                          MyEOSParams* eos_pars, const int l)
 {
     BS_ASSERT(l >= 0 && l <= 1); // Legendre order must be either zero or one
 
-    bs_real R0_n = 1., R1_n = 1.;
-    bs_real R0_p = 1., R1_p = 1.;
-    bs_real leg;
+    BS_REAL R0_n = 1., R1_n = 1.;
+    BS_REAL R0_p = 1., R1_p = 1.;
+    BS_REAL leg;
 
-    const bs_real nb   = eos_pars->nb;   // Number baryon density [nm^-3]
-    const bs_real temp = eos_pars->temp; // Temperature [MeV]
-    const bs_real yp   = eos_pars->yp;   // Proton fraction
-    const bs_real yn   = eos_pars->yn;   // Neutron fraction
+    const BS_REAL nb   = eos_pars->nb;   // Number baryon density [nm^-3]
+    const BS_REAL temp = eos_pars->temp; // Temperature [MeV]
+    const BS_REAL yp   = eos_pars->yp;   // Proton fraction
+    const BS_REAL yn   = eos_pars->yn;   // Neutron fraction
 
     // degeneracy parameter from Eqn. (C37) of Bruenn
-    const bs_real eta_pp =
+    const BS_REAL eta_pp =
         EtaNNSc(nb, temp, yp); // scattering on protons [nm^-3]
-    const bs_real eta_nn =
+    const BS_REAL eta_nn =
         EtaNNSc(nb, temp, yn); // scattering on neutrons [nm^-3]
 
     // Phase space, recoil and weak magnetism corrections
@@ -598,7 +598,7 @@ bs_real IsoScattLegCoeff(const bs_real omega, OpacityParams* opacity_pars,
 // pair opacities
 #ifdef GSL_INCLUDES_H_
 MyKernelQuantity PairEmissivityAbsorptivityIntegrandFermi(
-    bs_real var, MyEOSParams* my_eos_params, MyKernelParams* my_kernel_params);
+    BS_REAL var, MyEOSParams* my_eos_params, MyKernelParams* my_kernel_params);
 MyKernelQuantity PairOpacitiesFermi(MyQuadrature* quad,
                                     MyEOSParams* my_eos_params,
                                     MyKernelParams* my_kernel_params);
@@ -607,7 +607,7 @@ MyKernelQuantity PairOpacitiesFermi(MyQuadrature* quad,
 // bremsstrahlung opacities
 #ifdef GSL_INCLUDES_H_
 MyKernelQuantity
-BremEmissivityAbsorptivityIntegrandFermi(bs_real omega_prime,
+BremEmissivityAbsorptivityIntegrandFermi(BS_REAL omega_prime,
                                          MyEOSParams* my_eos_params,
                                          MyKernelParams* my_kernel_params);
 MyKernelQuantity BremOpacitiesFermi(MyQuadrature* quad,

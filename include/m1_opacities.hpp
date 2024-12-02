@@ -16,8 +16,8 @@
 /* Thresholds on the neutrino energy number and energy density. If values are
 below the thresholds, absorption opacities or scattering opacities are set to 0.
 */
-static const bs_real THRESHOLD_N = 1e-21;
-static const bs_real THRESHOLD_J = 1e-25;
+static const BS_REAL THRESHOLD_N = 1e-21;
+static const BS_REAL THRESHOLD_J = 1e-25;
 
 /* Computes the integrand for all single integrals from Leonardo's notes
  *
@@ -38,16 +38,16 @@ static const bs_real THRESHOLD_J = 1e-25;
 
 KOKKOS_INLINE_FUNCTION
 void Scattering1DIntegrand(const MyQuadrature* quad,
-                           GreyOpacityParams* grey_pars, const bs_real* t,
-                           bs_real out[][n_max])
+                           GreyOpacityParams* grey_pars, const BS_REAL* t,
+                           BS_REAL out[][n_max])
 {
-    static const bs_real four_pi = 4. * kBS_Pi;
+    static const BS_REAL four_pi = 4. * kBS_Pi;
 
     const int n = quad->nx;
 
-    bs_real nu, iso_scatt, aux;
+    BS_REAL nu, iso_scatt, aux;
 
-    bs_real g_nu[total_num_species];
+    BS_REAL g_nu[total_num_species];
 
     for (int i = 0; i < n; ++i)
     {
@@ -84,11 +84,11 @@ void Scattering1DIntegrand(const MyQuadrature* quad,
 
 KOKKOS_INLINE_FUNCTION
 void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
-                     const bs_real* t, bs_real out_em[][n_max],
-                     bs_real out_ab[][n_max], const int stim_abs)
+                     const BS_REAL* t, BS_REAL out_em[][n_max],
+                     BS_REAL out_ab[][n_max], const int stim_abs)
 {
     const int n = quad->nx;
-    bs_real nu, nu_sqr, g_nu;
+    BS_REAL nu, nu_sqr, g_nu;
     MyOpacity abs_em_beta;
 
     if (stim_abs == 1)
@@ -196,11 +196,11 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
 }
 
 KOKKOS_INLINE_FUNCTION
-void AddBetaReactionToIntegrand(int n, bs_real* nu_array,
+void AddBetaReactionToIntegrand(int n, BS_REAL* nu_array,
                                 GreyOpacityParams* grey_pars,
                                 M1MatrixKokkos2D* out, const int stim_abs)
 {
-    bs_real nu;
+    BS_REAL nu;
     MyOpacity abs_em_beta;
 
     if (stim_abs == 1)
@@ -246,7 +246,7 @@ void AddBetaReactionToIntegrand(int n, bs_real* nu_array,
 }
 
 KOKKOS_INLINE_FUNCTION
-void AddPairKernelsToIntegrand(int n, bs_real* nu_array,
+void AddPairKernelsToIntegrand(int n, BS_REAL* nu_array,
                                GreyOpacityParams* grey_pars,
                                M1MatrixKokkos2D* out)
 {
@@ -296,7 +296,7 @@ void AddPairKernelsToIntegrand(int n, bs_real* nu_array,
 
 
 KOKKOS_INLINE_FUNCTION
-void AddBremKernelsToIntegrand(int n, bs_real* nu_array,
+void AddBremKernelsToIntegrand(int n, BS_REAL* nu_array,
                                GreyOpacityParams* grey_pars,
                                M1MatrixKokkos2D* out)
 {
@@ -389,13 +389,13 @@ void AddBremKernelsToIntegrand(int n, bs_real* nu_array,
 }
 
 KOKKOS_INLINE_FUNCTION
-void AddInelKernelsToIntegrand(int n, bs_real* nu_array,
+void AddInelKernelsToIntegrand(int n, BS_REAL* nu_array,
                                GreyOpacityParams* grey_pars,
                                M1MatrixKokkos2D* out)
 {
-    bs_real nu, nu_bar;
-    bs_real g_nu[total_num_species], g_nu_bar[total_num_species];
-    bs_real block_factor_nu[total_num_species],
+    BS_REAL nu, nu_bar;
+    BS_REAL g_nu[total_num_species], g_nu_bar[total_num_species];
+    BS_REAL block_factor_nu[total_num_species],
         block_factor_nu_bar[total_num_species];
     MyKernelOutput inel_1, inel_2;
 
@@ -481,13 +481,13 @@ void AddInelKernelsToIntegrand(int n, bs_real* nu_array,
 }
 
 KOKKOS_INLINE_FUNCTION
-void WeightNuNuBarReactionsWithDistr(int n, bs_real* nu_array,
+void WeightNuNuBarReactionsWithDistr(int n, BS_REAL* nu_array,
                                      GreyOpacityParams* grey_pars,
                                      M1MatrixKokkos2D* out)
 {
-    bs_real nu, nu_bar;
-    bs_real g_nu[total_num_species], g_nu_bar[total_num_species];
-    bs_real block_factor_nu[total_num_species],
+    BS_REAL nu, nu_bar;
+    BS_REAL g_nu[total_num_species], g_nu_bar[total_num_species];
+    BS_REAL block_factor_nu[total_num_species],
         block_factor_nu_bar[total_num_species];
 
     for (int i = 0; i < 2 * n; ++i)
@@ -561,12 +561,12 @@ void WeightNuNuBarReactionsWithDistr(int n, bs_real* nu_array,
 }
 
 KOKKOS_INLINE_FUNCTION
-void AddCommonWeightsToIntegrand(int n, bs_real* nu_array,
+void AddCommonWeightsToIntegrand(int n, BS_REAL* nu_array,
                                  GreyOpacityParams* grey_pars,
                                  M1MatrixKokkos2D* out, int stim_abs)
 {
-    bs_real nu, nu_bar, nu_squared, nu_fourth;
-    bs_real g_nu[total_num_species], g_nu_bar[total_num_species];
+    BS_REAL nu, nu_bar, nu_squared, nu_fourth;
+    BS_REAL g_nu[total_num_species], g_nu_bar[total_num_species];
 
     BS_ASSERT((stim_abs == 0) || (stim_abs == 1));
 
@@ -661,17 +661,17 @@ void AddCommonWeightsToIntegrand(int n, bs_real* nu_array,
  *                                                                        + nu^3
  * nubar^2 [R_abs(Pair) + R_abs(Brem)]g_nubar g_nu)
  *
- * Note that there are no bs_real integrals for the computation of the
+ * Note that there are no BS_REAL integrals for the computation of the
  * scattering coefficient.
  */
 KOKKOS_INLINE_FUNCTION
-M1MatrixKokkos2D ComputeDoubleIntegrand(const MyQuadrature* quad, bs_real t,
+M1MatrixKokkos2D ComputeDoubleIntegrand(const MyQuadrature* quad, BS_REAL t,
                                         GreyOpacityParams* grey_pars,
                                         const int stim_abs)
 {
     const int n = quad->nx;
-    bs_real nu, nu_bar;
-    bs_real nu_array[n_max];
+    BS_REAL nu, nu_bar;
+    BS_REAL nu_array[n_max];
     M1MatrixKokkos2D out = {0};
 
     for (int i = 0; i < n; ++i)
@@ -681,8 +681,8 @@ M1MatrixKokkos2D ComputeDoubleIntegrand(const MyQuadrature* quad, bs_real t,
     }
 
     // compute the neutrino & anti-neutrino distribution function
-    bs_real g_nu[total_num_species], g_nu_bar[total_num_species];
-    bs_real block_factor_nu[total_num_species],
+    BS_REAL g_nu[total_num_species], g_nu_bar[total_num_species];
+    BS_REAL block_factor_nu[total_num_species],
         block_factor_nu_bar[total_num_species];
 
     if (grey_pars->opacity_flags.use_pair == 1)
@@ -765,8 +765,8 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     const MyQuadrature* quad_1d, const MyQuadrature* quad_2d,
     GreyOpacityParams* my_grey_opacity_params, const int stim_abs)
 {
-    bs_real n[total_num_species];
-    bs_real J[total_num_species];
+    BS_REAL n[total_num_species];
+    BS_REAL J[total_num_species];
 
     for (int idx = 0; idx < total_num_species; ++idx)
     {
@@ -779,15 +779,15 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
         J[idx] = J[idx] / kBS_MeV;
     }
 
-    const bs_real temp  = my_grey_opacity_params->eos_pars.temp;
-    const bs_real eta_e = my_grey_opacity_params->eos_pars.mu_e / temp;
+    const BS_REAL temp  = my_grey_opacity_params->eos_pars.temp;
+    const BS_REAL eta_e = my_grey_opacity_params->eos_pars.mu_e / temp;
 
     // @TODO: choose this appropriately
-    const bs_real s_pair = 0.5 * 4.364 * temp;
-    // const bs_real s_pair              = temp * (FDI_p4(eta_e) / FDI_p3(eta_e)
+    const BS_REAL s_pair = 0.5 * 4.364 * temp;
+    // const BS_REAL s_pair              = temp * (FDI_p4(eta_e) / FDI_p3(eta_e)
     // + FDI_p4(-eta_e) / FDI_p3(-eta_e));
-    const bs_real s_nux               = 1.5 * temp;
-    bs_real s_beta[total_num_species] = {0}, s_iso[total_num_species] = {0};
+    const BS_REAL s_nux               = 1.5 * temp;
+    BS_REAL s_beta[total_num_species] = {0}, s_iso[total_num_species] = {0};
 
     s_beta[id_nue]  = temp * FDI_p5(eta_e) / FDI_p4(eta_e);
     s_beta[id_anue] = temp * FDI_p5(-eta_e) / FDI_p4(-eta_e);
@@ -801,7 +801,7 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     MyQuadratureIntegrand iso_integrals = {0};
     if (my_grey_opacity_params->opacity_flags.use_iso == 1)
     {
-        bs_real out_iso[total_num_species][n_max];
+        BS_REAL out_iso[total_num_species][n_max];
         Scattering1DIntegrand(quad_1d, my_grey_opacity_params, s_iso, out_iso);
         iso_integrals = GaussLegendreIntegrate1DMatrix(
             quad_1d, total_num_species, out_iso, s_iso);
@@ -814,8 +814,8 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
 
     if (my_grey_opacity_params->opacity_flags.use_abs_em == 1)
     {
-        bs_real out_beta_em[total_num_species][n_max];
-        bs_real out_beta_ab[total_num_species][n_max];
+        BS_REAL out_beta_em[total_num_species][n_max];
+        BS_REAL out_beta_ab[total_num_species][n_max];
 
         Beta1DIntegrand(quad_1d, my_grey_opacity_params, s_beta, out_beta_em,
                         out_beta_ab, stim_abs);
@@ -969,22 +969,22 @@ M1Opacities ComputeM1Opacities(const MyQuadrature* quad_1d,
 /* Compute the integrands for the computation of the spectral emissivity and
  * inverse mean free path */
 KOKKOS_INLINE_FUNCTION
-MyQuadratureIntegrand SpectralIntegrand(bs_real* var, void* p)
+MyQuadratureIntegrand SpectralIntegrand(BS_REAL* var, void* p)
 {
     // energies and parameters
-    bs_real nu_bar = var[0]; // [MeV]
+    BS_REAL nu_bar = var[0]; // [MeV]
 
     GreyOpacityParams* my_grey_opacity_params = (GreyOpacityParams*)p;
     MyEOSParams my_eos_params  = my_grey_opacity_params->eos_pars;
     OpacityFlags opacity_flags = my_grey_opacity_params->opacity_flags;
     OpacityParams opacity_pars = my_grey_opacity_params->opacity_pars;
 
-    bs_real nu = my_grey_opacity_params->kernel_pars.pair_kernel_params.omega;
+    BS_REAL nu = my_grey_opacity_params->kernel_pars.pair_kernel_params.omega;
 
-    bs_real block_factor[total_num_species]; // blocking factor
+    BS_REAL block_factor[total_num_species]; // blocking factor
 
     // compute the neutrino & anti-neutrino distribution function
-    bs_real g_nu[total_num_species], g_nu_bar[total_num_species];
+    BS_REAL g_nu[total_num_species], g_nu_bar[total_num_species];
 
     for (int idx = 0; idx < total_num_species; ++idx)
     {
@@ -1047,7 +1047,7 @@ MyQuadratureIntegrand SpectralIntegrand(bs_real* var, void* p)
             &my_grey_opacity_params->eos_pars);
     }
 
-    bs_real pro_term[total_num_species] = {0};
+    BS_REAL pro_term[total_num_species] = {0};
 
     if (opacity_pars.neglect_blocking == false)
     {
@@ -1082,7 +1082,7 @@ MyQuadratureIntegrand SpectralIntegrand(bs_real* var, void* p)
         pro_term[idx] += inelastic_kernels_m1.em[idx] * g_nu_bar[idx];
     }
 
-    bs_real ann_term[total_num_species] = {0};
+    BS_REAL ann_term[total_num_species] = {0};
 
     ann_term[id_nue] =
         (pair_kernels_m1.abs[id_nue] + brem_kernels_m1.abs[id_nue]) *
@@ -1118,7 +1118,7 @@ MyQuadratureIntegrand SpectralIntegrand(bs_real* var, void* p)
         ann_term[idx] += inelastic_kernels_m1.abs[idx] * block_factor[idx];
     }
 
-    bs_real integrand_1[total_num_species], integrand_2[total_num_species];
+    BS_REAL integrand_1[total_num_species], integrand_2[total_num_species];
 
     for (int idx = 0; idx < total_num_species; ++idx)
     {
@@ -1144,7 +1144,7 @@ MyQuadratureIntegrand SpectralIntegrand(bs_real* var, void* p)
 
 // Version without stimulated absorption
 inline SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
-    const bs_real nu, MyQuadrature* quad_1d,
+    const BS_REAL nu, MyQuadrature* quad_1d,
     GreyOpacityParams* my_grey_opacity_params)
 {
     my_grey_opacity_params->kernel_pars.pair_kernel_params.omega      = nu;
@@ -1160,17 +1160,17 @@ inline SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
     integrand_m1_1d.my_quadrature_integrand    = integrand_m1_1d_info;
 
     // compute the neutrino & anti-neutrino distribution function
-    bs_real g_nu[total_num_species];
+    BS_REAL g_nu[total_num_species];
 
     for (int idx = 0; idx < total_num_species; ++idx)
     {
         g_nu[idx] = TotalNuF(nu, &my_grey_opacity_params->distr_pars, idx);
     }
 
-    const bs_real eta_e = my_grey_opacity_params->eos_pars.mu_e /
+    const BS_REAL eta_e = my_grey_opacity_params->eos_pars.mu_e /
                           my_grey_opacity_params->eos_pars.temp;
 
-    bs_real s[8];
+    BS_REAL s[8];
     for (int i = 0; i < 8; ++i)
     {
         // s[i] = 1.5 * my_grey_opacity_params->eos_pars.temp;
@@ -1192,7 +1192,7 @@ inline SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
                                  &my_grey_opacity_params->eos_pars); // [s^-1]
     }
 
-    bs_real iso_scatt = 0.;
+    BS_REAL iso_scatt = 0.;
     if (my_grey_opacity_params->opacity_flags.use_iso)
     {
         iso_scatt = IsoScattLegCoeff(nu, &my_grey_opacity_params->opacity_pars,
@@ -1248,7 +1248,7 @@ inline SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
 // Version with stimulated absorption
 KOKKOS_INLINE_FUNCTION
 SpectralOpacities
-ComputeSpectralOpacitiesStimulatedAbs(const bs_real nu, MyQuadrature* quad_1d,
+ComputeSpectralOpacitiesStimulatedAbs(const BS_REAL nu, MyQuadrature* quad_1d,
                                       GreyOpacityParams* my_grey_opacity_params)
 {
     SpectralOpacities spec_opacs = ComputeSpectralOpacitiesNotStimulatedAbs(

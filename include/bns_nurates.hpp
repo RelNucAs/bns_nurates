@@ -30,7 +30,7 @@
 #define REAL_TYPE double
 #endif
 
-typedef REAL_TYPE bs_real;
+typedef REAL_TYPE BS_REAL;
 
 #ifndef KOKKOS_INLINE_FUNCTION
 #ifdef KOKKOS_FLAG
@@ -94,24 +94,24 @@ struct MyQuadrature
 {
     enum Quadrature type; // type of quadrature (for the integration in the
                           // points variable, others are always kGauleg)
-    bs_real alpha;        // parameter for Gauss-Laguerre quadrature (optional)
+    BS_REAL alpha;        // parameter for Gauss-Laguerre quadrature (optional)
     int dim;              // dimension of quadrature, can be 1,2,3
     int nx; // number of points in the quadrature scheme in the points direction
     int ny; // number of points in the quadrature scheme in the y direction, set
             // to 1 if not needed
     int nz; // number of points in the quadrature scheme in the z direction, set
             // to 1 if not needed
-    bs_real x1; // lower limit of points, set to -42 if unused
-    bs_real x2; // upper limit of points, set to -42 if unused
-    bs_real y1; // lower limit of y, set to -42 if unused
-    bs_real y2; // upper limit of y, set to -42 if unused
-    bs_real z1; // lower limit of z, set to -42 if unused
-    bs_real z2; // upper limit of z, set to -42 if unused
-    bs_real
-        points[n_max]; // points for the quadrature scheme (store points in the
-                       // points direction, then y and z in one flat array)
-    bs_real w[n_max];  // weights for the quadrature scheme (store points in the
-                       // points direction, then y and z in one flat array)
+    BS_REAL x1; // lower limit of points, set to -42 if unused
+    BS_REAL x2; // upper limit of points, set to -42 if unused
+    BS_REAL y1; // lower limit of y, set to -42 if unused
+    BS_REAL y2; // upper limit of y, set to -42 if unused
+    BS_REAL z1; // lower limit of z, set to -42 if unused
+    BS_REAL z2; // upper limit of z, set to -42 if unused
+    BS_REAL
+    points[n_max];    // points for the quadrature scheme (store points in the
+                      // points direction, then y and z in one flat array)
+    BS_REAL w[n_max]; // weights for the quadrature scheme (store points in the
+                      // points direction, then y and z in one flat array)
 };
 typedef struct MyQuadrature MyQuadrature;
 __attribute__((unused)) static MyQuadrature quadrature_default = {.type =
@@ -138,7 +138,7 @@ __attribute__((unused)) static MyQuadrature quadrature_default = {.type =
 struct MyFunction
 {
     int dim; // number of function variables (1/2)
-    bs_real (*function)(bs_real* var, void* params); // function
+    BS_REAL (*function)(BS_REAL* var, void* params); // function
     void* params;                                    // function parameters
 };
 typedef struct MyFunction MyFunction;
@@ -153,7 +153,7 @@ typedef struct MyFunction MyFunction;
 struct MyQuadratureIntegrand
 {
     int n;                 // number of integrands/integrals
-    bs_real integrand[16]; // values of integrands/integrals (max: 16)
+    BS_REAL integrand[16]; // values of integrands/integrals (max: 16)
 };
 typedef struct MyQuadratureIntegrand MyQuadratureIntegrand;
 
@@ -165,7 +165,7 @@ typedef struct MyQuadratureIntegrand MyQuadratureIntegrand;
 struct MyFunctionMultiD
 {
     int dim; // number of function variables (1/2)
-    MyQuadratureIntegrand (*function)(bs_real* var3d,
+    MyQuadratureIntegrand (*function)(BS_REAL* var3d,
                                       void* params); // the function
     MyQuadratureIntegrand
         my_quadrature_integrand; // integrand information and values
@@ -184,8 +184,8 @@ typedef struct MyFunctionMultiD MyFunctionMultiD;
  */
 struct BremKernelParams
 {
-    bs_real omega;           // neutrino energy before interaction
-    bs_real omega_prime;     // neutrino energy after interaction
+    BS_REAL omega;           // neutrino energy before interaction
+    BS_REAL omega_prime;     // neutrino energy after interaction
     int l;                   // order of Legendre coefficient
     bool use_NN_medium_corr; // flag for inclusion of medium correction to HR98
                              // NN brem kernel as in Fischer16
@@ -198,15 +198,15 @@ typedef struct BremKernelParams BremKernelParams;
  */
 struct PairKernelParams
 {
-    bs_real omega;       // neutrino energy
-    bs_real omega_prime; // anti-neutrino energy
-    bs_real cos_theta;   // cosine of angle between nu and a-nu
-    bs_real mu;          // cosine of neutrino polar angle
-    bs_real mu_prime;    // cosine of anti-neutrino polar angle
-    bs_real lmax;        // maximum value of l for Legendre expansion
-    bs_real filter;      // filter parameter for pair kernel positivity
-    // bs_real alpha[dim_pair_t];
-    // bs_real pair_t[6][dim_pair_t];
+    BS_REAL omega;       // neutrino energy
+    BS_REAL omega_prime; // anti-neutrino energy
+    BS_REAL cos_theta;   // cosine of angle between nu and a-nu
+    BS_REAL mu;          // cosine of neutrino polar angle
+    BS_REAL mu_prime;    // cosine of anti-neutrino polar angle
+    BS_REAL lmax;        // maximum value of l for Legendre expansion
+    BS_REAL filter;      // filter parameter for pair kernel positivity
+    // BS_REAL alpha[dim_pair_t];
+    // BS_REAL pair_t[6][dim_pair_t];
 };
 typedef struct PairKernelParams PairKernelParams;
 
@@ -216,8 +216,8 @@ typedef struct PairKernelParams PairKernelParams;
  */
 struct InelasticScattKernelParams
 {
-    bs_real omega;       // neutrino energy
-    bs_real omega_prime; // anti-neutrino energy
+    BS_REAL omega;       // neutrino energy
+    BS_REAL omega_prime; // anti-neutrino energy
                          // @TODO: complete here
 };
 typedef struct InelasticScattKernelParams InelasticScattKernelParams;
@@ -244,20 +244,20 @@ typedef struct MyKernelParams MyKernelParams;
  */
 struct MyKernelOutput
 {
-    bs_real em[total_num_species];  // emission/production kernel
-    bs_real abs[total_num_species]; // absorption/annihilation kernel
+    BS_REAL em[total_num_species];  // emission/production kernel
+    BS_REAL abs[total_num_species]; // absorption/annihilation kernel
 };
 typedef struct MyKernelOutput MyKernelOutput;
 
 // @TODO: decide what to do with the following
 struct MyKernelQuantity
 {
-    bs_real
-        em_e; // quantity related to emission/production for electron neutrinos
-    bs_real abs_e; // quantity related to absorption for electron neutrinos
-    bs_real
-        em_x; // quantity related to emission/production for mu/tau neutrinos
-    bs_real abs_x; // quantity related to absorption for mu/tau neutrinos
+    BS_REAL
+    em_e; // quantity related to emission/production for electron neutrinos
+    BS_REAL abs_e; // quantity related to absorption for electron neutrinos
+    BS_REAL
+    em_x; // quantity related to emission/production for mu/tau neutrinos
+    BS_REAL abs_x; // quantity related to absorption for mu/tau neutrinos
 };
 typedef struct MyKernelQuantity MyKernelQuantity;
 
@@ -274,20 +274,20 @@ typedef struct MyKernelQuantity MyKernelQuantity;
  */
 struct MyEOSParams
 {
-    bs_real nb;    // baryon number density
-    bs_real temp;  // temperature
-    bs_real ye;    // electron fraction
-    bs_real yp;    // proton fraction
-    bs_real yn;    // neutron fraction
-    bs_real mu_p;  // proton chemical potential
-    bs_real mu_n;  // neutron chemical potential
-    bs_real mu_e;  // electron chemical potential
-    bs_real mu_mu; // muon chemical potential (this will be needed when
+    BS_REAL nb;    // baryon number density
+    BS_REAL temp;  // temperature
+    BS_REAL ye;    // electron fraction
+    BS_REAL yp;    // proton fraction
+    BS_REAL yn;    // neutron fraction
+    BS_REAL mu_p;  // proton chemical potential
+    BS_REAL mu_n;  // neutron chemical potential
+    BS_REAL mu_e;  // electron chemical potential
+    BS_REAL mu_mu; // muon chemical potential (this will be needed when
                    // including muon-dependent reactions)
-    bs_real dU; // nonrelativistic mean field intereaction potential difference
+    BS_REAL dU; // nonrelativistic mean field intereaction potential difference
                 // (as in Hempel 2015, Oertel et al. 2020)
-    bs_real
-        dm_eff; // nonrelativistic mean field effective nucleon mass differenece
+    BS_REAL
+    dm_eff; // nonrelativistic mean field effective nucleon mass differenece
 };
 typedef struct MyEOSParams MyEOSParams;
 
@@ -309,8 +309,8 @@ typedef struct MyEOSParams MyEOSParams;
  */
 struct MyOpacity
 {
-    bs_real abs[total_num_species]; // absorptivity
-    bs_real em[total_num_species];  // emissivity
+    BS_REAL abs[total_num_species]; // absorptivity
+    BS_REAL em[total_num_species];  // emissivity
 };
 typedef struct MyOpacity MyOpacity;
 
@@ -371,15 +371,15 @@ struct NuDistributionParams
 {
 
     // parameters for optically thick distribution function
-    bs_real w_t[total_num_species];    // contribution factor
-    bs_real temp_t[total_num_species]; // temperature
-    bs_real eta_t[total_num_species];  // degeneracy parameter
+    BS_REAL w_t[total_num_species];    // contribution factor
+    BS_REAL temp_t[total_num_species]; // temperature
+    BS_REAL eta_t[total_num_species];  // degeneracy parameter
 
     // parameters for optically thin distribution function
-    bs_real w_f[total_num_species];    // contribution factor
-    bs_real temp_f[total_num_species]; // temperature
-    bs_real c_f[total_num_species]; // constant in power from Federico's notes
-    bs_real beta_f[total_num_species]; // from Federico's notes
+    BS_REAL w_f[total_num_species];    // contribution factor
+    BS_REAL temp_f[total_num_species]; // temperature
+    BS_REAL c_f[total_num_species]; // constant in power from Federico's notes
+    BS_REAL beta_f[total_num_species]; // from Federico's notes
 };
 typedef struct NuDistributionParams NuDistributionParams;
 
@@ -391,10 +391,10 @@ typedef struct NuDistributionParams NuDistributionParams;
  */
 struct M1Quantities
 {
-    bs_real n[total_num_species];    // radiation number density
-    bs_real J[total_num_species];    // radiation energy density
-    bs_real H[total_num_species][4]; // radiation flux
-    bs_real chi[total_num_species];  // Eddington factor
+    BS_REAL n[total_num_species];    // radiation number density
+    BS_REAL J[total_num_species];    // radiation energy density
+    BS_REAL H[total_num_species][4]; // radiation flux
+    BS_REAL chi[total_num_species];  // Eddington factor
 };
 typedef struct M1Quantities M1Quantities;
 
@@ -446,13 +446,13 @@ typedef struct GreyOpacityParams GreyOpacityParams;
 struct M1Opacities
 {
     /* Number coefficients */
-    bs_real eta_0[total_num_species];     // number emissivity coefficient
-    bs_real kappa_0_a[total_num_species]; // number absorption coefficient
+    BS_REAL eta_0[total_num_species];     // number emissivity coefficient
+    BS_REAL kappa_0_a[total_num_species]; // number absorption coefficient
 
     /* Energy coefficients */
-    bs_real eta[total_num_species];     // energy emissivity coefficient
-    bs_real kappa_a[total_num_species]; // energy absorption coefficient
-    bs_real kappa_s[total_num_species]; // scattering coefficient
+    BS_REAL eta[total_num_species];     // energy emissivity coefficient
+    BS_REAL kappa_a[total_num_species]; // energy absorption coefficient
+    BS_REAL kappa_s[total_num_species]; // scattering coefficient
 };
 typedef struct M1Opacities M1Opacities;
 
@@ -465,29 +465,29 @@ typedef struct M1Opacities M1Opacities;
 
 struct M1Matrix
 {
-    bs_real** m1_mat_em[total_num_species];
-    bs_real** m1_mat_ab[total_num_species];
+    BS_REAL** m1_mat_em[total_num_species];
+    BS_REAL** m1_mat_ab[total_num_species];
 };
 typedef struct M1Matrix M1Matrix;
 
 struct M1MatrixKokkos2D
 {
-    bs_real m1_mat_em[total_num_species][n_max][n_max];
-    bs_real m1_mat_ab[total_num_species][n_max][n_max];
+    BS_REAL m1_mat_em[total_num_species][n_max][n_max];
+    BS_REAL m1_mat_ab[total_num_species][n_max][n_max];
 };
 typedef struct M1MatrixKokkos2D M1MatrixKokkos2D;
 
 struct M1MatrixKokkos2DFlatten
 {
-    bs_real m1_mat_em[total_num_species][n_max * n_max];
-    bs_real m1_mat_ab[total_num_species][n_max * n_max];
+    BS_REAL m1_mat_em[total_num_species][n_max * n_max];
+    BS_REAL m1_mat_ab[total_num_species][n_max * n_max];
 };
 typedef struct M1MatrixKokkos2DFlatten M1MatrixKokkos2DFlatten;
 
 
 struct M1MatrixKokkos1D
 {
-    bs_real m1_mat[12][n_max];
+    BS_REAL m1_mat[12][n_max];
 };
 typedef struct M1MatrixKokkos1D M1MatrixKokkos1D;
 
@@ -499,10 +499,10 @@ typedef struct M1MatrixKokkos1D M1MatrixKokkos1D;
  */
 struct SpectralOpacities
 {
-    bs_real j[total_num_species];       // emissivity
-    bs_real kappa[total_num_species];   // absorptivity / inverse mean free path
-    bs_real j_s[total_num_species];     // "emissivity" for scattering
-    bs_real kappa_s[total_num_species]; // inverse mean free path for scattering
+    BS_REAL j[total_num_species];       // emissivity
+    BS_REAL kappa[total_num_species];   // absorptivity / inverse mean free path
+    BS_REAL j_s[total_num_species];     // "emissivity" for scattering
+    BS_REAL kappa_s[total_num_species]; // inverse mean free path for scattering
 };
 typedef struct SpectralOpacities SpectralOpacities;
 
@@ -517,7 +517,7 @@ struct MyFunctionSpecial
 {
     int dim; // number of function variables (1/2)
     MyKernelQuantity (*function)(
-        bs_real* var, MyEOSParams* my_eos_params,
+        BS_REAL* var, MyEOSParams* my_eos_params,
         MyKernelParams* my_kernel_params); // the function
     MyEOSParams* eos_params;               // all eos parameters of the function
     MyKernelParams* kernel_params;         // all other parameters

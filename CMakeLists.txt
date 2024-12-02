@@ -66,7 +66,6 @@ add_definitions(-DSOURCE_DIR="${CMAKE_SOURCE_DIR}")
 set(BUILD_NURATES_THC OFF CACHE BOOL "Build nurates for THC")
 
 include_directories(include)
-include_directories(src)
 
 ################################################################################
 add_executable(point_check
@@ -77,10 +76,8 @@ add_executable(point_check
 			include/integration.hpp
 			include/kernels.hpp
 			include/weak_magnetism.hpp
-			include/kernel_beta_iso.hpp
-			src/output/outputs.hpp
+			include/formulas_beta_iso.hpp
 			include/eos.hpp
-			src/integration/integration_quadrature_io.cpp
 			include/kernel_pair.hpp
 			include/kernel_nes.hpp
       point_check.cpp
@@ -108,10 +105,8 @@ add_executable(test_opacities_benchmarks
 			include/integration.hpp
 			include/kernels.hpp
 			include/weak_magnetism.hpp
-			include/kernel_beta_iso.hpp
-			src/output/outputs.hpp
+			include/formulas_beta_iso.hpp
 			include/eos.hpp
-			src/integration/integration_quadrature_io.cpp
 			include/kernel_pair.hpp
 			include/kernel_nes.hpp
       tests/tests_opacities_m1/test_opacities_benchmarks.cpp
