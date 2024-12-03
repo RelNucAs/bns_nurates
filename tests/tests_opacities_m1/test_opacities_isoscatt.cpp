@@ -12,23 +12,27 @@
 
 #include "../tests.hpp"
 
-int main() {
+int main()
+{
 
-  printf("=================================================== \n");
-  printf("Testing opacities for isoenergetic scattering ... \n");
-  printf("=================================================== \n");
-  
-  char filename[200] = "m1_opacities_isoscatt.txt";
+    Kokkos::initialize();
 
-  // Opacity flags (activate only pair)
-  OpacityFlags opacity_flags = opacity_flags_default_none;
-  opacity_flags.use_iso = 1;
+    printf("=================================================== \n");
+    printf("Testing opacities for isoenergetic scattering ... \n");
+    printf("=================================================== \n");
 
-  // Opacity parameters (corrections all switched off)
-  OpacityParams opacity_pars = opacity_params_default_none;
+    char filename[200] = "m1_opacities_isoscatt.txt";
 
-  TestM1Opacities(filename, &opacity_flags, &opacity_pars);
-    
-  return 0;
+    // Opacity flags (activate only pair)
+    OpacityFlags opacity_flags = opacity_flags_default_none;
+    opacity_flags.use_iso      = 1;
+
+    // Opacity parameters (corrections all switched off)
+    OpacityParams opacity_pars = opacity_params_default_none;
+
+    TestM1Opacities(filename, &opacity_flags, &opacity_pars);
+
+    Kokkos::finalize();
+
+    return 0;
 }
-

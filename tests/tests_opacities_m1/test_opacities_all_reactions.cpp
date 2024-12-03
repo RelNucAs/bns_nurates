@@ -14,25 +14,26 @@
 
 #include "../tests.hpp"
 
-int main() {
+int main()
+{
 
-  Kokkos::initialize();
+    Kokkos::initialize();
 
-  printf("=================================================== \n");
-  printf("Testing opacities for all reactions ... \n");
-  printf("=================================================== \n");
-  
-  char filename[200] = "m1_opacities_all_reactions.txt";
+    printf("=================================================== \n");
+    printf("Testing opacities for all reactions ... \n");
+    printf("=================================================== \n");
 
-  // Opacity flags (activate all reactions)
-  OpacityFlags opacity_flags = opacity_flags_default_all;
+    char filename[200] = "m1_opacities_all_reactions.txt";
 
-  // Opacity parameters (corrections all switched off)
-  OpacityParams opacity_pars = opacity_params_default_none;
+    // Opacity flags (activate all reactions)
+    OpacityFlags opacity_flags = opacity_flags_default_all;
 
-  TestM1Opacities(filename, &opacity_flags, &opacity_pars);
-  
-  Kokkos::finalize();
+    // Opacity parameters (corrections all switched off)
+    OpacityParams opacity_pars = opacity_params_default_none;
 
-  return 0;
+    TestM1Opacities(filename, &opacity_flags, &opacity_pars);
+
+    Kokkos::finalize();
+
+    return 0;
 }

@@ -64,22 +64,26 @@ inline void GaussLegendre(MyQuadrature* quad)
         quad->w[i]              = 2.0 * xl / ((1.0 - POW2(z)) * POW2(pp));
         quad->w[n - 1 - i]      = quad->w[i];
 
-        BS_ASSERT(isfinite(quad->points[i]) && quad->points[i] > 0. &&
-                  quad->points[i] < 1.);
-        BS_ASSERT(isfinite(quad->points[n - 1 - i]) &&
-                  quad->points[n - 1 - i] > 0. && quad->points[n - 1 - i] < 1.);
+        BS_ASSERT(isfinite(quad->points[i]), "quad->points[%d]=%e", i,
+                  quad->points[i]);
+        BS_ASSERT(quad->points[i] > -1., "quad->points[%d]=%e", i,
+                  quad->points[i]);
+        BS_ASSERT(quad->points[i] < +1., "quad->points[%d]=%e", i,
+                  quad->points[i]);
+
+        BS_ASSERT(isfinite(quad->points[n - 1 - i]), "quad->points[%d]=%e",
+                  n - 1 - i, quad->points[n - 1 - i]);
+        BS_ASSERT(quad->points[n - 1 - i] > -1., "quad->points[%d]=%e",
+                  n - 1 - i, quad->points[n - 1 - i]);
+        BS_ASSERT(quad->points[n - 1 - i] < +1., "quad->points[%d]=%e",
+                  n - 1 - i, quad->points[n - 1 - i]);
+
+
         BS_ASSERT(isfinite(quad->w[i]) && quad->w[i] > 0. && quad->w[i] < 1.);
         BS_ASSERT(isfinite(quad->w[n - 1 - i]) && quad->w[n - 1 - i] > 0. &&
                   quad->w[n - 1 - i] < 1.);
     }
 }
-
-void GaussLegendreMultiD(MyQuadrature* quad);
-void GaussLaguerre(MyQuadrature* quad);
-
-// routines for saving and loading quadratures
-void SaveQuadrature(char* filedir, MyQuadrature* quad);
-void LoadQuadrature(char* filedir, MyQuadrature* quad);
 
 /* Make a convolution between sampled function and weights
  *
