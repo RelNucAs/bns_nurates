@@ -28,6 +28,7 @@
 
 #ifndef REAL_TYPE
 #define REAL_TYPE double
+#warning "REAL_TYPE for BNSNURATES has been set to double (default)."
 #endif
 
 typedef REAL_TYPE BS_REAL;

@@ -15,9 +15,6 @@
 #define func_tgamma(x) tgamma(x)
 #endif
 
-#ifdef GSL_INCLUDES_H_
-#endif // GSL_INCLUDES_H_
-
 
 KOKKOS_INLINE_FUNCTION
 void PairPsi(const int l, const BS_REAL y, const BS_REAL z, const BS_REAL eta,
