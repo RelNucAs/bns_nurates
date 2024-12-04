@@ -1,10 +1,19 @@
-# bns_nurates: A GPU friendly library for neutrino opacities in C++ and Kokkos
+# BNSNURATES: A GPU friendly library for neutrino opacities written in c++ with GPU support
 
-bns_nurates requires the following dependencies:
-- A C++ compiler
+BNSNURATES requires the following dependencies:
+- A C++ compiler which supports c++17
 - The GNU scientific library
 - Kokkos
 - OpenMP
+
+## Installation
+
+BNSNURATES is a header-only library, so it can be simply included into your
+code, provided the requirements listed above are satisfied. The various headers
+are in the `include` directory.
+
+
+## Stand alone build and testing
 
 Clone the repository recursively to also clone Kokkos which is available as a submodule:
 ```
@@ -29,21 +38,17 @@ If the code is intended for Nvidia GPUs (say, A100 in this case), enable CUDA du
 cmake -DKokkos_ENABLE_CUDA=ON -DKokkos_ARCH_AMPERE80=ON ../
 ```
 
-To install the library without Kokkos as a dependency, use
-```
-cmake -DENABLE_KOKKOS=OFF -DBUILD_NURATES_THC=ON ../
-```
-
 Similarly, to disable OpenMP, add the flag ```-DENABLE_OPENMP=OFF``` to cmake.
 
-#### Using bns_nurates as a thorn for the Einsten Toolkit
+## Using bns_nurates as a thorn for the Einsten Toolkit
 bns_nurates is also meant for use as a thorn ```Weakrates2``` for Cactus with THC. To do this, one must export these files:
 
 ```
-python export_thc.py /path/to/bns_nurates/ /path/to/destination/
+python utils/export_thc.py /path/to/bns_nurates/ /path/to/destination/
 ```
 
 Here ```/path/to/bns_nurates/``` is the full path for the top-level bns_nurates directory and ```/path/to/destination/``` is the full path to the ```src``` folder insider ```Weakrates2```
+
 
 ##### A C library for neutrino opacities in the context of binary neutron star mergers.
 
@@ -57,3 +62,4 @@ The following reactions are implemented:
 [^fn1]: [Burrows, Reddy and Thompson, Neutrino opacities in nuclear matter, Nucl.Phys. A 777 356-394 (2006)](https://doi.org/10.1016/j.nuclphysa.2004.06.012)
 [^fn2]: [Bruenn, Stellar core collapse - Numerical model and infall epoch, Astrophysical Journal Supplement Series 58 771-841 (1985)](https://doi.org/10.1086/191056)
 [^fn3]: [Pons, Miralles and Ibáñez, Legendre expansion of the kernel nu nubar -> e+e-: Influence of high order terms, Astron. Astrophys. Suppl. Ser. 129, 343-351 (1998)](https://doi.org/10.1051/aas:1998189)
+TODO: update this list
