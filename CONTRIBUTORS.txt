@@ -1,0 +1,9 @@
+Alphabetically sorted list of all people that contributed to the development of
+this BNS_NURATES.
+
+Albino Perego
+David Radice
+Federico Maria Guercilena
+Filippo Mazzini
+Leonardo Chiesa
+Maitraya Bhattacharyya
