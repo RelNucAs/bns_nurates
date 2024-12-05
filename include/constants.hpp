@@ -216,19 +216,19 @@ inline constexpr BS_REAL kBS_MpGrams =
     kBS_Mp * kBS_MeV_double / POW2(kBS_Clight);
 
 // Geometric mean of nucleon masses in grams
-inline const BS_REAL kBS_MAvgGrams =
-    kBS_MeV_double / POW2(kBS_Clight) * sqrt(kBS_Mn * kBS_Mp);
+inline constexpr BS_REAL kBS_MAvgGrams =
+    kBS_MeV_double / POW2(kBS_Clight) * 938.918532994116257276238085018813;
 
 // sqrt(pi)
-inline const BS_REAL kBS_SqrtPi = sqrt(kBS_Pi);
+inline constexpr BS_REAL kBS_SqrtPi = 1.77245385090551602729816748334106;
 // kBS_Pi * pi
-inline const BS_REAL kBS_PiSquared = POW2(kBS_Pi);
+inline constexpr BS_REAL kBS_PiSquared = 9.86960440108935861883449099987572;
 // 4 * piSquared
-inline const BS_REAL kBS_FourPiSquared = 4. * POW2(kBS_Pi);
+inline constexpr BS_REAL kBS_FourPiSquared = 39.4784176043574344753379639995029;
 // pi^(1/8)
-inline const BS_REAL kBS_Pi2OneEighth = pow(kBS_Pi, 1. / 8.);
+inline constexpr BS_REAL kBS_Pi2OneEighth = 1.15383506784998943054096521314981;
 // (pi / 2)^2.5
-inline const BS_REAL kBS_PiHalfToFiveHalves = pow(0.5 * kBS_Pi, 2.5);
+inline constexpr BS_REAL kBS_PiHalfToFiveHalves = 3.09242868139914350627854469835251;
 
 
 #endif // BNS_NURATES_SRC_CONSTANTS_H_
