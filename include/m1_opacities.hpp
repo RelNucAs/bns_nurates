@@ -787,7 +787,7 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     // const BS_REAL s_pair              = temp * (FDI_p4(eta_e) / FDI_p3(eta_e)
     // + FDI_p4(-eta_e) / FDI_p3(-eta_e));
     const BS_REAL s_nux               = 1.5 * temp;
-    const BS_REAL s_neps              = 1.5 * temp;
+    const BS_REAL s_neps              =  0.5 * 4.364 * temp;
 
     BS_REAL s_beta[total_num_species] = {0}, s_iso[total_num_species] = {0};
 
@@ -832,8 +832,8 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     }
 
 
-    MyQuadratureIntegrand n_integrals_2d, n_neps_2d = {0};
-    MyQuadratureIntegrand e_integrals_2d, e_neps_2d = {0};
+    MyQuadratureIntegrand n_integrals_2d = {0};
+    MyQuadratureIntegrand e_integrals_2d = {0};
     
     GreyOpacityParams local_grey_params = *my_grey_opacity_params;
     local_grey_params.opacity_flags.use_inelastic_scatt = 0;
@@ -843,6 +843,8 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     GaussLegendreIntegrate2DMatrixForM1Coeffs(quad_2d, &out_pair, s_pair,
                                               &n_integrals_2d, &e_integrals_2d);
 
+    MyQuadratureIntegrand n_neps_2d = {0};
+    MyQuadratureIntegrand e_neps_2d = {0};
     if (my_grey_opacity_params->opacity_flags.use_inelastic_scatt == 1)
     {
         local_grey_params.opacity_flags = opacity_flags_default_none;
