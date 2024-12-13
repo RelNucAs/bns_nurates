@@ -18,9 +18,9 @@ int main()
 
     Kokkos::initialize();
 
-    printf("=================================================== \n");
-    printf("Testing opacities for inelastic scattering ... \n");
-    printf("=================================================== \n");
+    printf("# =================================================== \n");
+    printf("# Testing opacities for inelastic scattering ... \n");
+    printf("# =================================================== \n");
 
     char filename[200] = "m1_opacities_inelastic_scatt.txt";
 

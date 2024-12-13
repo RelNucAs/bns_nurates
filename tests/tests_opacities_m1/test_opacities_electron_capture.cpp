@@ -18,9 +18,9 @@ int main()
 
     Kokkos::initialize();
 
-    printf("=================================================== \n");
-    printf("Testing opacities for electron/positron capture ... \n");
-    printf("=================================================== \n");
+    printf("# =================================================== \n");
+    printf("# Testing opacities for electron/positron capture ... \n");
+    printf("# =================================================== \n");
 
     char filename[200] = "m1_opacities_abs_em.txt";
 

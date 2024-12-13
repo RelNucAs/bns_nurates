@@ -433,6 +433,7 @@ TSWLatexianTemp*
 
 # txt files generated during tests
 tests/tests_opacities_m1/output/*.txt
+tests/tests_opacities_spectral/output/*.txt
 
 # VSC workspace files
 *.code-workspace
