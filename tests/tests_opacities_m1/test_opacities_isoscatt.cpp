@@ -17,9 +17,9 @@ int main()
 
     Kokkos::initialize();
 
-    printf("=================================================== \n");
-    printf("Testing opacities for isoenergetic scattering ... \n");
-    printf("=================================================== \n");
+    printf("# =================================================== \n");
+    printf("# Testing opacities for isoenergetic scattering ... \n");
+    printf("# =================================================== \n");
 
     char filename[200] = "m1_opacities_isoscatt.txt";
 

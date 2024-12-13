@@ -131,7 +131,9 @@ tests/tests_opacities_m1/test_opacities_inelastic_scatt.cpp)
 ADD_BNSNURATES_EXECUTABLE(
 test_opacities_all_reactions
 tests/tests_opacities_m1/test_opacities_all_reactions.cpp)
-
+ADD_BNSNURATES_EXECUTABLE(
+test_spectral_opacities_all_reactions
+tests/tests_opacities_spectral/test_opacities_spectral.cpp)
 ADD_BNSNURATES_EXECUTABLE(
 test_m1_distribution
 tests/tests_distribution/test_m1_distribution.cpp)

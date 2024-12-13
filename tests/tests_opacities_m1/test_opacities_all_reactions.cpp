@@ -19,9 +19,9 @@ int main()
 
     Kokkos::initialize();
 
-    printf("=================================================== \n");
-    printf("Testing opacities for all reactions ... \n");
-    printf("=================================================== \n");
+    printf("# =================================================== \n");
+    printf("# Testing opacities for all reactions ... \n");
+    printf("# =================================================== \n");
 
     char filename[200] = "m1_opacities_all_reactions.txt";
 
