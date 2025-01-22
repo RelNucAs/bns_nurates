@@ -11,6 +11,7 @@
 #include "bns_nurates.hpp"
 #include "functions.hpp"
 
+#define num_max_integrands 10
 
 /* Generate Gauss-Legendre quadratures in [x1,x2].
  *
@@ -504,12 +505,14 @@ inline MyQuadratureIntegrand GaussLegendreIntegrate2D(MyQuadrature* quad,
  * func:    the function(s) to be integrated
  * t:       the value at which to break the integral into two
  */
-inline MyQuadratureIntegrand
+KOKKOS_INLINE_FUNCTION
+MyQuadratureIntegrand
 GaussLegendreIntegrate1D(MyQuadrature* quad, MyFunctionMultiD* func, BS_REAL* t)
 {
 
     int num_integrands = func->my_quadrature_integrand.n;
-    BS_REAL f1_x[num_integrands][quad->nx], f2_x[num_integrands][quad->nx];
+    BS_ASSERT(num_integrands <= num_max_integrands);
+    BS_REAL f1_x[num_max_integrands][n_max], f2_x[num_max_integrands][n_max];
     BS_REAL var[2];
     MyQuadratureIntegrand result;
 
