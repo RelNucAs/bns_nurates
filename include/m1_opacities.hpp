@@ -1032,7 +1032,7 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     MyQuadratureIntegrand e_neps_2d = {0};
     if (my_grey_opacity_params->opacity_flags.use_inelastic_scatt == 1)
     {
-        local_grey_params.opacity_flags = opacity_flags_default_none;
+        local_grey_params.opacity_flags = {0};
         local_grey_params.opacity_flags.use_inelastic_scatt = 1;
         //M1MatrixKokkos2D out_inel                 = ComputeDoubleIntegrand(
         //quad_2d, s_neps, &local_grey_params, stim_abs);
@@ -1352,7 +1352,8 @@ MyQuadratureIntegrand SpectralIntegrand(BS_REAL* var, void* p)
 /* Computes the spectral emissivity and inverse mean free path */
 
 // Version without stimulated absorption
-inline SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
+KOKKOS_INLINE_FUNCTION
+SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
     const BS_REAL nu, MyQuadrature* quad_1d,
     GreyOpacityParams* my_grey_opacity_params)
 {
@@ -1393,8 +1394,6 @@ inline SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
         // s[i] =
             // 0.5 * my_grey_opacity_params->eos_pars.temp *
             // (FDI_p4(eta_e) / FDI_p3(eta_e) + FDI_p4(-eta_e) / FDI_p3(-eta_e));
-
-
     }
 
     MyQuadratureIntegrand integrals_pair_1d =
@@ -1404,7 +1403,7 @@ inline SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
 
     if (my_grey_opacity_params->opacity_flags.use_inelastic_scatt == 1)
     {
-        local_grey_params.opacity_flags = opacity_flags_default_none;
+        local_grey_params.opacity_flags = {0};
         local_grey_params.opacity_flags.use_inelastic_scatt = 1;
         integrand_m1_1d.params = &local_grey_params;
         integrals_neps_1d = GaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s_neps);
