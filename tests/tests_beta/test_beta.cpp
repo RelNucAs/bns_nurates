@@ -50,7 +50,7 @@ void generate_comparison_data(const bool use_dU)
     double omega; // [MeV]
 
     // Weak magnetism correction (code output)
-    double w, wbar;
+    BS_REAL w, wbar;
 
     // Data arrays (rates are not corrected for the weak magnetism, WM
     // corrections are provided separately)

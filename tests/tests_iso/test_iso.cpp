@@ -50,7 +50,7 @@ void test_iso()
     double omega; // [MeV]
 
     // Weak magnetism correction (code output)
-    double w0_n_out, w1_n_out, w0_p_out, w1_p_out;
+    BS_REAL w0_n_out, w1_n_out, w0_p_out, w1_p_out;
 
     // Data arrays (rates are not corrected for the weak magnetism, WM
     // corrections are provided separately)
