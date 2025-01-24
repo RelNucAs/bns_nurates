@@ -19,7 +19,6 @@ using HostMemSpace = Kokkos::HostSpace;
 using LayoutWrapper =
     Kokkos::LayoutRight; // increments last index fastest views defined like
 
-
 inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
                             OpacityParams* opacity_pars)
 {
@@ -215,6 +214,30 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
     Kokkos::deep_copy(d_weights, h_weights);
     Kokkos::deep_copy(d_points, h_points);
 
+    Kokkos::View<int*, LayoutWrapper, HostMemSpace> h_opacity_flags("opacity_flags", 5);
+    Kokkos::View<bool*, LayoutWrapper, HostMemSpace> h_opacity_pars("opacity_pars", 8);
+
+    h_opacity_flags(0) = opacity_flags->use_abs_em;
+    h_opacity_flags(1) = opacity_flags->use_pair;
+    h_opacity_flags(2) = opacity_flags->use_brem;
+    h_opacity_flags(3) = opacity_flags->use_inelastic_scatt;
+    h_opacity_flags(4) = opacity_flags->use_iso;
+
+    h_opacity_pars(0) = opacity_pars->use_dU;
+    h_opacity_pars(1) = opacity_pars->use_dm_eff;
+    h_opacity_pars(2) = opacity_pars->use_WM_ab;
+    h_opacity_pars(3) = opacity_pars->use_WM_sc;
+    h_opacity_pars(4) = opacity_pars->use_decay;
+    h_opacity_pars(5) = opacity_pars->use_BRT_brem;
+    h_opacity_pars(6) = opacity_pars->use_NN_medium_corr;
+    h_opacity_pars(7) = opacity_pars->neglect_blocking;
+
+    Kokkos::View<int*, LayoutWrapper, DevMemSpace> d_opacity_flags("opacity_flags", 5);
+    Kokkos::View<bool*, LayoutWrapper, DevMemSpace> d_opacity_pars("opacity_pars", 8);
+
+    Kokkos::deep_copy(d_opacity_flags, h_opacity_flags);
+    Kokkos::deep_copy(d_opacity_pars, h_opacity_pars);
+    
     printf("# Generated tables:\n");
     printf("# r diff_distr j0-nue j0-anue j0-nux j0-anux j-nue j-anue j-nux "
            "j-anux kappa0-a-nue kappa0-a-anue kappa0-a-nux kappa0-a-anux "
@@ -230,11 +253,21 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
 
             GreyOpacityParams my_grey_opacity_params;
 
-            my_grey_opacity_params.opacity_flags = {.use_abs_em          = 1,
-                                                    .use_pair            = 1,
-                                                    .use_brem            = 1,
-                                                    .use_inelastic_scatt = 1,
-                                                    .use_iso             = 1};
+            my_grey_opacity_params.opacity_flags = {.use_abs_em          = d_opacity_flags(0),
+                                                    .use_pair            = d_opacity_flags(1),
+                                                    .use_brem            = d_opacity_flags(2),
+                                                    .use_inelastic_scatt = d_opacity_flags(3),
+                                                    .use_iso             = d_opacity_flags(4)};
+
+            // Opacity parameters (corrections all switched off)
+            my_grey_opacity_params.opacity_pars = {.use_dU             = d_opacity_pars(0),
+                                                   .use_dm_eff         = d_opacity_pars(1),
+                                                   .use_WM_ab          = d_opacity_pars(2),
+                                                   .use_WM_sc          = d_opacity_pars(3),
+                                                   .use_decay          = d_opacity_pars(4),
+                                                   .use_BRT_brem       = d_opacity_pars(5),
+                                                   .use_NN_medium_corr = d_opacity_pars(6),
+                                                   .neglect_blocking   = d_opacity_pars(7)};
 
 
             // populate EOS parameters from table
@@ -245,18 +278,6 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
             my_grey_opacity_params.eos_pars.yp   = d_Yp(i);
             my_grey_opacity_params.eos_pars.yn   = d_Yn(i);
             my_grey_opacity_params.eos_pars.nb   = d_rho(i) / kBS_Mu * 1e-21;
-
-
-            // Opacity parameters (corrections all switched off)
-            my_grey_opacity_params.opacity_pars = {.use_dU             = false,
-                                                   .use_dm_eff         = false,
-                                                   .use_WM_ab          = false,
-                                                   .use_WM_sc          = false,
-                                                   .use_decay          = false,
-                                                   .use_BRT_brem       = false,
-                                                   .use_NN_medium_corr = false,
-                                                   .neglect_blocking   = false};
-
 
             // Distribution parameters
             my_grey_opacity_params.distr_pars = NuEquilibriumParams(
@@ -567,6 +588,30 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
     Kokkos::deep_copy(d_weights, h_weights);
     Kokkos::deep_copy(d_points, h_points);
 
+    Kokkos::View<int*, LayoutWrapper, HostMemSpace> h_opacity_flags("opacity_flags", 5);
+    Kokkos::View<bool*, LayoutWrapper, HostMemSpace> h_opacity_pars("opacity_pars", 8);
+
+    h_opacity_flags(0) = opacity_flags->use_abs_em;
+    h_opacity_flags(1) = opacity_flags->use_pair;
+    h_opacity_flags(2) = opacity_flags->use_brem;
+    h_opacity_flags(3) = opacity_flags->use_inelastic_scatt;
+    h_opacity_flags(4) = opacity_flags->use_iso;
+
+    h_opacity_pars(0) = opacity_pars->use_dU;
+    h_opacity_pars(1) = opacity_pars->use_dm_eff;
+    h_opacity_pars(2) = opacity_pars->use_WM_ab;
+    h_opacity_pars(3) = opacity_pars->use_WM_sc;
+    h_opacity_pars(4) = opacity_pars->use_decay;
+    h_opacity_pars(5) = opacity_pars->use_BRT_brem;
+    h_opacity_pars(6) = opacity_pars->use_NN_medium_corr;
+    h_opacity_pars(7) = opacity_pars->neglect_blocking;
+
+    Kokkos::View<int*, LayoutWrapper, DevMemSpace> d_opacity_flags("opacity_flags", 5);
+    Kokkos::View<bool*, LayoutWrapper, DevMemSpace> d_opacity_pars("opacity_pars", 8);
+
+    Kokkos::deep_copy(d_opacity_flags, h_opacity_flags);
+    Kokkos::deep_copy(d_opacity_pars, h_opacity_pars);
+
     printf("# Generated tables:\n");
     printf("# Energy j-nue j-anue j0-nux j-anux j-s-nue j-s-anue j-s-nux "
            "j-s-anux kappa-nue kappa-anue kappa-nux kappa-anux "
@@ -581,24 +626,22 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
 
             GreyOpacityParams my_grey_opacity_params;
 
-            my_grey_opacity_params.opacity_flags = {.use_abs_em          = 1,
-                                                    .use_pair            = 1,
-                                                    .use_brem            = 1,
-                                                    .use_inelastic_scatt = 1,
-                                                    .use_iso             = 1};
-
+            my_grey_opacity_params.opacity_flags = {.use_abs_em          = d_opacity_flags(0),
+                                                    .use_pair            = d_opacity_flags(1),
+                                                    .use_brem            = d_opacity_flags(2),
+                                                    .use_inelastic_scatt = d_opacity_flags(3),
+                                                    .use_iso             = d_opacity_flags(4)};
 
 
             // Opacity parameters (corrections all switched off)
-            my_grey_opacity_params.opacity_pars = {.use_dU             = true,
-                                                   .use_dm_eff         = true,
-                                                   .use_WM_ab          = true,
-                                                   .use_WM_sc          = true,
-                                                   .use_decay          = true,
-                                                   .use_BRT_brem       = false,
-                                                   .use_NN_medium_corr = true,
-                                                   .neglect_blocking   = false};
-
+            my_grey_opacity_params.opacity_pars = {.use_dU             = d_opacity_pars(0),
+                                                   .use_dm_eff         = d_opacity_pars(1),
+                                                   .use_WM_ab          = d_opacity_pars(2),
+                                                   .use_WM_sc          = d_opacity_pars(3),
+                                                   .use_decay          = d_opacity_pars(4),
+                                                   .use_BRT_brem       = d_opacity_pars(5),
+                                                   .use_NN_medium_corr = d_opacity_pars(6),
+                                                   .neglect_blocking   = d_opacity_pars(7)};
             
             printf("# Generating and populating quadrature on GPU\n");
             MyQuadrature gpu_quad;
