@@ -398,6 +398,359 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
     }
 }
 
+inline void TestM1OpacitiesSelectedPoints(char filename[200], OpacityFlags* opacity_flags,
+                            OpacityParams* opacity_pars)
+{
+
+    char filepath[300] = {'\0'};
+    char filedir[300]  = SOURCE_DIR;
+    char outname[200]  = "/inputs/DD2_M12980-12980_M1_LR/thermo_points_with_neutrinos.txt";
+
+    strcat(filepath, filedir);
+    strcat(filepath, outname);
+
+    printf("# Data_directory: %s\n", filepath);
+
+    FILE* fptr;
+    fptr = fopen(filepath, "r");
+    if (fptr == NULL)
+    {
+        printf("%s: The file %s does not exist!\n", __FILE__, filepath);
+        exit(1);
+    }
+
+    // store columns here
+    int num_data = 6;
+    Kokkos::View<int*, LayoutWrapper, HostMemSpace> h_zone("zone", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_rho("rho", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_T("T", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_Ye("Ye", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_mu_e("mu_e", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_mu_n("mu_n", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_mu_p("mu_p", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_Yp("Yp", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_Yn("Yn", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_dU("dU", num_data);
+    Kokkos::View<BS_REAL**, LayoutWrapper, HostMemSpace> h_nnu("nnu", num_data, total_num_species);
+    Kokkos::View<BS_REAL**, LayoutWrapper, HostMemSpace> h_jnu("Jnu", num_data, total_num_species);
+    Kokkos::View<BS_REAL**, LayoutWrapper, HostMemSpace> h_chinu("chinu", num_data, total_num_species);
+
+    Kokkos::View<int*, LayoutWrapper, DevMemSpace> d_zone("zone", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> d_rho("rho", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> d_T("T", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> d_Ye("Ye", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> d_mu_e("mu_e", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> d_mu_n("mu_n", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> d_mu_p("mu_p", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> d_Yp("Yp", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> d_Yn("Yn", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> d_dU("dU", num_data);
+    Kokkos::View<BS_REAL**, LayoutWrapper, DevMemSpace> d_nnu("nnu", num_data, total_num_species);
+    Kokkos::View<BS_REAL**, LayoutWrapper, DevMemSpace> d_jnu("Jnu", num_data, total_num_species);
+    Kokkos::View<BS_REAL**, LayoutWrapper, DevMemSpace> d_chinu("chinu", num_data, total_num_species);
+
+    // read in the data file
+    int i = 0;
+    char line[1000];
+    while (fgets(line, sizeof(line), fptr) != NULL)
+    {
+        if (line[0] == '#')
+        {
+            continue;
+        }
+
+        #ifndef REAL_TYPE_IS_DOUBLE
+            sscanf(line,
+               "%d %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
+               &h_zone(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_Yn(i), &h_Yp(i), &h_mu_e(i),
+               &h_mu_n(i), &h_mu_p(i), &h_dU(i), &h_nnu(i,0), &h_nnu(i,1), &h_nnu(i,2), &h_jnu(i,0), &h_jnu(i,1), &h_jnu(i,2), &h_chinu(i,0), &h_chinu(i,1), &h_chinu(i,2));
+        #else
+            sscanf(line,
+               "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
+               &h_zone(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_Yn(i), &h_Yp(i), &h_mu_e(i),
+               &h_mu_n(i), &h_mu_p(i), &h_dU(i), &h_nnu(i,0), &h_nnu(i,1), &h_nnu(i,2), &h_jnu(i,0), &h_jnu(i,1), &h_jnu(i,2), &h_chinu(i,0), &h_chinu(i,1), &h_chinu(i,2));
+        #endif
+
+        h_nnu(i,3) = h_nnu(i,2);
+        h_jnu(i,3) = h_jnu(i,2);
+        h_chinu(i,3) = h_chinu(i,2);
+
+        i++;
+    }
+
+    fclose(fptr);
+
+
+    printf("# Test for distribution function implementation:\n");
+
+    Kokkos::deep_copy(d_zone, h_zone);
+    Kokkos::deep_copy(d_rho, h_rho);
+    Kokkos::deep_copy(d_T, h_T);
+    Kokkos::deep_copy(d_Ye, h_Ye);
+    Kokkos::deep_copy(d_mu_e, h_mu_e);
+    Kokkos::deep_copy(d_mu_n, h_mu_n);
+    Kokkos::deep_copy(d_mu_p, h_mu_p);
+    Kokkos::deep_copy(d_Yp, h_Yp);
+    Kokkos::deep_copy(d_Yn, h_Yn);
+    Kokkos::deep_copy(d_dU, h_dU);
+    Kokkos::deep_copy(d_nnu, h_nnu);
+    Kokkos::deep_copy(d_jnu, h_jnu);
+    Kokkos::deep_copy(d_chinu, h_chinu);
+
+
+    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> d_diff_distribution(
+        "diff_distribution", num_data);
+    Kokkos::View<BS_REAL**, LayoutWrapper, DevMemSpace> d_coeffs_eta_0(
+        "coeffs_eta_0", num_data, 4);
+    Kokkos::View<BS_REAL**, LayoutWrapper, DevMemSpace> d_coeffs_eta(
+        "coeffs_eta", num_data, 4);
+    Kokkos::View<BS_REAL**, LayoutWrapper, DevMemSpace> d_coeffs_kappa_0_a(
+        "coeffs_kappa_0_a", num_data, 4);
+    Kokkos::View<BS_REAL**, LayoutWrapper, DevMemSpace> d_coeffs_kappa_a(
+        "coeffs_kappa_a", num_data, 4);
+    Kokkos::View<BS_REAL**, LayoutWrapper, DevMemSpace> d_coeffs_kappa_s(
+        "coeffs_kappa_s", num_data, 4);
+
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_diff_distribution(
+        "h_diff_distribution", num_data);
+    Kokkos::View<BS_REAL**, LayoutWrapper, HostMemSpace> h_coeffs_eta_0(
+        "h_coeffs_eta_0", num_data, 4);
+    Kokkos::View<BS_REAL**, LayoutWrapper, HostMemSpace> h_coeffs_eta(
+        "h_coeffs_eta", num_data, 4);
+    Kokkos::View<BS_REAL**, LayoutWrapper, HostMemSpace> h_coeffs_kappa_0_a(
+        "h_coeffs_kappa_0_a", num_data, 4);
+    Kokkos::View<BS_REAL**, LayoutWrapper, HostMemSpace> h_coeffs_kappa_a(
+        "h_coeffs_kappa_a", num_data, 4);
+    Kokkos::View<BS_REAL**, LayoutWrapper, HostMemSpace> h_coeffs_kappa_s(
+        "h_coeffs_kappa_s", num_data, 4);
+
+    printf("# Generating quadratures ...\n");
+    MyQuadrature my_quad = {.type   = kGauleg,
+                            .alpha  = -42.,
+                            .dim    = 1,
+                            .nx     = 50,
+                            .ny     = 1,
+                            .nz     = 1,
+                            .x1     = 0.,
+                            .x2     = 1.,
+                            .y1     = -42.,
+                            .y2     = -42.,
+                            .z1     = -42.,
+                            .z2     = -42.,
+                            .points = {0},
+                            .w      = {0}};
+    GaussLegendre(&my_quad);
+    printf("# Quadratures generated.\n");
+
+    Kokkos::View<int*, LayoutWrapper, HostMemSpace> h_n_quad("n_quad", 1);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_weights("h_weights",
+                                                                 my_quad.nx);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_points("h_points",
+                                                                my_quad.nx);
+
+    Kokkos::View<int*, LayoutWrapper, DevMemSpace> d_n_quad("n_quad", 1);
+    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> d_weights("weights",
+                                                                my_quad.nx);
+    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> d_points("points",
+                                                               my_quad.nx);
+
+    printf("# Copying quadrature data to Kokkos view on host\n");
+
+    h_n_quad(0) = my_quad.nx;
+
+    for (int i = 0; i < my_quad.nx; i++)
+    {
+        h_weights(i) = my_quad.w[i];
+        h_points(i)  = my_quad.points[i];
+    }
+
+    printf("# Deep copying quadrature data from host to device\n");
+
+    Kokkos::deep_copy(d_n_quad, h_n_quad);
+    Kokkos::deep_copy(d_weights, h_weights);
+    Kokkos::deep_copy(d_points, h_points);
+
+    Kokkos::View<int*, LayoutWrapper, HostMemSpace> h_opacity_flags("opacity_flags", 5);
+    Kokkos::View<bool*, LayoutWrapper, HostMemSpace> h_opacity_pars("opacity_pars", 8);
+
+    h_opacity_flags(0) = opacity_flags->use_abs_em;
+    h_opacity_flags(1) = opacity_flags->use_pair;
+    h_opacity_flags(2) = opacity_flags->use_brem;
+    h_opacity_flags(3) = opacity_flags->use_inelastic_scatt;
+    h_opacity_flags(4) = opacity_flags->use_iso;
+
+    h_opacity_pars(0) = opacity_pars->use_dU;
+    h_opacity_pars(1) = opacity_pars->use_dm_eff;
+    h_opacity_pars(2) = opacity_pars->use_WM_ab;
+    h_opacity_pars(3) = opacity_pars->use_WM_sc;
+    h_opacity_pars(4) = opacity_pars->use_decay;
+    h_opacity_pars(5) = opacity_pars->use_BRT_brem;
+    h_opacity_pars(6) = opacity_pars->use_NN_medium_corr;
+    h_opacity_pars(7) = opacity_pars->neglect_blocking;
+
+    Kokkos::View<int*, LayoutWrapper, DevMemSpace> d_opacity_flags("opacity_flags", 5);
+    Kokkos::View<bool*, LayoutWrapper, DevMemSpace> d_opacity_pars("opacity_pars", 8);
+
+    Kokkos::deep_copy(d_opacity_flags, h_opacity_flags);
+    Kokkos::deep_copy(d_opacity_pars, h_opacity_pars);
+    
+    printf("# Generated tables:\n");
+    printf("# r diff_distr j0-nue j0-anue j0-nux j0-anux j-nue j-anue j-nux "
+           "j-anux kappa0-a-nue kappa0-a-anue kappa0-a-nux kappa0-a-anux "
+           "kappa-a-nue kappa-a-anue kappa-a-nux kappa-a-anux kappa-s-nue "
+           "kappa-s-anue kappa-s-nux kappa-s-anux\n");
+
+    printf("# Entering Kokkos parallel_for loop\n");
+
+    Kokkos::parallel_for(
+        "loop_over_ccsn", Kokkos::RangePolicy<>(DevExeSpace(), 0, num_data),
+        KOKKOS_LAMBDA(const int& i) {
+            printf("# Entered in Kokkos parallel_for loop\n");
+
+            GreyOpacityParams my_grey_opacity_params;
+
+            my_grey_opacity_params.opacity_flags = {.use_abs_em          = d_opacity_flags(0),
+                                                    .use_pair            = d_opacity_flags(1),
+                                                    .use_brem            = d_opacity_flags(2),
+                                                    .use_inelastic_scatt = d_opacity_flags(3),
+                                                    .use_iso             = d_opacity_flags(4)};
+
+            // Opacity parameters (corrections all switched off)
+            my_grey_opacity_params.opacity_pars = {.use_dU             = d_opacity_pars(0),
+                                                   .use_dm_eff         = d_opacity_pars(1),
+                                                   .use_WM_ab          = d_opacity_pars(2),
+                                                   .use_WM_sc          = d_opacity_pars(3),
+                                                   .use_decay          = d_opacity_pars(4),
+                                                   .use_BRT_brem       = d_opacity_pars(5),
+                                                   .use_NN_medium_corr = d_opacity_pars(6),
+                                                   .neglect_blocking   = d_opacity_pars(7)};
+
+
+            // populate EOS parameters from table
+            my_grey_opacity_params.eos_pars.mu_e = d_mu_e(i);
+            my_grey_opacity_params.eos_pars.mu_p = d_mu_p(i);
+            my_grey_opacity_params.eos_pars.mu_n = d_mu_n(i);
+            my_grey_opacity_params.eos_pars.temp = d_T(i);
+            my_grey_opacity_params.eos_pars.yp   = d_Yp(i);
+            my_grey_opacity_params.eos_pars.yn   = d_Yn(i);
+            my_grey_opacity_params.eos_pars.nb   = d_rho(i) / kBS_Mu * 1e-21;
+            my_grey_opacity_params.eos_pars.ye   = d_Ye(i);
+            my_grey_opacity_params.eos_pars.dU   = d_dU(i);
+
+            // M1 parameters
+            for (int idx = 0; idx < total_num_species; ++idx)
+            {
+                my_grey_opacity_params.m1_pars.chi[idx] = d_chinu(i, idx);
+                my_grey_opacity_params.m1_pars.n[idx] = d_nnu(i, idx) * 1e-21;
+                my_grey_opacity_params.m1_pars.J[idx] = d_jnu(i, idx) * kBS_MeV * 1e-21;
+            }
+
+            // Distribution parameters
+            my_grey_opacity_params.distr_pars = CalculateDistrParamsFromM1(
+                &my_grey_opacity_params.m1_pars, &my_grey_opacity_params.eos_pars);
+
+            printf("# Generating and populating quadrature on GPU\n");
+
+            MyQuadrature gpu_quad;
+            gpu_quad.nx = d_n_quad(0);
+            for (int idx = 0; idx < gpu_quad.nx; idx++)
+            {
+                gpu_quad.w[idx]      = d_weights(idx);
+                gpu_quad.points[idx] = d_points(idx);
+            }
+
+            BS_REAL distr_fermi =
+                FermiDistr(123.4, my_grey_opacity_params.eos_pars.temp,
+                           my_grey_opacity_params.eos_pars.mu_e -
+                               my_grey_opacity_params.eos_pars.mu_n +
+                               my_grey_opacity_params.eos_pars.mu_p);
+            BS_REAL distr_nuftot =
+                TotalNuF(123.4, &my_grey_opacity_params.distr_pars, 0);
+
+            BS_REAL diff_distr = Kokkos::fabs(distr_fermi - distr_nuftot);
+
+            printf("# Computing M1 coefficients\n");
+
+            M1Opacities coeffs = ComputeM1Opacities(&gpu_quad, &gpu_quad,
+                                                    &my_grey_opacity_params);
+
+            printf("# Copying M1 coefficients to Kokkos view on device\n");
+            d_diff_distribution(i) = diff_distr;
+
+            d_coeffs_eta_0(i, id_nue)  = coeffs.eta_0[id_nue];
+            d_coeffs_eta_0(i, id_anue) = coeffs.eta_0[id_anue];
+            d_coeffs_eta_0(i, id_nux)  = coeffs.eta_0[id_nux];
+            d_coeffs_eta_0(i, id_anux) = coeffs.eta_0[id_anux];
+
+            d_coeffs_eta(i, id_nue)  = coeffs.eta[id_nue];
+            d_coeffs_eta(i, id_anue) = coeffs.eta[id_anue];
+            d_coeffs_eta(i, id_nux)  = coeffs.eta[id_nux];
+            d_coeffs_eta(i, id_anux) = coeffs.eta[id_anux];
+
+            d_coeffs_kappa_0_a(i, id_nue)  = coeffs.kappa_0_a[id_nue];
+            d_coeffs_kappa_0_a(i, id_anue) = coeffs.kappa_0_a[id_anue];
+            d_coeffs_kappa_0_a(i, id_nux)  = coeffs.kappa_0_a[id_nux];
+            d_coeffs_kappa_0_a(i, id_anux) = coeffs.kappa_0_a[id_anux];
+
+            d_coeffs_kappa_a(i, id_nue)  = coeffs.kappa_a[id_nue];
+            d_coeffs_kappa_a(i, id_anue) = coeffs.kappa_a[id_anue];
+            d_coeffs_kappa_a(i, id_nux)  = coeffs.kappa_a[id_nux];
+            d_coeffs_kappa_a(i, id_anux) = coeffs.kappa_a[id_anux];
+
+            d_coeffs_kappa_s(i, id_nue)  = coeffs.kappa_s[id_nue];
+            d_coeffs_kappa_s(i, id_anue) = coeffs.kappa_s[id_anue];
+            d_coeffs_kappa_s(i, id_nux)  = coeffs.kappa_s[id_nux];
+            d_coeffs_kappa_s(i, id_anux) = coeffs.kappa_s[id_anux];
+        });
+
+    printf("# Back on CPU, waiting for Kokkos fence\n");
+
+    Kokkos::fence();
+
+    printf("# Deep copying output from device to host\n");
+
+    Kokkos::deep_copy(h_diff_distribution, d_diff_distribution);
+    Kokkos::deep_copy(h_coeffs_eta_0, d_coeffs_eta_0);
+    Kokkos::deep_copy(h_coeffs_eta, d_coeffs_eta);
+    Kokkos::deep_copy(h_coeffs_kappa_0_a, d_coeffs_kappa_0_a);
+    Kokkos::deep_copy(h_coeffs_kappa_a, d_coeffs_kappa_a);
+    Kokkos::deep_copy(h_coeffs_kappa_s, d_coeffs_kappa_s);
+
+    printf("# Printing result\n");
+    for (int i = 0; i < num_data; i++)
+    {
+        #ifndef REAL_TYPE_IS_DOUBLE
+            printf("%d %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e "
+                "%e\n",
+                h_zone(i), h_diff_distribution(i), h_coeffs_eta_0(i, id_nue),
+                h_coeffs_eta_0(i, id_anue), h_coeffs_eta_0(i, id_nux),
+                h_coeffs_eta_0(i, id_anux), h_coeffs_eta(i, id_nue),
+                h_coeffs_eta(i, id_anue), h_coeffs_eta(i, id_nux),
+                h_coeffs_eta(i, id_anux), h_coeffs_kappa_0_a(i, id_nue),
+                h_coeffs_kappa_0_a(i, id_anue), h_coeffs_kappa_0_a(i, id_nux),
+                h_coeffs_kappa_0_a(i, id_anux), h_coeffs_kappa_a(i, id_nue),
+                h_coeffs_kappa_a(i, id_anue), h_coeffs_kappa_a(i, id_nux),
+                h_coeffs_kappa_a(i, id_anux), h_coeffs_kappa_s(i, id_nue),
+                h_coeffs_kappa_s(i, id_anue), h_coeffs_kappa_s(i, id_nux),
+                h_coeffs_kappa_s(i, id_anux));
+        #else
+            printf("%d %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le "
+                "%le\n",
+                h_zone(i), h_diff_distribution(i), h_coeffs_eta_0(i, id_nue),
+                h_coeffs_eta_0(i, id_anue), h_coeffs_eta_0(i, id_nux),
+                h_coeffs_eta_0(i, id_anux), h_coeffs_eta(i, id_nue),
+                h_coeffs_eta(i, id_anue), h_coeffs_eta(i, id_nux),
+                h_coeffs_eta(i, id_anux), h_coeffs_kappa_0_a(i, id_nue),
+                h_coeffs_kappa_0_a(i, id_anue), h_coeffs_kappa_0_a(i, id_nux),
+                h_coeffs_kappa_0_a(i, id_anux), h_coeffs_kappa_a(i, id_nue),
+                h_coeffs_kappa_a(i, id_anue), h_coeffs_kappa_a(i, id_nux),
+                h_coeffs_kappa_a(i, id_anux), h_coeffs_kappa_s(i, id_nue),
+                h_coeffs_kappa_s(i, id_anue), h_coeffs_kappa_s(i, id_nux),
+                h_coeffs_kappa_s(i, id_anux));
+        #endif
+    }
+}
+
 inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
                             OpacityParams* opacity_pars)
 {
