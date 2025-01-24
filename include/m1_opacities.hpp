@@ -1039,8 +1039,8 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
         //GaussLegendreIntegrate2DMatrixForM1Coeffs(quad_2d, &out_inel, s_neps,
         //                                      &n_neps_2d, &e_neps_2d);
         M1MatrixKokkos2D out_inel                 = ComputeNEPSIntegrand(
-        quad_2d, 2. * s_neps, &local_grey_params, stim_abs);
-        GaussLegendreIntegrate2DMatrixForNEPS(quad_2d, &out_inel, 2. * s_neps,
+        quad_2d, 4. * s_neps, &local_grey_params, stim_abs);
+        GaussLegendreIntegrate2DMatrixForNEPS(quad_2d, &out_inel, 4. * s_neps,
                                                &n_neps_2d, &e_neps_2d);
     }
 
