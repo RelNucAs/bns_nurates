@@ -714,7 +714,7 @@ void GaussLegendreIntegrate2DMatrixForNEPS(const MyQuadrature* quad,
                 x_j = quad->points[j];
                 w_j = quad->w[j];
 
-                w_ij  = w_i * w_j;
+                w_ij = w_i * w_j;
 
                 aux_1 = 0.5 * t * x_i * (1. - x_j);
                 aux_2 = 0.5 * t * x_i * (1. + x_j);
@@ -723,27 +723,31 @@ void GaussLegendreIntegrate2DMatrixForNEPS(const MyQuadrature* quad,
 
                 result_1->integrand[0 + idx] +=
                     w_ij * (x_i * (mat->m1_mat_em[idx][i][j] +
-                            mat->m1_mat_em[idx][i][n + j]) +
+                                   mat->m1_mat_em[idx][i][n + j]) +
                             (mat->m1_mat_em[idx][n + i][j] +
-                            mat->m1_mat_em[idx][n + i][n + j]) / x3_i);
+                             mat->m1_mat_em[idx][n + i][n + j]) /
+                                x3_i);
 
                 result_1->integrand[total_num_species + idx] +=
                     w_ij * (x_i * (mat->m1_mat_ab[idx][i][j] +
-                            mat->m1_mat_ab[idx][i][n + j]) +
+                                   mat->m1_mat_ab[idx][i][n + j]) +
                             (mat->m1_mat_ab[idx][n + i][j] +
-                            mat->m1_mat_ab[idx][n + i][n + j]) / x3_i);
+                             mat->m1_mat_ab[idx][n + i][n + j]) /
+                                x3_i);
 
                 result_2->integrand[0 + idx] +=
                     w_ij * (x_i * (aux_1 * mat->m1_mat_em[idx][i][j] +
-                            aux_2 * mat->m1_mat_em[idx][i][n + j]) +
+                                   aux_2 * mat->m1_mat_em[idx][i][n + j]) +
                             (aux_3 * mat->m1_mat_em[idx][n + i][j] +
-                            aux_4 * mat->m1_mat_em[idx][n + i][n + j]) / x3_i);
+                             aux_4 * mat->m1_mat_em[idx][n + i][n + j]) /
+                                x3_i);
 
                 result_2->integrand[total_num_species + idx] +=
                     w_ij * (x_i * (aux_1 * mat->m1_mat_ab[idx][i][j] +
-                            aux_2 * mat->m1_mat_ab[idx][i][n + j]) +
+                                   aux_2 * mat->m1_mat_ab[idx][i][n + j]) +
                             (aux_3 * mat->m1_mat_ab[idx][n + i][j] +
-                            aux_4 * mat->m1_mat_ab[idx][n + i][n + j]) / x3_i);
+                             aux_4 * mat->m1_mat_ab[idx][n + i][n + j]) /
+                                x3_i);
             }
         }
     }

@@ -20,10 +20,19 @@ KOKKOS_INLINE_FUNCTION
 void PairPsi(const int l, const BS_REAL y, const BS_REAL z, const BS_REAL eta,
              BS_REAL* psi_out)
 {
+    constexpr BS_REAL zero             = 0;
+    constexpr BS_REAL four             = 4;
+    constexpr BS_REAL fifteen          = 15;
+    constexpr BS_REAL twenty           = 20;
+    constexpr BS_REAL forty            = 40;
+    constexpr BS_REAL eighty           = 80;
+    constexpr BS_REAL onehundredtwenty = 120;
+    constexpr BS_REAL twohundred       = 200;
+
     BS_ASSERT(l == 0);
 
-    BS_ASSERT(isfinite(y) and y >= 0.);
-    BS_ASSERT(isfinite(y) and z >= 0.);
+    BS_ASSERT(isfinite(y) and y >= zero);
+    BS_ASSERT(isfinite(y) and z >= zero);
     BS_ASSERT(isfinite(eta));
 
     /* The check on eta is necessary because, if eta is very large, the electron
@@ -33,10 +42,10 @@ void PairPsi(const int l, const BS_REAL y, const BS_REAL z, const BS_REAL eta,
     check fixes that. */
     /* TODO: The threshold of 200 is somewhat arbitrary, can we find some better
     motivated number? */
-    if (eta - y - z > 200.)
+    if (eta - y - z > twohundred)
     {
-        psi_out[0] = 0.;
-        psi_out[1] = 0.;
+        psi_out[0] = zero;
+        psi_out[1] = zero;
     }
     else
     {
@@ -69,39 +78,44 @@ void PairPsi(const int l, const BS_REAL y, const BS_REAL z, const BS_REAL eta,
         const BS_REAL FDI_p5_emyz = FDI_p5(eta - y - z);
         const BS_REAL FDI_p5_epyz = FDI_p5(eta + y + z);
 
-        const BS_REAL x0  = 20 * FDI_p4_emy;
-        const BS_REAL x1  = 20 * FDI_p4_epz;
-        const BS_REAL x2  = 120 * FDI_p2_emy - 120 * FDI_p2_epz;
-        const BS_REAL x3  = -40 * FDI_p3_emy + 40 * FDI_p3_epz;
-        const BS_REAL x4  = 40 * FDI_p3_e;
-        const BS_REAL x5  = 40 * FDI_p3_emyz - x4;
-        const BS_REAL x6  = -20 * FDI_p4_e;
-        const BS_REAL x7  = 20 * FDI_p4_emyz + x6;
-        const BS_REAL x8  = -40 * FDI_p3_epyz + x4;
-        const BS_REAL x9  = 20 * FDI_p4_epyz + x6;
-        const BS_REAL x10 = -4 * FDI_p5_emy + 4 * FDI_p5_emyz - 4 * FDI_p5_emz +
-                            4 * FDI_p5_epy - 4 * FDI_p5_epyz + 4 * FDI_p5_epz;
-        const BS_REAL x11 = 20 * FDI_p4_epy;
-        const BS_REAL x12 = 20 * FDI_p4_emz;
-        const BS_REAL x13 = -40 * FDI_p3_emz + 40 * FDI_p3_epy;
-        const BS_REAL x14 = 120 * FDI_p2_emz - 120 * FDI_p2_epy;
+        const BS_REAL x0 = twenty * FDI_p4_emy;
+        const BS_REAL x1 = twenty * FDI_p4_epz;
+        const BS_REAL x2 =
+            onehundredtwenty * FDI_p2_emy - onehundredtwenty * FDI_p2_epz;
+        const BS_REAL x3  = -forty * FDI_p3_emy + forty * FDI_p3_epz;
+        const BS_REAL x4  = forty * FDI_p3_e;
+        const BS_REAL x5  = forty * FDI_p3_emyz - x4;
+        const BS_REAL x6  = -twenty * FDI_p4_e;
+        const BS_REAL x7  = twenty * FDI_p4_emyz + x6;
+        const BS_REAL x8  = -forty * FDI_p3_epyz + x4;
+        const BS_REAL x9  = twenty * FDI_p4_epyz + x6;
+        const BS_REAL x10 = -four * FDI_p5_emy + four * FDI_p5_emyz -
+                            four * FDI_p5_emz + four * FDI_p5_epy -
+                            four * FDI_p5_epyz + four * FDI_p5_epz;
+        const BS_REAL x11 = twenty * FDI_p4_epy;
+        const BS_REAL x12 = twenty * FDI_p4_emz;
+        const BS_REAL x13 = -forty * FDI_p3_emz + forty * FDI_p3_epy;
+        const BS_REAL x14 =
+            onehundredtwenty * FDI_p2_emz - onehundredtwenty * FDI_p2_epy;
 
-        const BS_REAL aux = 15 * POW2(y * z);
+        const BS_REAL aux = fifteen * POW2(y * z);
 
         psi_out[0] =
             x10 +
             y * (-x0 + x1 + x7 +
                  y * (x3 + x5 +
-                      z * (x2 + z * (-120 * FDI_p1_emy + 120 * FDI_p1_epz))) +
-                 z * (80 * FDI_p3_emy - 80 * FDI_p3_epz - x2 * z)) +
+                      z * (x2 + z * (-onehundredtwenty * FDI_p1_emy +
+                                     onehundredtwenty * FDI_p1_epz))) +
+                 z * (eighty * FDI_p3_emy - eighty * FDI_p3_epz - x2 * z)) +
             z * (x0 - x1 + x9 + z * (x3 + x8));
 
         psi_out[1] =
             x10 + y * (-x11 + x12 + x9 + y * (x13 + x8)) +
             z * (x11 - x12 + x7 +
-                 y * (80 * FDI_p3_emz - 80 * FDI_p3_epy - x14 * y) +
+                 y * (eighty * FDI_p3_emz - eighty * FDI_p3_epy - x14 * y) +
                  z * (x13 + x5 +
-                      y * (x14 + y * (-120 * FDI_p1_emz + 120 * FDI_p1_epy))));
+                      y * (x14 + y * (-onehundredtwenty * FDI_p1_emz +
+                                      onehundredtwenty * FDI_p1_epy))));
 
         psi_out[0] /= aux;
         psi_out[1] /= aux;
@@ -125,12 +139,15 @@ KOKKOS_INLINE_FUNCTION
 void PairPhi(const BS_REAL omega, const BS_REAL omega_prime, const int l,
              const BS_REAL eta, const BS_REAL T, BS_REAL* phi_out)
 {
+    constexpr BS_REAL zero = 0;
+    constexpr BS_REAL one  = 1;
+
     const BS_REAL y = omega / T;
     const BS_REAL z = omega_prime / T;
 
-    const BS_REAL aux = kBS_Pair_Phi * POW2(T) / (1. - SafeExp(y + z));
+    const BS_REAL aux = kBS_Pair_Phi * POW2(T) / (one - SafeExp(y + z));
 
-    BS_REAL pair_psi[2] = {0.};
+    BS_REAL pair_psi[2] = {zero};
 
     PairPsi(l, y, z, eta, pair_psi);
 
@@ -152,6 +169,9 @@ KOKKOS_INLINE_FUNCTION
 MyKernelOutput PairKernels(const MyEOSParams* eos_pars,
                            const PairKernelParams* kernel_pars)
 {
+    constexpr BS_REAL zero = 0;
+    constexpr BS_REAL half = 0.5;
+
     // EOS specific parameters
     const BS_REAL T   = eos_pars->temp;
     const BS_REAL eta = eos_pars->mu_e / T;
@@ -160,16 +180,16 @@ MyKernelOutput PairKernels(const MyEOSParams* eos_pars,
     const BS_REAL omega       = kernel_pars->omega;
     const BS_REAL omega_prime = kernel_pars->omega_prime;
 
-    BS_REAL pair_phi[4] = {0.};
+    BS_REAL pair_phi[4] = {zero};
 
     PairPhi(omega, omega_prime, 0, eta, T, pair_phi);
 
     MyKernelOutput pair_kernel;
 
-    pair_kernel.em[id_nue]  = 0.5 * pair_phi[0];
-    pair_kernel.em[id_anue] = 0.5 * pair_phi[1];
-    pair_kernel.em[id_nux]  = 0.5 * pair_phi[2];
-    pair_kernel.em[id_anux] = 0.5 * pair_phi[3];
+    pair_kernel.em[id_nue]  = half * pair_phi[0];
+    pair_kernel.em[id_anue] = half * pair_phi[1];
+    pair_kernel.em[id_nux]  = half * pair_phi[2];
+    pair_kernel.em[id_anux] = half * pair_phi[3];
 
     for (int idx = 0; idx < total_num_species; ++idx)
     {
@@ -202,13 +222,16 @@ KOKKOS_INLINE_FUNCTION
 void PairKernelsTable(const int n, const BS_REAL* nu_array,
                       GreyOpacityParams* grey_pars, M1MatrixKokkos2D* out)
 {
+    constexpr BS_REAL zero = 0;
+    constexpr BS_REAL one  = 1;
+
     MyKernelOutput pair_1, pair_2;
 
-    grey_pars->kernel_pars.pair_kernel_params.cos_theta = 1.;
-    grey_pars->kernel_pars.pair_kernel_params.filter    = 0.;
-    grey_pars->kernel_pars.pair_kernel_params.lmax      = 0;
-    grey_pars->kernel_pars.pair_kernel_params.mu        = 1.;
-    grey_pars->kernel_pars.pair_kernel_params.mu_prime  = 1.;
+    grey_pars->kernel_pars.pair_kernel_params.cos_theta = one;
+    grey_pars->kernel_pars.pair_kernel_params.filter    = zero;
+    grey_pars->kernel_pars.pair_kernel_params.lmax      = zero;
+    grey_pars->kernel_pars.pair_kernel_params.mu        = one;
+    grey_pars->kernel_pars.pair_kernel_params.mu_prime  = one;
 
     for (int i = 0; i < n; ++i)
     {

@@ -11,6 +11,14 @@
 //  \brief constants used throughout the code
 
 ////////////////////////////////////////////////////////////////////////////////
+// The logic of this file is that all "fundamental constants" (the speed of   //
+// light, Planck constant, masses of particles, etc.) are defined as double   //
+// precision floating-point numbers. All other constants, which that are      //
+// defined from the fundamental ones and that actually appear in the kernels, //
+// are instead defined as BS_REAL numbers. BS_REAL can be 'double' or 'float' //
+// as desired, but because these constants are computed from double precision //
+// ones, they are accurate in either case.                                    //
+//                                                                            //
 // All values are consistent with the CODATA Internationally recommended 2022 //
 // values of the Fundamental Physical Constants                               //
 // (https://pml.nist.gov/cuu/Constants/index.html)                            //
@@ -228,7 +236,8 @@ inline constexpr BS_REAL kBS_FourPiSquared = 39.4784176043574344753379639995029;
 // pi^(1/8)
 inline constexpr BS_REAL kBS_Pi2OneEighth = 1.15383506784998943054096521314981;
 // (pi / 2)^2.5
-inline constexpr BS_REAL kBS_PiHalfToFiveHalves = 3.09242868139914350627854469835251;
+inline constexpr BS_REAL kBS_PiHalfToFiveHalves =
+    3.09242868139914350627854469835251;
 
 
 #endif // BNS_NURATES_SRC_CONSTANTS_H_
