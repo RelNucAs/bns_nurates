@@ -33,10 +33,44 @@
 KOKKOS_INLINE_FUNCTION
 BS_REAL BremKernelS(BS_REAL x, BS_REAL y, BS_REAL eta_star)
 {
-    BS_ASSERT(x >= 0.);
-    BS_ASSERT(y >= 0.);
+    constexpr BS_REAL zero = 0;
+    constexpr BS_REAL one = 1;
+    constexpr BS_REAL two = 2;
+    constexpr BS_REAL three = 3;
+    constexpr BS_REAL four = 4;
+    constexpr BS_REAL five = 5;
+    constexpr BS_REAL six = 6;
+    constexpr BS_REAL twelve = 12;
+    constexpr BS_REAL thirty = 30;
+
+    constexpr BS_REAL three_halves = 1.5; 
+    constexpr BS_REAL five_halves = 2.5; 
+    constexpr BS_REAL eleven_tenth = 1.1;
+    constexpr BS_REAL twelve_tenth = 1.2;
+    constexpr BS_REAL one_fifth = 0.2;
+    constexpr BS_REAL two_fifth = 0.4;
+    constexpr BS_REAL four_fifth = 0.8;
+    constexpr BS_REAL fourteen_fifth = 2.8;
+    constexpr BS_REAL five_thousands = 0.005;
+    constexpr BS_REAL six_hundreds = 0.06;
+    constexpr BS_REAL one_tenth = 0.1;
+    constexpr BS_REAL twentythree_tenth = 2.3;
+    constexpr BS_REAL ninetythree_hundreds = 0.93;
+    constexpr BS_REAL sixtyseven_hundreds = 0.67;
+    constexpr BS_REAL eighteen_hundreds = 0.18;
+
+    constexpr BS_REAL ten_minus_fourteen = 1e-14;
+    constexpr BS_REAL ten_minus_ten = 1.e-10;
+
+    constexpr BS_REAL c1 = 0.0044;
+    constexpr BS_REAL c2 = 1.05;
+    constexpr BS_REAL c3 = 0.0001;
+    constexpr BS_REAL c4 = 2.39;
+
+    BS_ASSERT(x >= zero);
+    BS_ASSERT(y >= zero);
     BS_ASSERT(isfinite(eta_star));
-    BS_ASSERT(eta_star >= 0.);
+    BS_ASSERT(eta_star >= zero);
 
     // Prevent singular behavior
     x        = (x > kBS_Brem_Xmin) ? x : kBS_Brem_Xmin;
@@ -45,56 +79,57 @@ BS_REAL BremKernelS(BS_REAL x, BS_REAL y, BS_REAL eta_star)
 
     // Compute non-degenerate approximation, s_nd in Eqn. (45)
     const BS_REAL s_nd_numerator =
-        2. * kBS_SqrtPi * pow(x + 2. - SafeExp(-y / 12.), 1.5) *
-        (POW2(x) + 2. * x * y + 5. * POW2(y) / 3. + 1.);
+        two * kBS_SqrtPi * pow(x + two - SafeExp(-y / twelve), three_halves) *
+        (POW2(x) + two * x * y + five * POW2(y) / three + one);
     const BS_REAL s_nd_denominator =
         kBS_SqrtPi + POW4(kBS_Pi2OneEighth + x + y);
     const BS_REAL s_nd = s_nd_numerator / s_nd_denominator;
 
     // Compute degenerate approximation, s_d in Eqn. (46)
-    const BS_REAL u     = sqrt(y / (2. * eta_star)) + 1.e-10;
+    const BS_REAL u     = sqrt(y / (two * eta_star)) + ten_minus_ten;
     const BS_REAL u2    = POW2(u);
-    const BS_REAL u_arg = u2 / (2. * sqrt(2. * u2 + 4.));
-    BS_REAL f_u = (1. - 5. * u * atan(2. / u) / 6. + u2 / (3. * (u2 + 4.)) +
-                   atan(1. / u_arg) * u_arg / 3.);
+    const BS_REAL u_arg = u2 / (two * sqrt(two * u2 + four));
+    BS_REAL f_u = (one - five * u * atan(two / u) / six + u2 / (three * (u2 + four)) +
+                   atan(one / u_arg) * u_arg / three);
 
     // @TODO: Leonardo check this! Doing this to prevent s_d from being a large
     // negative number
-    f_u = (fabs(f_u) < 1e-14) ? 1e-14 : f_u;
+    f_u = (fabs(f_u) < ten_minus_fourteen) ? ten_minus_fourteen : f_u;
 
-    const BS_REAL s_d = 3. * kBS_PiHalfToFiveHalves * pow(eta_star, -2.5) *
+    const BS_REAL s_d = three * kBS_PiHalfToFiveHalves * pow(eta_star, -five_halves) *
                         (POW2(x) + kBS_FourPiSquared) * x * f_u /
-                        (kBS_FourPiSquared * (1. - SafeExp(-x)));
+                        (kBS_FourPiSquared * (one - SafeExp(-x)));
 
-    const BS_REAL pow_x_1_1 = pow(x, 1.1);
+    const BS_REAL pow_x_1_1 = pow(x, eleven_tenth);
 
     // F, Eqn. (50)
-    const BS_REAL f_denominator = (3. + POW2(x - 1.2) + pow(x, -4.)) *
-                                  (1. + POW2(eta_star)) * (1. + POW4(y));
+    const BS_REAL f_denominator = (three + POW2(x - twelve_tenth) + pow(x, -four)) *
+                                  (one + POW2(eta_star)) * (one + POW4(y));
     // Eq.(50)
-    const BS_REAL f_brem = 1. + 1. / f_denominator;
+    const BS_REAL f_brem = one + one / f_denominator;
 
     // G, Eqn. (50)
-    const BS_REAL g_brem = 1. - 0.0044 * pow_x_1_1 * y /
-                                    (0.8 + 0.06 * pow(y, 1.05)) *
-                                    sqrt(eta_star) / (eta_star + 0.2);
+    const BS_REAL g_brem = one - c1 * pow_x_1_1 * y /
+                                    (four_fifth + six_hundreds * pow(y, c2)) *
+                                    sqrt(eta_star) / (eta_star + one_fifth);
 
     // h and C, Eqn. (50)
-    const BS_REAL h_brem = 0.1 * eta_star / (2.39 + 0.1 * pow(eta_star, 1.1));
+    const BS_REAL h_brem = one_tenth * eta_star / (c4 + one_tenth * pow(eta_star, eleven_tenth));
     const BS_REAL c_brem =
-        1.1 * pow_x_1_1 * h_brem /
-        (2.3 + h_brem * pow(x, 0.93) + 0.0001 * pow(x, 1.2)) * 30. /
-        (30. + 0.005 * pow(x, 2.8));
+        eleven_tenth * pow_x_1_1 * h_brem /
+        (twentythree_tenth + h_brem * pow(x, ninetythree_hundreds) + c3 * pow(x, twelve_tenth)) * thirty /
+        (thirty + five_thousands
+           * pow(x, fourteen_fifth));
 
     // p, Eqn. (50)
-    const BS_REAL p_brem = 0.67 + 0.18 * pow(y, 0.4);
+    const BS_REAL p_brem = sixtyseven_hundreds + eighteen_hundreds * pow(y, two_fifth);
 
     // interpolated formula for s in Eqn. (49)
     const BS_REAL s_brem =
-        pow(pow(s_nd, -p_brem) + pow(s_d, -p_brem), -1. / p_brem) * f_brem *
-        (1. + c_brem * g_brem);
+        pow(pow(s_nd, -p_brem) + pow(s_d, -p_brem), -one / p_brem) * f_brem *
+        (one + c_brem * g_brem);
 
-    BS_ASSERT(s_brem >= 0.);
+    BS_ASSERT(s_brem >= zero);
 
     return s_brem;
 }
@@ -113,8 +148,33 @@ BS_REAL BremKernelS(BS_REAL x, BS_REAL y, BS_REAL eta_star)
 KOKKOS_INLINE_FUNCTION
 BS_REAL BremKernelG(BS_REAL y, BS_REAL eta_star)
 {
-    BS_ASSERT(y >= 0.);
-    BS_ASSERT(eta_star >= 0.);
+    constexpr BS_REAL zero = 0;
+    constexpr BS_REAL one = 1;
+    constexpr BS_REAL two = 2;
+    constexpr BS_REAL half = 0.5;
+    constexpr BS_REAL twentyfive = 25;
+
+    constexpr BS_REAL three_halves = 1.5;
+    constexpr BS_REAL five_halves = 2.5;
+    constexpr BS_REAL two_fifth = 0.4;
+    constexpr BS_REAL two_hundreds = 0.02;
+    constexpr BS_REAL four_hundreds = 0.04;
+    constexpr BS_REAL five_hundreds = 0.05;
+    constexpr BS_REAL twelve_tenth = 1.2;
+    constexpr BS_REAL six_tenth = 0.6;
+    constexpr BS_REAL eighteen_tenth = 1.8;
+    constexpr BS_REAL twentythree_tenth = 2.3;
+    constexpr BS_REAL fortyfive_hundreds = 0.45;
+    constexpr BS_REAL fifteen_hundreds = 0.15;
+
+    constexpr BS_REAL c1 = 15.6;
+    constexpr BS_REAL c2 = 0.63;
+    constexpr BS_REAL c3 = 1.45;
+    constexpr BS_REAL c4 = 0.025;
+    constexpr BS_REAL c5 = 13.75;
+
+    BS_ASSERT(y >= zero);
+    BS_ASSERT(eta_star >= zero);
 
     // prevent singular behavior
     y        = (y > kBS_Brem_Ymin) ? y : kBS_Brem_Ymin;
@@ -122,36 +182,36 @@ BS_REAL BremKernelG(BS_REAL y, BS_REAL eta_star)
 
     // alpha_1, Eqn. (53)
     const BS_REAL y2            = POW2(y);
-    const BS_REAL eta_star_inv  = 1. / eta_star;
-    const BS_REAL alpha_1_denom = 25. * y2 + 1.;
+    const BS_REAL eta_star_inv  = one / eta_star;
+    const BS_REAL alpha_1_denom = twentyfive * y2 + one;
 
     const BS_REAL alpha_1 =
-        (0.5 + eta_star_inv) / (1. + eta_star_inv) * (1. / alpha_1_denom) +
-        (0.5 + eta_star / 15.6) * 25. * y2 / alpha_1_denom;
+        (half + eta_star_inv) / (one + eta_star_inv) * (one / alpha_1_denom) +
+        (half + eta_star / c1) * twentyfive * y2 / alpha_1_denom;
 
     // alpha_2, Eqn. (53)
     const BS_REAL alpha_2 =
-        (0.63 + 0.04 * pow(eta_star, 1.45)) / (1. + 0.02 * pow(eta_star, 2.5));
+        (c2 + four_hundreds * pow(eta_star, c3)) / (one + two_hundreds * pow(eta_star, five_halves));
 
-    const BS_REAL pow_eta_star_1_5 = pow(eta_star, 1.5);
+    const BS_REAL pow_eta_star_1_5 = pow(eta_star, three_halves);
 
     // alpha_3, Eqn. (53)
     const BS_REAL alpha_3 =
-        1.2 * SafeExp(0.6 * eta_star - 0.4 * pow_eta_star_1_5);
+        twelve_tenth * SafeExp(six_tenth * eta_star - two_fifth * pow_eta_star_1_5);
 
     // p_1, Eqn. (53)
     const BS_REAL p_1 =
-        (1.8 + 0.45 * eta_star) / (1. + 0.15 * pow_eta_star_1_5);
+        (eighteen_tenth + fortyfive_hundreds * eta_star) / (one + fifteen_hundreds * pow_eta_star_1_5);
 
     // p_2, Eqn. (53)
-    const BS_REAL p_2 = 2.3 - 0.05 * eta_star / (1. + 0.025 * eta_star);
+    const BS_REAL p_2 = twentythree_tenth - five_hundreds * eta_star / (one + c4 * eta_star);
 
     // g, Eqn. (52)
     const BS_REAL g =
         (alpha_1 + alpha_2 * pow(y, p_1)) /
-        (1. + alpha_3 * pow(y, p_2) + alpha_2 * pow(y, p_1 + 2.) / 13.75);
+        (one + alpha_3 * pow(y, p_2) + alpha_2 * pow(y, p_1 + two) / c5);
 
-    BS_ASSERT(g >= 0.);
+    BS_ASSERT(g >= zero);
 
     return g;
 }
@@ -162,6 +222,16 @@ BS_REAL BremSingleChannelAbsKernel(const BS_REAL n_nuc, const BS_REAL m_nuc,
                                    BremKernelParams* kernel_params,
                                    MyEOSParams* eos_params)
 {
+    constexpr BS_REAL two = 2;
+    constexpr BS_REAL three = 3;
+    constexpr BS_REAL half = 0.5;
+    constexpr BS_REAL one_tenth = 0.1; 
+    constexpr BS_REAL two_thirds = 2. / 3.;
+    constexpr BS_REAL three_halves = 1.5; 
+
+    constexpr BS_REAL c1 = 1.63;
+    constexpr BS_REAL c2 = 1.94;
+
     // EOS parameters
     // Temperature
     const BS_REAL T = eos_params->temp; // [MeV]
@@ -176,18 +246,18 @@ BS_REAL BremSingleChannelAbsKernel(const BS_REAL n_nuc, const BS_REAL m_nuc,
     const BS_REAL x = (omega + omega_prime) / T;
 
     // Temperature in units of 10 MeV
-    const BS_REAL T_10 = T * 0.1;
+    const BS_REAL T_10 = T * one_tenth;
 
     // Nucleon effective degeneracy parameter, Eqn. (36) using baryon number
     // density instead of matter density
-    const BS_REAL eta_star = pow(3. * kBS_PiSquared * n_nuc, 2. / 3.) *
-                             kBS_Brem_Aux1 / (2. * m_nuc * T);
+    const BS_REAL eta_star = pow(three * kBS_PiSquared * n_nuc, two_thirds) *
+                             kBS_Brem_Aux1 / (two * m_nuc * T);
 
     // Spin-fluctuation rate gamma, Eqn. (37)
-    const BS_REAL gamma = 1.63 * pow(eta_star, 3. / 2.) * T_10;
+    const BS_REAL gamma = c1 * pow(eta_star, three_halves) * T_10;
 
     // Pion mass parameter y, Eqn. (38)
-    const BS_REAL y = 1.94 / T_10;
+    const BS_REAL y = c2 / T_10;
 
     // Dimensionless fitting parameter s
     const BS_REAL sb = BremKernelS(x, y, eta_star);
@@ -196,7 +266,7 @@ BS_REAL BremSingleChannelAbsKernel(const BS_REAL n_nuc, const BS_REAL m_nuc,
     const BS_REAL gb = BremKernelG(y, eta_star);
 
     // Differential absorption kernel, Eqn. (35)
-    return gamma / (POW2(x) + POW2(0.5 * gamma * gb)) * sb / T;
+    return gamma / (POW2(x) + POW2(half * gamma * gb)) * sb / T;
 }
 
 /* Compute the angular independent part of the absorption kernels for the
@@ -205,7 +275,9 @@ KOKKOS_INLINE_FUNCTION
 BS_REAL BremAllChannelsAbsKernel(BremKernelParams* kernel_params,
                                  MyEOSParams* eos_params)
 {
-    static const BS_REAL kTwentyeightThirds = 28. / 3.;
+    constexpr BS_REAL twentyeight_thirds = 28. / 3.;
+    constexpr BS_REAL one = 1;
+    constexpr BS_REAL three = 3;
 
     // EOS parameters
     const BS_REAL nb = eos_params->nb; // baryon number density [nm^-3]
@@ -233,12 +305,12 @@ BS_REAL BremAllChannelsAbsKernel(BremKernelParams* kernel_params,
 
     // Total absorption kernel
     BS_REAL s_abs_tot = kBS_Brem_Const * (nn * s_abs_nn + np * s_abs_pp +
-                                          28. * n_mean * s_abs_np / 3.);
+                                          twentyeight_thirds * n_mean * s_abs_np);
 
     // kernel correction due to medium dependence as in Fischer2016
     if (kernel_params->use_NN_medium_corr == true)
     {
-        s_abs_tot = s_abs_tot / POW6((1. + cbrt(nb / kBS_Saturation_n) / 3.));
+        s_abs_tot = s_abs_tot / POW6((one + cbrt(nb / kBS_Saturation_n) / three));
     }
 
     return s_abs_tot;
@@ -250,6 +322,9 @@ KOKKOS_INLINE_FUNCTION
 MyKernelOutput BremKernelsLegCoeff(BremKernelParams* kernel_params,
                                    MyEOSParams* eos_params)
 {
+    constexpr BS_REAL one = 1;
+    constexpr BS_REAL three = 3;
+
     // kernel parameters
     const int l         = kernel_params->l;     // order of Legendre coefficient
     const BS_REAL omega = kernel_params->omega; // neutrino energy [MeV]
@@ -270,10 +345,10 @@ MyKernelOutput BremKernelsLegCoeff(BremKernelParams* kernel_params,
     switch (l)
     {
     case 0:
-        s_abs = 3. * s_abs; // zeroth Legedre coefficient
+        s_abs = three * s_abs; // zeroth Legedre coefficient
         break;
     case 1:
-        s_abs = -1. * s_abs; // first Legedre coefficient
+        s_abs = - one * s_abs; // first Legedre coefficient
         break;
     default:
         printf("BremKernelsLegCoeff (kernel_brem.c): l = %d must be either 0 "
@@ -341,10 +416,17 @@ KOKKOS_INLINE_FUNCTION
 BS_REAL QBrem_BRT06(const BS_REAL nb, const BS_REAL T, const BS_REAL xn,
                     const BS_REAL xp)
 {
+    constexpr BS_REAL half = 0.5;
+    constexpr BS_REAL twentyeight_thirds = 28. / 3.;
+
+    constexpr BS_REAL eleven_halves = 5.5;
+
+    constexpr BS_REAL kBS_Brem_BRT06_Const = 2.0778e+02;
+
     const BS_REAL rho = nb * kBS_Mb; // mass density [g nm-3]
-    return 2.0778e+02 * 0.5 * kBS_MeV *
-           (POW2(xn) + POW2(xp) + 28. * xn * xp / 3.) * POW2(rho) *
-           pow(T, 5.5); // [MeV nm-3 s-1]
+    return kBS_Brem_BRT06_Const * half * kBS_MeV *
+           (POW2(xn) + POW2(xp) + twentyeight_thirds * xn * xp) * POW2(rho) *
+           pow(T, eleven_halves); // [MeV nm-3 s-1]
 }
 
 // Bremsstrahlung kernel from BRT06 Eq.(143) rewritten consistently
@@ -353,11 +435,13 @@ KOKKOS_INLINE_FUNCTION
 MyKernelOutput BremKernelsBRT06(BremKernelParams* kernel_params,
                                 MyEOSParams* eos_pars)
 {
+    constexpr BS_REAL half = 0.5;
+
     const BS_REAL omega       = kernel_params->omega;
     const BS_REAL omega_prime = kernel_params->omega_prime;
     const BS_REAL temp        = eos_pars->temp;
 
-    const BS_REAL x = 0.5 * (omega + omega_prime) / temp;
+    const BS_REAL x = half * (omega + omega_prime) / temp;
     const BS_REAL q_nb =
         QBrem_BRT06(eos_pars->nb, temp, eos_pars->yn, eos_pars->yp);
 

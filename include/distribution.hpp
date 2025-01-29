@@ -52,6 +52,26 @@ KOKKOS_INLINE_FUNCTION
 void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
                                 NuDistributionParams* out_distribution_pars)
 {
+    constexpr BS_REAL zero = 0;
+    constexpr BS_REAL one = 1;
+    constexpr BS_REAL half = 0.5;
+    constexpr BS_REAL three_halves = 1.5;
+    constexpr BS_REAL one_third = 1. / 3.;
+    
+    constexpr BS_REAL twenty = 20;
+    constexpr BS_REAL thirty = 30;
+
+    constexpr BS_REAL y1 = 0.005;
+    constexpr BS_REAL y2 = 0.7;
+    constexpr BS_REAL y3 = 0.7901234567745267;
+
+    constexpr BS_REAL kBS_ThickDistr_num_1[6] = {0.19926987701997, 38865.0149220478, 14364.6331099737, 5750.1878570758, 1120.71610972194, 1.60356108438235e-8};
+    constexpr BS_REAL kBS_ThickDistr_num_2[7] = {41.3836568203438, 32.5515666786612, 157.774993512235, 66.5726772426253, 14.4883415579211, 0.315360380575709, 0.000660414331285249};
+    constexpr BS_REAL kBS_ThickDistr_num_3[7] = {3852.81416018959, 5316.18895799799, 1102.91561586553, 1.54082262710661e-6, 1732.89925128741, 1769.59868329086, 586.406885304906};
+
+    constexpr BS_REAL kBS_ThickDistr_den_1[6] = {1.0, 38840.0743174942, 99.9009680656931, 171.874844843596, 75.7101579899442, 83.0160130941424};
+    constexpr BS_REAL kBS_ThickDistr_den_2[6] = {1.8888797407042, 5.35488690539183, 1.94673781342617, 0.483128792035557, 0.0113386564109086, 2.64160073447322e-5};
+    constexpr BS_REAL kBS_ThickDistr_den_3[6] = {255.936658313629, 9.42360945627147e-5, 81.2467063138386, 180.100197053091, 89.0343496217014, 143.849128123195};
 
     for (int nuid = 0; nuid < total_num_species; ++nuid)
     {
@@ -61,73 +81,73 @@ void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
         const BS_REAL chi = M1_pars->chi[nuid];
 
         BS_ASSERT(
-            n > 0.,
+            n > zero,
             "Neutrino (species=%d) number density is non-positive (n[%d]=%e).",
             nuid, nuid, n);
-        BS_ASSERT(chi >= 1. / 3. && chi <= 1.,
+        BS_ASSERT(chi >= one_third && chi <= one,
                   "Invalid Eddington factor (chi[%d]=%e).", nuid, chi);
 
-        out_distribution_pars->w_t[nuid] = 1.5 * (1. - chi);
+        out_distribution_pars->w_t[nuid] = three_halves * (one - chi);
 
         const BS_REAL y = n * POW3(n / J) / kBS_FourPi_hc3;
 
-        if (y < 0.005)
+        if (y < y1)
         {
             out_distribution_pars->eta_t[nuid] =
-                log((y * (y * (y * (y * (y * (y + 0.19926987701997) +
-                                         38865.0149220478) +
-                                    14364.6331099737) +
-                               5750.1878570758) +
-                          1120.71610972194) +
-                     1.60356108438235e-8) /
-                    (y * (y * (y * (y * (y * (y + 1.0) + 38840.0743174942) -
-                                    99.9009680656931) -
-                               171.874844843596) +
-                          75.7101579899442) +
-                     83.0160130941424));
+                log((y * (y * (y * (y * (y * (y + kBS_ThickDistr_num_1[0]) +
+                                         kBS_ThickDistr_num_1[1]) +
+                                    kBS_ThickDistr_num_1[2]) +
+                               kBS_ThickDistr_num_1[3]) +
+                          kBS_ThickDistr_num_1[4]) +
+                     kBS_ThickDistr_num_1[5]) /
+                    (y * (y * (y * (y * (y * (y + kBS_ThickDistr_den_1[0]) + kBS_ThickDistr_den_1[1]) -
+                                    kBS_ThickDistr_den_1[2]) -
+                               kBS_ThickDistr_den_1[3]) +
+                          kBS_ThickDistr_den_1[4]) +
+                     kBS_ThickDistr_den_1[5]));
         }
-        else if (y <= 0.7)
+        else if (y <= y2)
         {
             out_distribution_pars->eta_t[nuid] =
-                (y * (y * (y * (y * (y * (41.3836568203438 * y +
-                                          32.5515666786612) -
-                                     157.774993512235) +
-                                66.5726772426253) +
-                           14.4883415579211) +
-                      0.315360380575709) +
-                 0.000660414331285249) /
-                    (y * (y * (y * (y * (y * (y + 1.8888797407042) -
-                                         5.35488690539183) +
-                                    1.94673781342617) +
-                               0.483128792035557) +
-                          0.0113386564109086) +
-                     2.64160073447322e-5) -
-                30.;
+                (y * (y * (y * (y * (y * (kBS_ThickDistr_num_2[0] * y +
+                                          kBS_ThickDistr_num_2[1]) -
+                                     kBS_ThickDistr_num_2[2]) +
+                                kBS_ThickDistr_num_2[3]) +
+                           kBS_ThickDistr_num_2[4]) +
+                      kBS_ThickDistr_num_2[5]) +
+                 kBS_ThickDistr_num_2[6]) /
+                    (y * (y * (y * (y * (y * (y + kBS_ThickDistr_den_2[0]) -
+                                         kBS_ThickDistr_den_2[1]) +
+                                    kBS_ThickDistr_den_2[2]) +
+                               kBS_ThickDistr_den_2[3]) +
+                          kBS_ThickDistr_den_2[4]) +
+                     kBS_ThickDistr_den_2[5]) -
+                thirty;
         }
-        else if (y > 0.7 && y < 0.7901234567745267)
+        else if (y > y2 && y < y3)
         {
             out_distribution_pars->eta_t[nuid] =
-                exp((y * (y * (y * (y * (y * (3852.81416018959 * y -
-                                              5316.18895799799) +
-                                         1102.91561586553) +
-                                    1.54082262710661e-6) +
-                               1732.89925128741) -
-                          1769.59868329086) +
-                     586.406885304906) /
-                    (y * (y * (y * (y * (y * (y + 255.936658313629) +
-                                         9.42360945627147e-5) -
-                                    81.2467063138386) -
-                               180.100197053091) -
-                          89.0343496217014) +
-                     143.849128123195));
+                exp((y * (y * (y * (y * (y * (kBS_ThickDistr_num_3[0] * y -
+                                              kBS_ThickDistr_num_3[1]) +
+                                         kBS_ThickDistr_num_3[2]) +
+                                    kBS_ThickDistr_num_3[3]) +
+                               kBS_ThickDistr_num_3[4]) -
+                          kBS_ThickDistr_num_3[5]) +
+                     kBS_ThickDistr_num_3[6]) /
+                    (y * (y * (y * (y * (y * (y + kBS_ThickDistr_den_3[0]) +
+                                         kBS_ThickDistr_den_3[1]) -
+                                    kBS_ThickDistr_den_3[2]) -
+                               kBS_ThickDistr_den_3[3]) -
+                          kBS_ThickDistr_den_3[4]) +
+                     kBS_ThickDistr_den_3[5]));
         }
         else
         {
-            out_distribution_pars->eta_t[nuid] = 20.;
+            out_distribution_pars->eta_t[nuid] = twenty;
         }
 
         out_distribution_pars->eta_t[nuid] =
-            fmin(out_distribution_pars->eta_t[nuid], 20.);
+            fmin(out_distribution_pars->eta_t[nuid], twenty);
 
         out_distribution_pars->temp_t[nuid] =
             FDI_p2(out_distribution_pars->eta_t[nuid]) * J /
@@ -167,7 +187,15 @@ BS_REAL NuFThin(const BS_REAL omega, const NuDistributionParams* distr_pars,
 KOKKOS_INLINE_FUNCTION
 void CalculateThinParamsFromM1(const M1Quantities* M1_pars,
                                NuDistributionParams* out_distribution_pars)
-{
+{   
+    constexpr BS_REAL zero = 0;
+    constexpr BS_REAL one = 1;
+    constexpr BS_REAL three = 3;
+    constexpr BS_REAL half = 0.5;
+    constexpr BS_REAL one_third = 1. / 3.;
+
+    constexpr BS_REAL c_f = CONST_C_F;
+
     for (int nuid = 0; nuid < total_num_species; ++nuid)
     {
         const BS_REAL n = M1_pars->n[nuid]; // [nm^-3]
@@ -176,22 +204,22 @@ void CalculateThinParamsFromM1(const M1Quantities* M1_pars,
         const BS_REAL chi = M1_pars->chi[nuid];
 
         BS_ASSERT(
-            n > 0.,
+            n > zero,
             "Neutrino (species=%d) number density is non-positive (n[%d]=%e).",
             nuid, nuid, n);
-        BS_ASSERT(chi >= 1. / 3. && chi <= 1.,
+        BS_ASSERT(chi >= one_third && chi <= one,
                   "Invalid Eddington factor (chi[%d]=%e).", nuid, chi);
 
-        out_distribution_pars->w_f[nuid] = 0.5 * (3. * chi - 1.);
+        out_distribution_pars->w_f[nuid] = half * (three * chi - one);
 
-        out_distribution_pars->c_f[nuid] = CONST_C_F;
+        out_distribution_pars->c_f[nuid] = c_f;
 
-        const BS_REAL Tnu                   = J / (n * (CONST_C_F + 3.));
+        const BS_REAL Tnu                   = J / (n * (c_f + three));
         out_distribution_pars->temp_f[nuid] = Tnu;
 
         out_distribution_pars->beta_f[nuid] =
-            n / (kBS_FourPi_hc3 * GammaStirling(CONST_C_F + 3.) *
-                 pow(Tnu, CONST_C_F + 3.));
+            n / (kBS_FourPi_hc3 * GammaStirling(c_f + three) *
+                 pow(Tnu, c_f + three));
     }
 }
 
@@ -206,6 +234,12 @@ void CalculateThinParamsFromM1(const M1Quantities* M1_pars,
 KOKKOS_INLINE_FUNCTION
 NuDistributionParams NuEquilibriumParams(const MyEOSParams* eos_pars)
 {
+    constexpr BS_REAL zero = 0;
+    constexpr BS_REAL one = 1;
+    constexpr BS_REAL thousand = 1e3;
+
+    constexpr BS_REAL c_f = CONST_C_F;
+
     NuDistributionParams out;
 
     const BS_REAL T    = eos_pars->temp; // [MeV]
@@ -213,25 +247,25 @@ NuDistributionParams NuEquilibriumParams(const MyEOSParams* eos_pars)
     const BS_REAL mu_p = eos_pars->mu_p; // [MeV]
     const BS_REAL mu_n = eos_pars->mu_n; // [MeV]
 
-    BS_ASSERT(T > 0. && T < 1e3,
+    BS_ASSERT(T > zero && T < thousand,
               "Given temperature is either negative or beyond 1 GeV (T=%e).",
               T);
 
     for (int idx = 0; idx < total_num_species; ++idx)
     {
-        out.w_t[idx]    = 1.;
+        out.w_t[idx]    = one;
         out.temp_t[idx] = T;
 
-        out.w_f[idx]    = 0.;
-        out.c_f[idx]    = CONST_C_F;
+        out.w_f[idx]    = zero;
+        out.c_f[idx]    = c_f;
         out.temp_f[idx] = T;
-        out.beta_f[idx] = 1.;
+        out.beta_f[idx] = one;
     }
 
     out.eta_t[id_nue]  = (mu_e - mu_n + mu_p) / T;
     out.eta_t[id_anue] = -out.eta_t[id_nue];
-    out.eta_t[id_nux]  = 0.;
-    out.eta_t[id_anux] = 0.;
+    out.eta_t[id_nux]  = zero;
+    out.eta_t[id_anux] = zero;
 
     return out;
 }
@@ -246,8 +280,9 @@ KOKKOS_INLINE_FUNCTION
 BS_REAL TotalNuF(const BS_REAL omega, const NuDistributionParams* distr_pars,
                  const int nuid)
 {
+    constexpr BS_REAL zero = 0;
 
-    BS_ASSERT(omega >= 0., "Neutrino energy is negative.");
+    BS_ASSERT(omega >= zero, "Neutrino energy is negative.");
     BS_ASSERT(nuid >= 0 && nuid < total_num_species,
               "Invalid neutrino species ID.");
 
