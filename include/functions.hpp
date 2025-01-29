@@ -86,29 +86,34 @@ BS_REAL bessi1(const BS_REAL x)
     BS_REAL ax, ans;
     BS_REAL y;
 
+    constexpr BS_REAL zero            = 0;
+    constexpr BS_REAL fifteen_fourths = 3.75;
+    constexpr BS_REAL A[7] = {0.5,          0.87890594,  0.51498869, 0.15084934,
+                              0.2658733e-1, 0.301532e-2, 0.32411e-3};
+    constexpr BS_REAL B[9] = {0.2282967e-1, -0.2895312e-1, 0.1787654e-1,
+                              0.420059e-2,  0.39894228,    -0.3988024e-1,
+                              -0.362018e-2, 0.163801e-2,   -0.1031555e-1};
 
-    if ((ax = fabs(x)) < 3.75)
+
+    if ((ax = fabs(x)) < fifteen_fourths)
     {
-        y = x / 3.75, y = y * y;
-        ans = ax * (0.5 +
-                    y * (0.87890594 +
-                         y * (0.51498869 +
-                              y * (0.15084934 +
-                                   y * (0.2658733e-1 +
-                                        y * (0.301532e-2 + y * 0.32411e-3))))));
+        y = x / fifteen_fourths, y = y * y;
+        ans =
+            ax * (A[0] +
+                  y * (A[1] +
+                       y * (A[2] +
+                            y * (A[3] + y * (A[4] + y * (A[5] + y * A[6]))))));
     }
     else
     {
-        y   = 3.75 / ax;
-        ans = 0.2282967e-1 +
-              y * (-0.2895312e-1 + y * (0.1787654e-1 - y * 0.420059e-2));
-        ans = 0.39894228 +
-              y * (-0.3988024e-1 +
-                   y * (-0.362018e-2 +
-                        y * (0.163801e-2 + y * (-0.1031555e-1 + y * ans))));
+        y   = fifteen_fourths / ax;
+        ans = B[0] + y * (B[1] + y * (B[2] - y * B[3]));
+        ans =
+            B[4] + y * (B[5] + y * (B[6] + y * (B[7] + y * (B[8] + y * ans))));
         ans *= (exp(ax) / sqrt(ax));
     }
-    return x < 0.0 ? -ans : ans;
+
+    return x < zero ? -ans : ans;
 }
 
 
@@ -121,30 +126,37 @@ BS_REAL bessk1(const BS_REAL x)
 {
     BS_REAL y, ans;
 
-    if (x <= 2.0)
+    constexpr BS_REAL two  = 2;
+    constexpr BS_REAL four = 4;
+    constexpr BS_REAL A[8] = {1.0,          1.0,         0.15443144,
+                              -0.67278579,  -0.18156897, -0.1919402e-1,
+                              -0.110404e-2, -0.4686e-4};
+    constexpr BS_REAL B[7] = {1.25331414,   0.23498619,   -0.3655620e-1,
+                              0.1504268e-1, -0.780353e-2, 0.325614e-2,
+                              -0.68245e-3};
+
+
+    if (x <= two)
     {
-        y = x * x / 4.0;
+        y = x * x / four;
         ans =
-            (log(x / 2.0) * bessi1(x)) +
-            (1.0 / x) *
-                (1.0 +
-                 y * (0.15443144 +
-                      y * (-0.67278579 +
-                           y * (-0.18156897 +
-                                y * (-0.1919402e-1 +
-                                     y * (-0.110404e-2 + y * (-0.4686e-4)))))));
+            (log(x / two) * bessi1(x)) +
+            (A[0] / x) *
+                (A[1] +
+                 y * (A[2] +
+                      y * (A[3] +
+                           y * (A[4] + y * (A[5] + y * (A[6] + y * (A[7])))))));
     }
     else
     {
-        y   = 2.0 / x;
+        y   = two / x;
         ans = (exp(-x) / sqrt(x)) *
-              (1.25331414 +
-               y * (0.23498619 +
-                    y * (-0.3655620e-1 +
-                         y * (0.1504268e-1 +
-                              y * (-0.780353e-2 +
-                                   y * (0.325614e-2 + y * (-0.68245e-3)))))));
+              (B[0] +
+               y * (B[1] +
+                    y * (B[2] +
+                         y * (B[3] + y * (B[4] + y * (B[5] + y * (B[6])))))));
     }
+
     return ans;
 }
 
@@ -257,8 +269,11 @@ void ChebEvalE(const ChebSeries* cs, const BS_REAL x, SFResult* result)
     BS_REAL d  = 0.0;
     BS_REAL dd = 0.0;
 
-    BS_REAL y  = (2.0 * x - cs->a - cs->b) / (cs->b - cs->a);
-    BS_REAL y2 = 2.0 * y;
+    constexpr BS_REAL half = 0.5;
+    constexpr BS_REAL two  = 2;
+
+    BS_REAL y  = (two * x - cs->a - cs->b) / (cs->b - cs->a);
+    BS_REAL y2 = two * y;
 
     BS_REAL e = 0.0;
 
@@ -272,8 +287,8 @@ void ChebEvalE(const ChebSeries* cs, const BS_REAL x, SFResult* result)
 
     {
         BS_REAL temp = d;
-        d            = y * d - dd + 0.5 * cs->c[0];
-        e += fabs(y * temp) + fabs(dd) + 0.5 * fabs(cs->c[0]);
+        d            = y * d - dd + half * cs->c[0];
+        e += fabs(y * temp) + fabs(dd) + half * fabs(cs->c[0]);
     }
 
     result->val = d;
@@ -3878,16 +3893,18 @@ BS_REAL FermiDistr(const BS_REAL e, const BS_REAL temp, const BS_REAL mu)
     const BS_REAL arg = (e - mu) / temp;
     BS_REAL tmp;
 
+    constexpr BS_REAL one = 1;
+
     // Handle differently arg>0 and arg<0 cases
     if (arg > 0.)
     {
         tmp = SafeExp(-arg);
-        return tmp / (tmp + 1.);
+        return tmp / (tmp + one);
     }
     else
     {
         tmp = SafeExp(arg);
-        return 1. / (tmp + 1.);
+        return one / (tmp + one);
     }
 }
 
@@ -3901,7 +3918,10 @@ BS_REAL NEPSExpFunc(BS_REAL x)
     const BS_REAL exp_ = SafeExp(-fabs(x));
     const int is_x_neg = signbit(x);
 
-    return (is_x_neg - (! is_x_neg) * exp_) / (1. - exp_ + (x == 0.));
+    constexpr BS_REAL zero = 0;
+    constexpr BS_REAL one  = 1;
+
+    return (is_x_neg - (! is_x_neg) * exp_) / (one - exp_ + (x == zero));
 }
 
 
@@ -3916,7 +3936,8 @@ BS_REAL Gammln(const BS_REAL xx)
 {
     int j;
     BS_REAL x, tmp, y, ser;
-    static const BS_REAL cof[14] = {
+
+    constexpr BS_REAL cof[14] = {
         57.1562356658629235,     -59.5979603554754912,
         14.1360979747417471,     -0.491913816097620199,
         .339946499848118887e-4,  .465236289270485756e-4,
@@ -3924,29 +3945,40 @@ BS_REAL Gammln(const BS_REAL xx)
         -.210264441724104883e-3, .217439618115212643e-3,
         -.164318106536763890e-3, .844182239838527433e-4,
         -.261908384015814087e-4, .368991826595316234e-5};
+    constexpr BS_REAL a = 5.24218750000000000;
+    constexpr BS_REAL b = 0.5;
+    constexpr BS_REAL c = 0.999999999999997092;
+    constexpr BS_REAL d = 2.5066282746310005;
+
     if (xx <= 0)
     {
         // throw("bad arg in gammln");
         printf("bad arg in gammln");
         // exit(1);
     }
+
     y = x = xx;
-    tmp   = x + 5.24218750000000000;
-    tmp   = (x + 0.5) * log(tmp) - tmp;
-    ser   = 0.999999999999997092;
+    tmp   = x + a;
+    tmp   = (x + b) * log(tmp) - tmp;
+    ser   = c;
+
     for (j = 0; j < 14; j++)
+    {
         ser += cof[j] / ++y;
-    return tmp + log(2.5066282746310005 * ser / x);
+    }
+
+    return tmp + log(d * ser / x);
 }
 
 // Compute the Gamma function using Serling's approximation
 KOKKOS_INLINE_FUNCTION
 BS_REAL GammaStirling(const BS_REAL x)
 {
-    static const BS_REAL e     = 2.718281828459045235360287471352;
-    static const BS_REAL twopi = 6.283185307179586;
+    constexpr BS_REAL zero  = 0;
+    constexpr BS_REAL e     = 2.718281828459045235360287471352;
+    constexpr BS_REAL twopi = 6.283185307179586;
 
-    BS_ASSERT(x > 0.);
+    BS_ASSERT(x > zero);
 
     return sqrt(twopi / x) * pow(x / e, x);
 }
@@ -3964,8 +3996,10 @@ BS_REAL GammaStirling(const BS_REAL x)
 KOKKOS_INLINE_FUNCTION
 BS_REAL W0(const BS_REAL x)
 {
-    static const BS_REAL e  = 2.718281828459045235360287471352;
-    static const BS_REAL ie = 1. / e;
+    constexpr BS_REAL zero = 0;
+    constexpr BS_REAL one  = 1;
+    constexpr BS_REAL e    = 2.718281828459045235360287471352;
+    constexpr BS_REAL ie   = one / e;
     BS_REAL beta;
 
     BS_ASSERT(x > -ie);
@@ -3976,21 +4010,21 @@ BS_REAL W0(const BS_REAL x)
         BS_REAL log_x = log(x);
         beta          = log_x - log(log_x);
     }
-    else if (x > 0.)
+    else if (x > zero)
     {
         beta = x / e;
     }
     else
     { // if(x > -ie)
         BS_REAL tmp_1 = e * x;
-        BS_REAL tmp_2 = sqrt(1 + tmp_1);
-        BS_REAL tmp_3 = 1. + tmp_2;
+        BS_REAL tmp_2 = sqrt(one + tmp_1);
+        BS_REAL tmp_3 = one + tmp_2;
         beta          = tmp_1 * log(tmp_3) / (tmp_2 * tmp_3);
     }
 
-    beta = beta / (1. + beta) * (1. + log(x / beta));
-    beta = beta / (1. + beta) * (1. + log(x / beta));
-    beta = beta / (1. + beta) * (1. + log(x / beta));
+    beta = beta / (one + beta) * (one + log(x / beta));
+    beta = beta / (one + beta) * (one + log(x / beta));
+    beta = beta / (one + beta) * (one + log(x / beta));
 
     return beta;
 }
@@ -4004,8 +4038,8 @@ BS_REAL W0(const BS_REAL x)
 
 // 1D root-finding parameters
 // @TODO: find suitable values for the following parameters
-const int ntrial_1d   = 150;     // Maximum allowed number of iterations.
-const BS_REAL xacc_1d = 1.0E-07; // Set the accuracy for Newton Raphson
+constexpr int ntrial_1d   = 150;     // Maximum allowed number of iterations.
+constexpr BS_REAL xacc_1d = 1.0e-07; // Set the accuracy for Newton Raphson
 
 // 1D Newton-Raphson with analytic derivative
 KOKKOS_INLINE_FUNCTION
@@ -4019,10 +4053,13 @@ BS_REAL MNewt1d(BS_REAL guess, BS_REAL x1, BS_REAL x2, BS_REAL f0,
     // struct that returns the value of the function first derivative at the
     // point x.
     BS_REAL xh, xl;
-    BS_REAL fl = func->function(&x1, func->params) - f0;
-    BS_REAL fh = func->function(&x2, func->params) - f0;
+    BS_REAL fl             = func->function(&x1, func->params) - f0;
+    BS_REAL fh             = func->function(&x2, func->params) - f0;
+    constexpr BS_REAL zero = 0;
+    constexpr BS_REAL half = 0.5;
+    constexpr BS_REAL two  = 2;
 
-    if ((fl > 0.0 && fh > 0.0) || (fl < 0.0 && fh < 0.0))
+    if ((fl > zero && fh > zero) || (fl < zero && fh < zero))
     {
         printf("xl = %.3e, fl = %.3e\n", x1, fl);
         printf("xh = %.3e, fh = %.3e\n", x2, fh);
@@ -4031,12 +4068,12 @@ BS_REAL MNewt1d(BS_REAL guess, BS_REAL x1, BS_REAL x2, BS_REAL f0,
         // throw("Root must be bracketed in rtsafe");
     }
 
-    if (fl == 0.0)
+    if (fl == zero)
         return x1;
-    if (fh == 0.0)
+    if (fh == zero)
         return x2;
 
-    if (fl < 0.0)
+    if (fl < zero)
     { // Orient the search so that f(xl) < 0.
         xl = x1;
         xh = x2;
@@ -4056,11 +4093,11 @@ BS_REAL MNewt1d(BS_REAL guess, BS_REAL x1, BS_REAL x2, BS_REAL f0,
 
     for (int j = 0; j < ntrial_1d; j++)
     { // Loop over allowed iterations.
-        if ((((rts - xh) * df - f) * ((rts - xl) * df - f) > 0.0) ||
-            (fabs(2.0 * f) > fabs(dxold * df)))
+        if ((((rts - xh) * df - f) * ((rts - xl) * df - f) > zero) ||
+            (fabs(two * f) > fabs(dxold * df)))
         { // Bisect if Newton out of range, or not decreasing fast enough.
             dxold = dx;
-            dx    = 0.5 * (xh - xl);
+            dx    = half * (xh - xl);
             rts   = xl + dx;
             if (xl == rts)
                 return rts;
@@ -4082,7 +4119,7 @@ BS_REAL MNewt1d(BS_REAL guess, BS_REAL x1, BS_REAL x2, BS_REAL f0,
             f0; // The one new function evaluation per iteration.
         df = dfunc->function(&rts, dfunc->params);
 
-        if (f < 0.0)
+        if (f < zero)
         { // Maintain the bracket on the root.
             xl = rts;
         }
@@ -4193,13 +4230,16 @@ void MNewt2d(BS_REAL* x, BS_REAL C[2],
 KOKKOS_INLINE_FUNCTION
 BS_REAL HeavisidePiecewise(const BS_REAL x)
 {
-    if (x < 0.)
+    constexpr BS_REAL zero = 0;
+    constexpr BS_REAL one  = 1;
+
+    if (x < zero)
     {
-        return 0.;
+        return zero;
     }
     else
     {
-        return 1.;
+        return one;
     }
 }
 
@@ -4207,8 +4247,12 @@ BS_REAL HeavisidePiecewise(const BS_REAL x)
 KOKKOS_INLINE_FUNCTION
 BS_REAL HeavisideTanhApprox(const BS_REAL x)
 {
-    return 0.5 * (1. + tanh(2. * a_heaviside * x /
-                            (fabs(x) + DBL_MIN))); // DBL_TRUE_MIN
+    constexpr BS_REAL half = 0.5;
+    constexpr BS_REAL one  = 1;
+    constexpr BS_REAL two  = 2;
+
+    return half * (one + tanh(two * a_heaviside * x /
+                              (fabs(x) + DBL_MIN))); // DBL_TRUE_MIN
 }
 
 /*===========================================================================*/
