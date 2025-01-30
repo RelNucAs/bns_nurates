@@ -1047,14 +1047,14 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     {
         local_grey_params.opacity_flags                     = {0};
         local_grey_params.opacity_flags.use_inelastic_scatt = 1;
-        //M1MatrixKokkos2D out_inel                 = ComputeDoubleIntegrand(
-        //quad_2d, s_neps, &local_grey_params, stim_abs);
-        //GaussLegendreIntegrate2DMatrixForM1Coeffs(quad_2d, &out_inel, s_neps,
-        //                                      &n_neps_2d, &e_neps_2d);
-        M1MatrixKokkos2D out_inel                 = ComputeNEPSIntegrand(
-        quad_2d, four * s_neps, &local_grey_params, stim_abs);
+        // M1MatrixKokkos2D out_inel                 = ComputeDoubleIntegrand(
+        // quad_2d, s_neps, &local_grey_params, stim_abs);
+        // GaussLegendreIntegrate2DMatrixForM1Coeffs(quad_2d, &out_inel, s_neps,
+        //                                       &n_neps_2d, &e_neps_2d);
+        M1MatrixKokkos2D out_inel = ComputeNEPSIntegrand(
+            quad_2d, four * s_neps, &local_grey_params, stim_abs);
         GaussLegendreIntegrate2DMatrixForNEPS(quad_2d, &out_inel, four * s_neps,
-                                               &n_neps_2d, &e_neps_2d);
+                                              &n_neps_2d, &e_neps_2d);
     }
 
     M1Opacities m1_opacities = {0};
@@ -1502,14 +1502,18 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
     sp_opacities.j_s[id_anux] =
         four * kBS_Pi * POW2(nu) * g_nu[id_anux] * iso_scatt;
 
-    sp_opacities.kappa_s[id_nue] =
-        four * kBS_Pi * POW2(nu) * (one - g_nu[id_nue]) * iso_scatt / kBS_Clight;
-    sp_opacities.kappa_s[id_anue] =
-        four * kBS_Pi * POW2(nu) * (one - g_nu[id_anue]) * iso_scatt / kBS_Clight;
-    sp_opacities.kappa_s[id_nux] =
-        four * kBS_Pi * POW2(nu) * (one - g_nu[id_nux]) * iso_scatt / kBS_Clight;
-    sp_opacities.kappa_s[id_anux] =
-        four * kBS_Pi * POW2(nu) * (one - g_nu[id_anux]) * iso_scatt / kBS_Clight;
+    sp_opacities.kappa_s[id_nue] = four * kBS_Pi * POW2(nu) *
+                                   (one - g_nu[id_nue]) * iso_scatt /
+                                   kBS_Clight;
+    sp_opacities.kappa_s[id_anue] = four * kBS_Pi * POW2(nu) *
+                                    (one - g_nu[id_anue]) * iso_scatt /
+                                    kBS_Clight;
+    sp_opacities.kappa_s[id_nux] = four * kBS_Pi * POW2(nu) *
+                                   (one - g_nu[id_nux]) * iso_scatt /
+                                   kBS_Clight;
+    sp_opacities.kappa_s[id_anux] = four * kBS_Pi * POW2(nu) *
+                                    (one - g_nu[id_anux]) * iso_scatt /
+                                    kBS_Clight;
 
     return sp_opacities;
 }

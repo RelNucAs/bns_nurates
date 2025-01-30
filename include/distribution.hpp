@@ -52,12 +52,12 @@ KOKKOS_INLINE_FUNCTION
 void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
                                 NuDistributionParams* out_distribution_pars)
 {
-    constexpr BS_REAL zero = 0;
-    constexpr BS_REAL one = 1;
-    constexpr BS_REAL half = 0.5;
+    constexpr BS_REAL zero         = 0;
+    constexpr BS_REAL one          = 1;
+    constexpr BS_REAL half         = 0.5;
     constexpr BS_REAL three_halves = 1.5;
-    constexpr BS_REAL one_third = 1. / 3.;
-    
+    constexpr BS_REAL one_third    = 1. / 3.;
+
     constexpr BS_REAL twenty = 20;
     constexpr BS_REAL thirty = 30;
 
@@ -65,13 +65,30 @@ void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
     constexpr BS_REAL y2 = 0.7;
     constexpr BS_REAL y3 = 0.7901234567745267;
 
-    constexpr BS_REAL kBS_ThickDistr_num_1[6] = {0.19926987701997, 38865.0149220478, 14364.6331099737, 5750.1878570758, 1120.71610972194, 1.60356108438235e-8};
-    constexpr BS_REAL kBS_ThickDistr_num_2[7] = {41.3836568203438, 32.5515666786612, 157.774993512235, 66.5726772426253, 14.4883415579211, 0.315360380575709, 0.000660414331285249};
-    constexpr BS_REAL kBS_ThickDistr_num_3[7] = {3852.81416018959, 5316.18895799799, 1102.91561586553, 1.54082262710661e-6, 1732.89925128741, 1769.59868329086, 586.406885304906};
+    constexpr BS_REAL kBS_ThickDistr_num_1[6] = {
+        0.19926987701997, 38865.0149220478, 14364.6331099737,
+        5750.1878570758,  1120.71610972194, 1.60356108438235e-8};
+    constexpr BS_REAL kBS_ThickDistr_num_2[7] = {
+        41.3836568203438,    32.5515666786612, 157.774993512235,
+        66.5726772426253,    14.4883415579211, 0.315360380575709,
+        0.000660414331285249};
+    constexpr BS_REAL kBS_ThickDistr_num_3[7] = {
+        3852.81416018959,    5316.18895799799, 1102.91561586553,
+        1.54082262710661e-6, 1732.89925128741, 1769.59868329086,
+        586.406885304906};
 
-    constexpr BS_REAL kBS_ThickDistr_den_1[6] = {1.0, 38840.0743174942, 99.9009680656931, 171.874844843596, 75.7101579899442, 83.0160130941424};
-    constexpr BS_REAL kBS_ThickDistr_den_2[6] = {1.8888797407042, 5.35488690539183, 1.94673781342617, 0.483128792035557, 0.0113386564109086, 2.64160073447322e-5};
-    constexpr BS_REAL kBS_ThickDistr_den_3[6] = {255.936658313629, 9.42360945627147e-5, 81.2467063138386, 180.100197053091, 89.0343496217014, 143.849128123195};
+    constexpr BS_REAL kBS_ThickDistr_den_1[6] = {1.0,
+                                                 38840.0743174942,
+                                                 99.9009680656931,
+                                                 171.874844843596,
+                                                 75.7101579899442,
+                                                 83.0160130941424};
+    constexpr BS_REAL kBS_ThickDistr_den_2[6] = {
+        1.8888797407042,   5.35488690539183,   1.94673781342617,
+        0.483128792035557, 0.0113386564109086, 2.64160073447322e-5};
+    constexpr BS_REAL kBS_ThickDistr_den_3[6] = {
+        255.936658313629, 9.42360945627147e-5, 81.2467063138386,
+        180.100197053091, 89.0343496217014,    143.849128123195};
 
     for (int nuid = 0; nuid < total_num_species; ++nuid)
     {
@@ -100,7 +117,8 @@ void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
                                kBS_ThickDistr_num_1[3]) +
                           kBS_ThickDistr_num_1[4]) +
                      kBS_ThickDistr_num_1[5]) /
-                    (y * (y * (y * (y * (y * (y + kBS_ThickDistr_den_1[0]) + kBS_ThickDistr_den_1[1]) -
+                    (y * (y * (y * (y * (y * (y + kBS_ThickDistr_den_1[0]) +
+                                         kBS_ThickDistr_den_1[1]) -
                                     kBS_ThickDistr_den_1[2]) -
                                kBS_ThickDistr_den_1[3]) +
                           kBS_ThickDistr_den_1[4]) +
@@ -187,11 +205,11 @@ BS_REAL NuFThin(const BS_REAL omega, const NuDistributionParams* distr_pars,
 KOKKOS_INLINE_FUNCTION
 void CalculateThinParamsFromM1(const M1Quantities* M1_pars,
                                NuDistributionParams* out_distribution_pars)
-{   
-    constexpr BS_REAL zero = 0;
-    constexpr BS_REAL one = 1;
-    constexpr BS_REAL three = 3;
-    constexpr BS_REAL half = 0.5;
+{
+    constexpr BS_REAL zero      = 0;
+    constexpr BS_REAL one       = 1;
+    constexpr BS_REAL three     = 3;
+    constexpr BS_REAL half      = 0.5;
     constexpr BS_REAL one_third = 1. / 3.;
 
     constexpr BS_REAL c_f = CONST_C_F;
@@ -234,8 +252,8 @@ void CalculateThinParamsFromM1(const M1Quantities* M1_pars,
 KOKKOS_INLINE_FUNCTION
 NuDistributionParams NuEquilibriumParams(const MyEOSParams* eos_pars)
 {
-    constexpr BS_REAL zero = 0;
-    constexpr BS_REAL one = 1;
+    constexpr BS_REAL zero     = 0;
+    constexpr BS_REAL one      = 1;
     constexpr BS_REAL thousand = 1e3;
 
     constexpr BS_REAL c_f = CONST_C_F;
