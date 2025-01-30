@@ -47,8 +47,8 @@ void NucFrmFac(const BS_REAL E, BS_REAL* cv, BS_REAL* ca, BS_REAL* F2,
                const int reacflag)
 {
     constexpr BS_REAL zero = 0;
-    constexpr BS_REAL one = 1;
-    constexpr BS_REAL two = 2;
+    constexpr BS_REAL one  = 1;
+    constexpr BS_REAL two  = 2;
     constexpr BS_REAL half = 0.5;
 
     constexpr BS_REAL c1 = 5.6;
@@ -62,19 +62,21 @@ void NucFrmFac(const BS_REAL E, BS_REAL* cv, BS_REAL* ca, BS_REAL* F2,
     // (Anti)neutrino energy rescaled by the nucleon mass, Eq. 4
     const BS_REAL ehor = E * kBS_WM_e_scale; // dimensionless
 
-    const BS_REAL tau = half * POW2(ehor) / (one + ehor);            // Eq.(B10)
-    const BS_REAL eta = one / (one + c1 * tau);                     // Eq.(B16)
-    const BS_REAL G   = one / pow(one + c2 * tau, two);             // Eq.(B17)
-    const BS_REAL Fp1 = (one + tau * (one + lamp)) * G / (one + tau); // Eq.(B11)
+    const BS_REAL tau = half * POW2(ehor) / (one + ehor); // Eq.(B10)
+    const BS_REAL eta = one / (one + c1 * tau);           // Eq.(B16)
+    const BS_REAL G   = one / pow(one + c2 * tau, two);   // Eq.(B17)
+    const BS_REAL Fp1 =
+        (one + tau * (one + lamp)) * G / (one + tau);               // Eq.(B11)
     const BS_REAL Fp2 = lamp * G / (one + tau);                     // Eq.(B12)
-    const BS_REAL Fn1 = tau * lamn * (one - eta) * G / (one + tau);  // Eq.(B13)
-    const BS_REAL Fn2 = lamn * (one + tau * eta) * G / (one + tau);  // Eq.(B14)
+    const BS_REAL Fn1 = tau * lamn * (one - eta) * G / (one + tau); // Eq.(B13)
+    const BS_REAL Fn2 = lamn * (one + tau * eta) * G / (one + tau); // Eq.(B14)
 
     BS_REAL frm1, frm2, frm3;
 
     /* Different parametrization depending on the reaction */
     if (reacflag == 1)
     {
+<<<<<<< HEAD
         frm1 = (half - two * sinthw2) * Fp1 - half * Fn1;      // Eq.(B1)
         frm2 = half * (ga - gs) / POW2(one + c3 * tau); // Eq.(B2)
         frm3 = (half - two * sinthw2) * Fp2 - half * Fn2;      // Eq.(B3)
@@ -123,16 +125,16 @@ void NucFrmFac(const BS_REAL E, BS_REAL* cv, BS_REAL* ca, BS_REAL* F2,
 KOKKOS_INLINE_FUNCTION
 void WMAbsEm(const BS_REAL omega, BS_REAL* R, BS_REAL* Rbar)
 {
-    constexpr BS_REAL one = 1;
-    constexpr BS_REAL two = 2;
+    constexpr BS_REAL one   = 1;
+    constexpr BS_REAL two   = 2;
     constexpr BS_REAL three = 3;
-    constexpr BS_REAL four = 4;
+    constexpr BS_REAL four  = 4;
 
-    constexpr BS_REAL four_thirds = 4. / 3.;
-    constexpr BS_REAL five_thirds = 5. / 3.;
-    constexpr BS_REAL eight_thirds = 8. / 3.;
+    constexpr BS_REAL four_thirds    = 4. / 3.;
+    constexpr BS_REAL five_thirds    = 5. / 3.;
+    constexpr BS_REAL eight_thirds   = 8. / 3.;
     constexpr BS_REAL sixteen_thirds = 16. / 3.;
-    constexpr BS_REAL two_fifth = 2. / 5.;
+    constexpr BS_REAL two_fifth      = 2. / 5.;
 
     constexpr BS_REAL ga = kBS_Ga;
     constexpr BS_REAL gv = kBS_Gv;
@@ -148,7 +150,8 @@ void WMAbsEm(const BS_REAL omega, BS_REAL* R, BS_REAL* Rbar)
         three * ca * ca * POW2(one + four_thirds * ehor) +
         eight_thirds * cv * F2 * POW2(ehor) +
         five_thirds * POW2(ehor) * (one + two_fifth * ehor) * POW2(F2);
-    const BS_REAL tmp2 = four * (cv + F2) * ca * ehor * (one + four_thirds * ehor);
+    const BS_REAL tmp2 =
+        four * (cv + F2) * ca * ehor * (one + four_thirds * ehor);
     // const BS_REAL tmp3 = (cv*cv+3.0*ca*ca)*POW3(one+two*ehor);
     const BS_REAL tmp3 =
         (POW2(gv) + three * POW2(ga)) * POW3(one + two * ehor);
@@ -165,9 +168,9 @@ void WMAbsEm(const BS_REAL omega, BS_REAL* R, BS_REAL* Rbar)
 KOKKOS_INLINE_FUNCTION
 void WMScatt(const BS_REAL omega, BS_REAL* R0, BS_REAL* R1, const int reacflag)
 {
-    constexpr BS_REAL two = 2;
-    constexpr BS_REAL three = 3;
-    constexpr BS_REAL four = 4;
+    constexpr BS_REAL two          = 2;
+    constexpr BS_REAL three        = 3;
+    constexpr BS_REAL four         = 4;
     constexpr BS_REAL three_halves = 1.5;
 
     constexpr BS_REAL hpv = kBS_Hpv;

@@ -71,8 +71,8 @@ BS_REAL EtaNNAbs(const BS_REAL n_in, const BS_REAL n_out, const BS_REAL mu_hat,
     // return 0.;
     // }
 
-    constexpr BS_REAL zero = 0;
-    constexpr BS_REAL one = 1;
+    constexpr BS_REAL zero     = 0;
+    constexpr BS_REAL one      = 1;
     constexpr BS_REAL mu_thres = CONST_MU_THRES;
 
     // if mu_hat too small, neglect nucleon degeneracy as backup
@@ -143,7 +143,7 @@ void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
                          const BS_REAL mu_lepton, BS_REAL* out)
 {
     constexpr BS_REAL zero = 0;
-    constexpr BS_REAL one = 1;
+    constexpr BS_REAL one  = 1;
 
     const BS_REAL mass_lepton_squared = POW2(mass_lepton);
 
@@ -208,8 +208,8 @@ void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
         {
             dec_term = E_p_squared *
                        sqrt(one - mass_lepton_squared /
-                                     E_p_squared); // * HeavisideTanhApprox(E_p
-                                                   // - mass_lepton)
+                                      E_p_squared); // * HeavisideTanhApprox(E_p
+                                                    // - mass_lepton)
         }
     }
 
@@ -253,8 +253,8 @@ void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
         {
             dec_term = E_e_squared *
                        sqrt(one - mass_lepton_squared /
-                                     E_e_squared); // * HeavisideTanhApprox(E_e
-                                                   // - mass_lepton)
+                                      E_e_squared); // * HeavisideTanhApprox(E_e
+                                                    // - mass_lepton)
         }
     }
 
@@ -415,10 +415,10 @@ void BetaOpacitiesTable(MyQuadrature* quad, MyEOSParams* eos_pars,
 KOKKOS_INLINE_FUNCTION
 BS_REAL EtaNNSc(const BS_REAL nb, const BS_REAL temp, const BS_REAL yN)
 {
-    constexpr BS_REAL zero = 0;
-    constexpr BS_REAL one = 1;
+    constexpr BS_REAL zero         = 0;
+    constexpr BS_REAL one          = 1;
     constexpr BS_REAL three_halves = 1.5;
-    constexpr BS_REAL two_thirds = 2. / 3.;
+    constexpr BS_REAL two_thirds   = 2. / 3.;
 
     // nucleon (neutron/proton) number density
     const BS_REAL nN = yN * nb; // [nm^-3]
@@ -458,7 +458,7 @@ BS_REAL IsoScattNucleon(const BS_REAL omega, OpacityParams* opacity_pars,
                         const int reacflag)
 {
     constexpr BS_REAL three = 3;
-    
+
     BS_REAL R0 = 1., R1 = 1.;
     BS_REAL leg_0, leg_1;
 
