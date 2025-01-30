@@ -76,7 +76,6 @@ void NucFrmFac(const BS_REAL E, BS_REAL* cv, BS_REAL* ca, BS_REAL* F2,
     /* Different parametrization depending on the reaction */
     if (reacflag == 1)
     {
-<<<<<<< HEAD
         frm1 = (half - two * sinthw2) * Fp1 - half * Fn1;      // Eq.(B1)
         frm2 = half * (ga - gs) / POW2(one + c3 * tau); // Eq.(B2)
         frm3 = (half - two * sinthw2) * Fp2 - half * Fn2;      // Eq.(B3)
