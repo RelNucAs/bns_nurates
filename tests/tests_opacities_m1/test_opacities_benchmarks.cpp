@@ -50,26 +50,26 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
 
     // store columns here
     int num_data = 102;
-    double e_nu;
+    BS_REAL e_nu;
     Kokkos::View<int*, LayoutWrapper, HostMemSpace> h_zone("zone", num_data);
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_r("r", num_data);
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_rho("rho", num_data);
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_T("T", num_data);
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_Ye("Ye", num_data);
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_mu_e("mu_e", num_data);
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_mu_hat("mu_hat",
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_r("r", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_rho("rho", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_T("T", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_Ye("Ye", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_mu_e("mu_e", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_mu_hat("mu_hat",
                                                                 num_data);
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_Yh("Yh", num_data);
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_Ya("Ya", num_data);
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_Yp("Yp", num_data);
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_Yn("Yn", num_data);
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_em_nue("em_nue",
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_Yh("Yh", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_Ya("Ya", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_Yp("Yp", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_Yn("Yn", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_em_nue("em_nue",
                                                                 num_data);
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_l_nue_inv("l_nue_inv",
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_l_nue_inv("l_nue_inv",
                                                                    num_data);
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_em_anue("em_anue",
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_em_anue("em_anue",
                                                                  num_data);
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_l_anue_inv(
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_l_anue_inv(
         "l_anue_inv", num_data);
 
     // read in the data file
@@ -79,47 +79,56 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
     {
         if (line[1] == '#' && i == 0)
         {
+#ifndef REAL_TYPE_IS_DOUBLE
+            sscanf(line + 14, "%f\n", &e_nu);
+#else
             sscanf(line + 14, "%lf\n", &e_nu);
-            continue;
+#endif            continue;
         }
         else if (line[1] == '#' && i != 0)
         {
             continue;
         }
 
+#ifndef REAL_TYPE_IS_DOUBLE
+        sscanf(line, "%d %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
+               &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
+               &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i), &h_Yn(i),
+               &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
+#else
         sscanf(line,
                "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
                &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
                &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i), &h_Yn(i),
                &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
-        i++;
+#endif
     }
 
     fclose(fptr);
 
     // construct arrays based on meshblock dimensions
     int npts = mb_nx * mb_nx * mb_nx;
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> mb_h_rho("mb_h_rho",
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> mb_h_rho("mb_h_rho",
                                                                 npts);
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> mb_h_T("mb_h_T", npts);
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> mb_h_Ye("mb_h_Ye", npts);
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> mb_h_mu_e("mb_h_mu_e",
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> mb_h_T("mb_h_T", npts);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> mb_h_Ye("mb_h_Ye", npts);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> mb_h_mu_e("mb_h_mu_e",
                                                                  npts);
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> mb_h_mu_hat(
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> mb_h_mu_hat(
         "mb_h_mu_hat", npts);
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> mb_h_Yp("mb_h_Yp", npts);
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> mb_h_Yn("mb_h_Yn", npts);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> mb_h_Yp("mb_h_Yp", npts);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> mb_h_Yn("mb_h_Yn", npts);
 
-    Kokkos::View<double*, LayoutWrapper, DevMemSpace> mb_d_rho("mb_d_rho",
+    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> mb_d_rho("mb_d_rho",
                                                                npts);
-    Kokkos::View<double*, LayoutWrapper, DevMemSpace> mb_d_T("mb_d_T", npts);
-    Kokkos::View<double*, LayoutWrapper, DevMemSpace> mb_d_Ye("mb_d_Ye", npts);
-    Kokkos::View<double*, LayoutWrapper, DevMemSpace> mb_d_mu_e("mb_d_mu_e",
+    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> mb_d_T("mb_d_T", npts);
+    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> mb_d_Ye("mb_d_Ye", npts);
+    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> mb_d_mu_e("mb_d_mu_e",
                                                                 npts);
-    Kokkos::View<double*, LayoutWrapper, DevMemSpace> mb_d_mu_hat("mb_d_mu_hat",
+    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> mb_d_mu_hat("mb_d_mu_hat",
                                                                   npts);
-    Kokkos::View<double*, LayoutWrapper, DevMemSpace> mb_d_Yp("mb_d_Yp", npts);
-    Kokkos::View<double*, LayoutWrapper, DevMemSpace> mb_d_Yn("mb_d_Yn", npts);
+    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> mb_d_Yp("mb_d_Yp", npts);
+    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> mb_d_Yn("mb_d_Yn", npts);
 
     printf("Building data arrays %d points ...\n", npts);
 
@@ -150,30 +159,30 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
 
     printf("Data arrays generated.\n");
 
-    Kokkos::View<double*, LayoutWrapper, DevMemSpace> d_diff_distribution(
+    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> d_diff_distribution(
         "diff_distribution", num_data);
-    Kokkos::View<double**, LayoutWrapper, DevMemSpace> d_coeffs_eta_0(
+    Kokkos::View<BS_REAL**, LayoutWrapper, DevMemSpace> d_coeffs_eta_0(
         "coeffs_eta_0", num_data, 4);
-    Kokkos::View<double**, LayoutWrapper, DevMemSpace> d_coeffs_eta(
+    Kokkos::View<BS_REAL**, LayoutWrapper, DevMemSpace> d_coeffs_eta(
         "coeffs_eta", num_data, 4);
-    Kokkos::View<double**, LayoutWrapper, DevMemSpace> d_coeffs_kappa_0_a(
+    Kokkos::View<BS_REAL**, LayoutWrapper, DevMemSpace> d_coeffs_kappa_0_a(
         "coeffs_kappa_0_a", num_data, 4);
-    Kokkos::View<double**, LayoutWrapper, DevMemSpace> d_coeffs_kappa_a(
+    Kokkos::View<BS_REAL**, LayoutWrapper, DevMemSpace> d_coeffs_kappa_a(
         "coeffs_kappa_a", num_data, 4);
-    Kokkos::View<double**, LayoutWrapper, DevMemSpace> d_coeffs_kappa_s(
+    Kokkos::View<BS_REAL**, LayoutWrapper, DevMemSpace> d_coeffs_kappa_s(
         "coeffs_kappa_s", num_data, 4);
 
-    Kokkos::View<double*, LayoutWrapper, HostMemSpace> h_diff_distribution(
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_diff_distribution(
         "h_diff_distribution", num_data);
-    Kokkos::View<double**, LayoutWrapper, HostMemSpace> h_coeffs_eta_0(
+    Kokkos::View<BS_REAL**, LayoutWrapper, HostMemSpace> h_coeffs_eta_0(
         "h_coeffs_eta_0", num_data, 4);
-    Kokkos::View<double**, LayoutWrapper, HostMemSpace> h_coeffs_eta(
+    Kokkos::View<BS_REAL**, LayoutWrapper, HostMemSpace> h_coeffs_eta(
         "h_coeffs_eta", num_data, 4);
-    Kokkos::View<double**, LayoutWrapper, HostMemSpace> h_coeffs_kappa_0_a(
+    Kokkos::View<BS_REAL**, LayoutWrapper, HostMemSpace> h_coeffs_kappa_0_a(
         "h_coeffs_kappa_0_a", num_data, 4);
-    Kokkos::View<double**, LayoutWrapper, HostMemSpace> h_coeffs_kappa_a(
+    Kokkos::View<BS_REAL**, LayoutWrapper, HostMemSpace> h_coeffs_kappa_a(
         "h_coeffs_kappa_a", num_data, 4);
-    Kokkos::View<double**, LayoutWrapper, HostMemSpace> h_coeffs_kappa_s(
+    Kokkos::View<BS_REAL**, LayoutWrapper, HostMemSpace> h_coeffs_kappa_s(
         "h_coeffs_kappa_s", num_data, 4);
 
     printf("Generating quadratures with %d points ...\n", nx);
@@ -194,6 +203,10 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
     GaussLegendre(&my_quad);
     printf("Quadratures generated.\n");
 
+    constexpr BS_REAL delta_m = kBS_Q;
+    constexpr BS_REAL mu = kBS_Mu;
+    constexpr BS_REAL nm3_to_cm3 = 1e-21;
+
     auto start = std::chrono::high_resolution_clock::now();
     Kokkos::parallel_for(
         "test_opacities_benchmarks_compute_opacities_loop",
@@ -211,11 +224,11 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
             // populate EOS parameters from table
             my_grey_opacity_params.eos_pars.mu_e = mb_d_mu_e(i);
             my_grey_opacity_params.eos_pars.mu_p = 0.;
-            my_grey_opacity_params.eos_pars.mu_n = mb_d_mu_hat(i) + kBS_Q;
+            my_grey_opacity_params.eos_pars.mu_n = mb_d_mu_hat(i) + delta_m;
             my_grey_opacity_params.eos_pars.temp = mb_d_T(i);
             my_grey_opacity_params.eos_pars.yp   = mb_d_Yp(i);
             my_grey_opacity_params.eos_pars.yn   = mb_d_Yn(i);
-            my_grey_opacity_params.eos_pars.nb   = mb_d_rho(i) / kBS_Mu * 1e-21;
+            my_grey_opacity_params.eos_pars.nb   = mb_d_rho(i) / mu * nm3_to_cm3;
 
 
             // Opacity parameters (corrections all switched off)
