@@ -285,6 +285,7 @@ void ChebEvalE(const ChebSeries* cs, const BS_REAL x, SFResult* result)
 
     constexpr BS_REAL half = 0.5;
     constexpr BS_REAL two  = 2;
+    constexpr BS_REAL kBS_dbl_epsilon = DBL_EPSILON;
 
     BS_REAL y  = (two * x - cs->a - cs->b) / (cs->b - cs->a);
     BS_REAL y2 = two * y;
@@ -306,7 +307,7 @@ void ChebEvalE(const ChebSeries* cs, const BS_REAL x, SFResult* result)
     }
 
     result->val = d;
-    result->err = DBL_EPSILON * e + fabs(cs->c[cs->order]);
+    result->err = kBS_dbl_epsilon * e + fabs(cs->c[cs->order]);
 
     return; // GSL_SUCCESS;
 }
@@ -4097,7 +4098,7 @@ BS_REAL FermiDistr(const BS_REAL e, const BS_REAL temp, const BS_REAL mu)
     constexpr BS_REAL one = 1;
 
     // Handle differently arg>0 and arg<0 cases
-    if (arg > 0.)
+    if (arg > zero)
     {
         tmp = SafeExp(-arg);
         return tmp / (tmp + one);
@@ -4452,8 +4453,11 @@ BS_REAL HeavisideTanhApprox(const BS_REAL x)
     constexpr BS_REAL one  = 1;
     constexpr BS_REAL two  = 2;
 
-    return half * (one + tanh(two * a_heaviside * x /
-                              (fabs(x) + DBL_MIN))); // DBL_TRUE_MIN
+    constexpr BS_REAL kBS_aHeaviside = a_heaviside;
+    constexpr BS_REAL kBS_dbl_min = DBL_MIN;
+
+    return half * (one + tanh(two * kBS_aHeaviside * x /
+                              (fabs(x) + kBS_dbl_min))); // DBL_TRUE_MIN
 }
 
 /*===========================================================================*/
@@ -4473,8 +4477,8 @@ void InitializeM1MatrixSingleFlavor(M1Matrix* mat, const int n, const int idx)
 
         for (int j = 0; j < 2 * n; j++)
         {
-            mat->m1_mat_ab[idx][i][j] = 0.;
-            mat->m1_mat_em[idx][i][j] = 0.;
+            mat->m1_mat_ab[idx][i][j] = zero;
+            mat->m1_mat_em[idx][i][j] = zero;
         }
     }
 

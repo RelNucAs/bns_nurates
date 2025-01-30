@@ -27,6 +27,8 @@
  */
 inline void GaussLegendre(MyQuadrature* quad)
 {
+    constexpr BS_REAL half = 0.5;
+
     const double kEps = 1.0e-10; // 1.0e-14;
 
     BS_ASSERT(quad->dim == 1);
@@ -36,8 +38,8 @@ inline void GaussLegendre(MyQuadrature* quad)
 
     int n = quad->nx;
     int m = (n + 1) / 2;
-    xm    = 0.5 * (quad->x2 + quad->x1);
-    xl    = 0.5 * (quad->x2 - quad->x1);
+    xm    = half * (quad->x2 + quad->x1);
+    xl    = half * (quad->x2 - quad->x1);
 
     for (int i = 0; i < m; ++i)
     {
@@ -257,9 +259,11 @@ inline BS_REAL GaussLaguerreIntegrateZeroInf(MyQuadrature* quad,
                                              MyFunction* func)
 {
 
+    constexpr BS_REAL zero = 0;
+
     BS_REAL f[quad->nx];
 
-    if (quad->alpha == 0.)
+    if (quad->alpha == zero)
     {
         for (int i = 0; i < quad->nx; ++i)
         {
@@ -688,6 +692,9 @@ void GaussLegendreIntegrate2DMatrixForNEPS(const MyQuadrature* quad,
                                            MyQuadratureIntegrand* result_1,
                                            MyQuadratureIntegrand* result_2)
 {
+    constexpr BS_REAL half = 0.5;
+    constexpr BS_REAL one = 1;
+
     const int n              = quad->nx;
     const int num_integrands = 2 * total_num_species;
 
@@ -716,10 +723,10 @@ void GaussLegendreIntegrate2DMatrixForNEPS(const MyQuadrature* quad,
 
                 w_ij = w_i * w_j;
 
-                aux_1 = 0.5 * t * x_i * (1. - x_j);
-                aux_2 = 0.5 * t * x_i * (1. + x_j);
-                aux_3 = 0.5 * t * (1. - x_j) / x_i;
-                aux_4 = 0.5 * t * (1. + x_j) / x_i;
+                aux_1 = half * t * x_i * (one - x_j);
+                aux_2 = half * t * x_i * (one + x_j);
+                aux_3 = half * t * (one - x_j) / x_i;
+                aux_4 = half * t * (one + x_j) / x_i;
 
                 result_1->integrand[0 + idx] +=
                     w_ij * (x_i * (mat->m1_mat_em[idx][i][j] +
@@ -754,8 +761,8 @@ void GaussLegendreIntegrate2DMatrixForNEPS(const MyQuadrature* quad,
 
     for (int idx = 0; idx < num_integrands; ++idx)
     {
-        result_1->integrand[idx] *= 0.5 * t_sqr;
-        result_2->integrand[idx] *= 0.5 * t_sqr;
+        result_1->integrand[idx] *= half * t_sqr;
+        result_2->integrand[idx] *= half * t_sqr;
     }
 
     return;

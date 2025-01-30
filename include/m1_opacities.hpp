@@ -963,6 +963,7 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     GreyOpacityParams* my_grey_opacity_params, const int stim_abs)
 {
     constexpr BS_REAL four = 4;
+    constexpr BS_REAL c_light = kBS_Clight;
 
     BS_REAL n[total_num_species];
     BS_REAL J[total_num_species];
@@ -1084,7 +1085,7 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     if (n[id_nue] > THRESHOLD_N)
     {
         m1_opacities.kappa_0_a[id_nue] =
-            kBS_FourPi_hc3 / (kBS_Clight * n[id_nue]) *
+            kBS_FourPi_hc3 / (c_light * n[id_nue]) *
             (kBS_FourPi_hc3 *
                  (n_integrals_2d.integrand[4] + n_neps_2d.integrand[4]) +
              beta_n_abs_integrals.integrand[id_nue]);
@@ -1094,12 +1095,12 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
         m1_opacities.kappa_a[id_nue] =
             n[id_nue] == zero ?
                 zero :
-                kBS_FourPi_hc3 / (kBS_Clight * J[id_nue]) *
+                kBS_FourPi_hc3 / (c_light * J[id_nue]) *
                     (kBS_FourPi_hc3 * (e_integrals_2d.integrand[4] +
                                        e_neps_2d.integrand[4]) +
                      beta_j_abs_integrals.integrand[id_nue]);
         m1_opacities.kappa_s[id_nue] = kBS_FourPi_hc3 /
-                                       (kBS_Clight * J[id_nue]) *
+                                       (c_light * J[id_nue]) *
                                        iso_integrals.integrand[id_nue];
     }
 
@@ -1115,7 +1116,7 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     if (n[id_anue] > THRESHOLD_N)
     {
         m1_opacities.kappa_0_a[id_anue] =
-            kBS_FourPi_hc3 / (kBS_Clight * n[id_anue]) *
+            kBS_FourPi_hc3 / (c_light * n[id_anue]) *
             (kBS_FourPi_hc3 *
                  (n_integrals_2d.integrand[5] + n_neps_2d.integrand[5]) +
              beta_n_abs_integrals.integrand[id_anue]);
@@ -1123,12 +1124,12 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     if (J[id_anue] > THRESHOLD_J)
     {
         m1_opacities.kappa_a[id_anue] =
-            kBS_FourPi_hc3 / (kBS_Clight * J[id_anue]) *
+            kBS_FourPi_hc3 / (c_light * J[id_anue]) *
             (kBS_FourPi_hc3 *
                  (e_integrals_2d.integrand[5] + e_neps_2d.integrand[5]) +
              beta_j_abs_integrals.integrand[id_anue]);
         m1_opacities.kappa_s[id_anue] = kBS_FourPi_hc3 /
-                                        (kBS_Clight * J[id_anue]) *
+                                        (c_light * J[id_anue]) *
                                         iso_integrals.integrand[id_anue];
     }
 
@@ -1142,16 +1143,16 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     if (n[id_nux] > THRESHOLD_N)
     {
         m1_opacities.kappa_0_a[id_nux] =
-            kBS_FourPi_hc3_sqr / (kBS_Clight * n[id_nux]) *
+            kBS_FourPi_hc3_sqr / (c_light * n[id_nux]) *
             (n_integrals_2d.integrand[6] + n_neps_2d.integrand[6]);
     }
     if (J[id_nux] > THRESHOLD_J)
     {
         m1_opacities.kappa_a[id_nux] =
-            kBS_FourPi_hc3_sqr / (kBS_Clight * J[id_nux]) *
+            kBS_FourPi_hc3_sqr / (c_light * J[id_nux]) *
             (e_integrals_2d.integrand[6] + e_neps_2d.integrand[6]);
         m1_opacities.kappa_s[id_nux] = kBS_FourPi_hc3 /
-                                       (kBS_Clight * J[id_nux]) *
+                                       (c_light * J[id_nux]) *
                                        iso_integrals.integrand[id_nux];
     }
 
@@ -1167,17 +1168,17 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
         m1_opacities.kappa_0_a[id_anux] =
             n[id_anux] == zero ?
                 zero :
-                kBS_FourPi_hc3_sqr / (kBS_Clight * n[id_anux]) *
+                kBS_FourPi_hc3_sqr / (c_light * n[id_anux]) *
                     (n_integrals_2d.integrand[7] + n_neps_2d.integrand[7]);
     }
     if (J[id_anux] > THRESHOLD_J)
     {
         m1_opacities.kappa_a[id_anux] =
-            kBS_FourPi_hc3_sqr / (kBS_Clight * J[id_anux]) *
+            kBS_FourPi_hc3_sqr / (c_light * J[id_anux]) *
             (e_integrals_2d.integrand[7] + e_neps_2d.integrand[7]);
 
         m1_opacities.kappa_s[id_anux] = kBS_FourPi_hc3 /
-                                        (kBS_Clight * J[id_anux]) *
+                                        (c_light * J[id_anux]) *
                                         iso_integrals.integrand[id_anux];
     }
 
@@ -1390,6 +1391,8 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
     constexpr BS_REAL zero = 0;
     constexpr BS_REAL one  = 1;
     constexpr BS_REAL four = 4;
+    constexpr BS_REAL four_pi = 4 * kBS_Pi;
+    constexpr BS_REAL c_light = kBS_Clight;
 
     my_grey_opacity_params->kernel_pars.pair_kernel_params.omega      = nu;
     my_grey_opacity_params->kernel_pars.brem_kernel_params.omega      = nu;
@@ -1417,11 +1420,14 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
     const BS_REAL eta_e = my_grey_opacity_params->eos_pars.mu_e /
                           my_grey_opacity_params->eos_pars.temp;
 
+    constexpr BS_REAL temp_multiple = 0.5 * 4.364;
+
     BS_REAL s_pair[8], s_neps[8];
+    
     for (int i = 0; i < 8; ++i)
     {
         // s[i] = 1.5 * my_grey_opacity_params->eos_pars.temp;
-        s_pair[i] = 0.5 * 4.364 * my_grey_opacity_params->eos_pars.temp;
+        s_pair[i] = temp_multiple * my_grey_opacity_params->eos_pars.temp;
         s_neps[i] = nu;
         // s[i] = my_grey_opacity_params->eos_pars.temp;
         // s[i] = 2.425E-03 * my_grey_opacity_params->eos_pars.temp;
@@ -1476,40 +1482,40 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
         (abs_em_beta.abs[id_nue] +
          kBS_FourPi_hc3 * (integrals_pair_1d.integrand[4] +
                            integrals_neps_1d.integrand[4])) /
-        kBS_Clight;
+        c_light;
     sp_opacities.kappa[id_anue] =
         (abs_em_beta.abs[id_anue] +
          kBS_FourPi_hc3 * (integrals_pair_1d.integrand[5] +
                            integrals_neps_1d.integrand[5])) /
-        kBS_Clight;
+        c_light;
     sp_opacities.kappa[id_nux] =
         (abs_em_beta.abs[id_nux] +
          kBS_FourPi_hc3 * (integrals_pair_1d.integrand[6] +
                            integrals_neps_1d.integrand[6])) /
-        kBS_Clight;
+        c_light;
     sp_opacities.kappa[id_anux] =
         (abs_em_beta.abs[id_anux] +
          kBS_FourPi_hc3 * (integrals_pair_1d.integrand[7] +
                            integrals_neps_1d.integrand[7])) /
-        kBS_Clight;
+        c_light;
 
     sp_opacities.j_s[id_nue] =
-        four * kBS_Pi * POW2(nu) * g_nu[id_nue] * iso_scatt;
+        four_pi * POW2(nu) * g_nu[id_nue] * iso_scatt;
     sp_opacities.j_s[id_anue] =
-        four * kBS_Pi * POW2(nu) * g_nu[id_anue] * iso_scatt;
+        four_pi * POW2(nu) * g_nu[id_anue] * iso_scatt;
     sp_opacities.j_s[id_nux] =
-        four * kBS_Pi * POW2(nu) * g_nu[id_nux] * iso_scatt;
+        four_pi * POW2(nu) * g_nu[id_nux] * iso_scatt;
     sp_opacities.j_s[id_anux] =
-        four * kBS_Pi * POW2(nu) * g_nu[id_anux] * iso_scatt;
+        four_pi * POW2(nu) * g_nu[id_anux] * iso_scatt;
 
     sp_opacities.kappa_s[id_nue] =
-        four * kBS_Pi * POW2(nu) * (one - g_nu[id_nue]) * iso_scatt / kBS_Clight;
+        four_pi * POW2(nu) * (one - g_nu[id_nue]) * iso_scatt / c_light;
     sp_opacities.kappa_s[id_anue] =
-        four * kBS_Pi * POW2(nu) * (one - g_nu[id_anue]) * iso_scatt / kBS_Clight;
+        four_pi * POW2(nu) * (one - g_nu[id_anue]) * iso_scatt / c_light;
     sp_opacities.kappa_s[id_nux] =
-        four * kBS_Pi * POW2(nu) * (one - g_nu[id_nux]) * iso_scatt / kBS_Clight;
+        four_pi * POW2(nu) * (one - g_nu[id_nux]) * iso_scatt / c_light;
     sp_opacities.kappa_s[id_anux] =
-        four * kBS_Pi * POW2(nu) * (one - g_nu[id_anux]) * iso_scatt / kBS_Clight;
+        four_pi * POW2(nu) * (one - g_nu[id_anux]) * iso_scatt / c_light;
 
     return sp_opacities;
 }
@@ -1521,15 +1527,17 @@ SpectralOpacities
 ComputeSpectralOpacitiesStimulatedAbs(const BS_REAL nu, MyQuadrature* quad_1d,
                                       GreyOpacityParams* my_grey_opacity_params)
 {
+    constexpr BS_REAL c_light = kBS_Clight;
+
     SpectralOpacities spec_opacs = ComputeSpectralOpacitiesNotStimulatedAbs(
         nu, quad_1d, my_grey_opacity_params);
 
     for (int idx = 0; idx < total_num_species; ++idx)
     {
         spec_opacs.kappa[idx] =
-            spec_opacs.j[idx] / kBS_Clight + spec_opacs.kappa[idx];
+            spec_opacs.j[idx] / c_light + spec_opacs.kappa[idx];
         spec_opacs.kappa_s[idx] =
-            spec_opacs.j_s[idx] / kBS_Clight + spec_opacs.kappa_s[idx];
+            spec_opacs.j_s[idx] / c_light + spec_opacs.kappa_s[idx];
     }
 
     return spec_opacs;

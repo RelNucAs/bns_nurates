@@ -55,6 +55,10 @@ void NucFrmFac(const BS_REAL E, BS_REAL* cv, BS_REAL* ca, BS_REAL* F2,
     constexpr BS_REAL c2 = 4.97;
     constexpr BS_REAL c3 = 3.53;
 
+    constexpr BS_REAL sinthw2 = kBS_SinThW2;
+    constexpr BS_REAL ga = kBS_Ga;
+    constexpr BS_REAL gs = kBS_Gs;
+
     // (Anti)neutrino energy rescaled by the nucleon mass, Eq. 4
     const BS_REAL ehor = E * kBS_WM_e_scale; // dimensionless
 
@@ -71,20 +75,20 @@ void NucFrmFac(const BS_REAL E, BS_REAL* cv, BS_REAL* ca, BS_REAL* F2,
     /* Different parametrization depending on the reaction */
     if (reacflag == 1)
     {
-        frm1 = (half - two * kBS_SinThW2) * Fp1 - half * Fn1;      // Eq.(B1)
-        frm2 = half * (kBS_Ga - kBS_Gs) / POW2(one + c3 * tau); // Eq.(B2)
-        frm3 = (half - two * kBS_SinThW2) * Fp2 - half * Fn2;      // Eq.(B3)
+        frm1 = (half - two * sinthw2) * Fp1 - half * Fn1;      // Eq.(B1)
+        frm2 = half * (ga - gs) / POW2(one + c3 * tau); // Eq.(B2)
+        frm3 = (half - two * sinthw2) * Fp2 - half * Fn2;      // Eq.(B3)
     }
     else if (reacflag == 2)
     {
-        frm1 = (half - two * kBS_SinThW2) * Fn1 - half * Fp1;       // Eq.(B4)
-        frm2 = -half * (kBS_Ga + kBS_Gs) / POW2(one + c3 * tau); // Eq.(B5)
-        frm3 = (half - two * kBS_SinThW2) * Fn2 - half * Fp2;       // Eq.(B6)
+        frm1 = (half - two * sinthw2) * Fn1 - half * Fp1;       // Eq.(B4)
+        frm2 = -half * (ga + gs) / POW2(one + c3 * tau); // Eq.(B5)
+        frm3 = (half - two * sinthw2) * Fn2 - half * Fp2;       // Eq.(B6)
     }
     else if (reacflag == 3)
     {
         frm1 = Fp1 - Fn1;                      // Eq.(B7)
-        frm2 = kBS_Ga / POW2(one + c3 * tau); // Eq.(B8)
+        frm2 = ga / POW2(one + c3 * tau); // Eq.(B8)
         frm3 = Fp2 - Fn2;                      // Eq.(B9)
     }
     else
@@ -130,6 +134,9 @@ void WMAbsEm(const BS_REAL omega, BS_REAL* R, BS_REAL* Rbar)
     constexpr BS_REAL sixteen_thirds = 16. / 3.;
     constexpr BS_REAL two_fifth = 2. / 5.;
 
+    constexpr BS_REAL ga = kBS_Ga;
+    constexpr BS_REAL gv = kBS_Gv;
+
     BS_REAL cv, ca, F2;
 
     NucFrmFac(omega, &cv, &ca, &F2, 3); // nuclear form factors
@@ -144,7 +151,7 @@ void WMAbsEm(const BS_REAL omega, BS_REAL* R, BS_REAL* Rbar)
     const BS_REAL tmp2 = four * (cv + F2) * ca * ehor * (one + four_thirds * ehor);
     // const BS_REAL tmp3 = (cv*cv+3.0*ca*ca)*POW3(one+two*ehor);
     const BS_REAL tmp3 =
-        (POW2(kBS_Gv) + three * POW2(kBS_Ga)) * POW3(one + two * ehor);
+        (POW2(gv) + three * POW2(ga)) * POW3(one + two * ehor);
 
     *R    = (tmp1 + tmp2) / tmp3; // Eq.(22)
     *Rbar = (tmp1 - tmp2) / tmp3; // Eq.(22)
@@ -163,6 +170,11 @@ void WMScatt(const BS_REAL omega, BS_REAL* R0, BS_REAL* R1, const int reacflag)
     constexpr BS_REAL four = 4;
     constexpr BS_REAL three_halves = 1.5;
 
+    constexpr BS_REAL hpv = kBS_Hpv;
+    constexpr BS_REAL hpa = kBS_Hpa;
+    constexpr BS_REAL hnv = kBS_Hnv;
+    constexpr BS_REAL hna = kBS_Hna;
+
     BS_REAL cv, ca, F2;
     BS_REAL h0, h1;
 
@@ -173,13 +185,13 @@ void WMScatt(const BS_REAL omega, BS_REAL* R0, BS_REAL* R1, const int reacflag)
     // @TODO: evaluate this at compile time
     if (reacflag == 1)
     {
-        h0 = POW2(kBS_Hpv) + three * POW2(kBS_Hpa);
-        h1 = POW2(kBS_Hpv) - POW2(kBS_Hpa);
+        h0 = POW2(hpv) + three * POW2(hpa);
+        h1 = POW2(hpv) - POW2(hpa);
     }
     else if (reacflag == 2)
     {
-        h0 = POW2(kBS_Hnv) + three * POW2(kBS_Hna);
-        h1 = POW2(kBS_Hnv) - POW2(kBS_Hna);
+        h0 = POW2(hnv) + three * POW2(hna);
+        h1 = POW2(hnv) - POW2(hna);
     }
 
     const BS_REAL ehor = omega * kBS_WM_e_scale;

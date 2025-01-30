@@ -241,7 +241,7 @@ void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
     fd_e = FermiDistr(E_e, T, +mu_lepton);
     fd_p = FermiDistr(E_p, T, -mu_lepton);
 
-    if (E_p - mass_lepton >= 0.)
+    if (E_p - mass_lepton >= zero)
     {
         cap_term = E_p_squared * sqrt(one - mass_lepton_squared / E_p_squared) *
                    Rbar; // * HeavisideTanhApprox(E_p - mass_lepton)
