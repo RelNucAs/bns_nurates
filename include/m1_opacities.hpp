@@ -962,7 +962,7 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     const MyQuadrature* quad_1d, const MyQuadrature* quad_2d,
     GreyOpacityParams* my_grey_opacity_params, const int stim_abs)
 {
-    constexpr BS_REAL four = 4;
+    constexpr BS_REAL four    = 4;
     constexpr BS_REAL c_light = kBS_Clight;
 
     BS_REAL n[total_num_species];
@@ -1099,8 +1099,7 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
                     (kBS_FourPi_hc3 * (e_integrals_2d.integrand[4] +
                                        e_neps_2d.integrand[4]) +
                      beta_j_abs_integrals.integrand[id_nue]);
-        m1_opacities.kappa_s[id_nue] = kBS_FourPi_hc3 /
-                                       (c_light * J[id_nue]) *
+        m1_opacities.kappa_s[id_nue] = kBS_FourPi_hc3 / (c_light * J[id_nue]) *
                                        iso_integrals.integrand[id_nue];
     }
 
@@ -1151,8 +1150,7 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
         m1_opacities.kappa_a[id_nux] =
             kBS_FourPi_hc3_sqr / (c_light * J[id_nux]) *
             (e_integrals_2d.integrand[6] + e_neps_2d.integrand[6]);
-        m1_opacities.kappa_s[id_nux] = kBS_FourPi_hc3 /
-                                       (c_light * J[id_nux]) *
+        m1_opacities.kappa_s[id_nux] = kBS_FourPi_hc3 / (c_light * J[id_nux]) *
                                        iso_integrals.integrand[id_nux];
     }
 
@@ -1388,9 +1386,9 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
     const BS_REAL nu, MyQuadrature* quad_1d,
     GreyOpacityParams* my_grey_opacity_params)
 {
-    constexpr BS_REAL zero = 0;
-    constexpr BS_REAL one  = 1;
-    constexpr BS_REAL four = 4;
+    constexpr BS_REAL zero    = 0;
+    constexpr BS_REAL one     = 1;
+    constexpr BS_REAL four    = 4;
     constexpr BS_REAL four_pi = 4 * kBS_Pi;
     constexpr BS_REAL c_light = kBS_Clight;
 
@@ -1423,7 +1421,7 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
     constexpr BS_REAL temp_multiple = 0.5 * 4.364;
 
     BS_REAL s_pair[8], s_neps[8];
-    
+
     for (int i = 0; i < 8; ++i)
     {
         // s[i] = 1.5 * my_grey_opacity_params->eos_pars.temp;
@@ -1499,14 +1497,10 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
                            integrals_neps_1d.integrand[7])) /
         c_light;
 
-    sp_opacities.j_s[id_nue] =
-        four_pi * POW2(nu) * g_nu[id_nue] * iso_scatt;
-    sp_opacities.j_s[id_anue] =
-        four_pi * POW2(nu) * g_nu[id_anue] * iso_scatt;
-    sp_opacities.j_s[id_nux] =
-        four_pi * POW2(nu) * g_nu[id_nux] * iso_scatt;
-    sp_opacities.j_s[id_anux] =
-        four_pi * POW2(nu) * g_nu[id_anux] * iso_scatt;
+    sp_opacities.j_s[id_nue]  = four_pi * POW2(nu) * g_nu[id_nue] * iso_scatt;
+    sp_opacities.j_s[id_anue] = four_pi * POW2(nu) * g_nu[id_anue] * iso_scatt;
+    sp_opacities.j_s[id_nux]  = four_pi * POW2(nu) * g_nu[id_nux] * iso_scatt;
+    sp_opacities.j_s[id_anux] = four_pi * POW2(nu) * g_nu[id_anux] * iso_scatt;
 
     sp_opacities.kappa_s[id_nue] =
         four_pi * POW2(nu) * (one - g_nu[id_nue]) * iso_scatt / c_light;
