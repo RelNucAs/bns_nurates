@@ -56,8 +56,8 @@ void NucFrmFac(const BS_REAL E, BS_REAL* cv, BS_REAL* ca, BS_REAL* F2,
     constexpr BS_REAL c3 = 3.53;
 
     constexpr BS_REAL sinthw2 = kBS_SinThW2;
-    constexpr BS_REAL ga = kBS_Ga;
-    constexpr BS_REAL gs = kBS_Gs;
+    constexpr BS_REAL ga      = kBS_Ga;
+    constexpr BS_REAL gs      = kBS_Gs;
 
     // (Anti)neutrino energy rescaled by the nucleon mass, Eq. 4
     const BS_REAL ehor = E * kBS_WM_e_scale; // dimensionless
@@ -76,21 +76,21 @@ void NucFrmFac(const BS_REAL E, BS_REAL* cv, BS_REAL* ca, BS_REAL* F2,
     /* Different parametrization depending on the reaction */
     if (reacflag == 1)
     {
-        frm1 = (half - two * sinthw2) * Fp1 - half * Fn1;      // Eq.(B1)
-        frm2 = half * (ga - gs) / POW2(one + c3 * tau); // Eq.(B2)
-        frm3 = (half - two * sinthw2) * Fp2 - half * Fn2;      // Eq.(B3)
+        frm1 = (half - two * sinthw2) * Fp1 - half * Fn1; // Eq.(B1)
+        frm2 = half * (ga - gs) / POW2(one + c3 * tau);   // Eq.(B2)
+        frm3 = (half - two * sinthw2) * Fp2 - half * Fn2; // Eq.(B3)
     }
     else if (reacflag == 2)
     {
-        frm1 = (half - two * sinthw2) * Fn1 - half * Fp1;       // Eq.(B4)
-        frm2 = -half * (ga + gs) / POW2(one + c3 * tau); // Eq.(B5)
-        frm3 = (half - two * sinthw2) * Fn2 - half * Fp2;       // Eq.(B6)
+        frm1 = (half - two * sinthw2) * Fn1 - half * Fp1; // Eq.(B4)
+        frm2 = -half * (ga + gs) / POW2(one + c3 * tau);  // Eq.(B5)
+        frm3 = (half - two * sinthw2) * Fn2 - half * Fp2; // Eq.(B6)
     }
     else if (reacflag == 3)
     {
-        frm1 = Fp1 - Fn1;                      // Eq.(B7)
+        frm1 = Fp1 - Fn1;                 // Eq.(B7)
         frm2 = ga / POW2(one + c3 * tau); // Eq.(B8)
-        frm3 = Fp2 - Fn2;                      // Eq.(B9)
+        frm3 = Fp2 - Fn2;                 // Eq.(B9)
     }
     else
     {
@@ -152,8 +152,7 @@ void WMAbsEm(const BS_REAL omega, BS_REAL* R, BS_REAL* Rbar)
     const BS_REAL tmp2 =
         four * (cv + F2) * ca * ehor * (one + four_thirds * ehor);
     // const BS_REAL tmp3 = (cv*cv+3.0*ca*ca)*POW3(one+two*ehor);
-    const BS_REAL tmp3 =
-        (POW2(gv) + three * POW2(ga)) * POW3(one + two * ehor);
+    const BS_REAL tmp3 = (POW2(gv) + three * POW2(ga)) * POW3(one + two * ehor);
 
     *R    = (tmp1 + tmp2) / tmp3; // Eq.(22)
     *Rbar = (tmp1 - tmp2) / tmp3; // Eq.(22)

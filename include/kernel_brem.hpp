@@ -427,11 +427,11 @@ BS_REAL QBrem_BRT06(const BS_REAL nb, const BS_REAL T, const BS_REAL xn,
 {
     constexpr BS_REAL half               = 0.5;
     constexpr BS_REAL twentyeight_thirds = 28. / 3.;
-    constexpr BS_REAL eleven_halves = 5.5;
-    constexpr BS_REAL mb = kBS_Mb;
+    constexpr BS_REAL eleven_halves      = 5.5;
+    constexpr BS_REAL mb                 = kBS_Mb;
 
     constexpr BS_REAL kBS_Brem_BRT06_Const = 2.0778e+02;
-    const BS_REAL rho = nb * mb; // mass density [g nm-3]
+    const BS_REAL rho                      = nb * mb; // mass density [g nm-3]
     return kBS_Brem_BRT06_Const * half * kBS_MeV *
            (POW2(xn) + POW2(xp) + twentyeight_thirds * xn * xp) * POW2(rho) *
            pow(T, eleven_halves); // [MeV nm-3 s-1]
