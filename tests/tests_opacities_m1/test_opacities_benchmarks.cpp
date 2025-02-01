@@ -281,7 +281,7 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
     printf("zone-cycles/second = %e\n", double(npts) / time_taken_seconds);
 }
 
-int main()
+int main(int argc, char *argv[])
 {
 
     Kokkos::initialize();
@@ -292,23 +292,44 @@ int main()
 
     int nx, mb_nx;
 
-    std::cout << "Enter the number of quadrature points: ";
-    std::cin >> nx;
-
-    if (std::cin.fail())
+    if (argc != 3)
     {
-        std::cerr << "Invalid input!" << std::endl;
-        return 1;
+        printf("Usage: %s <n_quad> <mesh_size>\n", argv[0]);
+	return 1;
     }
 
-    std::cout << "Enter Nx for meshblock with [Nx x Nx x Nx] points: ";
-    std::cin >> mb_nx;
+    nx = atoi(argv[1]);
+    mb_nx = atoi(argv[2]);
 
-    if (std::cin.fail())
+    if (nx == 0)
     {
-        std::cerr << "Invalid input!" << std::endl;
-        return 1;
+         std::cerr << "Invalid input!" << std::endl;
+         return 1;
     }
+
+    if (nx * 2 > n_max)
+    {
+         std::cerr << "Number of quadrature points exceeds n_max!" << std::endl;
+         std::cerr << "2 * nx = " << 2 * nx << std::endl;
+         std::cerr << "n_max = "  <<  n_max << std::endl;
+         return 1;
+    }
+
+    if (mb_nx == 0)
+    {
+         std::cerr << "Invalid input!" << std::endl;
+         return 1;
+    }
+    
+    std::cout << "Number of quadrature points: ";
+    std::cout << nx;
+    std::cout << std::endl;
+    std::cout << std::endl;
+    
+    std::cout << "Nx for meshblock with [Nx x Nx x Nx] points: ";
+    std::cout << mb_nx;
+    std::cout << std::endl;
+    std::cout << std::endl;
 
     TestM1OpacitiesBenchmarks(nx, mb_nx);
 
