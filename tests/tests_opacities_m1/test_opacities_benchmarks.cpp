@@ -80,29 +80,35 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
     {
         if (line[1] == '#' && i == 0)
         {
-#ifndef REAL_TYPE_IS_DOUBLE
-            sscanf(line + 14, "%f\n", &e_nu);
-#else
-            sscanf(line + 14, "%lf\n", &e_nu);
-#endif continue;
+            if (std::is_same_v<BS_REAL, float>)
+            {
+	        sscanf(line + 14, "%f\n", &e_nu);
+            }
+	    else
+	    {
+                sscanf(line + 14, "%lf\n", &e_nu);
+            }
         }
         else if (line[1] == '#' && i != 0)
         {
             continue;
         }
 
-#ifndef REAL_TYPE_IS_DOUBLE
-        sscanf(line, "%d %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
-               &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
-               &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i), &h_Yn(i),
-               &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
-#else
-        sscanf(line,
-               "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
-               &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
-               &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i), &h_Yn(i),
-               &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
-#endif
+        if (std::is_same_v<BS_REAL, float>)
+        {
+            sscanf(line, "%d %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
+                   &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
+                   &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i), &h_Yn(i),
+                   &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
+        }
+	else
+        {
+	    sscanf(line,
+                   "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
+                   &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
+                   &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i), &h_Yn(i),
+                   &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
+        }
     }
 
     fclose(fptr);
