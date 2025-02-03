@@ -27,8 +27,6 @@
  */
 inline void GaussLegendre(MyQuadrature* quad)
 {
-    constexpr BS_REAL half = 0.5;
-
     const double kEps = 1.0e-10; // 1.0e-14;
 
     BS_ASSERT(quad->dim == 1);
@@ -38,8 +36,8 @@ inline void GaussLegendre(MyQuadrature* quad)
 
     int n = quad->nx;
     int m = (n + 1) / 2;
-    xm    = half * (quad->x2 + quad->x1);
-    xl    = half * (quad->x2 - quad->x1);
+    xm    = 0.5 * (quad->x2 + quad->x1);
+    xl    = 0.5 * (quad->x2 - quad->x1);
 
     for (int i = 0; i < m; ++i)
     {
