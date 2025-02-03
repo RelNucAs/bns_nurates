@@ -8,18 +8,17 @@
 #include "bns_nurates.hpp"
 #include "constants.hpp"
 
-constexpr BS_REAL zero                  = 0;
-constexpr BS_REAL one_twentyth          = 0.05;
-constexpr BS_REAL one_tenth             = 0.1;
-constexpr BS_REAL one_fifth             = 0.2;
-constexpr BS_REAL one_third             = 0.3333333333333333333;
-constexpr BS_REAL half                  = 0.5;
-constexpr BS_REAL one                   = 1;
-constexpr BS_REAL two                   = 2;
-constexpr BS_REAL five                  = 5;
-constexpr BS_REAL ten                   = 10;
-constexpr BS_REAL twenty                = 20;
-constexpr BS_REAL forty                 = 40;
+constexpr BS_REAL zero = 0;
+constexpr BS_REAL one_twentyth = 0.05;
+constexpr BS_REAL one_tenth = 0.1;
+constexpr BS_REAL one_fifth = 0.2;
+constexpr BS_REAL one_third = 0.3333333333333333333;
+constexpr BS_REAL one = 1;
+constexpr BS_REAL two = 2;
+constexpr BS_REAL five = 5;
+constexpr BS_REAL ten = 10;
+constexpr BS_REAL twenty = 20;
+constexpr BS_REAL forty = 40;
 constexpr BS_REAL onethousandsixhundred = 1600;
 constexpr BS_REAL fdi_litconst          = 7.38905609893065023;
 
@@ -517,6 +516,7 @@ BS_REAL FDI_m92(const BS_REAL x)
                                2160.21729234460541,
                                677.261952266814024,
                                56.0179124057448609};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -781,6 +781,7 @@ BS_REAL FDI_m72(const BS_REAL x)
                                7642.62657004470466,
                                1584.72834559231955,
                                86.0988387732258338};
+   constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -1013,6 +1014,7 @@ BS_REAL FDI_m52(const BS_REAL x)
                               56944.6907876652433,
                               7175.67113380361324,
                               207.376531486457753};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -1222,6 +1224,7 @@ BS_REAL FDI_m32(const BS_REAL x)
                               9877.87829948067200,
                               2644.71979353906092,
                               128.863768007644572};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -1414,6 +1417,7 @@ BS_REAL FDI_m12(const BS_REAL x)
                               2.56931790679436797e-7,
                               9.97897786755446178e-9,
                               8.67667698791108582e-10};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -1562,6 +1566,7 @@ BS_REAL FDI_0(const BS_REAL y)
         284.26032127745967,    315.2592651624449,      310.2713981221035,
         206.21640678892182,    96.77898293084927,      35.456591489081173,
         8.1762315442738975};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -1656,6 +1661,7 @@ BS_REAL FDI_p12(const BS_REAL x)
                               8109.79390744477921,  342.069867454704106,
                               1.07141702293504595,  6569.98472532829094,
                               280.706465851683809};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -1806,6 +1812,7 @@ BS_REAL FDI_p1(const BS_REAL y)
         27.2746245830016,     -61.57766112137513,    -53.72117554363975,
         -25.678454878692950,  -7.1995819520154718};
     constexpr BS_REAL C[2] = {1.64493406684822644, 0.5};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -1905,6 +1912,7 @@ BS_REAL FDI_p32(const BS_REAL x)
                               -2.79156524536560815e-6,
                               2.95571462110856359e-8,
                               6.70917556862133933e-10};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -2058,6 +2066,7 @@ BS_REAL FDI_p2(const BS_REAL y)
         1428.0589853413436,   531.62378035996132,   122.54595216479181,
         8.395768655115050,    -3.9142702096919080};
     constexpr BS_REAL C[2] = {3.28986813369645287, 0.333333333333333333};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -2153,6 +2162,7 @@ BS_REAL FDI_p52(const BS_REAL x)
                               3.78966458769690333e-6,
                               2.09248095155530095e-8,
                               3.52097438532254351e-10};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -2297,6 +2307,7 @@ BS_REAL FDI_p3(const BS_REAL y)
         2972.7443644211129,  2393.9995533270879,  1259.0724833462608,
         459.86413596901097,  112.60906419590854,  16.468882811659000};
     constexpr BS_REAL C[3] = {11.3643939539669510, 4.93480220054467931, 0.25};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -2390,6 +2401,7 @@ BS_REAL FDI_p72(const BS_REAL x)
                               -0.0000113689722343055157,
                               -2.69205155161558844e-8,
                               2.81838487282327867e-10};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -2537,6 +2549,7 @@ BS_REAL FDI_p4(const BS_REAL y)
         3236.2237702166948,  2500.5977847175497,  1278.0109577275445,
         448.99020896813485,  105.86020755838874,  15.216887271751039};
     constexpr BS_REAL C[3] = {45.4575758158678040, 6.57973626739290575, 0.2};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -2630,6 +2643,7 @@ BS_REAL FDI_p92(const BS_REAL x)
                               0.000125058641885852090,
                               5.92447825215879480e-8,
                               3.38237202703194112e-10};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -2779,6 +2793,7 @@ BS_REAL FDI_p5(const BS_REAL y)
         397.7596246691212,   91.84661231161838,   13.491911254479298};
     constexpr BS_REAL C[4] = {236.532261911384425, 113.643939539669510,
                               8.22467033424113218, 0.166666666666666667};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -2874,6 +2889,7 @@ BS_REAL FDI_p112(const BS_REAL x)
                               0.00162576228417182612,
                               -2.56764926438640722e-7,
                               6.18964665583859548e-10};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -3027,6 +3043,7 @@ BS_REAL FDI_p6(const BS_REAL y)
         406.93880737411049,    89.70143752313466,   12.997281214703279};
     constexpr BS_REAL C[4] = {1419.19357146830655, 227.287879079339020,
                               9.86960440108935862, 0.142857142857142857};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -3122,6 +3139,7 @@ BS_REAL FDI_p132(const BS_REAL x)
                               0.00812881145350198890,
                               3.85165680520411590e-6,
                               1.83598087001386478e-9};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -3291,6 +3309,7 @@ BS_REAL FDI_p7(const BS_REAL y)
         456.50435752749115,    95.80622002968487,     13.317952574698873};
     constexpr BS_REAL C[5] = {10042.0286586746908, 4967.17750013907292,
                               397.753788388843285, 11.5145384679375851, 0.125};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -3389,6 +3408,7 @@ BS_REAL FDI_p152(const BS_REAL x)
                               0.0276379588953803004,
                               0.0000654786006189425666,
                               1.03209499898071117e-8};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -3557,6 +3577,7 @@ BS_REAL FDI_p8(const BS_REAL y)
     constexpr BS_REAL C[5] = {80336.2292693975266, 13245.8066670375278,
                               636.406061422149257, 13.1594725347858115,
                               0.111111111111111111};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -3650,6 +3671,7 @@ BS_REAL FDI_p172(const BS_REAL x)
                               0.0750173171258174240,
                               0.000414697262104018271,
                               1.95167395079296505e-7};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -3816,6 +3838,7 @@ BS_REAL FDI_p9(const BS_REAL y)
     constexpr BS_REAL C[6] = {725062.913034521571, 361513.031712288870,
                               29803.0650008344375, 954.609092133223885,
                               14.8044066016340379, 0.1};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -3909,6 +3932,7 @@ BS_REAL FDI_p192(const BS_REAL x)
                               0.00174172934550196671,
                               4.09368331231164635e-6,
                               6.44677689509362889e-10};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -4083,6 +4107,7 @@ BS_REAL FDI_p10(const BS_REAL y)
     constexpr BS_REAL C[6] = {7.25062913034521571e6, 1.20504343904096290e6,
                               59606.1300016688751,   1363.72727447603412,
                               16.4493406684822644,   0.0909090909090909091};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -4181,6 +4206,7 @@ BS_REAL FDI_p212(const BS_REAL x)
                               0.00572282501335319477,
                               0.0000313848422097767888,
                               1.47431097320479878e-8};
+    constexpr BS_REAL half = 0.5;
 
     if (x < -two)
     {
@@ -4706,10 +4732,20 @@ BS_REAL HeavisideTanhApprox(const BS_REAL x)
     constexpr BS_REAL two  = 2;
 
     constexpr BS_REAL kBS_aHeaviside = a_heaviside;
-    constexpr BS_REAL kBS_dbl_min    = DBL_MIN;
+    
+    BS_REAL kBS_REAL_MIN;
+   
+    if (std::is_same_v<BS_REAL, float>)
+    {
+        kBS_REAL_MIN = FLT_MIN; // FLT_TRUE_MIN
+    }
+    else
+    {
+	kBS_REAL_MIN = DBL_MIN; // DBL_TRUE_MIN
+    }
 
     return half * (one + tanh(two * kBS_aHeaviside * x /
-                              (fabs(x) + kBS_dbl_min))); // DBL_TRUE_MIN
+                              (fabs(x) + kBS_REAL_MIN)));
 }
 
 /*===========================================================================*/

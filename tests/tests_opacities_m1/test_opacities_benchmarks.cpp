@@ -88,6 +88,7 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
 	    {
                 sscanf(line + 14, "%lf\n", &e_nu);
             }
+	    continue;
         }
         else if (line[1] == '#' && i != 0)
         {
@@ -109,6 +110,7 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
                    &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i), &h_Yn(i),
                    &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
         }
+	i++;
     }
 
     fclose(fptr);
@@ -275,6 +277,7 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
             M1Opacities coeffs =
                 ComputeM1Opacities(&my_quad, &my_quad, &my_grey_opacity_params);
             auto testval = coeffs.eta[id_nue];
+	    printf("%.15e\n", testval);
         });
 
     Kokkos::fence();
