@@ -380,8 +380,8 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
     {
 	if (std::is_same_v<BS_REAL, float>)
 	{
-	    printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e "
-               "%e\n",
+	    printf("%.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e "
+               "%.15e\n",
                h_r(i), h_diff_distribution(i), h_coeffs_eta_0(i, id_nue),
                h_coeffs_eta_0(i, id_anue), h_coeffs_eta_0(i, id_nux),
                h_coeffs_eta_0(i, id_anux), h_coeffs_eta(i, id_nue),
@@ -396,9 +396,9 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
        }
 	else
 	{	
-        printf("%le %le %le %le %le %le %le %le %le %le %le %le %le %le %le "
-               "%le %le %le %le %le %le "
-               "%le\n",
+        printf("%.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le "
+               "%.15le %.15le %.15le %.15le %.15le %.15le "
+               "%.15le\n",
                h_r(i), h_diff_distribution(i), h_coeffs_eta_0(i, id_nue),
                h_coeffs_eta_0(i, id_anue), h_coeffs_eta_0(i, id_nux),
                h_coeffs_eta_0(i, id_anux), h_coeffs_eta(i, id_nue),
@@ -682,7 +682,7 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200],
                 my_grey_opacity_params.m1_pars.chi[idx] = d_chinu(i, idx);
                 my_grey_opacity_params.m1_pars.n[idx]   = d_nnu(i, idx) * 1e-21;
                 my_grey_opacity_params.m1_pars.J[idx] =
-                    d_jnu(i, idx) * kBS_MeV * 1e-21;
+                    d_jnu(i, idx) * 1e-21 * kBS_MeV;
             }
 
             // Distribution parameters
@@ -762,8 +762,8 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200],
     {
 	if (std::is_same_v<BS_REAL, float>)
 	{
-		printf("%d %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e "
-               "%e\n",
+		printf("%d %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e "
+               "%.15e\n",
                h_zone(i), h_diff_distribution(i), h_coeffs_eta_0(i, id_nue),
                h_coeffs_eta_0(i, id_anue), h_coeffs_eta_0(i, id_nux),
                h_coeffs_eta_0(i, id_anux), h_coeffs_eta(i, id_nue),
@@ -776,9 +776,9 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200],
                h_coeffs_kappa_s(i, id_anue), h_coeffs_kappa_s(i, id_nux),
                h_coeffs_kappa_s(i, id_anux));
 	} else {
-        printf("%d %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le "
-               "%le %le %le %le %le "
-               "%le\n",
+        printf("%d %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le "
+               "%.15le %.15le %.15le %.15le %.15le "
+               "%.15le\n",
                h_zone(i), h_diff_distribution(i), h_coeffs_eta_0(i, id_nue),
                h_coeffs_eta_0(i, id_anue), h_coeffs_eta_0(i, id_nux),
                h_coeffs_eta_0(i, id_anux), h_coeffs_eta(i, id_nue),
@@ -1152,7 +1152,7 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
         {
 	if (std::is_same_v<BS_REAL, float>)
 	{
-	    	printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e ",
+	    	printf("%.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e ",
                    h_j(j, i, id_nue), h_j(j, i, id_anue), h_j(j, i, id_nux),
                    h_j(j, i, id_anux), h_j_s(j, i, id_nue),
                    h_j_s(j, i, id_anue), h_j_s(j, i, id_nux),
@@ -1162,8 +1162,8 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
                    h_kappa_s(j, i, id_anue), h_kappa_s(j, i, id_nux),
                    h_kappa_s(j, i, id_anux));
 	} else {
-            printf("%le %le %le %le %le %le %le %le %le %le %le %le %le %le "
-                   "%le %le ",
+            printf("%.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le "
+                   "%.15le %.15le ",
                    h_j(j, i, id_nue), h_j(j, i, id_anue), h_j(j, i, id_nux),
                    h_j(j, i, id_anux), h_j_s(j, i, id_nue),
                    h_j_s(j, i, id_anue), h_j_s(j, i, id_nux),
