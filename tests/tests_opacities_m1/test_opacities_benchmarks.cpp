@@ -56,19 +56,20 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
     Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_rho("rho", num_data);
     Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_T("T", num_data);
     Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_Ye("Ye", num_data);
-    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_mu_e("mu_e", num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_mu_e("mu_e",
+                                                               num_data);
     Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_mu_hat("mu_hat",
-                                                                num_data);
+                                                                 num_data);
     Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_Yh("Yh", num_data);
     Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_Ya("Ya", num_data);
     Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_Yp("Yp", num_data);
     Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_Yn("Yn", num_data);
     Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_em_nue("em_nue",
-                                                                num_data);
-    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_l_nue_inv("l_nue_inv",
-                                                                   num_data);
-    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_em_anue("em_anue",
                                                                  num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_l_nue_inv("l_nue_inv",
+                                                                    num_data);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_em_anue("em_anue",
+                                                                  num_data);
     Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> h_l_anue_inv(
         "l_anue_inv", num_data);
 
@@ -79,29 +80,37 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
     {
         if (line[1] == '#' && i == 0)
         {
-#ifndef REAL_TYPE_IS_DOUBLE
-            sscanf(line + 14, "%f\n", &e_nu);
-#else
-            sscanf(line + 14, "%lf\n", &e_nu);
-#endif            continue;
+            if (std::is_same_v<BS_REAL, float>)
+            {
+	        sscanf(line + 14, "%f\n", &e_nu);
+            }
+	    else
+	    {
+                sscanf(line + 14, "%lf\n", &e_nu);
+            }
+	    continue;
         }
         else if (line[1] == '#' && i != 0)
         {
             continue;
         }
 
-#ifndef REAL_TYPE_IS_DOUBLE
-        sscanf(line, "%d %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
-               &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
-               &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i), &h_Yn(i),
-               &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
-#else
-        sscanf(line,
-               "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
-               &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
-               &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i), &h_Yn(i),
-               &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
-#endif
+        if (std::is_same_v<BS_REAL, float>)
+        {
+            sscanf(line, "%d %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
+                   &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
+                   &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i), &h_Yn(i),
+                   &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
+        }
+	else
+        {
+	    sscanf(line,
+                   "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
+                   &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
+                   &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i), &h_Yn(i),
+                   &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
+        }
+	i++;
     }
 
     fclose(fptr);
@@ -109,24 +118,27 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
     // construct arrays based on meshblock dimensions
     int npts = mb_nx * mb_nx * mb_nx;
     Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> mb_h_rho("mb_h_rho",
-                                                                npts);
-    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> mb_h_T("mb_h_T", npts);
-    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> mb_h_Ye("mb_h_Ye", npts);
-    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> mb_h_mu_e("mb_h_mu_e",
                                                                  npts);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> mb_h_T("mb_h_T", npts);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> mb_h_Ye("mb_h_Ye",
+                                                                npts);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> mb_h_mu_e("mb_h_mu_e",
+                                                                  npts);
     Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> mb_h_mu_hat(
         "mb_h_mu_hat", npts);
-    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> mb_h_Yp("mb_h_Yp", npts);
-    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> mb_h_Yn("mb_h_Yn", npts);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> mb_h_Yp("mb_h_Yp",
+                                                                npts);
+    Kokkos::View<BS_REAL*, LayoutWrapper, HostMemSpace> mb_h_Yn("mb_h_Yn",
+                                                                npts);
 
     Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> mb_d_rho("mb_d_rho",
-                                                               npts);
+                                                                npts);
     Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> mb_d_T("mb_d_T", npts);
     Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> mb_d_Ye("mb_d_Ye", npts);
     Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> mb_d_mu_e("mb_d_mu_e",
-                                                                npts);
-    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> mb_d_mu_hat("mb_d_mu_hat",
-                                                                  npts);
+                                                                 npts);
+    Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> mb_d_mu_hat(
+        "mb_d_mu_hat", npts);
     Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> mb_d_Yp("mb_d_Yp", npts);
     Kokkos::View<BS_REAL*, LayoutWrapper, DevMemSpace> mb_d_Yn("mb_d_Yn", npts);
 
@@ -203,8 +215,8 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
     GaussLegendre(&my_quad);
     printf("Quadratures generated.\n");
 
-    constexpr BS_REAL delta_m = kBS_Q;
-    constexpr BS_REAL mu = kBS_Mu;
+    constexpr BS_REAL delta_m    = kBS_Q;
+    constexpr BS_REAL mu         = kBS_Mu;
     constexpr BS_REAL nm3_to_cm3 = 1e-21;
 
     auto start = std::chrono::high_resolution_clock::now();
@@ -228,7 +240,7 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
             my_grey_opacity_params.eos_pars.temp = mb_d_T(i);
             my_grey_opacity_params.eos_pars.yp   = mb_d_Yp(i);
             my_grey_opacity_params.eos_pars.yn   = mb_d_Yn(i);
-            my_grey_opacity_params.eos_pars.nb   = mb_d_rho(i) / mu * nm3_to_cm3;
+            my_grey_opacity_params.eos_pars.nb = mb_d_rho(i) / mu * nm3_to_cm3;
 
 
             // Opacity parameters (corrections all switched off)
@@ -265,6 +277,7 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
             M1Opacities coeffs =
                 ComputeM1Opacities(&my_quad, &my_quad, &my_grey_opacity_params);
             auto testval = coeffs.eta[id_nue];
+	    printf("%.15e\n", testval);
         });
 
     Kokkos::fence();
@@ -281,7 +294,7 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
     printf("zone-cycles/second = %e\n", double(npts) / time_taken_seconds);
 }
 
-int main()
+int main(int argc, char *argv[])
 {
 
     Kokkos::initialize();
@@ -292,23 +305,44 @@ int main()
 
     int nx, mb_nx;
 
-    std::cout << "Enter the number of quadrature points: ";
-    std::cin >> nx;
-
-    if (std::cin.fail())
+    if (argc != 3)
     {
-        std::cerr << "Invalid input!" << std::endl;
-        return 1;
+        printf("Usage: %s <n_quad> <mesh_size>\n", argv[0]);
+	return 1;
     }
 
-    std::cout << "Enter Nx for meshblock with [Nx x Nx x Nx] points: ";
-    std::cin >> mb_nx;
+    nx = atoi(argv[1]);
+    mb_nx = atoi(argv[2]);
 
-    if (std::cin.fail())
+    if (nx == 0)
     {
-        std::cerr << "Invalid input!" << std::endl;
-        return 1;
+         std::cerr << "Invalid input!" << std::endl;
+         return 1;
     }
+
+    if (nx * 2 > n_max)
+    {
+         std::cerr << "Number of quadrature points exceeds n_max!" << std::endl;
+         std::cerr << "2 * nx = " << 2 * nx << std::endl;
+         std::cerr << "n_max = "  <<  n_max << std::endl;
+         return 1;
+    }
+
+    if (mb_nx == 0)
+    {
+         std::cerr << "Invalid input!" << std::endl;
+         return 1;
+    }
+    
+    std::cout << "Number of quadrature points: ";
+    std::cout << nx;
+    std::cout << std::endl;
+    std::cout << std::endl;
+    
+    std::cout << "Nx for meshblock with [Nx x Nx x Nx] points: ";
+    std::cout << mb_nx;
+    std::cout << std::endl;
+    std::cout << std::endl;
 
     TestM1OpacitiesBenchmarks(nx, mb_nx);
 

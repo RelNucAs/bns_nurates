@@ -94,30 +94,36 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
     {
         if (line[1] == '#' && i == 0)
         {
-#ifndef REAL_TYPE_IS_DOUBLE
-            sscanf(line + 14, "%f\n", &e_nu);
-#else
-            sscanf(line + 14, "%lf\n", &e_nu);
-#endif
-            continue;
+	    if (std::is_same_v<BS_REAL, float>)
+            {
+                sscanf(line + 14, "%f\n", &e_nu);
+            }
+	    else
+            {
+	        sscanf(line + 14, "%lf\n", &e_nu);
+	    }
+	    continue;
         }
         else if (line[1] == '#' && i != 0)
         {
             continue;
         }
 
-#ifndef REAL_TYPE_IS_DOUBLE
-        sscanf(line, "%d %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
+	if (std::is_same_v<BS_REAL, float>)
+        {
+	    sscanf(line, "%d %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
                &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
                &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i), &h_Yn(i),
                &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
-#else
-        sscanf(line,
+        }
+	else
+        {
+            sscanf(line,
                "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
                &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
                &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i), &h_Yn(i),
                &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
-#endif
+        }
 
         i++;
     }
@@ -372,8 +378,9 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
     printf("# Printing result\n");
     for (int i = 0; i < num_data; i++)
     {
-#ifndef REAL_TYPE_IS_DOUBLE
-        printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e "
+	if (std::is_same_v<BS_REAL, float>)
+	{
+	    printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e "
                "%e\n",
                h_r(i), h_diff_distribution(i), h_coeffs_eta_0(i, id_nue),
                h_coeffs_eta_0(i, id_anue), h_coeffs_eta_0(i, id_nux),
@@ -386,7 +393,9 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
                h_coeffs_kappa_a(i, id_anux), h_coeffs_kappa_s(i, id_nue),
                h_coeffs_kappa_s(i, id_anue), h_coeffs_kappa_s(i, id_nux),
                h_coeffs_kappa_s(i, id_anux));
-#else
+       }
+	else
+	{	
         printf("%le %le %le %le %le %le %le %le %le %le %le %le %le %le %le "
                "%le %le %le %le %le %le "
                "%le\n",
@@ -401,7 +410,7 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
                h_coeffs_kappa_a(i, id_anux), h_coeffs_kappa_s(i, id_nue),
                h_coeffs_kappa_s(i, id_anue), h_coeffs_kappa_s(i, id_nux),
                h_coeffs_kappa_s(i, id_anux));
-#endif
+       }
     }
 }
 
@@ -477,14 +486,15 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200],
             continue;
         }
 
-#ifndef REAL_TYPE_IS_DOUBLE
-        sscanf(line,
+	if (std::is_same_v<BS_REAL, float>)
+        {
+		sscanf(line,
                "%d %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
                &h_zone(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_Yn(i), &h_Yp(i),
                &h_mu_e(i), &h_mu_n(i), &h_mu_p(i), &h_dU(i), &h_nnu(i, 0),
                &h_nnu(i, 1), &h_nnu(i, 2), &h_jnu(i, 0), &h_jnu(i, 1),
                &h_jnu(i, 2), &h_chinu(i, 0), &h_chinu(i, 1), &h_chinu(i, 2));
-#else
+	} else {
         sscanf(line,
                "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf "
                "%lf %lf %lf\n",
@@ -492,7 +502,7 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200],
                &h_mu_e(i), &h_mu_n(i), &h_mu_p(i), &h_dU(i), &h_nnu(i, 0),
                &h_nnu(i, 1), &h_nnu(i, 2), &h_jnu(i, 0), &h_jnu(i, 1),
                &h_jnu(i, 2), &h_chinu(i, 0), &h_chinu(i, 1), &h_chinu(i, 2));
-#endif
+	}
 
         h_nnu(i, 3)   = h_nnu(i, 2);
         h_jnu(i, 3)   = h_jnu(i, 2);
@@ -750,8 +760,9 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200],
     printf("# Printing result\n");
     for (int i = 0; i < num_data; i++)
     {
-#ifndef REAL_TYPE_IS_DOUBLE
-        printf("%d %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e "
+	if (std::is_same_v<BS_REAL, float>)
+	{
+		printf("%d %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e "
                "%e\n",
                h_zone(i), h_diff_distribution(i), h_coeffs_eta_0(i, id_nue),
                h_coeffs_eta_0(i, id_anue), h_coeffs_eta_0(i, id_nux),
@@ -764,7 +775,7 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200],
                h_coeffs_kappa_a(i, id_anux), h_coeffs_kappa_s(i, id_nue),
                h_coeffs_kappa_s(i, id_anue), h_coeffs_kappa_s(i, id_nux),
                h_coeffs_kappa_s(i, id_anux));
-#else
+	} else {
         printf("%d %le %le %le %le %le %le %le %le %le %le %le %le %le %le %le "
                "%le %le %le %le %le "
                "%le\n",
@@ -779,7 +790,7 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200],
                h_coeffs_kappa_a(i, id_anux), h_coeffs_kappa_s(i, id_nue),
                h_coeffs_kappa_s(i, id_anue), h_coeffs_kappa_s(i, id_nux),
                h_coeffs_kappa_s(i, id_anux));
-#endif
+	}
     }
 }
 
@@ -1130,16 +1141,18 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
     printf("# Printing result\n");
     for (int i = 0; i < n_bins; i++)
     {
-#ifndef REAL_TYPE_IS_DOUBLE
-        printf("%.8e ", h_e_bins(i));
-#else
+	if (std::is_same_v<BS_REAL, float>)
+	{
+		printf("%.8e ", h_e_bins(i));
+	} else {
         printf("%.8le ", h_e_bins(i));
-#endif
+	}
 
         for (int j = 0; j < 6; j++)
         {
-#ifndef REAL_TYPE_IS_DOUBLE
-            printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e ",
+	if (std::is_same_v<BS_REAL, float>)
+	{
+	    	printf("%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e ",
                    h_j(j, i, id_nue), h_j(j, i, id_anue), h_j(j, i, id_nux),
                    h_j(j, i, id_anux), h_j_s(j, i, id_nue),
                    h_j_s(j, i, id_anue), h_j_s(j, i, id_nux),
@@ -1148,7 +1161,7 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
                    h_kappa(j, i, id_anux), h_kappa_s(j, i, id_nue),
                    h_kappa_s(j, i, id_anue), h_kappa_s(j, i, id_nux),
                    h_kappa_s(j, i, id_anux));
-#else
+	} else {
             printf("%le %le %le %le %le %le %le %le %le %le %le %le %le %le "
                    "%le %le ",
                    h_j(j, i, id_nue), h_j(j, i, id_anue), h_j(j, i, id_nux),
@@ -1159,7 +1172,7 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
                    h_kappa(j, i, id_anux), h_kappa_s(j, i, id_nue),
                    h_kappa_s(j, i, id_anue), h_kappa_s(j, i, id_nux),
                    h_kappa_s(j, i, id_anux));
-#endif
+	   }
         }
         printf("\n");
     }
