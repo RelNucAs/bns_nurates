@@ -94,7 +94,7 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
     {
         if (line[1] == '#' && i == 0)
         {
-	    if (std::is_same_v<BS_REAL, float>)
+	    if constexpr (std::is_same_v<BS_REAL, float>)
             {
                 sscanf(line + 14, "%f\n", &e_nu);
             }
@@ -109,7 +109,7 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
             continue;
         }
 
-	if (std::is_same_v<BS_REAL, float>)
+	if constexpr (std::is_same_v<BS_REAL, float>)
         {
 	    sscanf(line, "%d %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
                &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
@@ -378,7 +378,7 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
     printf("# Printing result\n");
     for (int i = 0; i < num_data; i++)
     {
-	if (std::is_same_v<BS_REAL, float>)
+	if constexpr (std::is_same_v<BS_REAL, float>)
 	{
 	    printf("%.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e "
                "%.15e\n",
@@ -486,7 +486,7 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200],
             continue;
         }
 
-	if (std::is_same_v<BS_REAL, float>)
+	if constexpr (std::is_same_v<BS_REAL, float>)
         {
 		sscanf(line,
                "%d %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
@@ -760,7 +760,7 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200],
     printf("# Printing result\n");
     for (int i = 0; i < num_data; i++)
     {
-	if (std::is_same_v<BS_REAL, float>)
+	if constexpr (std::is_same_v<BS_REAL, float>)
 	{
 		printf("%d %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e "
                "%.15e\n",
@@ -1141,7 +1141,7 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
     printf("# Printing result\n");
     for (int i = 0; i < n_bins; i++)
     {
-	if (std::is_same_v<BS_REAL, float>)
+	if constexpr (std::is_same_v<BS_REAL, float>)
 	{
 		printf("%.8e ", h_e_bins(i));
 	} else {
@@ -1150,7 +1150,7 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
 
         for (int j = 0; j < 6; j++)
         {
-	if (std::is_same_v<BS_REAL, float>)
+	if constexpr (std::is_same_v<BS_REAL, float>)
 	{
 	    	printf("%.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e ",
                    h_j(j, i, id_nue), h_j(j, i, id_anue), h_j(j, i, id_nux),

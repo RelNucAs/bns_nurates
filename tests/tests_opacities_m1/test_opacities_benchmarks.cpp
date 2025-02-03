@@ -80,7 +80,7 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
     {
         if (line[1] == '#' && i == 0)
         {
-            if (std::is_same_v<BS_REAL, float>)
+            if constexpr (std::is_same_v<BS_REAL, float>)
             {
 	        sscanf(line + 14, "%f\n", &e_nu);
             }
@@ -95,7 +95,7 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
             continue;
         }
 
-        if (std::is_same_v<BS_REAL, float>)
+        if constexpr (std::is_same_v<BS_REAL, float>)
         {
             sscanf(line, "%d %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
                    &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
