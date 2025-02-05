@@ -766,13 +766,14 @@ M1MatrixKokkos2D ComputeNEPSIntegrand(const MyQuadrature* quad, BS_REAL t,
 
     const int n = quad->nx;
     BS_REAL x_i, x_j;
+    BS_REAL one_plus_x_i, one_plus_x_j;
+    BS_REAL one_minus_x_i, one_minus_x_j;
     BS_REAL nu, nu_bar, nu_fourth;
-
-    // BS_REAL nu_array_1[n_max];
-    // BS_REAL nu_array_2[n_max];
 
     BS_REAL tmp_em_1, tmp_em_2;
     BS_REAL tmp_abs_1, tmp_abs_2;
+
+    BS_REAL t_half = 0.5 * t;
 
     // compute the neutrino & anti-neutrino distribution function
     BS_REAL g_nu[total_num_species], g_nu_bar[total_num_species];
@@ -783,28 +784,20 @@ M1MatrixKokkos2D ComputeNEPSIntegrand(const MyQuadrature* quad, BS_REAL t,
 
     M1MatrixKokkos2D out = {0};
 
-    // for (int i = 0; i < n; ++i)
-    // {
-    //     x = quad->points[i];
-
-    //     nu_array_1[i]     = t * x;
-    //     nu_array_1[n + i] = t / x;
-
-    //     nu_array_2[i] = x / (1. - x) - (1. - x) / x; 
-    // }
-
     for (int i = 0; i < n; ++i)
     {
-
         x_i = quad->points[i];
+        one_plus_x_i = 1. + x_i;
+        one_minus_x_i = 1. - x_i;
 
         for (int j = 0; j < n; ++j)
         {
-
             x_j = quad->points[j];
+            one_plus_x_j = 1. + x_j;
+            one_minus_x_j = 1. - x_j;
 
-            nu = 0.5 * t * x_i * (1. - x_j);
-            nu_bar = 0.5 * t * x_i * (1. + x_j);
+            nu = t_half * x_i * one_minus_x_j;
+            nu_bar = t_half * x_i * one_plus_x_j;
 
             nu_fourth  = POW2(nu) * POW2(nu_bar);
 
@@ -870,8 +863,8 @@ M1MatrixKokkos2D ComputeNEPSIntegrand(const MyQuadrature* quad, BS_REAL t,
                 }
             }
 
-            nu = 0.5 * t * (1. - x_j) / x_i;
-            nu_bar = 0.5 * t * (1. + x_j) / x_i;
+            nu = t_half * one_minus_x_j / x_i;
+            nu_bar = t_half * one_plus_x_j / x_i;
 
             nu_fourth  = POW2(nu) * POW2(nu_bar);
 
@@ -1034,10 +1027,6 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     {
         local_grey_params.opacity_flags = {0};
         local_grey_params.opacity_flags.use_inelastic_scatt = 1;
-        //M1MatrixKokkos2D out_inel                 = ComputeDoubleIntegrand(
-        //quad_2d, s_neps, &local_grey_params, stim_abs);
-        //GaussLegendreIntegrate2DMatrixForM1Coeffs(quad_2d, &out_inel, s_neps,
-        //                                      &n_neps_2d, &e_neps_2d);
         M1MatrixKokkos2D out_inel                 = ComputeNEPSIntegrand(
         quad_2d, 4. * s_neps, &local_grey_params, stim_abs);
         GaussLegendreIntegrate2DMatrixForNEPS(quad_2d, &out_inel, 4. * s_neps,
