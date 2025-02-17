@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Perego"
+  given-names: "Albino"
+  orcid: "https://orcid.org/0000-0002-0936-8237"
+- family-names: "Radice"
+  given-names: "David"
+  orcid: "https://orcid.org/0000-0001-6982-1008"
+- family-names: "Guercilena"
+  given-names: "Federico Maria"
+  orcid: "https://orcid.org/0000-0003-3824-4433"
+- family-names: "Chiesa"
+  given-names: "Leonardo"
+  orcid: "https://orcid.org/0000-0002-5112-1975"
+- family-names: "Bhattacharyya"
+  given-names: "Maitraya"
+  orcid: "https://orcid.org/0000-0003-4618-3159"
+title: "BNS_NURATES"
+version: 1.1
+#doi: https://doi.org/10.48550/arXiv.2412.04570
+date-released: 2025-02-17
+url: "https://github.com/RelNucAs/bns_nurates"
