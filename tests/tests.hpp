@@ -94,35 +94,37 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
     {
         if (line[1] == '#' && i == 0)
         {
-	    if constexpr (std::is_same_v<BS_REAL, float>)
+            if constexpr (std::is_same_v<BS_REAL, float>)
             {
                 sscanf(line + 14, "%f\n", &e_nu);
             }
-	    else
+            else
             {
-	        sscanf(line + 14, "%lf\n", &e_nu);
-	    }
-	    continue;
+                sscanf(line + 14, "%lf\n", &e_nu);
+            }
+            continue;
         }
         else if (line[1] == '#' && i != 0)
         {
             continue;
         }
 
-	if constexpr (std::is_same_v<BS_REAL, float>)
+        if constexpr (std::is_same_v<BS_REAL, float>)
         {
-	    sscanf(line, "%d %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
-               &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
-               &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i), &h_Yn(i),
-               &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
+            sscanf(line, "%d %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
+                   &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i),
+                   &h_mu_e(i), &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i),
+                   &h_Yn(i), &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i),
+                   &h_l_anue_inv(i));
         }
-	else
+        else
         {
-            sscanf(line,
-               "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
-               &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
-               &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i), &h_Yn(i),
-               &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
+            sscanf(
+                line,
+                "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
+                &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
+                &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i), &h_Yn(i),
+                &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
         }
 
         i++;
@@ -378,39 +380,44 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
     printf("# Printing result\n");
     for (int i = 0; i < num_data; i++)
     {
-	if constexpr (std::is_same_v<BS_REAL, float>)
-	{
-	    printf("%.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e "
-               "%.15e\n",
-               h_r(i), h_diff_distribution(i), h_coeffs_eta_0(i, id_nue),
-               h_coeffs_eta_0(i, id_anue), h_coeffs_eta_0(i, id_nux),
-               h_coeffs_eta_0(i, id_anux), h_coeffs_eta(i, id_nue),
-               h_coeffs_eta(i, id_anue), h_coeffs_eta(i, id_nux),
-               h_coeffs_eta(i, id_anux), h_coeffs_kappa_0_a(i, id_nue),
-               h_coeffs_kappa_0_a(i, id_anue), h_coeffs_kappa_0_a(i, id_nux),
-               h_coeffs_kappa_0_a(i, id_anux), h_coeffs_kappa_a(i, id_nue),
-               h_coeffs_kappa_a(i, id_anue), h_coeffs_kappa_a(i, id_nux),
-               h_coeffs_kappa_a(i, id_anux), h_coeffs_kappa_s(i, id_nue),
-               h_coeffs_kappa_s(i, id_anue), h_coeffs_kappa_s(i, id_nux),
-               h_coeffs_kappa_s(i, id_anux));
-       }
-	else
-	{	
-        printf("%.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le "
-               "%.15le %.15le %.15le %.15le %.15le %.15le "
-               "%.15le\n",
-               h_r(i), h_diff_distribution(i), h_coeffs_eta_0(i, id_nue),
-               h_coeffs_eta_0(i, id_anue), h_coeffs_eta_0(i, id_nux),
-               h_coeffs_eta_0(i, id_anux), h_coeffs_eta(i, id_nue),
-               h_coeffs_eta(i, id_anue), h_coeffs_eta(i, id_nux),
-               h_coeffs_eta(i, id_anux), h_coeffs_kappa_0_a(i, id_nue),
-               h_coeffs_kappa_0_a(i, id_anue), h_coeffs_kappa_0_a(i, id_nux),
-               h_coeffs_kappa_0_a(i, id_anux), h_coeffs_kappa_a(i, id_nue),
-               h_coeffs_kappa_a(i, id_anue), h_coeffs_kappa_a(i, id_nux),
-               h_coeffs_kappa_a(i, id_anux), h_coeffs_kappa_s(i, id_nue),
-               h_coeffs_kappa_s(i, id_anue), h_coeffs_kappa_s(i, id_nux),
-               h_coeffs_kappa_s(i, id_anux));
-       }
+        if constexpr (std::is_same_v<BS_REAL, float>)
+        {
+            printf("%.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e "
+                   "%.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e "
+                   "%.15e %.15e %.15e "
+                   "%.15e\n",
+                   h_r(i), h_diff_distribution(i), h_coeffs_eta_0(i, id_nue),
+                   h_coeffs_eta_0(i, id_anue), h_coeffs_eta_0(i, id_nux),
+                   h_coeffs_eta_0(i, id_anux), h_coeffs_eta(i, id_nue),
+                   h_coeffs_eta(i, id_anue), h_coeffs_eta(i, id_nux),
+                   h_coeffs_eta(i, id_anux), h_coeffs_kappa_0_a(i, id_nue),
+                   h_coeffs_kappa_0_a(i, id_anue),
+                   h_coeffs_kappa_0_a(i, id_nux),
+                   h_coeffs_kappa_0_a(i, id_anux), h_coeffs_kappa_a(i, id_nue),
+                   h_coeffs_kappa_a(i, id_anue), h_coeffs_kappa_a(i, id_nux),
+                   h_coeffs_kappa_a(i, id_anux), h_coeffs_kappa_s(i, id_nue),
+                   h_coeffs_kappa_s(i, id_anue), h_coeffs_kappa_s(i, id_nux),
+                   h_coeffs_kappa_s(i, id_anux));
+        }
+        else
+        {
+            printf("%.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le "
+                   "%.15le %.15le %.15le %.15le %.15le %.15le %.15le "
+                   "%.15le %.15le %.15le %.15le %.15le %.15le "
+                   "%.15le\n",
+                   h_r(i), h_diff_distribution(i), h_coeffs_eta_0(i, id_nue),
+                   h_coeffs_eta_0(i, id_anue), h_coeffs_eta_0(i, id_nux),
+                   h_coeffs_eta_0(i, id_anux), h_coeffs_eta(i, id_nue),
+                   h_coeffs_eta(i, id_anue), h_coeffs_eta(i, id_nux),
+                   h_coeffs_eta(i, id_anux), h_coeffs_kappa_0_a(i, id_nue),
+                   h_coeffs_kappa_0_a(i, id_anue),
+                   h_coeffs_kappa_0_a(i, id_nux),
+                   h_coeffs_kappa_0_a(i, id_anux), h_coeffs_kappa_a(i, id_nue),
+                   h_coeffs_kappa_a(i, id_anue), h_coeffs_kappa_a(i, id_nux),
+                   h_coeffs_kappa_a(i, id_anux), h_coeffs_kappa_s(i, id_nue),
+                   h_coeffs_kappa_s(i, id_anue), h_coeffs_kappa_s(i, id_nux),
+                   h_coeffs_kappa_s(i, id_anux));
+        }
     }
 }
 
@@ -486,23 +493,28 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200],
             continue;
         }
 
-	if constexpr (std::is_same_v<BS_REAL, float>)
+        if constexpr (std::is_same_v<BS_REAL, float>)
         {
-		sscanf(line,
-               "%d %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
-               &h_zone(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_Yn(i), &h_Yp(i),
-               &h_mu_e(i), &h_mu_n(i), &h_mu_p(i), &h_dU(i), &h_nnu(i, 0),
-               &h_nnu(i, 1), &h_nnu(i, 2), &h_jnu(i, 0), &h_jnu(i, 1),
-               &h_jnu(i, 2), &h_chinu(i, 0), &h_chinu(i, 1), &h_chinu(i, 2));
-	} else {
-        sscanf(line,
-               "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf "
-               "%lf %lf %lf\n",
-               &h_zone(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_Yn(i), &h_Yp(i),
-               &h_mu_e(i), &h_mu_n(i), &h_mu_p(i), &h_dU(i), &h_nnu(i, 0),
-               &h_nnu(i, 1), &h_nnu(i, 2), &h_jnu(i, 0), &h_jnu(i, 1),
-               &h_jnu(i, 2), &h_chinu(i, 0), &h_chinu(i, 1), &h_chinu(i, 2));
-	}
+            sscanf(line,
+                   "%d %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
+                   &h_zone(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_Yn(i), &h_Yp(i),
+                   &h_mu_e(i), &h_mu_n(i), &h_mu_p(i), &h_dU(i), &h_nnu(i, 0),
+                   &h_nnu(i, 1), &h_nnu(i, 2), &h_jnu(i, 0), &h_jnu(i, 1),
+                   &h_jnu(i, 2), &h_chinu(i, 0), &h_chinu(i, 1),
+                   &h_chinu(i, 2));
+        }
+        else
+        {
+            sscanf(line,
+                   "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf "
+                   "%lf "
+                   "%lf %lf %lf\n",
+                   &h_zone(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_Yn(i), &h_Yp(i),
+                   &h_mu_e(i), &h_mu_n(i), &h_mu_p(i), &h_dU(i), &h_nnu(i, 0),
+                   &h_nnu(i, 1), &h_nnu(i, 2), &h_jnu(i, 0), &h_jnu(i, 1),
+                   &h_jnu(i, 2), &h_chinu(i, 0), &h_chinu(i, 1),
+                   &h_chinu(i, 2));
+        }
 
         h_nnu(i, 3)   = h_nnu(i, 2);
         h_jnu(i, 3)   = h_jnu(i, 2);
@@ -760,37 +772,44 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200],
     printf("# Printing result\n");
     for (int i = 0; i < num_data; i++)
     {
-	if constexpr (std::is_same_v<BS_REAL, float>)
-	{
-		printf("%d %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e "
-               "%.15e\n",
-               h_zone(i), h_diff_distribution(i), h_coeffs_eta_0(i, id_nue),
-               h_coeffs_eta_0(i, id_anue), h_coeffs_eta_0(i, id_nux),
-               h_coeffs_eta_0(i, id_anux), h_coeffs_eta(i, id_nue),
-               h_coeffs_eta(i, id_anue), h_coeffs_eta(i, id_nux),
-               h_coeffs_eta(i, id_anux), h_coeffs_kappa_0_a(i, id_nue),
-               h_coeffs_kappa_0_a(i, id_anue), h_coeffs_kappa_0_a(i, id_nux),
-               h_coeffs_kappa_0_a(i, id_anux), h_coeffs_kappa_a(i, id_nue),
-               h_coeffs_kappa_a(i, id_anue), h_coeffs_kappa_a(i, id_nux),
-               h_coeffs_kappa_a(i, id_anux), h_coeffs_kappa_s(i, id_nue),
-               h_coeffs_kappa_s(i, id_anue), h_coeffs_kappa_s(i, id_nux),
-               h_coeffs_kappa_s(i, id_anux));
-	} else {
-        printf("%d %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le "
-               "%.15le %.15le %.15le %.15le %.15le "
-               "%.15le\n",
-               h_zone(i), h_diff_distribution(i), h_coeffs_eta_0(i, id_nue),
-               h_coeffs_eta_0(i, id_anue), h_coeffs_eta_0(i, id_nux),
-               h_coeffs_eta_0(i, id_anux), h_coeffs_eta(i, id_nue),
-               h_coeffs_eta(i, id_anue), h_coeffs_eta(i, id_nux),
-               h_coeffs_eta(i, id_anux), h_coeffs_kappa_0_a(i, id_nue),
-               h_coeffs_kappa_0_a(i, id_anue), h_coeffs_kappa_0_a(i, id_nux),
-               h_coeffs_kappa_0_a(i, id_anux), h_coeffs_kappa_a(i, id_nue),
-               h_coeffs_kappa_a(i, id_anue), h_coeffs_kappa_a(i, id_nux),
-               h_coeffs_kappa_a(i, id_anux), h_coeffs_kappa_s(i, id_nue),
-               h_coeffs_kappa_s(i, id_anue), h_coeffs_kappa_s(i, id_nux),
-               h_coeffs_kappa_s(i, id_anux));
-	}
+        if constexpr (std::is_same_v<BS_REAL, float>)
+        {
+            printf("%d %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e "
+                   "%.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e "
+                   "%.15e %.15e "
+                   "%.15e\n",
+                   h_zone(i), h_diff_distribution(i), h_coeffs_eta_0(i, id_nue),
+                   h_coeffs_eta_0(i, id_anue), h_coeffs_eta_0(i, id_nux),
+                   h_coeffs_eta_0(i, id_anux), h_coeffs_eta(i, id_nue),
+                   h_coeffs_eta(i, id_anue), h_coeffs_eta(i, id_nux),
+                   h_coeffs_eta(i, id_anux), h_coeffs_kappa_0_a(i, id_nue),
+                   h_coeffs_kappa_0_a(i, id_anue),
+                   h_coeffs_kappa_0_a(i, id_nux),
+                   h_coeffs_kappa_0_a(i, id_anux), h_coeffs_kappa_a(i, id_nue),
+                   h_coeffs_kappa_a(i, id_anue), h_coeffs_kappa_a(i, id_nux),
+                   h_coeffs_kappa_a(i, id_anux), h_coeffs_kappa_s(i, id_nue),
+                   h_coeffs_kappa_s(i, id_anue), h_coeffs_kappa_s(i, id_nux),
+                   h_coeffs_kappa_s(i, id_anux));
+        }
+        else
+        {
+            printf("%d %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le "
+                   "%.15le %.15le %.15le %.15le %.15le %.15le %.15le "
+                   "%.15le %.15le %.15le %.15le %.15le "
+                   "%.15le\n",
+                   h_zone(i), h_diff_distribution(i), h_coeffs_eta_0(i, id_nue),
+                   h_coeffs_eta_0(i, id_anue), h_coeffs_eta_0(i, id_nux),
+                   h_coeffs_eta_0(i, id_anux), h_coeffs_eta(i, id_nue),
+                   h_coeffs_eta(i, id_anue), h_coeffs_eta(i, id_nux),
+                   h_coeffs_eta(i, id_anux), h_coeffs_kappa_0_a(i, id_nue),
+                   h_coeffs_kappa_0_a(i, id_anue),
+                   h_coeffs_kappa_0_a(i, id_nux),
+                   h_coeffs_kappa_0_a(i, id_anux), h_coeffs_kappa_a(i, id_nue),
+                   h_coeffs_kappa_a(i, id_anue), h_coeffs_kappa_a(i, id_nux),
+                   h_coeffs_kappa_a(i, id_anux), h_coeffs_kappa_s(i, id_nue),
+                   h_coeffs_kappa_s(i, id_anue), h_coeffs_kappa_s(i, id_nux),
+                   h_coeffs_kappa_s(i, id_anux));
+        }
     }
 }
 
@@ -1141,38 +1160,44 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
     printf("# Printing result\n");
     for (int i = 0; i < n_bins; i++)
     {
-	if constexpr (std::is_same_v<BS_REAL, float>)
-	{
-		printf("%.8e ", h_e_bins(i));
-	} else {
-        printf("%.8le ", h_e_bins(i));
-	}
+        if constexpr (std::is_same_v<BS_REAL, float>)
+        {
+            printf("%.8e ", h_e_bins(i));
+        }
+        else
+        {
+            printf("%.8le ", h_e_bins(i));
+        }
 
         for (int j = 0; j < 6; j++)
         {
-	if constexpr (std::is_same_v<BS_REAL, float>)
-	{
-	    	printf("%.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e ",
-                   h_j(j, i, id_nue), h_j(j, i, id_anue), h_j(j, i, id_nux),
-                   h_j(j, i, id_anux), h_j_s(j, i, id_nue),
-                   h_j_s(j, i, id_anue), h_j_s(j, i, id_nux),
-                   h_j_s(j, i, id_anux), h_kappa(j, i, id_nue),
-                   h_kappa(j, i, id_anue), h_kappa(j, i, id_nux),
-                   h_kappa(j, i, id_anux), h_kappa_s(j, i, id_nue),
-                   h_kappa_s(j, i, id_anue), h_kappa_s(j, i, id_nux),
-                   h_kappa_s(j, i, id_anux));
-	} else {
-            printf("%.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le "
-                   "%.15le %.15le ",
-                   h_j(j, i, id_nue), h_j(j, i, id_anue), h_j(j, i, id_nux),
-                   h_j(j, i, id_anux), h_j_s(j, i, id_nue),
-                   h_j_s(j, i, id_anue), h_j_s(j, i, id_nux),
-                   h_j_s(j, i, id_anux), h_kappa(j, i, id_nue),
-                   h_kappa(j, i, id_anue), h_kappa(j, i, id_nux),
-                   h_kappa(j, i, id_anux), h_kappa_s(j, i, id_nue),
-                   h_kappa_s(j, i, id_anue), h_kappa_s(j, i, id_nux),
-                   h_kappa_s(j, i, id_anux));
-	   }
+            if constexpr (std::is_same_v<BS_REAL, float>)
+            {
+                printf("%.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e "
+                       "%.15e %.15e %.15e %.15e %.15e %.15e %.15e ",
+                       h_j(j, i, id_nue), h_j(j, i, id_anue), h_j(j, i, id_nux),
+                       h_j(j, i, id_anux), h_j_s(j, i, id_nue),
+                       h_j_s(j, i, id_anue), h_j_s(j, i, id_nux),
+                       h_j_s(j, i, id_anux), h_kappa(j, i, id_nue),
+                       h_kappa(j, i, id_anue), h_kappa(j, i, id_nux),
+                       h_kappa(j, i, id_anux), h_kappa_s(j, i, id_nue),
+                       h_kappa_s(j, i, id_anue), h_kappa_s(j, i, id_nux),
+                       h_kappa_s(j, i, id_anux));
+            }
+            else
+            {
+                printf("%.15le %.15le %.15le %.15le %.15le %.15le %.15le "
+                       "%.15le %.15le %.15le %.15le %.15le %.15le %.15le "
+                       "%.15le %.15le ",
+                       h_j(j, i, id_nue), h_j(j, i, id_anue), h_j(j, i, id_nux),
+                       h_j(j, i, id_anux), h_j_s(j, i, id_nue),
+                       h_j_s(j, i, id_anue), h_j_s(j, i, id_nux),
+                       h_j_s(j, i, id_anux), h_kappa(j, i, id_nue),
+                       h_kappa(j, i, id_anue), h_kappa(j, i, id_nux),
+                       h_kappa(j, i, id_anux), h_kappa_s(j, i, id_nue),
+                       h_kappa_s(j, i, id_anue), h_kappa_s(j, i, id_nux),
+                       h_kappa_s(j, i, id_anux));
+            }
         }
         printf("\n");
     }
