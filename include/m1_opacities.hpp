@@ -54,6 +54,10 @@ void Scattering1DIntegrand(const MyQuadrature* quad,
         for (int idx = 0; idx < total_num_species; ++idx)
         {
             nu = t[idx] * quad->points[i];
+            BS_ASSERT(nu >= 0,
+                      "Neutrino energy is negative (nu=%e, t[%d]=%e, "
+                      "quad->points[%d]=%e)",
+                      nu, idx, t[idx], i, quad->points[i]);
 
             // compute the neutrino distribution function
             g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, idx);
@@ -66,6 +70,10 @@ void Scattering1DIntegrand(const MyQuadrature* quad,
             out[idx][i] = g_nu[idx] * aux;
 
             nu = t[idx] / quad->points[i];
+            BS_ASSERT(nu >= 0,
+                      "Neutrino energy is negative (nu=%e, t[%d]=%e, "
+                      "quad->points[%d]=%e)",
+                      nu, idx, t[idx], i, quad->points[i]);
 
             // compute the neutrino distribution function
             g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, idx);
@@ -95,9 +103,14 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
     {
         for (int i = 0; i < n; ++i)
         {
-            nu     = t[id_nue] * quad->points[i];
+            nu = t[id_nue] * quad->points[i];
+            BS_ASSERT(nu >= 0,
+                      "Neutrino energy is negative (nu=%e, t[id_nue]=%e, "
+                      "quad->points[%d]=%e)",
+                      nu, t[id_nue], i, quad->points[i]);
             nu_sqr = POW2(nu);
-            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_nue);
+
+            g_nu = TotalNuF(nu, &grey_pars->distr_pars, id_nue);
 
             abs_em_beta = StimAbsOpacity(nu, &grey_pars->opacity_pars,
                                          &grey_pars->eos_pars); // [s^-1]
@@ -108,7 +121,11 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
             // ab = em + ab (stimulated absorption)
             out_ab[id_nue][i] = nu_sqr * g_nu * abs_em_beta.abs[id_nue];
 
-            nu     = t[id_anue] * quad->points[i];
+            nu = t[id_anue] * quad->points[i];
+            BS_ASSERT(nu >= 0,
+                      "Neutrino energy is negative (nu=%e, t[id_anue]=%e, "
+                      "quad->points[%d]=%e)",
+                      nu, t[id_anue], i, quad->points[i]);
             nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anue);
 
@@ -120,7 +137,11 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
             // ab = em + ab (stimulated absorption)
             out_ab[id_anue][i] = nu_sqr * g_nu * abs_em_beta.abs[id_anue];
 
-            nu     = t[id_nue] / quad->points[i];
+            nu = t[id_nue] / quad->points[i];
+            BS_ASSERT(nu >= 0,
+                      "Neutrino energy is negative (nu=%e, t[id_nue]=%e, "
+                      "quad->points[%d]=%e)",
+                      nu, t[id_nue], i, quad->points[i]);
             nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_nue);
 
@@ -132,7 +153,11 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
             // ab = em + ab (stimulated absorption)
             out_ab[id_nue][n + i] = nu_sqr * g_nu * abs_em_beta.abs[id_nue];
 
-            nu     = t[id_anue] / quad->points[i];
+            nu = t[id_anue] / quad->points[i];
+            BS_ASSERT(nu >= 0,
+                      "Neutrino energy is negative (nu=%e, t[id_anue]=%e, "
+                      "quad->points[%d]=%e)",
+                      nu, t[id_anue], i, quad->points[i]);
             nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anue);
 
@@ -149,7 +174,11 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
     {
         for (int i = 0; i < n; ++i)
         {
-            nu     = t[id_nue] * quad->points[i];
+            nu = t[id_nue] * quad->points[i];
+            BS_ASSERT(nu >= 0,
+                      "Neutrino energy is negative (nu=%e, t[id_nue]=%e, "
+                      "quad->points[%d]=%e)",
+                      nu, t[id_nue], i, quad->points[i]);
             nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_nue);
 
@@ -160,7 +189,11 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
             out_em[id_nue][i] = nu_sqr * abs_em_beta.em[id_nue];
             out_ab[id_nue][i] = nu_sqr * g_nu * abs_em_beta.abs[id_nue];
 
-            nu     = t[id_anue] * quad->points[i];
+            nu = t[id_anue] * quad->points[i];
+            BS_ASSERT(nu >= 0,
+                      "Neutrino energy is negative (nu=%e, t[id_anue]=%e, "
+                      "quad->points[%d]=%e)",
+                      nu, t[id_anue], i, quad->points[i]);
             nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anue);
 
@@ -170,7 +203,11 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
             out_em[id_anue][i] = nu_sqr * abs_em_beta.em[id_anue];
             out_ab[id_anue][i] = nu_sqr * g_nu * abs_em_beta.abs[id_anue];
 
-            nu     = t[id_nue] / quad->points[i];
+            nu = t[id_nue] / quad->points[i];
+            BS_ASSERT(nu >= 0,
+                      "Neutrino energy is negative (nu=%e, t[id_nue]=%e, "
+                      "quad->points[%d]=%e)",
+                      nu, t[id_nue], i, quad->points[i]);
             nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_nue);
 
@@ -180,7 +217,11 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
             out_em[id_nue][n + i] = nu_sqr * abs_em_beta.em[id_nue];
             out_ab[id_nue][n + i] = nu_sqr * g_nu * abs_em_beta.abs[id_nue];
 
-            nu     = t[id_anue] / quad->points[i];
+            nu = t[id_anue] / quad->points[i];
+            BS_ASSERT(nu >= 0,
+                      "Neutrino energy is negative (nu=%e, t[id_anue]=%e, "
+                      "quad->points[%d]=%e)",
+                      nu, t[id_anue], i, quad->points[i]);
             nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anue);
 
@@ -407,6 +448,7 @@ void AddInelKernelsToIntegrand(int n, BS_REAL* nu_array,
     for (int i = 0; i < 2 * n; ++i)
     {
         nu = nu_array[i];
+        BS_ASSERT(nu >= 0, "Neutrino energy is negative (nu=%e)", nu);
 
         for (int idx = 0; idx < total_num_species; ++idx)
         {
@@ -440,6 +482,8 @@ void AddInelKernelsToIntegrand(int n, BS_REAL* nu_array,
         for (int j = i + 1; j < 2 * n; ++j)
         {
             nu_bar = nu_array[j];
+            BS_ASSERT(nu_bar >= 0, "Neutrino energy is negative (nu_bar=%e)",
+                      nu_bar);
 
             for (int idx = 0; idx < total_num_species; ++idx)
             {
@@ -500,6 +544,7 @@ void WeightNuNuBarReactionsWithDistr(int n, BS_REAL* nu_array,
     for (int i = 0; i < 2 * n; ++i)
     {
         nu = nu_array[i];
+        BS_ASSERT(nu >= 0, "Neutrino energy is negative (nu=%e)", nu);
 
         for (int idx = 0; idx < total_num_species; ++idx)
         {
@@ -528,6 +573,8 @@ void WeightNuNuBarReactionsWithDistr(int n, BS_REAL* nu_array,
         for (int j = i + 1; j < 2 * n; ++j)
         {
             nu_bar = nu_array[j];
+            BS_ASSERT(nu_bar >= 0, "Neutrino energy is negative (nu_bar=%e)",
+                      nu_bar);
 
             for (int idx = 0; idx < total_num_species; ++idx)
             {
@@ -583,9 +630,10 @@ void AddCommonWeightsToIntegrand(int n, BS_REAL* nu_array,
     {
         for (int i = 0; i < 2 * n; ++i)
         {
-            nu         = nu_array[i];
+            nu = nu_array[i];
+            BS_ASSERT(nu >= 0, "Neutrino energy is negative (nu=%e)", nu);
             nu_squared = POW2(nu);
-            nu_fourth  = nu_squared * nu_squared;
+            nu_fourth  = POW2(nu_squared);
 
             for (int idx = 0; idx < total_num_species; ++idx)
             {
@@ -599,8 +647,10 @@ void AddCommonWeightsToIntegrand(int n, BS_REAL* nu_array,
 
             for (int j = i + 1; j < 2 * n; ++j)
             {
-                nu_bar    = nu_array[j];
-                nu_fourth = nu_squared * nu_bar * nu_bar;
+                nu_bar = nu_array[j];
+                BS_ASSERT(nu_bar >= 0,
+                          "Neutrino energy is negative (nu_bar=%e)", nu_bar);
+                nu_fourth = nu_squared * POW2(nu_bar);
 
                 for (int idx = 0; idx < total_num_species; ++idx)
                 {
@@ -624,9 +674,10 @@ void AddCommonWeightsToIntegrand(int n, BS_REAL* nu_array,
     {
         for (int i = 0; i < 2 * n; ++i)
         {
-            nu         = nu_array[i];
+            nu = nu_array[i];
+            BS_ASSERT(nu >= 0, "Neutrino energy is negative (nu=%e)", nu);
             nu_squared = POW2(nu);
-            nu_fourth  = nu_squared * nu_squared;
+            nu_fourth  = POW2(nu_squared);
 
             for (int idx = 0; idx < total_num_species; ++idx)
             {
@@ -638,8 +689,10 @@ void AddCommonWeightsToIntegrand(int n, BS_REAL* nu_array,
 
             for (int j = i + 1; j < 2 * n; ++j)
             {
-                nu_bar    = nu_array[j];
-                nu_fourth = nu_squared * nu_bar * nu_bar;
+                nu_bar = nu_array[j];
+                BS_ASSERT(nu_bar >= 0,
+                          "Neutrino energy is negative (nu_bar=%e)", nu_bar);
+                nu_fourth = nu_squared * POW2(nu_bar);
 
                 for (int idx = 0; idx < total_num_species; ++idx)
                 {
@@ -811,8 +864,11 @@ M1MatrixKokkos2D ComputeNEPSIntegrand(const MyQuadrature* quad, BS_REAL t,
 
             x_j = quad->points[j];
 
-            nu     = half * t * x_i * (one - x_j);
+            nu = half * t * x_i * (one - x_j);
+            BS_ASSERT(nu >= 0, "Neutrino energy is negative (nu=%e)", nu);
             nu_bar = half * t * x_i * (one + x_j);
+            BS_ASSERT(nu_bar >= 0, "Neutrino energy is negative (nu_bar=%e)",
+                      nu_bar);
 
             nu_fourth = POW2(nu) * POW2(nu_bar);
 
@@ -880,8 +936,11 @@ M1MatrixKokkos2D ComputeNEPSIntegrand(const MyQuadrature* quad, BS_REAL t,
                 }
             }
 
-            nu     = half * t * (one - x_j) / x_i;
+            nu = half * t * (one - x_j) / x_i;
+            BS_ASSERT(nu >= 0, "Neutrino energy is negative (nu=%e)", nu);
             nu_bar = half * t * (one + x_j) / x_i;
+            BS_ASSERT(nu_bar >= 0, "Neutrino energy is negative (nu_bar=%e)",
+                      nu_bar);
 
             nu_fourth = POW2(nu) * POW2(nu_bar);
 
@@ -983,6 +1042,8 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     const BS_REAL eta_e = my_grey_opacity_params->eos_pars.mu_e / temp;
 
     constexpr BS_REAL three_halves  = 1.5;
+    constexpr BS_REAL five_sixths   = 0.8333333333333333;
+    constexpr BS_REAL five          = 5;
     constexpr BS_REAL temp_multiple = 0.5 * 4.364;
     const BS_REAL s_pair            = temp_multiple * temp;
     // const BS_REAL s_pair              = temp * (FDI_p4(eta_e) / FDI_p3(eta_e)
@@ -992,8 +1053,21 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
 
     BS_REAL s_beta[total_num_species] = {0}, s_iso[total_num_species] = {0};
 
-    s_beta[id_nue]  = temp * FDI_p5(eta_e) / FDI_p4(eta_e);
-    s_beta[id_anue] = temp * FDI_p5(-eta_e) / FDI_p4(-eta_e);
+    if (eta_e > -30. and eta_e < 30.)
+    {
+        s_beta[id_nue]  = temp * FDI_p5(eta_e) / FDI_p4(eta_e);
+        s_beta[id_anue] = temp * FDI_p5(-eta_e) / FDI_p4(-eta_e);
+    }
+    else if (eta_e > 30.)
+    {
+        s_beta[id_nue]  = temp * eta_e * five_sixths;
+        s_beta[id_anue] = temp * five;
+    }
+    else
+    {
+        s_beta[id_nue]  = temp * five;
+        s_beta[id_anue] = temp * eta_e * five_sixths;
+    }
 
     for (int idx = 0; idx < total_num_species; ++idx)
     {
@@ -1360,8 +1434,8 @@ MyQuadratureIntegrand SpectralIntegrand(BS_REAL* var, void* p)
 
     for (int idx = 0; idx < total_num_species; ++idx)
     {
-        integrand_1[idx] = nu_bar * nu_bar * pro_term[idx];
-        integrand_2[idx] = nu_bar * nu_bar * ann_term[idx];
+        integrand_1[idx] = POW2(nu_bar) * pro_term[idx];
+        integrand_2[idx] = POW2(nu_bar) * ann_term[idx];
     }
 
     MyQuadratureIntegrand result = {.n = 8};
