@@ -52,6 +52,18 @@ Here ```/path/to/bns_nurates/``` is the full path for the top-level bns_nurates
 directory and ```/path/to/destination/``` is the full path to the ```src```
 folder insider ```Weakrates2```
 
+## Purpose of the library
+
+BNS_NURATES can be exploited to compute both energy-dependent (spectral) and energy-integrated
+(gray) emissivities and opacities for the most relevant neutrino-matter interactions in BNS
+mergers. The definitions of such quantites can be found in [^fn1], which also discusses in
+more details the design of the library.
+A self-explanatory minimal working example is provided in the repo (mwe.cpp), which can be
+compiled within the build folder as follows
+```
+cmake --build . --target MWE
+```
+
 ## Included neutrino-matter interactions
 
 BNS_NURATES implements the following neutrino reactions (see also [^fn1]):
