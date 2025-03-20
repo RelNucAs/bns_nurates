@@ -52,26 +52,51 @@ Here ```/path/to/bns_nurates/``` is the full path for the top-level bns_nurates
 directory and ```/path/to/destination/``` is the full path to the ```src```
 folder insider ```Weakrates2```
 
+## Included neutrino-matter interactions
 
-##### A C library for neutrino opacities in the context of binary neutron star mergers.
+BNS_NURATES implements the following neutrino reactions (see also [^fn1]):
 
-These opacities are based on Burrows (2004)[^fn1], Bruenn (1985)[^fn2] and
-references therein.
+- **Beta processes**
 
-The following reactions are implemented:
-- Neutrino absorption on protons Eq:C13 from Bruenn (1985) with blocking factor
-  and weak magnetism from Burrows (2004) included.
-- Neutrino absorption on neutrons Eq:C19 from Bruenn (1985) with blocking factor
-  and weak magnetism from Burrows (2004) included.
-- Pair production and annihilation of neutrinos Eq:2, Eq:3 and emissivity, mean
-  free path from Eq:4 of Pons et. al. (1998)[^fn3] are included.
+    Implemented as in [^fn2], [^fn3] under the assumption of zero-momentum transfer and non-relativistic nucleons. We account for the impact from
+    relativistic mean-field effects as in [^fn3], [^fn4], and the correction due to the sum of phase-space, recoil and weak magnetism effects as in 
+    [^fn5]. They include:
+    
+  * Neutrino absorptions on nucleons / $e^\pm$ captures
+    ### $\nu_e + n \leftrightarrow e^- + p$
+    ### $\bar{\nu}_e + p \leftrightarrow e^+ + n$ 
+    
+  * (Inverse) nucleon decay 
+    ### $\nu_e + n \leftrightarrow e^- + p$
+    ### $\bar{\nu}_e + p \leftrightarrow e^+ + n$
 
-[^fn1]: [Burrows, Reddy and Thompson, Neutrino opacities in nuclear matter,
-    Nucl.Phys. A 777 356-394
-    (2006)](https://doi.org/10.1016/j.nuclphysa.2004.06.012)
-[^fn2]: [Bruenn, Stellar core collapse - Numerical model and infall epoch,
-    Astrophysical Journal Supplement Series 58 771-841
-    (1985)](https://doi.org/10.1086/191056)
-[^fn3]: [Pons, Miralles and Ibáñez, Legendre expansion of the kernel nu nubar ->
-e+e-: Influence of high order terms, Astron. Astrophys. Suppl. Ser. 129, 343-351
-(1998)](https://doi.org/10.1051/aas:1998189) TODO: update this list
+- **Pair processes**
+
+  * $e^+ e^-$ annihilation (implemented as in [^fn6])
+    ### $e^+ + e^- \leftrightarrow \nu + \bar{\nu}$
+
+
+
+  * Nucleon-nucleon bremsstrahlung (implemented as in [^fn7], including the medium modification from [^fn8])
+    ### $N + N \leftrightarrow N + N + \nu + \bar{\nu}$
+
+- **Scattering processes**
+   
+  * Isoenergetic scattering off nucleons (implemented as in [^fn2], including phase-space, recoil and weak magnetism effects as in 
+    [^fn5])
+    ### $\nu + N \rightarrow \nu + N$
+
+  * Inelastic scattering off $e^\pm$ (implemented as in [^fn2], [^fn9])
+    ### $\nu + e^\pm \rightarrow \nu + e^\pm$
+
+
+[^fn1]: [L. Chiesa et al., Phys. Rev. D 111, 063053 (2025)](https://doi.org/10.1103/PhysRevD.111.063053)
+[^fn2]: [S. W. Bruenn, Astrophys. J. Suppl. Ser. 58, 771 (1985)](https://doi.org/10.1086/191056)
+[^fn3]: [M. Oertel, A. Pascal, M. Mancini, and J. Novak, Phys. Rev. C 102, 035802 (2020)](https://doi.org/10.1103/PhysRevC.102.035802)
+[^fn4]: [M. Hempel, Phys. Rev. C 91, 055807 (2015)](https://doi.org/10.1103/PhysRevC.91.055807)
+[^fn5]: [C. J. Horowitz, Phys. Rev. D 65, 043001 (2002)](https://doi.org/10.1103/PhysRevD.65.043001)
+[^fn6]: [J. A. Pons, J. A. Miralles, and J. M. Ibanez, Astron. Astrophys. Suppl. Ser. 129, 343 (1998)](https://doi.org/10.1051/aas:1998189)
+[^fn7]: [S. Hannestad and G. Raffelt, Astrophys. J. 507, 339 (1998)](https://doi.org/10.1086/306303)
+[^fn8]: [T. Fischer, Astron. Astrophys. 593, A103 (2016)](https://doi.org/10.1051/0004-6361/201628991)
+[^fn9]: [A. Mezzacappa and S. W. Bruenn, Astrophys. J. 410, 740 (1993)](https://doi.org/10.1086/172791)
+[^fn10]:[A. Burrows, S. Reddy, and T. A. Thompson, Nucl. Phys. A777, 356 (2006)](https://doi.org/10.1016/j.nuclphysa.2004.06.012)
