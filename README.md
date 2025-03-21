@@ -80,8 +80,8 @@ This creates a Python module named ```bnsnurates``` can that imported as
 ```
 import bnsnurates as bns
 ```
-To make the module available to your Python environment either add the ```bindings/`` folder
-to your PYTHONPATH or install the module. ```bindings/test_bindings.py`` is a minimal working
+To make the module available to your Python environment either add the ```bindings/``` folder
+to your PYTHONPATH or install the module. ```bindings/test_bindings.py``` is a minimal working
 example that can be used for testing the bindings.
 
 ## Included neutrino-matter interactions
