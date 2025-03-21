@@ -10,6 +10,9 @@
 // scattering using Eq. (43) from Mezzacappa & Bruenn, ApJ v.410, p.740 (1993)
 // https://ui.adsabs.harvard.edu/abs/1993ApJ...410..740M/abstract
 
+#ifndef BNS_NURATES_INCLUDE_KERNEL_NEPS_HPP_
+#define BNS_NURATES_INCLUDE_KERNEL_NEPS_HPP_
+
 #include "bns_nurates.hpp"
 #include "functions.hpp"
 #include "constants.hpp"
@@ -363,3 +366,5 @@ void InelasticKernelsTable(const int n, BS_REAL* nu_array,
 
     return;
 }
+
+#endif // BNS_NURATES_INCLUDE_KERNEL_NEPS_HPP_
