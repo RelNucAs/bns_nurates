@@ -58,11 +58,31 @@ BNS_NURATES can be exploited to compute both energy-dependent (spectral) and ene
 (gray) emissivities and opacities for the most relevant neutrino-matter interactions in BNS
 mergers. The definitions of such quantites can be found in [^fn1], which also discusses in
 more details the design of the library.
-A self-explanatory minimal working example is provided in the repo (mwe.cpp), which can be
+A self-explanatory minimal working example is provided in the repo ```(mwe.cpp)```, which can be
 compiled within the build folder as follows
 ```
 cmake --build . --target MWE
 ```
+
+## Python bindings
+
+Bindings can be generated for calling BNS_NURATES functions directly from Python.
+This is done through SWIG (tested version: 4.0.2). Once SWIG is installed on the system,
+enter the ```bindings/``` folder
+```
+cd bindings
+```
+and run the following command
+```
+python3 setup.py build_ext --inplace
+```
+This creates a Python module named ```bnsnurates``` can that imported as
+```
+import bnsnurates as bns
+```
+To make the module available to your Python environment either add the ```bindings/`` folder
+to your PYTHONPATH or install the module. ```bindings/test_bindings.py`` is a minimal working
+example that can be used for testing the bindings.
 
 ## Included neutrino-matter interactions
 
