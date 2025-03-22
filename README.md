@@ -63,6 +63,8 @@ compiled within the build folder as follows
 ```
 cmake --build . --target MWE
 ```
+Thermodynamic conditions extracted from a BNS merger simulation (used for the postprocessing
+analysis in [^fn1]) are also provided in the ```inputs/BNS``` folder.
 
 ## Python bindings
 
