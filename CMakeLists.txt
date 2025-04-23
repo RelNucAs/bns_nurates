@@ -142,9 +142,6 @@ test_opacities_all_reactions
 tests/tests_opacities_m1/test_opacities_all_reactions.cpp)
 
 ADD_BNSNURATES_EXECUTABLE(
-test_dumb_function
-tests/tests_opacities_m1/test_dumb_function.cpp)
-ADD_BNSNURATES_EXECUTABLE(
 test_spectral_opacities_all_reactions
 tests/tests_opacities_spectral/test_opacities_spectral.cpp)
 
