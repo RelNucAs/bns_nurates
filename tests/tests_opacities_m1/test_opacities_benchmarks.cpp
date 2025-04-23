@@ -82,13 +82,13 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
         {
             if constexpr (std::is_same_v<BS_REAL, float>)
             {
-	        sscanf(line + 14, "%f\n", &e_nu);
+                sscanf(line + 14, "%f\n", &e_nu);
             }
-	    else
-	    {
+            else
+            {
                 sscanf(line + 14, "%lf\n", &e_nu);
             }
-	    continue;
+            continue;
         }
         else if (line[1] == '#' && i != 0)
         {
@@ -98,19 +98,21 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
         if constexpr (std::is_same_v<BS_REAL, float>)
         {
             sscanf(line, "%d %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
-                   &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
-                   &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i), &h_Yn(i),
-                   &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
+                   &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i),
+                   &h_mu_e(i), &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i),
+                   &h_Yn(i), &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i),
+                   &h_l_anue_inv(i));
         }
-	else
+        else
         {
-	    sscanf(line,
-                   "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
-                   &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
-                   &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i), &h_Yn(i),
-                   &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
+            sscanf(
+                line,
+                "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
+                &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
+                &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i), &h_Yn(i),
+                &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
         }
-	i++;
+        i++;
     }
 
     fclose(fptr);
@@ -277,7 +279,7 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
             M1Opacities coeffs =
                 ComputeM1Opacities(&my_quad, &my_quad, &my_grey_opacity_params);
             auto testval = coeffs.eta[id_nue];
-	    printf("%.15e\n", testval);
+            printf("%.15e\n", testval);
         });
 
     Kokkos::fence();
@@ -294,7 +296,7 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx)
     printf("zone-cycles/second = %e\n", double(npts) / time_taken_seconds);
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 
     Kokkos::initialize();
@@ -308,37 +310,37 @@ int main(int argc, char *argv[])
     if (argc != 3)
     {
         printf("Usage: %s <n_quad> <mesh_size>\n", argv[0]);
-	return 1;
+        return 1;
     }
 
-    nx = atoi(argv[1]);
+    nx    = atoi(argv[1]);
     mb_nx = atoi(argv[2]);
 
     if (nx == 0)
     {
-         std::cerr << "Invalid input!" << std::endl;
-         return 1;
+        std::cerr << "Invalid input!" << std::endl;
+        return 1;
     }
 
     if (nx * 2 > n_max)
     {
-         std::cerr << "Number of quadrature points exceeds n_max!" << std::endl;
-         std::cerr << "2 * nx = " << 2 * nx << std::endl;
-         std::cerr << "n_max = "  <<  n_max << std::endl;
-         return 1;
+        std::cerr << "Number of quadrature points exceeds n_max!" << std::endl;
+        std::cerr << "2 * nx = " << 2 * nx << std::endl;
+        std::cerr << "n_max = " << n_max << std::endl;
+        return 1;
     }
 
     if (mb_nx == 0)
     {
-         std::cerr << "Invalid input!" << std::endl;
-         return 1;
+        std::cerr << "Invalid input!" << std::endl;
+        return 1;
     }
-    
+
     std::cout << "Number of quadrature points: ";
     std::cout << nx;
     std::cout << std::endl;
     std::cout << std::endl;
-    
+
     std::cout << "Nx for meshblock with [Nx x Nx x Nx] points: ";
     std::cout << mb_nx;
     std::cout << std::endl;

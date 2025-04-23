@@ -8,17 +8,17 @@
 #include "bns_nurates.hpp"
 #include "constants.hpp"
 
-constexpr BS_REAL zero = 0;
-constexpr BS_REAL one_twentyth = 0.05;
-constexpr BS_REAL one_tenth = 0.1;
-constexpr BS_REAL one_fifth = 0.2;
-constexpr BS_REAL one_third = 0.3333333333333333333;
-constexpr BS_REAL one = 1;
-constexpr BS_REAL two = 2;
-constexpr BS_REAL five = 5;
-constexpr BS_REAL ten = 10;
-constexpr BS_REAL twenty = 20;
-constexpr BS_REAL forty = 40;
+constexpr BS_REAL zero                  = 0;
+constexpr BS_REAL one_twentyth          = 0.05;
+constexpr BS_REAL one_tenth             = 0.1;
+constexpr BS_REAL one_fifth             = 0.2;
+constexpr BS_REAL one_third             = 0.3333333333333333333;
+constexpr BS_REAL one                   = 1;
+constexpr BS_REAL two                   = 2;
+constexpr BS_REAL five                  = 5;
+constexpr BS_REAL ten                   = 10;
+constexpr BS_REAL twenty                = 20;
+constexpr BS_REAL forty                 = 40;
 constexpr BS_REAL onethousandsixhundred = 1600;
 constexpr BS_REAL fdi_litconst          = 7.38905609893065023;
 
@@ -516,7 +516,7 @@ BS_REAL FDI_m92(const BS_REAL x)
                                2160.21729234460541,
                                677.261952266814024,
                                56.0179124057448609};
-    constexpr BS_REAL half = 0.5;
+    constexpr BS_REAL half  = 0.5;
 
     if (x < -two)
     {
@@ -781,7 +781,7 @@ BS_REAL FDI_m72(const BS_REAL x)
                                7642.62657004470466,
                                1584.72834559231955,
                                86.0988387732258338};
-   constexpr BS_REAL half = 0.5;
+    constexpr BS_REAL half  = 0.5;
 
     if (x < -two)
     {
@@ -4732,20 +4732,20 @@ BS_REAL HeavisideTanhApprox(const BS_REAL x)
     constexpr BS_REAL two  = 2;
 
     constexpr BS_REAL kBS_aHeaviside = a_heaviside;
-    
+
     BS_REAL kBS_REAL_MIN;
-   
+
     if (std::is_same_v<BS_REAL, float>)
     {
         kBS_REAL_MIN = FLT_MIN; // FLT_TRUE_MIN
     }
     else
     {
-	kBS_REAL_MIN = DBL_MIN; // DBL_TRUE_MIN
+        kBS_REAL_MIN = DBL_MIN; // DBL_TRUE_MIN
     }
 
-    return half * (one + tanh(two * kBS_aHeaviside * x /
-                              (fabs(x) + kBS_REAL_MIN)));
+    return half *
+           (one + tanh(two * kBS_aHeaviside * x / (fabs(x) + kBS_REAL_MIN)));
 }
 
 /*===========================================================================*/
