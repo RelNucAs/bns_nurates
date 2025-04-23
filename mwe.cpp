@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
     GreyOpacityParams my_grey_opacity_params = {0};
     my_grey_opacity_params.opacity_flags     = opacity_flags_default_none;
     my_grey_opacity_params.opacity_pars      = opacity_params_default_none;
-    
+
     // Select active reactions
     my_grey_opacity_params.opacity_flags.use_abs_em =
         1; // Activate beta processes
@@ -152,7 +152,7 @@ int main(int argc, char* argv[])
     my_grey_opacity_params.m1_pars.chi[id_anue] = 0.333333333333333333333333333;
     my_grey_opacity_params.m1_pars.chi[id_nux]  = 0.333333333333333333333333333;
     my_grey_opacity_params.m1_pars.chi[id_anux] = 0.333333333333333333333333333;
-    
+
     // Restore to input units (from MeV nm^-3 to g s^-2 nm^-1)
     my_grey_opacity_params.m1_pars.J[id_nue] *= kBS_MeV;
     my_grey_opacity_params.m1_pars.J[id_anue] *= kBS_MeV;

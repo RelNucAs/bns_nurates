@@ -19,7 +19,7 @@
 
 // Numerical constants
 //---------------------------------------------------------------------------------------------------------------------
-static const BS_REAL kTaylorSeriesEpsilon = 1e-3;
+constexpr BS_REAL kTaylorSeriesEpsilon = 1e-3;
 
 
 // Physical constats
@@ -52,24 +52,29 @@ BS_REAL MezzacappaIntOut(BS_REAL w, BS_REAL wp, BS_REAL x, BS_REAL y, int sign,
                          BS_REAL b1, BS_REAL b2, BS_REAL* fdi_diff_w,
                          BS_REAL* fdi_diff_abs)
 {
+    constexpr BS_REAL one_fifth = 0.2;
+    constexpr BS_REAL two       = 2;
+    constexpr BS_REAL three     = 3;
+    constexpr BS_REAL six       = 6;
+
     return (((b1 + b2) * (sign * fdi_diff_abs[2] - fdi_diff_w[4]) *
-                 0.2 // All G5 terms
+                 one_fifth // All G5 terms
 
              - b1 * (w + wp) *
                    (
 
                        fdi_diff_w[3]
 
-                       + 2. * ((w + wp) * fdi_diff_w[2] +
-                               3. * w * wp * fdi_diff_w[1])
+                       + two * ((w + wp) * fdi_diff_w[2] +
+                                three * w * wp * fdi_diff_w[1])
 
                            ) // G4(eta - wp) + G3(eta - wp) term
 
              + sign * ((b1 * x - b2 * y) * fdi_diff_abs[1] +
-                       2. * (b1 * x * x + b2 * y * y) * fdi_diff_abs[0])) /
+                       two * (b1 * x * x + b2 * y * y) * fdi_diff_abs[0])) /
                 (w * w * wp * wp)
 
-            - 6. * b1 * fdi_diff_w[0]);
+            - six * b1 * fdi_diff_w[0]);
 }
 
 // Taylor expansion in the lowest energy of the function MezzacappaIntOut and
@@ -78,19 +83,26 @@ KOKKOS_INLINE_FUNCTION
 BS_REAL MezzacappaIntOneEnergy(BS_REAL x, BS_REAL y, int sign, BS_REAL b1,
                                BS_REAL b2, const BS_REAL* fdis)
 {
+    constexpr BS_REAL one_fifth = 0.2;
+    constexpr BS_REAL two       = 2;
+    constexpr BS_REAL three     = 3;
+    constexpr BS_REAL four      = 4;
+    constexpr BS_REAL six       = 6;
+
     return -sign * y *
-           (2. * (b1 + b2) * fdis[0]
+           (two * (b1 + b2) * fdis[0]
 
-            + (b1 * (y + 4. * x) + 3. * b2 * y) * fdis[1]
+            + (b1 * (y + four * x) + three * b2 * y) * fdis[1]
 
-            + (b1 * (3. * y - 4. * x) + b2 * y) * fdis[2]
+            + (b1 * (three * y - four * x) + b2 * y) * fdis[2]
 
-            + ((b1 + 6. * b2) * y * y * 0.2 + b1 * x * y + 2. * b1 * x * x) *
+            + ((b1 + six * b2) * y * y * one_fifth + b1 * x * y +
+               two * b1 * x * x) *
                   fdis[3]
 
-            -
-            ((6. * b1 + b2) * y * y * 0.2 - 3. * b1 * x * y + 2. * b1 * x * x) *
-                fdis[4]) /
+            - ((six * b1 + b2) * y * y * one_fifth - three * b1 * x * y +
+               two * b1 * x * x) *
+                  fdis[4]) /
            (x * x);
 }
 
@@ -100,13 +112,22 @@ KOKKOS_INLINE_FUNCTION
 BS_REAL MezzacappaIntTwoEnergies(BS_REAL w, BS_REAL wp, BS_REAL x, BS_REAL y,
                                  BS_REAL b1, BS_REAL b2, const BS_REAL* fdis)
 {
+    constexpr BS_REAL two        = 2;
+    constexpr BS_REAL four       = 4;
+    constexpr BS_REAL eleven     = 11;
+    constexpr BS_REAL twenty     = 20;
+    constexpr BS_REAL twentyfive = 25;
+    constexpr BS_REAL thirthy    = 30;
+
     return y * (w - wp) *
            ((b1 + b2) *
-                (4. * fdis[2]
+                (four * fdis[2]
 
-                 + fdis[0] * (11. * y * y - 25. * x * y + 20. * x * x) / 30.)
+                 + fdis[0] *
+                       (eleven * y * y - twentyfive * x * y + twenty * x * x) /
+                       thirthy)
 
-            + (b1 - b2) * (2. * x - y) * fdis[1]) /
+            + (b1 - b2) * (two * x - y) * fdis[1]) /
            (x * x);
 }
 
@@ -129,6 +150,10 @@ MyKernelOutput NESKernels(InelasticScattKernelParams* kernel_params,
     const BS_REAL exp_factor_exchanged = NEPSExpFunc(w - wp);
 
     MyKernelOutput output;
+
+    constexpr BS_REAL zero = 0;
+    constexpr BS_REAL one  = 1;
+    constexpr BS_REAL six  = 6;
 
     if (y > eta_e * kTaylorSeriesEpsilon)
     {
@@ -161,8 +186,8 @@ MyKernelOutput NESKernels(InelasticScattKernelParams* kernel_params,
 
         const BS_REAL fdis[5] = {
             FDI_p2(eta_e - x) - FDI_p2(eta_e), FDI_p1(eta_e - x), FDI_p1(eta_e),
-            FDI_0(eta_e - x) + y * FermiDistr(0., 1., eta_e - x) / 6,
-            FDI_0(eta_e) - y * FermiDistr(0., 1., eta_e) / 6};
+            FDI_0(eta_e - x) + y * FermiDistr(zero, one, eta_e - x) / six,
+            FDI_0(eta_e) - y * FermiDistr(zero, one, eta_e) / six};
 
         output.abs[id_nue] = kBS_NEPS_Const * POW2(T) *
                              MezzacappaIntOneEnergy(x, y, sign, kBS_NEPS_BPlus,
@@ -227,6 +252,10 @@ MyKernelOutput NPSKernels(InelasticScattKernelParams* kernel_params,
 
     MyKernelOutput output;
 
+    constexpr BS_REAL zero = 0;
+    constexpr BS_REAL one  = 1;
+    constexpr BS_REAL six  = 6;
+
     if (y > eta_p * kTaylorSeriesEpsilon)
     {
         BS_REAL fdi_diff_abs[3], fdi_diff_w[5];
@@ -258,8 +287,8 @@ MyKernelOutput NPSKernels(InelasticScattKernelParams* kernel_params,
 
         const BS_REAL fdis[5] = {
             FDI_p2(eta_p - x) - FDI_p2(eta_p), FDI_p1(eta_p - x), FDI_p1(eta_p),
-            FDI_0(eta_p - x) + y * FermiDistr(0., 1., eta_p - x) / 6,
-            FDI_0(eta_p) - y * FermiDistr(0., 1., eta_p) / 6};
+            FDI_0(eta_p - x) + y * FermiDistr(zero, one, eta_p - x) / six,
+            FDI_0(eta_p) - y * FermiDistr(zero, one, eta_p) / six};
 
         output.abs[id_nue] = kBS_NEPS_Const * POW2(T) *
                              MezzacappaIntOneEnergy(x, y, sign, kBS_NEPS_BZero,

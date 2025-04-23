@@ -257,9 +257,11 @@ inline BS_REAL GaussLaguerreIntegrateZeroInf(MyQuadrature* quad,
                                              MyFunction* func)
 {
 
+    constexpr BS_REAL zero = 0;
+
     BS_REAL f[quad->nx];
 
-    if (quad->alpha == 0.)
+    if (quad->alpha == zero)
     {
         for (int i = 0; i < quad->nx; ++i)
         {
@@ -688,6 +690,9 @@ void GaussLegendreIntegrate2DMatrixForNEPS(const MyQuadrature* quad,
                                            MyQuadratureIntegrand* result_1,
                                            MyQuadratureIntegrand* result_2)
 {
+    constexpr BS_REAL half = 0.5;
+    constexpr BS_REAL one  = 1;
+
     const int n              = quad->nx;
     const int num_integrands = 2 * total_num_species;
 
@@ -714,44 +719,49 @@ void GaussLegendreIntegrate2DMatrixForNEPS(const MyQuadrature* quad,
                 x_j = quad->points[j];
                 w_j = quad->w[j];
 
-                w_ij  = w_i * w_j;
+                w_ij = w_i * w_j;
 
-                aux_1 = 0.5 * t * x_i * (1. - x_j);
-                aux_2 = 0.5 * t * x_i * (1. + x_j);
-                aux_3 = 0.5 * t * (1. - x_j) / x_i;
-                aux_4 = 0.5 * t * (1. + x_j) / x_i;
+                aux_1 = half * t * x_i * (one - x_j);
+                aux_2 = half * t * x_i * (one + x_j);
+                aux_3 = half * t * (one - x_j) / x_i;
+                aux_4 = half * t * (one + x_j) / x_i;
 
                 result_1->integrand[0 + idx] +=
                     w_ij * (x_i * (mat->m1_mat_em[idx][i][j] +
-                            mat->m1_mat_em[idx][i][n + j]) +
+                                   mat->m1_mat_em[idx][i][n + j]) +
                             (mat->m1_mat_em[idx][n + i][j] +
-                            mat->m1_mat_em[idx][n + i][n + j]) / x3_i);
+                             mat->m1_mat_em[idx][n + i][n + j]) /
+                                x3_i);
 
                 result_1->integrand[total_num_species + idx] +=
                     w_ij * (x_i * (mat->m1_mat_ab[idx][i][j] +
-                            mat->m1_mat_ab[idx][i][n + j]) +
+                                   mat->m1_mat_ab[idx][i][n + j]) +
                             (mat->m1_mat_ab[idx][n + i][j] +
-                            mat->m1_mat_ab[idx][n + i][n + j]) / x3_i);
+                             mat->m1_mat_ab[idx][n + i][n + j]) /
+                                x3_i);
 
                 result_2->integrand[0 + idx] +=
                     w_ij * (x_i * (aux_1 * mat->m1_mat_em[idx][i][j] +
-                            aux_2 * mat->m1_mat_em[idx][i][n + j]) +
+                                   aux_2 * mat->m1_mat_em[idx][i][n + j]) +
                             (aux_3 * mat->m1_mat_em[idx][n + i][j] +
-                            aux_4 * mat->m1_mat_em[idx][n + i][n + j]) / x3_i);
+                             aux_4 * mat->m1_mat_em[idx][n + i][n + j]) /
+                                x3_i);
 
                 result_2->integrand[total_num_species + idx] +=
                     w_ij * (x_i * (aux_1 * mat->m1_mat_ab[idx][i][j] +
-                            aux_2 * mat->m1_mat_ab[idx][i][n + j]) +
+                                   aux_2 * mat->m1_mat_ab[idx][i][n + j]) +
                             (aux_3 * mat->m1_mat_ab[idx][n + i][j] +
-                            aux_4 * mat->m1_mat_ab[idx][n + i][n + j]) / x3_i);
+                             aux_4 * mat->m1_mat_ab[idx][n + i][n + j]) /
+                                x3_i);
+
             }
         }
     }
 
     for (int idx = 0; idx < num_integrands; ++idx)
     {
-        result_1->integrand[idx] *= 0.5 * t_sqr;
-        result_2->integrand[idx] *= 0.5 * t_sqr;
+        result_1->integrand[idx] *= half * t_sqr;
+        result_2->integrand[idx] *= half * t_sqr;
     }
 
     return;

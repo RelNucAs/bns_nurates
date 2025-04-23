@@ -35,7 +35,7 @@
 //           (https://journals.aps.org/prc/abstract/10.1103/PhysRevC.91.055807)
 
 // Constants for beta reactions
-#define mu_thres 1.0e-02 // mu_hat threshold value in EtaNNAbs evaluation
+#define CONST_MU_THRES 1.0e-02 // mu_hat threshold value in EtaNNAbs evaluation
 
 // ----------------------------------------------------------------------------------
 
@@ -71,6 +71,10 @@ BS_REAL EtaNNAbs(const BS_REAL n_in, const BS_REAL n_out, const BS_REAL mu_hat,
     // return 0.;
     // }
 
+    constexpr BS_REAL zero     = 0;
+    constexpr BS_REAL one      = 1;
+    constexpr BS_REAL mu_thres = CONST_MU_THRES;
+
     // if mu_hat too small, neglect nucleon degeneracy as backup
     if (fabs(mu_hat) < mu_thres)
     {
@@ -78,13 +82,13 @@ BS_REAL EtaNNAbs(const BS_REAL n_in, const BS_REAL n_out, const BS_REAL mu_hat,
     }
 
     // Eq.(C14), [nm-3]
-    const BS_REAL etanp = (n_out - n_in) / (SafeExp(-mu_hat / T) - 1.);
+    const BS_REAL etanp = (n_out - n_in) / (SafeExp(-mu_hat / T) - one);
 
     BS_ASSERT(isfinite(etanp),
               "etanp factor in beta-process kernel is not finite.")
 
     // backup if etanp is negative
-    if (etanp < 0.)
+    if (etanp < zero)
     {
         return n_in;
     }
@@ -138,6 +142,9 @@ void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
                          MyEOSParams* eos_pars, const BS_REAL mass_lepton,
                          const BS_REAL mu_lepton, BS_REAL* out)
 {
+    constexpr BS_REAL zero = 0;
+    constexpr BS_REAL one  = 1;
+
     const BS_REAL mass_lepton_squared = POW2(mass_lepton);
 
     BS_REAL Qprime, mu_np;
@@ -189,20 +196,20 @@ void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
     fd_p = FermiDistr(E_p, T, -mu_lepton);
 
     // @TODO: HeavisideTanhApprox is 0.5 instead of 1 in E = m
-    if (E_e - mass_lepton >= 0.)
+    if (E_e - mass_lepton >= zero)
     {
-        cap_term = E_e_squared * sqrt(1. - mass_lepton_squared / E_e_squared) *
+        cap_term = E_e_squared * sqrt(one - mass_lepton_squared / E_e_squared) *
                    R; // * HeavisideTanhApprox(E_e - mass_lepton)
     }
 
     if (opacity_pars->use_decay)
     {
-        if (E_p - mass_lepton >= 0.)
+        if (E_p - mass_lepton >= zero)
         {
             dec_term = E_p_squared *
-                       sqrt(1. - mass_lepton_squared /
-                                     E_p_squared); // * HeavisideTanhApprox(E_p
-                                                   // - mass_lepton)
+                       sqrt(one - mass_lepton_squared /
+                                      E_p_squared); // * HeavisideTanhApprox(E_p
+                                                    // - mass_lepton)
         }
     }
 
@@ -211,7 +218,7 @@ void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
 
     // Neutrino emissivity [s^-1], Eq.(C15), remove c to get output in nm^-1
     out[1] =
-        kBS_Beta_Const * etapn * (cap_term * fd_e + dec_term * (1. - fd_p));
+        kBS_Beta_Const * etapn * (cap_term * fd_e + dec_term * (one - fd_p));
     // Neutrino absorptivity [s^-1]
     out[0] = out[1] * SafeExp((omega - (mu_p + mu_lepton - mu_n)) / T);
 
@@ -222,8 +229,8 @@ void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
     // kAbsEmConst * etanp * cap_term / (1. + exp(eos_pars->mu_e / temp -
     // FDI_p5(mu_nue)/FDI_p4(mu_nue)));
 
-    cap_term = 0.;
-    dec_term = 0.;
+    cap_term = zero;
+    dec_term = zero;
 
     E_p = omega - Qprime; // Positron energy [MeV]
     E_e = -E_p;           // Electron energy [MeV]
@@ -234,26 +241,26 @@ void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
     fd_e = FermiDistr(E_e, T, +mu_lepton);
     fd_p = FermiDistr(E_p, T, -mu_lepton);
 
-    if (E_p - mass_lepton >= 0.)
+    if (E_p - mass_lepton >= zero)
     {
-        cap_term = E_p_squared * sqrt(1. - mass_lepton_squared / E_p_squared) *
+        cap_term = E_p_squared * sqrt(one - mass_lepton_squared / E_p_squared) *
                    Rbar; // * HeavisideTanhApprox(E_p - mass_lepton)
     }
 
     if (opacity_pars->use_decay)
     {
-        if (E_e - mass_lepton >= 0.)
+        if (E_e - mass_lepton >= zero)
         {
             dec_term = E_e_squared *
-                       sqrt(1. - mass_lepton_squared /
-                                     E_e_squared); // * HeavisideTanhApprox(E_e
-                                                   // - mass_lepton)
+                       sqrt(one - mass_lepton_squared /
+                                      E_e_squared); // * HeavisideTanhApprox(E_e
+                                                    // - mass_lepton)
         }
     }
 
     // Antineutrino emissivity [s^-1], Eq.(C20), remove c to get output in nm^-1
     out[3] =
-        kBS_Beta_Const * etanp * (cap_term * fd_p + dec_term * (1. - fd_e));
+        kBS_Beta_Const * etanp * (cap_term * fd_p + dec_term * (one - fd_e));
     // Antineutrino absorptivity [s^-1]
     out[2] = out[3] * SafeExp((omega - (mu_n - mu_p - mu_lepton)) / T);
 
@@ -261,13 +268,13 @@ void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
     // out[2] = kAbsEmConst * etapn * (cap_term * (1 - fd_p) + dec_term * fd_e);
     // // Antineutrino absorptivity [s-1], Eq.(C19)
 
-    BS_ASSERT(isfinite(out[1]) && out[1] >= 0.,
+    BS_ASSERT(isfinite(out[1]) && out[1] >= zero,
               "Invalid beta-process nue emissivity.");
-    BS_ASSERT(isfinite(out[3]) && out[3] >= 0.,
+    BS_ASSERT(isfinite(out[3]) && out[3] >= zero,
               "Invalid beta-process anue emissivity.");
-    BS_ASSERT(isfinite(out[0]) && out[0] >= 0.,
+    BS_ASSERT(isfinite(out[0]) && out[0] >= zero,
               "Invalid beta-process nue absorptivity.");
-    BS_ASSERT(isfinite(out[2]) && out[2] >= 0.,
+    BS_ASSERT(isfinite(out[2]) && out[2] >= zero,
               "Invalid beta-process anue absorptivity.");
 
     return;
@@ -408,22 +415,27 @@ void BetaOpacitiesTable(MyQuadrature* quad, MyEOSParams* eos_pars,
 KOKKOS_INLINE_FUNCTION
 BS_REAL EtaNNSc(const BS_REAL nb, const BS_REAL temp, const BS_REAL yN)
 {
+    constexpr BS_REAL zero         = 0;
+    constexpr BS_REAL one          = 1;
+    constexpr BS_REAL three_halves = 1.5;
+    constexpr BS_REAL two_thirds   = 2. / 3.;
+
     // nucleon (neutron/proton) number density
     const BS_REAL nN = yN * nb; // [nm^-3]
 
     // Enforce zero rates if no nucleons are present
-    if (nN <= 0.)
+    if (nN <= zero)
     {
-        return 0.;
+        return zero;
     }
 
     // Linear interpolation between degenerate and non-degnerate limit in
     // Eq.(C37)
     // Fermi energy computation
-    const BS_REAL eFN = kBS_Iso_eF * pow(nN, 2. / 3.); // [MeV]
-    const BS_REAL aux = 1.5 * temp / eFN;
+    const BS_REAL eFN = kBS_Iso_eF * pow(nN, two_thirds); // [MeV]
+    const BS_REAL aux = three_halves * temp / eFN;
 
-    return nN * aux / sqrt(1. + POW2(aux)); // [nm-3]
+    return nN * aux / sqrt(one + POW2(aux)); // [nm-3]
 }
 
 /**
@@ -445,6 +457,8 @@ BS_REAL IsoScattNucleon(const BS_REAL omega, OpacityParams* opacity_pars,
                         MyEOSParams* eos_pars, const BS_REAL yN,
                         const int reacflag)
 {
+    constexpr BS_REAL three = 3;
+
     BS_REAL R0 = 1., R1 = 1.;
     BS_REAL leg_0, leg_1;
 
@@ -477,7 +491,7 @@ BS_REAL IsoScattNucleon(const BS_REAL omega, OpacityParams* opacity_pars,
     }
 
     // Eq.(A41)
-    return etaNN * (leg_0 - leg_1 / 3.); // [MeV nm^3 s-1]
+    return etaNN * (leg_0 - leg_1 / three); // [MeV nm^3 s-1]
 }
 
 /**
