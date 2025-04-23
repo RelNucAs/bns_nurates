@@ -93,7 +93,7 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
     char line[1000];
     while (fgets(line, sizeof(line), fptr) != NULL)
     {
-        if (line[1] == '#' && i == 0)
+	if (line[1] == '#' && i == 0)
         {
             if constexpr (std::is_same_v<BS_REAL, float>)
             {
@@ -113,21 +113,18 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
         if constexpr (std::is_same_v<BS_REAL, float>)
         {
             sscanf(line, "%d %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
-                   &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i),
-                   &h_mu_e(i), &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i),
-                   &h_Yn(i), &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i),
-                   &h_l_anue_inv(i));
+                   &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
+                   &h_mu_hat(i), &h_Yh(i), &h_Ya(i), &h_Yp(i), &h_Yn(i),
+                   &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
         }
         else
         {
-            sscanf(
-                line,
-                "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
-                &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
-                &h_mu_hat(i), &h_Yh[i], &h_Ya[i], &h_Yp(i), &h_Yn(i),
-                &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
+            sscanf(line,
+                   "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
+                   &h_zone(i), &h_r(i), &h_rho(i), &h_T(i), &h_Ye(i), &h_mu_e(i),
+                   &h_mu_hat(i), &h_Yh(i), &h_Ya(i), &h_Yp(i), &h_Yn(i),
+                   &h_em_nue(i), &h_l_nue_inv(i), &h_em_anue(i), &h_l_anue_inv(i));
         }
-
         i++;
     }
 
@@ -292,8 +289,8 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
             my_grey_opacity_params.eos_pars.yp   = d_Yp(i);
             my_grey_opacity_params.eos_pars.yn   = d_Yn(i);
             my_grey_opacity_params.eos_pars.nb   = d_rho(i) / kBS_Mu * 1e-21;
-
-            // Distribution parameters
+            
+	    // Distribution parameters
             my_grey_opacity_params.distr_pars = NuEquilibriumParams(
                 &my_grey_opacity_params
                      .eos_pars); // consider neutrino distribution function at
@@ -421,15 +418,14 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
     }
 }
 
-inline void TestM1OpacitiesSelectedPoints(char filename[200],
-                                          OpacityFlags* opacity_flags,
-                                          OpacityParams* opacity_pars)
+inline void TestM1OpacitiesSelectedPoints(char filename[200], const int nx, OpacityFlags* opacity_flags,
+                            OpacityParams* opacity_pars)
 {
 
     char filepath[300] = {'\0'};
     char filedir[300]  = SOURCE_DIR;
     char outname[200] =
-        "/inputs/DD2_M12980-12980_M1_LR/thermo_points_with_neutrinos.txt";
+        "/inputs/CCSN/thermo_points_with_neutrinos.txt";
 
     strcat(filepath, filedir);
     strcat(filepath, outname);
@@ -573,7 +569,7 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200],
     MyQuadrature my_quad = {.type   = kGauleg,
                             .alpha  = -42.,
                             .dim    = 1,
-                            .nx     = 50,
+                            .nx     = nx,
                             .ny     = 1,
                             .nz     = 1,
                             .x1     = 0.,

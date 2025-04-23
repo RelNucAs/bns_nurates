@@ -59,8 +59,9 @@ BS_REAL BremKernelS(BS_REAL x, BS_REAL y, BS_REAL eta_star)
     constexpr BS_REAL sixtyseven_hundreds  = 0.67;
     constexpr BS_REAL eighteen_hundreds    = 0.18;
 
-    constexpr BS_REAL ten_minus_fourteen = 1e-14;
+    constexpr BS_REAL ten_minus_fourteen = 1.e-14;
     constexpr BS_REAL ten_minus_ten      = 1.e-10;
+    constexpr BS_REAL ten_minus_seven    = 1.e-7;
 
     constexpr BS_REAL c1 = 0.0044;
     constexpr BS_REAL c2 = 1.05;
@@ -93,11 +94,18 @@ BS_REAL BremKernelS(BS_REAL x, BS_REAL y, BS_REAL eta_star)
         (one - five * u * atan(two / u) / six + u2 / (three * (u2 + four)) +
          atan(one / u_arg) * u_arg / three);
 
-    // @TODO: Leonardo check this! Doing this to prevent s_d from being a large
-    // negative number
-    f_u = (fabs(f_u) < ten_minus_fourteen) ? ten_minus_fourteen : f_u;
+    BS_REAL fu_threshold;
 
-    // f_u = fabs(f_u);
+    if constexpr (std::is_same_v<BS_REAL, float>)
+    {
+       fu_threshold = ten_minus_seven;
+    } else {
+       fu_threshold = ten_minus_fourteen;
+    }
+
+    // @TODO: check this fix! Doing this to prevent s_d from being a large
+    // negative number
+    f_u = (fabs(f_u) < fu_threshold) ? fu_threshold : f_u;
 
     const BS_REAL s_d = three * kBS_PiHalfToFiveHalves *
                         pow(eta_star, -five_halves) *
