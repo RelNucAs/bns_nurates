@@ -679,7 +679,7 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200], const int nx, Opac
             my_grey_opacity_params.eos_pars.temp = d_T(i);
             my_grey_opacity_params.eos_pars.yp   = d_Yp(i);
             my_grey_opacity_params.eos_pars.yn   = d_Yn(i);
-            my_grey_opacity_params.eos_pars.nb   = d_rho(i) * 1e-21 / kBS_Mu;
+            my_grey_opacity_params.eos_pars.nb   = d_rho(i) / kBS_Mu * 1e-21;
             my_grey_opacity_params.eos_pars.ye   = d_Ye(i);
             my_grey_opacity_params.eos_pars.dU   = d_dU(i);
 
