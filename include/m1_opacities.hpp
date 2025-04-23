@@ -1114,7 +1114,7 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
         (my_grey_opacity_params->opacity_flags.use_brem == 1))
     {
         M1MatrixKokkos2D out_pair =
-           ComputeDoubleIntegrand(quad_2d, s_pair, &my_grey_opacity_params, stim_abs);
+           ComputeDoubleIntegrand(quad_2d, s_pair, my_grey_opacity_params, stim_abs);
         GaussLegendreIntegrate2DMatrixForM1Coeffs(quad_2d, &out_pair, s_pair,
                                                   &n_integrals_2d, &e_integrals_2d);
     }
@@ -1125,23 +1125,10 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     if (my_grey_opacity_params->opacity_flags.use_inelastic_scatt == 1)
     {
         M1MatrixKokkos2D out_inel = ComputeNEPSIntegrand(
-            quad_2d, four * s_neps, &my_grey_opacity_params, stim_abs);
+            quad_2d, four * s_neps, my_grey_opacity_params, stim_abs);
         GaussLegendreIntegrate2DMatrixForNEPS(quad_2d, &out_inel, four * s_neps,
                                               &n_neps_2d, &e_neps_2d);
     }
-
-    MyQuadratureIntegrand n_neps_2d = {0};
-    MyQuadratureIntegrand e_neps_2d = {0};
-    if (my_grey_opacity_params->opacity_flags.use_inelastic_scatt == 1)
-    {
-        local_grey_params.opacity_flags = {0};
-        local_grey_params.opacity_flags.use_inelastic_scatt = 1;
-        M1MatrixKokkos2D out_inel                 = ComputeNEPSIntegrand(
-        quad_2d, 4. * s_neps, &local_grey_params, stim_abs);
-        GaussLegendreIntegrate2DMatrixForNEPS(quad_2d, &out_inel, 4. * s_neps,
-                                               &n_neps_2d, &e_neps_2d);
-    }
-
 
     M1Opacities m1_opacities = {0};
 
