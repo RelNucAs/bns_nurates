@@ -335,6 +335,7 @@ void AddPairKernelsToIntegrand(int n, BS_REAL* nu_array,
             }
         }
     }
+
     return;
 }
 
@@ -770,48 +771,48 @@ M1MatrixKokkos2D ComputeDoubleIntegrand(const MyQuadrature* quad, BS_REAL t,
         AddInelKernelsToIntegrand(n, nu_array, grey_pars, &out);
     }
 
-    /*
-    if (grey_pars->opacity_flags.use_abs_em == 1)
-    {
-      AddBetaReactionToIntegrand(n, nu_array, grey_pars, &out, stim_abs);
-    }
-    */
+    // /*
+    // if (grey_pars->opacity_flags.use_abs_em == 1)
+    // {
+    //   AddBetaReactionToIntegrand(n, nu_array, grey_pars, &out, stim_abs);
+    // }
+    // */
 
-    /*
-    //////////////////////////////////////////////
-    ////// ONLY FOR COMPARISON WITH NULIB ////////
-    //////////////////////////////////////////////
-    if (kirchoff_flag)
-    {
-        ann_term_ij[id_nue] +=
-            (pair.m1_mat_em[id_nue][i][j] + brem.m1_mat_em[0][i][j]) *
-            g_nu_bar[id_anue] / g_nu[id_nue];
-        ann_term_ij[id_anue] +=
-            (pair.m1_mat_em[id_anue][i][j] + brem.m1_mat_em[0][i][j]) *
-            g_nu_bar[id_nue] / g_nu[id_anue];
-        ann_term_ij[id_nux] +=
-            (pair.m1_mat_em[id_nux][i][j] + brem.m1_mat_em[0][i][j]) *
-            g_nu_bar[id_anux] / g_nu[id_nux];
-        ann_term_ij[id_anux] +=
-            (pair.m1_mat_em[id_anux][i][j] + brem.m1_mat_em[0][i][j]) *
-            g_nu_bar[id_nux] / g_nu[id_anux];
+    // /*
+    // //////////////////////////////////////////////
+    // ////// ONLY FOR COMPARISON WITH NULIB ////////
+    // //////////////////////////////////////////////
+    // if (kirchoff_flag)
+    // {
+    //     ann_term_ij[id_nue] +=
+    //         (pair.m1_mat_em[id_nue][i][j] + brem.m1_mat_em[0][i][j]) *
+    //         g_nu_bar[id_anue] / g_nu[id_nue];
+    //     ann_term_ij[id_anue] +=
+    //         (pair.m1_mat_em[id_anue][i][j] + brem.m1_mat_em[0][i][j]) *
+    //         g_nu_bar[id_nue] / g_nu[id_anue];
+    //     ann_term_ij[id_nux] +=
+    //         (pair.m1_mat_em[id_nux][i][j] + brem.m1_mat_em[0][i][j]) *
+    //         g_nu_bar[id_anux] / g_nu[id_nux];
+    //     ann_term_ij[id_anux] +=
+    //         (pair.m1_mat_em[id_anux][i][j] + brem.m1_mat_em[0][i][j]) *
+    //         g_nu_bar[id_nux] / g_nu[id_anux];
 
-        ann_term_ji[id_nue] +=
-            (pair.m1_mat_em[id_nue][j][i] + brem.m1_mat_em[0][j][i]) *
-            g_nu[id_anue] / g_nu_bar[id_nue];
-        ann_term_ji[id_anue] +=
-            (pair.m1_mat_em[id_anue][j][i] + brem.m1_mat_em[0][j][i]) *
-            g_nu[id_nue] / g_nu_bar[id_anue];
-        ann_term_ji[id_nux] +=
-            (pair.m1_mat_em[id_nux][j][i] + brem.m1_mat_em[0][j][i]) *
-            g_nu[id_anux] / g_nu_bar[id_nux];
-        ann_term_ji[id_anux] +=
-            (pair.m1_mat_em[id_anux][j][i] + brem.m1_mat_em[0][j][i]) *
-            g_nu[id_nux] / g_nu_bar[id_anux];
-    }
-    */
+    //     ann_term_ji[id_nue] +=
+    //         (pair.m1_mat_em[id_nue][j][i] + brem.m1_mat_em[0][j][i]) *
+    //         g_nu[id_anue] / g_nu_bar[id_nue];
+    //     ann_term_ji[id_anue] +=
+    //         (pair.m1_mat_em[id_anue][j][i] + brem.m1_mat_em[0][j][i]) *
+    //         g_nu[id_nue] / g_nu_bar[id_anue];
+    //     ann_term_ji[id_nux] +=
+    //         (pair.m1_mat_em[id_nux][j][i] + brem.m1_mat_em[0][j][i]) *
+    //         g_nu[id_anux] / g_nu_bar[id_nux];
+    //     ann_term_ji[id_anux] +=
+    //         (pair.m1_mat_em[id_anux][j][i] + brem.m1_mat_em[0][j][i]) *
+    //         g_nu[id_nux] / g_nu_bar[id_anux];
+    // }
+    // */
 
-    //////////////////////////////////////////////
+    // //////////////////////////////////////////////
 
     AddCommonWeightsToIntegrand(n, nu_array, grey_pars, &out, stim_abs);
 
@@ -1106,15 +1107,20 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     }
 
 
+    GreyOpacityParams local_grey_params = *my_grey_opacity_params;
+    
     MyQuadratureIntegrand n_integrals_2d = {0};
     MyQuadratureIntegrand e_integrals_2d = {0};
-
-    GreyOpacityParams local_grey_params = *my_grey_opacity_params;
-    local_grey_params.opacity_flags.use_inelastic_scatt = 0;
-    M1MatrixKokkos2D out_pair =
-        ComputeDoubleIntegrand(quad_2d, s_pair, &local_grey_params, stim_abs);
-    GaussLegendreIntegrate2DMatrixForM1Coeffs(quad_2d, &out_pair, s_pair,
-                                              &n_integrals_2d, &e_integrals_2d);
+    
+    if ((my_grey_opacity_params->opacity_flags.use_pair == 1) ||
+        (my_grey_opacity_params->opacity_flags.use_brem == 1))
+    {
+        local_grey_params.opacity_flags.use_inelastic_scatt = 0;
+        M1MatrixKokkos2D out_pair =
+           ComputeDoubleIntegrand(quad_2d, s_pair, &local_grey_params, stim_abs);
+        GaussLegendreIntegrate2DMatrixForM1Coeffs(quad_2d, &out_pair, s_pair,
+                                                  &n_integrals_2d, &e_integrals_2d);
+    }
 
     MyQuadratureIntegrand n_neps_2d = {0};
     MyQuadratureIntegrand e_neps_2d = {0};

@@ -97,6 +97,8 @@ BS_REAL BremKernelS(BS_REAL x, BS_REAL y, BS_REAL eta_star)
     // negative number
     f_u = (fabs(f_u) < ten_minus_fourteen) ? ten_minus_fourteen : f_u;
 
+    f_u = fabs(f_u);
+
     const BS_REAL s_d = three * kBS_PiHalfToFiveHalves *
                         pow(eta_star, -five_halves) *
                         (POW2(x) + kBS_FourPiSquared) * x * f_u /
