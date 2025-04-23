@@ -5,6 +5,9 @@
 //! \file  kernel_pair.hpp
 //  \brief contains pair kernels and associated helper functions
 
+#ifndef BNS_NURATES_INCLUDE_KERNEL_PAIR_HPP_
+#define BNS_NURATES_INCLUDE_KERNEL_PAIR_HPP_
+
 #include "bns_nurates.hpp"
 #include "constants.hpp"
 #include "functions.hpp"
@@ -258,3 +261,5 @@ void PairKernelsTable(const int n, const BS_REAL* nu_array,
 
     return;
 }
+
+#endif // BNS_NURATES_INCLUDE_KERNEL_PAIR_HPP_

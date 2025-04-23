@@ -87,6 +87,7 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
         "l_anue_inv", num_data);
 
 
+
     // read in the data file
     int i = 0;
     char line[1000];
@@ -282,7 +283,6 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
                 .use_BRT_brem       = d_opacity_pars(5),
                 .use_NN_medium_corr = d_opacity_pars(6),
                 .neglect_blocking   = d_opacity_pars(7)};
-
 
             // populate EOS parameters from table
             my_grey_opacity_params.eos_pars.mu_e = d_mu_e(i);
@@ -676,7 +676,6 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200],
                 .use_NN_medium_corr = d_opacity_pars(6),
                 .neglect_blocking   = d_opacity_pars(7)};
 
-
             // populate EOS parameters from table
             my_grey_opacity_params.eos_pars.mu_e = d_mu_e(i);
             my_grey_opacity_params.eos_pars.mu_p = d_mu_p(i);
@@ -837,9 +836,10 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
     const BS_REAL log_e_min = -1;
     const BS_REAL log_e_max = +3;
 
-    const BS_REAL dE = (log_e_max - log_e_min) / ((BS_REAL)n_bins);
+    const BS_REAL dE = (log_e_max - log_e_min) / ((BS_REAL) n_bins);
 
     for (int i = 0; i < n_bins; i++)
+
     {
         h_e_bins(i) = pow(10., log_e_min + i * dE);
     }
@@ -1144,6 +1144,7 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
                 d_kappa_s(j, i, id_nux)  = rates.kappa_s[id_nux];
                 d_kappa_s(j, i, id_anux) = rates.kappa_s[id_anux];
             }
+
         });
 
     printf("# Back on CPU, waiting for Kokkos fence\n");

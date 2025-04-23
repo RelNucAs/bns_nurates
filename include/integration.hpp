@@ -753,6 +753,7 @@ void GaussLegendreIntegrate2DMatrixForNEPS(const MyQuadrature* quad,
                             (aux_3 * mat->m1_mat_ab[idx][n + i][j] +
                              aux_4 * mat->m1_mat_ab[idx][n + i][n + j]) /
                                 x3_i);
+
             }
         }
     }

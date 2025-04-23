@@ -438,4 +438,13 @@ tests/tests_opacities_spectral/output/*.txt
 # VSC workspace files
 *.code-workspace
 
+# Python cache files
+**/__pycache__/
+
+# Bindings generation files 
+bindings/_bnsnurates*
+bindings/bnsnurates.py
+bindings/bnsnurates_wrap.cpp
+
+# Build files
 build*
