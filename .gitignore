@@ -438,4 +438,4 @@ tests/tests_opacities_spectral/output/*.txt
 # VSC workspace files
 *.code-workspace
 
-build/*
+build*
