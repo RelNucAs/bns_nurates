@@ -514,7 +514,7 @@ GaussLegendreIntegrate1D(MyQuadrature* quad, MyFunctionMultiD* func, BS_REAL* t)
 
     int num_integrands = func->my_quadrature_integrand.n;
     BS_ASSERT(num_integrands <= num_max_integrands);
-    BS_REAL f1_x[num_max_integrands][n_max], f2_x[num_max_integrands][n_max];
+    BS_REAL f1_x[num_max_integrands][BS_N_MAX], f2_x[num_max_integrands][BS_N_MAX];
     BS_REAL var[2];
     MyQuadratureIntegrand result;
 
@@ -770,7 +770,7 @@ void GaussLegendreIntegrate2DMatrixForNEPS(const MyQuadrature* quad,
 KOKKOS_INLINE_FUNCTION
 MyQuadratureIntegrand GaussLegendreIntegrate1DMatrix(const MyQuadrature* quad,
                                                      const int num_integrands,
-                                                     const BS_REAL mat[][n_max],
+                                                     const BS_REAL mat[][BS_N_MAX],
                                                      BS_REAL* t)
 {
     const int n = quad->nx;
@@ -805,7 +805,7 @@ MyQuadratureIntegrand GaussLegendreIntegrate1DMatrix(const MyQuadrature* quad,
 KOKKOS_INLINE_FUNCTION
 void GaussLegendreIntegrate1DMatrixOnlyNumber(const MyQuadrature* quad,
                                               const int num_integrands,
-                                              const BS_REAL mat[][n_max],
+                                              const BS_REAL mat[][BS_N_MAX],
                                               BS_REAL* t,
                                               MyQuadratureIntegrand* out_n,
                                               MyQuadratureIntegrand* out_j)

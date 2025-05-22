@@ -54,7 +54,7 @@ typedef REAL_TYPE BS_REAL;
 #define dim_pair_t 100
 
 // Define maximum number of quadrature points
-#define n_max 40
+#define BS_N_MAX 40
 
 /* ==================================================================================
  * Integration structures
@@ -110,9 +110,9 @@ struct MyQuadrature
     BS_REAL z1; // lower limit of z, set to -42 if unused
     BS_REAL z2; // upper limit of z, set to -42 if unused
     BS_REAL
-    points[n_max];    // points for the quadrature scheme (store points in the
+    points[BS_N_MAX];    // points for the quadrature scheme (store points in the
                       // points direction, then y and z in one flat array)
-    BS_REAL w[n_max]; // weights for the quadrature scheme (store points in the
+    BS_REAL w[BS_N_MAX]; // weights for the quadrature scheme (store points in the
                       // points direction, then y and z in one flat array)
 };
 typedef struct MyQuadrature MyQuadrature;
@@ -474,22 +474,22 @@ typedef struct M1Matrix M1Matrix;
 
 struct M1MatrixKokkos2D
 {
-    BS_REAL m1_mat_em[total_num_species][n_max][n_max];
-    BS_REAL m1_mat_ab[total_num_species][n_max][n_max];
+    BS_REAL m1_mat_em[total_num_species][BS_N_MAX][BS_N_MAX];
+    BS_REAL m1_mat_ab[total_num_species][BS_N_MAX][BS_N_MAX];
 };
 typedef struct M1MatrixKokkos2D M1MatrixKokkos2D;
 
 struct M1MatrixKokkos2DFlatten
 {
-    BS_REAL m1_mat_em[total_num_species][n_max * n_max];
-    BS_REAL m1_mat_ab[total_num_species][n_max * n_max];
+    BS_REAL m1_mat_em[total_num_species][BS_N_MAX * BS_N_MAX];
+    BS_REAL m1_mat_ab[total_num_species][BS_N_MAX * BS_N_MAX];
 };
 typedef struct M1MatrixKokkos2DFlatten M1MatrixKokkos2DFlatten;
 
 
 struct M1MatrixKokkos1D
 {
-    BS_REAL m1_mat[12][n_max];
+    BS_REAL m1_mat[12][BS_N_MAX];
 };
 typedef struct M1MatrixKokkos1D M1MatrixKokkos1D;
 
