@@ -94,7 +94,7 @@ void NucFrmFac(const BS_REAL E, BS_REAL* cv, BS_REAL* ca, BS_REAL* F2,
     }
     else
     {
-        printf("Error: reacflag out of range in NucFrmFac\n");
+        Kokkos::printf("Error: reacflag out of range in NucFrmFac\n");
     }
 
     *cv = frm1;

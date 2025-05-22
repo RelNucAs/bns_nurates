@@ -536,7 +536,7 @@ typedef struct MyFunctionSpecial MyFunctionSpecial;
 inline void BS_do_assert(const char* snippet, const char* file, int line,
                          const char* message, ...)
 {
-    printf("\n\n---- Assert failed ----\n"
+    Kokkos::printf("\n\n---- Assert failed ----\n"
            "EXPRESSION: %s\n"
            "FILE: %s\n"
            "LINE: %d\n\n",
@@ -550,7 +550,7 @@ inline void BS_do_assert(const char* snippet, const char* file, int line,
         vprintf(data, arg);
     }
 
-    printf("\n\n");
+    Kokkos::printf("\n\n");
     fflush(stdout);
 
     abort();
