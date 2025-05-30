@@ -10,7 +10,19 @@ import argparse
 import subprocess
 
 # Replacement rules go here (only change this)
-replacement_rules = [("func_tgamma", "tgamma"),("Kokkos::tgamma", "tgamma"),("Kokkos::printf", "printf"),("KOKKOS_INLINE_FUNCTION","inline")]
+replacement_rules = [("BS_PRINTF", "printf"),("KOKKOS_INLINE_FUNCTION","inline")]
+
+# Text block to replace
+text_block = """#ifndef KOKKOS_INLINE_FUNCTION
+#ifdef KOKKOS_FLAG
+#include <Kokkos_Core.hpp>
+#define BS_PRINTF Kokkos::printf
+#else
+#define KOKKOS_INLINE_FUNCTION inline
+#define BS_PRINTF printf
+#endif
+#endif
+"""
 
 # Compute the diff between a file in the source and destination
 def diff_files(source_filepath, destination_filepath):
@@ -28,6 +40,12 @@ def replace_file_content(file_content, replacements):
 
     return modified_content
 
+# Remove Kokkos block from bns_nurates.hpp
+def remove_bns_nurates_text_block(file_content):
+    modified_content = file_content.replace(text_block,"")
+    
+    return modified_content
+    
 # Perform text substitions on all files in a folder
 def refactor_and_copy(source_dir, destination_dir, replacements):
     
@@ -56,7 +74,10 @@ def refactor_and_copy(source_dir, destination_dir, replacements):
 
         with open(source_filepath, 'r') as f:
             content = f.read()
-
+            
+            if(filename == "bns_nurates.hpp"):
+                content = remove_bns_nurates_text_block(content)
+                
             modified_content = replace_file_content(content, replacements)
 
             with open(destination_filepath, 'w') as out:
