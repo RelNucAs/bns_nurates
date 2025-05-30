@@ -5,64 +5,12 @@ and export the resulting files for use with Weakrates2 thorn
 Usage: python export_thc.py /path/to/bns_nurates /path/to/destination
 """
 
-import re
 import os
-import shutil
-import numpy as np
-import subprocess
 import argparse
+import subprocess
 
-# Function to define macro for KOKKOS_INLINE_FUNCTION as normal inline in bns_nurates.hpp
-def replace_macro_bns_nurates_hpp(input_filepath, output_filepath):
-    replacement_line = '#define KOKKOS_INLINE_FUNCTION inline\n'
-    
-    with open(input_filepath, 'r') as file:
-        input_lines = file.readlines()
-
-    idx = 0
-    with open(output_filepath, 'w') as file:
-        inside_block = False
-        for line in input_lines:
-            if(idx < 16):
-                if re.match(r'#ifndef KOKKOS_INLINE_FUNCTION', line):
-                    inside_block = True
-                    file.write(replacement_line)
-                    continue
-                elif re.match(r'#endif', line):
-                    if inside_block:
-                        inside_block = False
-                    continue 
-                elif inside_block:
-                    continue
-                
-            file.write(line)
-            idx = idx + 1
-
-# Function to define macro for tgamma with tgamma in math.h in kernel_pair.hpp
-def replace_macro_kernel_pair_hpp(input_filepath, output_filepath):
-    replacement_line = '#define func_tgamma(x) tgamma(x)\n'
-    
-    with open(input_filepath, 'r') as file:
-        input_lines = file.readlines()
-
-    idx = 0
-    with open(output_filepath, 'w') as file:
-        inside_block = False
-        for line in input_lines:
-            if(idx < 15):
-                if re.match(r'#ifdef KOKKOS_FLAG', line):
-                    inside_block = True
-                    file.write(replacement_line)
-                    continue
-                elif re.match(r'#endif', line):
-                    if inside_block and idx > 0:
-                        inside_block = False
-                    continue 
-                elif inside_block:
-                    continue
-            
-            file.write(line)
-            idx = idx + 1
+# Replacement rules go here (only change this)
+replacement_rules = [("func_tgamma", "tgamma"),("Kokkos::tgamma", "tgamma"),("Kokkos::printf", "printf"),("KOKKOS_INLINE_FUNCTION","inline")]
 
 # Compute the diff between a file in the source and destination
 def diff_files(source_filepath, destination_filepath):
@@ -71,30 +19,50 @@ def diff_files(source_filepath, destination_filepath):
 
     return filediff.stdout
 
-# function to copy hpp and cpp files into a destination directory fixing the macros
-# Needs full path of top level bns_nurates directory and the destination directory
-def refactor_and_copy(source_dir, destination_dir):
+# Perform text subsitutions on file content
+def replace_file_content(file_content, replacements):
+
+    modified_content = file_content
+    for find_string, replace_string in replacements:
+        modified_content = modified_content.replace(find_string, replace_string)
+
+    return modified_content
+
+# Perform text substitions on all files in a folder
+def refactor_and_copy(source_dir, destination_dir, replacements):
     
-    files = os.listdir(source_dir + '/include/')
-    files_full = np.array([os.path.join(source_dir + '/include/', file) for file in files])
+    source_include_dir = os.path.join(source_dir, "include")
+    if not os.path.isdir(source_include_dir):
+        print(f"Source directory {source_include_dir} does not exist!")
+        print("Aborting.")
+        return False
+
+    try:
+        files = os.listdir(source_include_dir)
+    except OSError as e:
+        print(f"Error getting filenames in {source_include_dir}: {e}")
+        print("Aborting.")
+        return False
+
     diff_stdout = []
+    for filename in files:
+        source_filepath = os.path.join(source_include_dir, filename)
+        destination_filepath = os.path.join(destination_dir, filename)
 
-    for i in range(0,len(files)):
-    
-        file = files[i]
-        file_full = files_full[i]
-        destination_file = destination_dir + '/' + file
-    
-        print(f"Copying {file_full} to {destination_file}")
-        
-        if(file == "bns_nurates.hpp"):
-            replace_macro_bns_nurates_hpp(file_full, destination_file)
-        elif(file == "kernel_pair.hpp"):
-            replace_macro_kernel_pair_hpp(file_full, destination_file)
-        else:    
-            shutil.copy(file_full, destination_file)
+        if not os.path.isfile(source_filepath):
+            printf(f"Error {source_filepath} is not a file!")
+            printf("Aborting.")
+            return False
 
-        diff_stdout.append(diff_files(file_full, destination_file))
+        with open(source_filepath, 'r') as f:
+            content = f.read()
+
+            modified_content = replace_file_content(content, replacements)
+
+            with open(destination_filepath, 'w') as out:
+                out.write(modified_content)
+
+        diff_stdout.append(diff_files(source_filepath, destination_filepath))
 
     print("=============")
     print("Changes made:")
@@ -102,8 +70,10 @@ def refactor_and_copy(source_dir, destination_dir):
     for diff in diff_stdout:
         print(diff)
 
+    return True
+    
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Prepare include files from bns_nurates for THC")
+    parser = argparse.ArgumentParser(description="Prepare include files from bns_nurates for THC installation")
     parser.add_argument('source_dir', type=str, help="Full path for the top level bns_nurates directory")
     parser.add_argument('destination_dir', type=str, help="Full path of the destination directory")
 
@@ -120,4 +90,5 @@ if __name__ == "__main__":
         os.makedirs(destination_dir)
         print(f"Created destination directory: {destination_dir}")
 
-    refactor_and_copy(source_dir, destination_dir)
+    result = refactor_and_copy(source_dir, destination_dir, replacement_rules)
+    print(result)
