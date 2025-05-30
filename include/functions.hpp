@@ -29,12 +29,12 @@ constexpr BS_REAL fdi_litconst          = 7.38905609893065023;
 #ifndef _USENRERRORCLASS_
 #define throw(message)                                                         \
     //} //\
-        //Kokkos::printf("ERROR: %s\n     in file %s at line %d\n", message, __FILE__, \
+        //BS_PRINTF("ERROR: %s\n     in file %s at line %d\n", message, __FILE__, \
                __LINE__);
                                                                      \
         //exit(1);
         //BS_REAL dummy_var = -42.;
-        Kokkos::printf("Throw function here");
+        BS_PRINTF("Throw function here");
                                                                       \
     //}
 #else
@@ -50,7 +50,7 @@ struct NRerror
 #define throw(message) throw(NRerror(message, __FILE__, __LINE__));
 void NRcatch(NRerror err)
 {
-    Kokkos::printf("ERROR: %s\n     in file %s at line %d\n", err.message, err.file,
+    BS_PRINTF("ERROR: %s\n     in file %s at line %d\n", err.message, err.file,
            err.line);
     exit(1);
 }
@@ -327,7 +327,7 @@ void SFPsiOutput(const BS_REAL x, SFResult* result)
     {
         // result->val = std::nan;
         // result->err = std::nan;
-        Kokkos::printf("Error in digamma computation\n");
+        BS_PRINTF("Error in digamma computation\n");
         exit(EXIT_FAILURE);
     }
     else if (y >= 2.0)
@@ -343,7 +343,7 @@ void SFPsiOutput(const BS_REAL x, SFResult* result)
             {
                 // result->val = std::nan;
                 // result->err = std::nan;
-                Kokkos::printf("Error in digamma computation\n");
+                BS_PRINTF("Error in digamma computation\n");
                 exit(EXIT_FAILURE);
             }
             else
@@ -4433,7 +4433,7 @@ BS_REAL Gammln(const BS_REAL xx)
     if (xx <= 0)
     {
         // throw("bad arg in gammln");
-        Kokkos::printf("bad arg in gammln");
+        BS_PRINTF("bad arg in gammln");
         // exit(1);
     }
 
@@ -4541,9 +4541,9 @@ BS_REAL MNewt1d(BS_REAL guess, BS_REAL x1, BS_REAL x2, BS_REAL f0,
 
     if ((fl > zero && fh > zero) || (fl < zero && fh < zero))
     {
-        Kokkos::printf("xl = %.3e, fl = %.3e\n", x1, fl);
-        Kokkos::printf("xh = %.3e, fh = %.3e\n", x2, fh);
-        Kokkos::printf("Root must be bracketed in rtsafe");
+        BS_PRINTF("xl = %.3e, fl = %.3e\n", x1, fl);
+        BS_PRINTF("xh = %.3e, fh = %.3e\n", x2, fh);
+        BS_PRINTF("Root must be bracketed in rtsafe");
         exit(1);
         // throw("Root must be bracketed in rtsafe");
     }
@@ -4609,7 +4609,7 @@ BS_REAL MNewt1d(BS_REAL guess, BS_REAL x1, BS_REAL x2, BS_REAL f0,
         }
     }
     // throw("Maximum number of iterations exceeded in rtsafe");
-    Kokkos::printf("Maximum number of iterations exceeded in rtsafe");
+    BS_PRINTF("Maximum number of iterations exceeded in rtsafe");
     exit(1);
 }
 
@@ -4688,7 +4688,7 @@ void MNewt2d(BS_REAL* x, BS_REAL C[2],
         {
             errx += fabs(p[i]);
             x[i] += p[i];
-            // Kokkos::printf("x[%d] = %.3e\n", i, x[i]);
+            // BS_PRINTF("x[%d] = %.3e\n", i, x[i]);
         }
         if (errx <= tolx_2d)
             return;

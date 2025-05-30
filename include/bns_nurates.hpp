@@ -37,8 +37,10 @@ typedef REAL_TYPE BS_REAL;
 #ifndef KOKKOS_INLINE_FUNCTION
 #ifdef KOKKOS_FLAG
 #include <Kokkos_Core.hpp>
+#define BS_PRINTF Kokkos::printf
 #else
 #define KOKKOS_INLINE_FUNCTION inline
+#define BS_PRINTF printf
 #endif
 #endif
 
@@ -536,7 +538,7 @@ typedef struct MyFunctionSpecial MyFunctionSpecial;
 inline void BS_do_assert(const char* snippet, const char* file, int line,
                          const char* message, ...)
 {
-    Kokkos::printf("\n\n---- Assert failed ----\n"
+    BS_PRINTF("\n\n---- Assert failed ----\n"
            "EXPRESSION: %s\n"
            "FILE: %s\n"
            "LINE: %d\n\n",
@@ -550,7 +552,7 @@ inline void BS_do_assert(const char* snippet, const char* file, int line,
         vprintf(data, arg);
     }
 
-    Kokkos::printf("\n\n");
+    BS_PRINTF("\n\n");
     fflush(stdout);
 
     abort();
