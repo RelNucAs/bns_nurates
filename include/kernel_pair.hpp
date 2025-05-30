@@ -12,12 +12,6 @@
 #include "constants.hpp"
 #include "functions.hpp"
 
-#ifdef KOKKOS_FLAG
-#define func_tgamma(x) Kokkos::tgamma(x)
-#else
-#define func_tgamma(x) tgamma(x)
-#endif
-
 
 KOKKOS_INLINE_FUNCTION
 void PairPsi(const int l, const BS_REAL y, const BS_REAL z, const BS_REAL eta,

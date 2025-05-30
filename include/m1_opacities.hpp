@@ -39,7 +39,7 @@ constexpr BS_REAL THRESHOLD_J = 1e-25;
 KOKKOS_INLINE_FUNCTION
 void Scattering1DIntegrand(const MyQuadrature* quad,
                            GreyOpacityParams* grey_pars, const BS_REAL* t,
-                           BS_REAL out[][n_max])
+                           BS_REAL out[][BS_N_MAX])
 {
     constexpr BS_REAL four_pi = 4 * kBS_Pi;
 
@@ -92,8 +92,8 @@ void Scattering1DIntegrand(const MyQuadrature* quad,
 
 KOKKOS_INLINE_FUNCTION
 void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
-                     const BS_REAL* t, BS_REAL out_em[][n_max],
-                     BS_REAL out_ab[][n_max], const int stim_abs)
+                     const BS_REAL* t, BS_REAL out_em[][BS_N_MAX],
+                     BS_REAL out_ab[][BS_N_MAX], const int stim_abs)
 {
     const int n = quad->nx;
     BS_REAL nu, nu_sqr, g_nu;
@@ -734,7 +734,7 @@ M1MatrixKokkos2D ComputeDoubleIntegrand(const MyQuadrature* quad, BS_REAL t,
 {
     const int n = quad->nx;
     BS_REAL nu, nu_bar;
-    BS_REAL nu_array[n_max];
+    BS_REAL nu_array[BS_N_MAX];
     M1MatrixKokkos2D out = {0};
 
     for (int i = 0; i < n; ++i)
@@ -1079,7 +1079,7 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     MyQuadratureIntegrand iso_integrals = {0};
     if (my_grey_opacity_params->opacity_flags.use_iso == 1)
     {
-        BS_REAL out_iso[total_num_species][n_max];
+        BS_REAL out_iso[total_num_species][BS_N_MAX];
         Scattering1DIntegrand(quad_1d, my_grey_opacity_params, s_iso, out_iso);
         iso_integrals = GaussLegendreIntegrate1DMatrix(
             quad_1d, total_num_species, out_iso, s_iso);
@@ -1092,8 +1092,8 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
 
     if (my_grey_opacity_params->opacity_flags.use_abs_em == 1)
     {
-        BS_REAL out_beta_em[total_num_species][n_max];
-        BS_REAL out_beta_ab[total_num_species][n_max];
+        BS_REAL out_beta_em[total_num_species][BS_N_MAX];
+        BS_REAL out_beta_ab[total_num_species][BS_N_MAX];
 
         Beta1DIntegrand(quad_1d, my_grey_opacity_params, s_beta, out_beta_em,
                         out_beta_ab, stim_abs);
