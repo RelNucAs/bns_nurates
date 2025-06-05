@@ -370,7 +370,7 @@ MyKernelOutput BremKernelsLegCoeff(BremKernelParams* kernel_params,
         s_abs = -one * s_abs; // first Legedre coefficient
         break;
     default:
-        printf("BremKernelsLegCoeff (kernel_brem.c): l = %d must be either 0 "
+        BS_PRINTF("BremKernelsLegCoeff (kernel_brem.c): l = %d must be either 0 "
                "or 1\n",
                l);
     }
