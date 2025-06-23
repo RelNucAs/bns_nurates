@@ -13,14 +13,12 @@ import subprocess
 replacement_rules = [("BS_PRINTF", "printf"),("KOKKOS_INLINE_FUNCTION","inline")]
 
 # Text block to replace
-text_block = """#ifndef KOKKOS_INLINE_FUNCTION
-#ifdef KOKKOS_FLAG
+text_block = """#ifdef KOKKOS_INLINE_FUNCTION
 #include <Kokkos_Core.hpp>
 #define BS_PRINTF Kokkos::printf
 #else
 #define KOKKOS_INLINE_FUNCTION inline
 #define BS_PRINTF printf
-#endif
 #endif
 """
 

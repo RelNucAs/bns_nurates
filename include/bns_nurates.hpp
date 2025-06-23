@@ -29,19 +29,16 @@
 #ifndef REAL_TYPE
 #define REAL_TYPE double
 #define REAL_TYPE_IS_DOUBLE
-#warning "REAL_TYPE for BNSNURATES has been set to double (default)."
 #endif
 
 typedef REAL_TYPE BS_REAL;
 
-#ifndef KOKKOS_INLINE_FUNCTION
-#ifdef KOKKOS_FLAG
+#ifdef KOKKOS_INLINE_FUNCTION
 #include <Kokkos_Core.hpp>
 #define BS_PRINTF Kokkos::printf
 #else
 #define KOKKOS_INLINE_FUNCTION inline
 #define BS_PRINTF printf
-#endif
 #endif
 
 // Define indices of neutrino species
