@@ -1030,12 +1030,9 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     for (int idx = 0; idx < total_num_species; ++idx)
     {
         // m1_pars.n and m1_pars.J are assumed to be parsed in [nm^-3]
-        // and [g nm^-1 s^-2]
+        // and [MeV nm^-3]
         n[idx] = my_grey_opacity_params->m1_pars.n[idx];
         J[idx] = my_grey_opacity_params->m1_pars.J[idx];
-
-        // g nm-1 s^-1 -> MeV nm-3 conversion
-        J[idx] = J[idx] / kBS_MeV;
     }
 
     const BS_REAL temp  = my_grey_opacity_params->eos_pars.temp;
