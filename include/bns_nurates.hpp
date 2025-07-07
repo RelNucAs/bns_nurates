@@ -109,10 +109,11 @@ struct MyQuadrature
     BS_REAL z1; // lower limit of z, set to -42 if unused
     BS_REAL z2; // upper limit of z, set to -42 if unused
     BS_REAL
-    points[BS_N_MAX];    // points for the quadrature scheme (store points in the
+    points[BS_N_MAX]; // points for the quadrature scheme (store points in the
                       // points direction, then y and z in one flat array)
-    BS_REAL w[BS_N_MAX]; // weights for the quadrature scheme (store points in the
-                      // points direction, then y and z in one flat array)
+    BS_REAL
+        w[BS_N_MAX]; // weights for the quadrature scheme (store points in the
+                     // points direction, then y and z in one flat array)
 };
 typedef struct MyQuadrature MyQuadrature;
 __attribute__((unused)) static MyQuadrature quadrature_default = {.type =
@@ -536,10 +537,10 @@ inline void BS_do_assert(const char* snippet, const char* file, int line,
                          const char* message, ...)
 {
     BS_PRINTF("\n\n---- Assert failed ----\n"
-           "EXPRESSION: %s\n"
-           "FILE: %s\n"
-           "LINE: %d\n\n",
-           snippet, file, line);
+              "EXPRESSION: %s\n"
+              "FILE: %s\n"
+              "LINE: %d\n\n",
+              snippet, file, line);
 
     if (*message)
     {

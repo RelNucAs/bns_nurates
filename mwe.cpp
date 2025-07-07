@@ -13,10 +13,10 @@ int main(int argc, char* argv[])
 {
     // Fix the neutrino energy for computation of spectral rates
     const double nu_energy = 10.; // [MeV]
-    
+
     // Input thermodynamic quantities (corresponding to point A in Chiesa+25 PRD)
     // N.B.: chemical potentials include the rest mass contribution
-    const double nb = 4.208366627847035e+38;  // Baryon number density [cm-3]           
+    const double nb = 4.208366627847035e+38;  // Baryon number density [cm-3]
     const double T = 12.406403541564941;      // Temperature [MeV]
     const double ye = 0.07158458232879639;    // Electron fraction
     const double mu_e = 187.1814489;          // Electron chemical potential [MeV]
@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
     // N.B.: only the 'nx' member can be modified, all the others should
     //       be always set as the following
     MyQuadrature my_quadrature;
-    my_quadrature.nx   = 6;  // number of quadrature points   
+    my_quadrature.nx   = 6;  // number of quadrature points
     my_quadrature.dim  = 1;
     my_quadrature.type = kGauleg;
     my_quadrature.x1   = 0.;
@@ -174,7 +174,7 @@ int main(int argc, char* argv[])
     // Compute and output spectral emissivities and inverse mean free paths (not in the stimulated
     // absorption formalism)
     spectral_rates = ComputeSpectralOpacitiesNotStimulatedAbs(nu_energy, &my_quadrature, &my_grey_opacity_params);
-    
+
     // The numerical factors restore usual units (see output)
     // N.B.: 'j' and 'kappa' are the spectral emissivities and inverse mean free paths for the
     //       sum of the active inelastic reactions, 'j_s' and 'kappa_s' are the equivalent for

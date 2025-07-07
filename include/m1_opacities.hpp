@@ -1072,7 +1072,6 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     }
 
 
-
     MyQuadratureIntegrand iso_integrals = {0};
     if (my_grey_opacity_params->opacity_flags.use_iso == 1)
     {
@@ -1106,19 +1105,19 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
 
     MyQuadratureIntegrand n_integrals_2d = {0};
     MyQuadratureIntegrand e_integrals_2d = {0};
-    
+
     if ((my_grey_opacity_params->opacity_flags.use_pair == 1) ||
         (my_grey_opacity_params->opacity_flags.use_brem == 1))
     {
-        M1MatrixKokkos2D out_pair =
-           ComputeDoubleIntegrand(quad_2d, s_pair, my_grey_opacity_params, stim_abs);
-        GaussLegendreIntegrate2DMatrixForM1Coeffs(quad_2d, &out_pair, s_pair,
-                                                  &n_integrals_2d, &e_integrals_2d);
+        M1MatrixKokkos2D out_pair = ComputeDoubleIntegrand(
+            quad_2d, s_pair, my_grey_opacity_params, stim_abs);
+        GaussLegendreIntegrate2DMatrixForM1Coeffs(
+            quad_2d, &out_pair, s_pair, &n_integrals_2d, &e_integrals_2d);
     }
 
     MyQuadratureIntegrand n_neps_2d = {0};
     MyQuadratureIntegrand e_neps_2d = {0};
-   
+
     if (my_grey_opacity_params->opacity_flags.use_inelastic_scatt == 1)
     {
         M1MatrixKokkos2D out_inel = ComputeNEPSIntegrand(
@@ -1530,7 +1529,7 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
                                      &my_grey_opacity_params->eos_pars, 0);
     }
 
-    
+
     SpectralOpacities sp_opacities;
 
     sp_opacities.j[id_nue] = abs_em_beta.em[id_nue] +

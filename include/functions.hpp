@@ -29,7 +29,8 @@ constexpr BS_REAL fdi_litconst          = 7.38905609893065023;
 #ifndef _USENRERRORCLASS_
 #define throw(message)                                                         \
     //} //\
-        //BS_PRINTF("ERROR: %s\n     in file %s at line %d\n", message, __FILE__, \
+        //BS_PRINTF("ERROR: %s\n     in file %s at line %d\n", message,
+__FILE__, \
                __LINE__);
                                                                      \
         //exit(1);
