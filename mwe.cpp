@@ -13,10 +13,10 @@ int main(int argc, char* argv[])
 {
     // Fix the neutrino energy for computation of spectral rates
     const double nu_energy = 10.; // [MeV]
-    
+
     // Input thermodynamic quantities (corresponding to point A in Chiesa+25 PRD)
     // N.B.: chemical potentials include the rest mass contribution
-    const double nb = 4.208366627847035e+38;  // Baryon number density [cm-3]           
+    const double nb = 4.208366627847035e+38;  // Baryon number density [cm-3]
     const double T = 12.406403541564941;      // Temperature [MeV]
     const double ye = 0.07158458232879639;    // Electron fraction
     const double mu_e = 187.1814489;          // Electron chemical potential [MeV]
@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
     // N.B.: only the 'nx' member can be modified, all the others should
     //       be always set as the following
     MyQuadrature my_quadrature;
-    my_quadrature.nx   = 6;  // number of quadrature points   
+    my_quadrature.nx   = 6;  // number of quadrature points
     my_quadrature.dim  = 1;
     my_quadrature.type = kGauleg;
     my_quadrature.x1   = 0.;
@@ -153,22 +153,16 @@ int main(int argc, char* argv[])
     my_grey_opacity_params.m1_pars.chi[id_nux]  = 0.333333333333333333333333333;
     my_grey_opacity_params.m1_pars.chi[id_anux] = 0.333333333333333333333333333;
 
-    // Restore to input units (from MeV nm^-3 to g s^-2 nm^-1)
-    my_grey_opacity_params.m1_pars.J[id_nue] *= kBS_MeV;
-    my_grey_opacity_params.m1_pars.J[id_anue] *= kBS_MeV;
-    my_grey_opacity_params.m1_pars.J[id_nux] *= kBS_MeV;
-    my_grey_opacity_params.m1_pars.J[id_anux] *= kBS_MeV;
-
     // Restore units of cm^-3 and MeV cm^-3 for printing
     const double n_nue_eq = my_grey_opacity_params.m1_pars.n[id_nue] * 1e21;
     const double n_anue_eq = my_grey_opacity_params.m1_pars.n[id_anue] * 1e21;
     const double n_nux_eq = my_grey_opacity_params.m1_pars.n[id_nux] * 1e21;
     const double n_anux_eq = my_grey_opacity_params.m1_pars.n[id_anux] * 1e21;
 
-    const double J_nue_eq = my_grey_opacity_params.m1_pars.J[id_nue] * 1e21 / kBS_MeV;
-    const double J_anue_eq = my_grey_opacity_params.m1_pars.J[id_anue] * 1e21 / kBS_MeV;
-    const double J_nux_eq = my_grey_opacity_params.m1_pars.J[id_nux] * 1e21 / kBS_MeV;
-    const double J_anux_eq = my_grey_opacity_params.m1_pars.J[id_anux] * 1e21 / kBS_MeV;
+    const double J_nue_eq = my_grey_opacity_params.m1_pars.J[id_nue] * 1e21;
+    const double J_anue_eq = my_grey_opacity_params.m1_pars.J[id_anue] * 1e21;
+    const double J_nux_eq = my_grey_opacity_params.m1_pars.J[id_nux] * 1e21;
+    const double J_anux_eq = my_grey_opacity_params.m1_pars.J[id_anux] * 1e21;
 
     printf("Reconstructed neutrino densities assuming equilibrium\n");
     printf("-----------------------------------------------------\n");
@@ -180,7 +174,7 @@ int main(int argc, char* argv[])
     // Compute and output spectral emissivities and inverse mean free paths (not in the stimulated
     // absorption formalism)
     spectral_rates = ComputeSpectralOpacitiesNotStimulatedAbs(nu_energy, &my_quadrature, &my_grey_opacity_params);
-    
+
     // The numerical factors restore usual units (see output)
     // N.B.: 'j' and 'kappa' are the spectral emissivities and inverse mean free paths for the
     //       sum of the active inelastic reactions, 'j_s' and 'kappa_s' are the equivalent for
@@ -233,16 +227,16 @@ int main(int argc, char* argv[])
 
     // Set neutrino number and energy densities
     my_grey_opacity_params.m1_pars.n[id_nue]    = n_nue * 1e-21; // nm^-3
-    my_grey_opacity_params.m1_pars.J[id_nue]    = j_nue * 1e-21 * kBS_MeV; // g s^-2 nm^-1
+    my_grey_opacity_params.m1_pars.J[id_nue]    = j_nue * 1e-21; // MeV nm^-3
     my_grey_opacity_params.m1_pars.chi[id_nue]  = chi_nue;
     my_grey_opacity_params.m1_pars.n[id_anue]   = n_anue * 1e-21; // nm^-3
-    my_grey_opacity_params.m1_pars.J[id_anue]   = j_anue * 1e-21 * kBS_MeV; // g s^-2 nm^-1
+    my_grey_opacity_params.m1_pars.J[id_anue]   = j_anue * 1e-21; // MeV nm^-3
     my_grey_opacity_params.m1_pars.chi[id_anue] = chi_anue;
     my_grey_opacity_params.m1_pars.n[id_nux]    = n_nux * 1e-21; // nm^-3
-    my_grey_opacity_params.m1_pars.J[id_nux]    = j_nux * 1e-21 * kBS_MeV; // g s^-2 nm^-1
+    my_grey_opacity_params.m1_pars.J[id_nux]    = j_nux * 1e-21; // MeV nm^-3
     my_grey_opacity_params.m1_pars.chi[id_nux]  = chi_nux;
     my_grey_opacity_params.m1_pars.n[id_anux]   = n_nux * 1e-21; // nm^-3
-    my_grey_opacity_params.m1_pars.J[id_anux]   = j_nux * 1e-21 * kBS_MeV; // g s^-2 nm^-1
+    my_grey_opacity_params.m1_pars.J[id_anux]   = j_nux * 1e-21; // MeV nm^-3
     my_grey_opacity_params.m1_pars.chi[id_anux] = chi_nux;
 
     // Compute neutrino distribution parameters from neutrino number/energy

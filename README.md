@@ -95,12 +95,12 @@ BNS_NURATES implements the following neutrino reactions (see also [^fn1]):
     Implemented as in [^fn2], [^fn3] under the assumption of zero-momentum transfer and non-relativistic nucleons. We account for the impact from
     relativistic mean-field effects as in [^fn3], [^fn4], and the correction due to the sum of phase-space, recoil and weak magnetism effects as in 
     [^fn5]. They include:
-    
+
   * Neutrino absorptions on nucleons / $e^\pm$ captures
     ### $\nu_e + n \leftrightarrow e^- + p$
-    ### $\bar{\nu}_e + p \leftrightarrow e^+ + n$ 
-    
-  * (Inverse) nucleon decay 
+    ### $\bar{\nu}_e + p \leftrightarrow e^+ + n$
+
+  * (Inverse) nucleon decay
     ### $\nu_e + n \leftrightarrow e^- + p$
     ### $\bar{\nu}_e + p \leftrightarrow e^+ + n$
 

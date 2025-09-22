@@ -92,15 +92,14 @@ void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
 
     for (int nuid = 0; nuid < total_num_species; ++nuid)
     {
-        const BS_REAL n = fmax(1e-100, M1_pars->n[nuid]); // [nm^-3]
-        // Convert J from g nm-1 s^-1 to MeV nm-3
-        const BS_REAL J   = fmax(1e-100, M1_pars->J[nuid]) / kBS_MeV;
+        const BS_REAL n   = fmax(1e-100, M1_pars->n[nuid]); // [nm^-3]
+        const BS_REAL J   = fmax(1e-100, M1_pars->J[nuid]); // [MeV nm^-3]
         const BS_REAL chi = M1_pars->chi[nuid];
 
         // BS_ASSERT(
-            // n > zero,
-            // "Neutrino (species=%d) number density is non-positive (n[%d]=%e).",
-            // nuid, nuid, n);
+        // n > zero,
+        // "Neutrino (species=%d) number density is non-positive (n[%d]=%e).",
+        // nuid, nuid, n);
         BS_ASSERT(chi >= one_third && chi <= one,
                   "Invalid Eddington factor (chi[%d]=%e).", nuid, chi);
 
@@ -216,15 +215,14 @@ void CalculateThinParamsFromM1(const M1Quantities* M1_pars,
 
     for (int nuid = 0; nuid < total_num_species; ++nuid)
     {
-        const BS_REAL n = fmax(1e-100, M1_pars->n[nuid]); // [nm^-3]
-        // Convert J from g nm-1 s^-1 to MeV nm-3
-        const BS_REAL J   = fmax(1e-100, M1_pars->J[nuid]) / kBS_MeV;
+        const BS_REAL n   = fmax(1e-100, M1_pars->n[nuid]); // [nm^-3]
+        const BS_REAL J   = fmax(1e-100, M1_pars->J[nuid]); // [MeV nm^-3]
         const BS_REAL chi = M1_pars->chi[nuid];
 
         // BS_ASSERT(
-            // n > zero,
-            // "Neutrino (species=%d) number density is non-positive (n[%d]=%e).",
-            // nuid, nuid, n);
+        // n > zero,
+        // "Neutrino (species=%d) number density is non-positive (n[%d]=%e).",
+        // nuid, nuid, n);
         BS_ASSERT(chi >= one_third && chi <= one,
                   "Invalid Eddington factor (chi[%d]=%e).", nuid, chi);
 

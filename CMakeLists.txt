@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.5)
 project(bns_nurates VERSION 1.0 LANGUAGES C CXX)
 
 # Kokkos require C++17 standard as minimum

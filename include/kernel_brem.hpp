@@ -98,9 +98,11 @@ BS_REAL BremKernelS(BS_REAL x, BS_REAL y, BS_REAL eta_star)
 
     if constexpr (std::is_same_v<BS_REAL, float>)
     {
-       fu_threshold = ten_minus_seven;
-    } else {
-       fu_threshold = ten_minus_fourteen;
+        fu_threshold = ten_minus_seven;
+    }
+    else
+    {
+        fu_threshold = ten_minus_fourteen;
     }
 
     // @TODO: check this fix! Doing this to prevent s_d from being a large
@@ -370,9 +372,10 @@ MyKernelOutput BremKernelsLegCoeff(BremKernelParams* kernel_params,
         s_abs = -one * s_abs; // first Legedre coefficient
         break;
     default:
-        printf("BremKernelsLegCoeff (kernel_brem.c): l = %d must be either 0 "
-               "or 1\n",
-               l);
+        BS_PRINTF(
+            "BremKernelsLegCoeff (kernel_brem.c): l = %d must be either 0 "
+            "or 1\n",
+            l);
     }
 
     // production kernel from detailed balance
