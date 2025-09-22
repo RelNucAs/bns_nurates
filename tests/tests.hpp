@@ -8,6 +8,8 @@
 #ifndef BNS_NURATES_TESTS_TESTS_HPP_
 #define BNS_NURATES_TESTS_TESTS_HPP_
 
+#include <Kokkos_Core.hpp>
+
 #include "bns_nurates.hpp"
 #include "distribution.hpp"
 #include "integration.hpp"
