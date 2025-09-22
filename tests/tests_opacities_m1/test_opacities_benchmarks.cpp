@@ -82,14 +82,12 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx, OpacityFlags* opacity_flags,
             sscanf(line, "%d %f %f %f %f %f %f %f %f %f %f\n", &zone[i], &r[i],
                    &rho[i], &temp[i], &Ye[i], &mu_e[i], &mu_hat[i], &Yh[i],
                    &Ya[i], &Yp[i], &Yn[i]);
-            ,
         }
         else
         {
             sscanf(line, "%d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
                    &zone[i], &r[i], &rho[i], &temp[i], &Ye[i], &mu_e[i],
                    &mu_hat[i], &Yh[i], &Ya[i], &Yp[i], &Yn[i]);
-            ,
         }
         i++;
     }
@@ -130,7 +128,7 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx, OpacityFlags* opacity_flags,
     for (int i = 0; i < npts; i++)
     {
         int index   = uniform_int_distribution(generate);
-        mb_h_idx(i) = index;
+        //mb_h_idx(i) = index;
 
         mb_h_rho(i)    = rho[index];
         mb_h_T(i)      = temp[index];
@@ -179,7 +177,7 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx, OpacityFlags* opacity_flags,
     Kokkos::deep_copy(d_opacity_pars, h_opacity_pars);
 
     // Generate quadrature data and store them in Kokkos views
-    BS_ASSERT(2 * nx <= n_max, "2*nx is larger than n_max");
+    BS_ASSERT(2 * nx <= BS_N_MAX, "2*nx is larger than BS_N_MAX");
 
     MyQuadrature my_quad = {.type   = kGauleg,
                             .alpha  = -42.,
@@ -409,12 +407,12 @@ int main(int argc, char* argv[])
             return 1;
         }
 
-        if (nx * 2 > n_max)
+        if (nx * 2 > BS_N_MAX)
         {
-            std::cerr << "Number of quadrature points exceeds n_max!"
+            std::cerr << "Number of quadrature points exceeds BS_N_MAX!"
                       << std::endl;
             std::cerr << "2 * nx = " << 2 * nx << std::endl;
-            std::cerr << "n_max = " << n_max << std::endl;
+            std::cerr << "BS_N_MAX = " << BS_N_MAX << std::endl;
             return 1;
         }
 
