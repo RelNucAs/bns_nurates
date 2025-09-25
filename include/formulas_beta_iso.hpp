@@ -124,8 +124,6 @@ BS_REAL EtaPN(const BS_REAL nn, const BS_REAL np, const BS_REAL mu_hat,
     return EtaNNAbs(np, nn, -mu_hat, T);
 }
 
-// @TODO: add effective mass correction to the rates
-
 /* Compute opacities for:
  *
  * 1. Neutrino absorption on neutron (nu + n -> l- + p)
@@ -133,9 +131,9 @@ BS_REAL EtaPN(const BS_REAL nn, const BS_REAL np, const BS_REAL mu_hat,
  *
  * Inputs:
  *    omega [MeV], mLep [MeV], muLep [MeV]
- * Outputs: j_x and 1/lambda_x for electron neutrino and electron antineutrino
- *    out[0]: j_nue [s^-1], out[1]: 1/lamda_nue [s^-1], out[2]: j_anue [s^-1],
- * out[3]: 1/lamda_anue [s^-1]
+ * Outputs: j_x and 1/lambda_x for neutrino and antineutrino
+ *    out[0]: c/lambda_nu [s^-1], out[1]: j_nu [s^-1], out[2]: c/lambda_anu [s^-1],
+ * out[3]: j_anu [s^-1]
  */
 KOKKOS_INLINE_FUNCTION
 void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
