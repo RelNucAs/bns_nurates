@@ -12,6 +12,12 @@ BNS_NURATES is a header-only library, so it can be simply included into your
 code, provided the requirements listed above are satisfied. The various headers
 are in the `include` directory.
 
+## Purpose of the library
+
+BNS_NURATES can be exploited to compute both energy-dependent (spectral) and energy-integrated
+(gray) emissivities and opacities for the most relevant neutrino-matter interactions in BNS
+mergers. The definitions of such quantites can be found in [^fn1], which also discusses in
+more details the design of the library.
 
 ## Stand alone build and testing
 
@@ -29,10 +35,15 @@ By default Kokkos and OpenMP are enabled. To compile for a CPU based system run
 ```
 cmake ../
 ```
-and build nurates
+and build
 ```
-cmake --build . --target nurates
+cmake --build . --target MWE
 ```
+This will compile the minimal working example provided in the repo ```(mwe.cpp)```, which
+evaluates spectral and gray neutrino rates for a single thermodynamic point. Thermodynamic
+conditions extracted from a BNS merger simulation (used for the postprocessing
+analysis in [^fn1]) are provided in the ```inputs/BNS``` folder for testing purposes.
+
 If the code is intended for Nvidia GPUs (say, A100 in this case), enable CUDA during compilation
 ```
 cmake -DKokkos_ENABLE_CUDA=ON -DKokkos_ARCH_AMPERE80=ON ../
@@ -52,19 +63,7 @@ Here ```/path/to/bns_nurates/``` is the full path for the top-level bns_nurates
 directory and ```/path/to/destination/``` is the full path to the ```src```
 folder insider ```Weakrates2```
 
-## Purpose of the library
 
-BNS_NURATES can be exploited to compute both energy-dependent (spectral) and energy-integrated
-(gray) emissivities and opacities for the most relevant neutrino-matter interactions in BNS
-mergers. The definitions of such quantites can be found in [^fn1], which also discusses in
-more details the design of the library.
-A self-explanatory minimal working example is provided in the repo ```(mwe.cpp)```, which can be
-compiled within the build folder as follows
-```
-cmake --build . --target MWE
-```
-Thermodynamic conditions extracted from a BNS merger simulation (used for the postprocessing
-analysis in [^fn1]) are also provided in the ```inputs/BNS``` folder.
 
 ## Python bindings
 
