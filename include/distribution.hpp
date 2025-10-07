@@ -52,9 +52,8 @@ KOKKOS_INLINE_FUNCTION
 void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
                                 NuDistributionParams* out_distribution_pars)
 {
-    constexpr BS_REAL zero         = 0;
+    //constexpr BS_REAL zero         = 0;
     constexpr BS_REAL one          = 1;
-    constexpr BS_REAL half         = 0.5;
     constexpr BS_REAL three_halves = 1.5;
     constexpr BS_REAL one_third    = 1. / 3.;
 
