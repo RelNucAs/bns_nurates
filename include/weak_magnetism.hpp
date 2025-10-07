@@ -46,7 +46,6 @@ KOKKOS_INLINE_FUNCTION
 void NucFrmFac(const BS_REAL E, BS_REAL* cv, BS_REAL* ca, BS_REAL* F2,
                const int reacflag)
 {
-    constexpr BS_REAL zero = 0;
     constexpr BS_REAL one  = 1;
     constexpr BS_REAL two  = 2;
     constexpr BS_REAL half = 0.5;

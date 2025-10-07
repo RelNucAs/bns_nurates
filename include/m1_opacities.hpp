@@ -733,7 +733,6 @@ M1MatrixKokkos2D ComputeDoubleIntegrand(const MyQuadrature* quad, BS_REAL t,
                                         const int stim_abs)
 {
     const int n = quad->nx;
-    BS_REAL nu, nu_bar;
     BS_REAL nu_array[BS_N_MAX];
     M1MatrixKokkos2D out = {0};
 
@@ -742,11 +741,6 @@ M1MatrixKokkos2D ComputeDoubleIntegrand(const MyQuadrature* quad, BS_REAL t,
         nu_array[i]     = t * quad->points[i];
         nu_array[n + i] = t / quad->points[i];
     }
-
-    // compute the neutrino & anti-neutrino distribution function
-    BS_REAL g_nu[total_num_species], g_nu_bar[total_num_species];
-    BS_REAL block_factor_nu[total_num_species],
-        block_factor_nu_bar[total_num_species];
 
     if (grey_pars->opacity_flags.use_pair == 1)
     {
@@ -781,6 +775,11 @@ M1MatrixKokkos2D ComputeDoubleIntegrand(const MyQuadrature* quad, BS_REAL t,
     // //////////////////////////////////////////////
     // ////// ONLY FOR COMPARISON WITH NULIB ////////
     // //////////////////////////////////////////////
+    // compute the neutrino & anti-neutrino distribution function
+    //BS_REAL g_nu[total_num_species], g_nu_bar[total_num_species];
+    //BS_REAL block_factor_nu[total_num_species],
+    //    block_factor_nu_bar[total_num_species];
+    //
     // if (kirchoff_flag)
     // {
     //     ann_term_ij[id_nue] +=
@@ -1456,7 +1455,6 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
 {
     constexpr BS_REAL zero    = 0;
     constexpr BS_REAL one     = 1;
-    constexpr BS_REAL four    = 4;
     constexpr BS_REAL four_pi = 4 * kBS_Pi;
     constexpr BS_REAL c_light = kBS_Clight;
 
@@ -1483,8 +1481,8 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
         g_nu[idx] = TotalNuF(nu, &my_grey_opacity_params->distr_pars, idx);
     }
 
-    const BS_REAL eta_e = my_grey_opacity_params->eos_pars.mu_e /
-                          my_grey_opacity_params->eos_pars.temp;
+    //const BS_REAL eta_e = my_grey_opacity_params->eos_pars.mu_e /
+    //                      my_grey_opacity_params->eos_pars.temp;
 
     constexpr BS_REAL temp_multiple = 0.5 * 4.364;
 
