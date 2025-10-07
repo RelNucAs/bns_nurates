@@ -281,8 +281,6 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx, OpacityFlags* opacity_flags,
             for (int idx = 0; idx < total_num_species; idx++)
             {
                 my_grey_opacity_params.m1_pars.chi[idx] = 1. / 3.;
-                my_grey_opacity_params.m1_pars.J[idx] =
-                    my_grey_opacity_params.m1_pars.J[idx] * mev_to_erg;
             }
 
             // Populate quadrature structure
@@ -356,18 +354,18 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx, OpacityFlags* opacity_flags,
     //     "
     //            "%.15le %.15le %.15le %.15le %.15le %.15le %.15le "
     //            "%.15le %.15le %.15le %.15le %.15le\n",
-    //            i, mb_h_idx(i), h_coeffs_eta_0(i, id_nue),
-    //            h_coeffs_eta_0(i, id_anue), h_coeffs_eta_0(i, id_nux),
-    //            h_coeffs_eta_0(i, id_anux), h_coeffs_eta(i, id_nue),
-    //            h_coeffs_eta(i, id_anue), h_coeffs_eta(i, id_nux),
-    //            h_coeffs_eta(i, id_anux), h_coeffs_kappa_0_a(i, id_nue),
-    //            h_coeffs_kappa_0_a(i, id_anue),
-    //            h_coeffs_kappa_0_a(i, id_nux),
-    //            h_coeffs_kappa_0_a(i, id_anux), h_coeffs_kappa_a(i, id_nue),
-    //            h_coeffs_kappa_a(i, id_anue), h_coeffs_kappa_a(i, id_nux),
-    //            h_coeffs_kappa_a(i, id_anux), h_coeffs_kappa_s(i, id_nue),
-    //            h_coeffs_kappa_s(i, id_anue), h_coeffs_kappa_s(i, id_nux),
-    //            h_coeffs_kappa_s(i, id_anux));
+    //             i, mb_h_idx(i), h_coeffs_eta_0(i, id_nue) * 1e21,
+    //             h_coeffs_eta_0(i, id_anue) * 1e21, h_coeffs_eta_0(i, id_nux) * 1e21,
+    //             h_coeffs_eta_0(i, id_anux) * 1e21, h_coeffs_eta(i, id_nue) * 1e21,
+    //             h_coeffs_eta(i, id_anue) * 1e21 , h_coeffs_eta(i, id_nux) * 1e21,
+    //             h_coeffs_eta(i, id_anux) * 1e21 , h_coeffs_kappa_0_a(i, id_nue) * 1e21,
+    //             h_coeffs_kappa_0_a(i, id_anue) * 1e7,
+    //             h_coeffs_kappa_0_a(i, id_nux) * 1e7,
+    //             h_coeffs_kappa_0_a(i, id_anux) * 1e7, h_coeffs_kappa_a(i, id_nue) * 1e7,
+    //             h_coeffs_kappa_a(i, id_anue) * 1e7, h_coeffs_kappa_a(i, id_nux) * 1e7,
+    //             h_coeffs_kappa_a(i, id_anux) * 1e7, h_coeffs_kappa_s(i, id_nue) * 1e7,
+    //             h_coeffs_kappa_s(i, id_anue) * 1e7, h_coeffs_kappa_s(i, id_nux) * 1e7,
+    //             h_coeffs_kappa_s(i, id_anux) * 1e7);
     // }
 
     printf("Opacities computed.\n");
