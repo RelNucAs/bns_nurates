@@ -8,6 +8,7 @@
 #ifndef BNS_NURATES_TESTS_TESTS_HPP_
 #define BNS_NURATES_TESTS_TESTS_HPP_
 
+#include <iostream>
 #include <Kokkos_Core.hpp>
 
 #include "bns_nurates.hpp"
@@ -192,6 +193,16 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
                             .z2     = -42.,
                             .points = {0},
                             .w      = {0}};
+
+    if (my_quad.nx * 2 > BS_N_MAX)
+    {
+       std::cerr << "Number of quadrature points exceeds BS_N_MAX!"
+                 << std::endl;
+       std::cerr << "2 * nx = " << 2 * my_quad.nx << std::endl;
+       std::cerr << "BS_N_MAX = " << BS_N_MAX << std::endl;
+       return;
+    }
+
     GaussLegendre(&my_quad);
     printf("# Quadratures generated.\n");
 
@@ -426,6 +437,15 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200], const int nx,
                                           OpacityParams* opacity_pars)
 {
 
+    if (nx * 2 > BS_N_MAX)
+    {
+       std::cerr << "Number of quadrature points exceeds BS_N_MAX!"
+                 << std::endl;
+       std::cerr << "2 * nx = " << 2 * nx << std::endl;
+       std::cerr << "BS_N_MAX = " << BS_N_MAX << std::endl;
+       return;
+    }
+    
     char filepath[300] = {'\0'};
     char filedir[300]  = SOURCE_DIR;
     char outname[200]  = "/inputs/CCSN/thermo_points_with_neutrinos.txt";
@@ -981,6 +1001,16 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
                             .z2     = -42.,
                             .points = {0},
                             .w      = {0}};
+    
+    if (my_quad.nx * 2 > BS_N_MAX)
+    {
+       std::cerr << "Number of quadrature points exceeds BS_N_MAX!"
+                 << std::endl;
+       std::cerr << "2 * nx = " << 2 * my_quad.nx << std::endl;
+       std::cerr << "BS_N_MAX = " << BS_N_MAX << std::endl;
+       return;
+    }
+
     GaussLegendre(&my_quad);
     printf("# Quadratures generated.\n");
 
