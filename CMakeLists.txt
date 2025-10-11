@@ -17,7 +17,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 cmake_policy(SET CMP0079 NEW)
 
 find_package(GSL)
-find_package(HDF5)
 
 # set OpenMP macro to OFF
 set(ENABLE_OPENMP ON CACHE BOOL "Enable OpenMP support")
@@ -62,10 +61,6 @@ if (${GSL_FOUND})
     add_compile_definitions(GSL_INCLUDES_H_)
 endif()
 
-if (${HDF5_FOUND})
-    add_compile_definitions(HDF5_INCLUDES_H_)
-endif()
-
 add_definitions(-DSOURCE_DIR="${CMAKE_SOURCE_DIR}")
 
 include_directories(include)
@@ -85,9 +80,6 @@ if (ENABLE_OPENMP)
 endif()
 if (${GSL_FOUND})
     target_link_libraries(${NAME} GSL::gsl GSL::gslcblas)
-endif()
-if (${HDF5_FOUND})
-    target_link_libraries(${NAME} HDF5::HDF5)
 endif()
 target_link_libraries(${NAME} m)
 endmacro()
