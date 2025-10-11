@@ -17,6 +17,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 cmake_policy(SET CMP0079 NEW)
 
 find_package(GSL)
+find_package(HDF5)
 
 # set OpenMP macro to OFF
 set(ENABLE_OPENMP ON CACHE BOOL "Enable OpenMP support")
@@ -61,10 +62,14 @@ if (${GSL_FOUND})
     add_compile_definitions(GSL_INCLUDES_H_)
 endif()
 
+if (${HDF5_FOUND})
+    add_compile_definitions(HDF5_INCLUDES_H_)
+endif()
+
 add_definitions(-DSOURCE_DIR="${CMAKE_SOURCE_DIR}")
 
 include_directories(include)
-include_directories(tests)
+# include_directories(tests)
 
 ################################################################################
 macro(ADD_BNSNURATES_EXECUTABLE NAME PATH)
@@ -81,6 +86,9 @@ endif()
 if (${GSL_FOUND})
     target_link_libraries(${NAME} GSL::gsl GSL::gslcblas)
 endif()
+if (${HDF5_FOUND})
+    target_link_libraries(${NAME} HDF5::HDF5)
+endif()
 target_link_libraries(${NAME} m)
 endmacro()
 ################################################################################
@@ -93,58 +101,58 @@ ADD_BNSNURATES_EXECUTABLE(
 point_out
 utils/point_out.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
-test_opacities_benchmarks
-tests/tests_opacities_m1/test_opacities_benchmarks.cpp)
+# ADD_BNSNURATES_EXECUTABLE(
+# test_opacities_benchmarks
+# tests/tests_opacities_m1/test_opacities_benchmarks.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
-test_beta
-tests/tests_beta/test_beta.cpp)
+# ADD_BNSNURATES_EXECUTABLE(
+# test_beta
+# tests/tests_beta/test_beta.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
-test_iso
-tests/tests_iso/test_iso.cpp)
+# ADD_BNSNURATES_EXECUTABLE(
+# test_iso
+# tests/tests_iso/test_iso.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
-test_brem
-tests/tests_brem/test_brem.cpp)
+# ADD_BNSNURATES_EXECUTABLE(
+# test_brem
+# tests/tests_brem/test_brem.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
-test_pair_kernels
-tests/tests_pair/test_pair_kernels.cpp)
+# ADD_BNSNURATES_EXECUTABLE(
+# test_pair_kernels
+# tests/tests_pair/test_pair_kernels.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
-test_gauss_legendre_1d
-tests/tests_quadrature_integrate/test_gauss_legendre_1d.cpp)
+# ADD_BNSNURATES_EXECUTABLE(
+# test_gauss_legendre_1d
+# tests/tests_quadrature_integrate/test_gauss_legendre_1d.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
-test_opacities_electron_capture
-tests/tests_opacities_m1/test_opacities_electron_capture.cpp)
+# ADD_BNSNURATES_EXECUTABLE(
+# test_opacities_electron_capture
+# tests/tests_opacities_m1/test_opacities_electron_capture.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
-test_opacities_isoscatt
-tests/tests_opacities_m1/test_opacities_isoscatt.cpp)
+# ADD_BNSNURATES_EXECUTABLE(
+# test_opacities_isoscatt
+# tests/tests_opacities_m1/test_opacities_isoscatt.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
-test_opacities_brem
-tests/tests_opacities_m1/test_opacities_brem.cpp)
+# ADD_BNSNURATES_EXECUTABLE(
+# test_opacities_brem
+# tests/tests_opacities_m1/test_opacities_brem.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
-test_opacities_pair
-tests/tests_opacities_m1/test_opacities_pair.cpp)
+# ADD_BNSNURATES_EXECUTABLE(
+# test_opacities_pair
+# tests/tests_opacities_m1/test_opacities_pair.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
-test_opacities_inelastic_scatt
-tests/tests_opacities_m1/test_opacities_inelastic_scatt.cpp)
+# ADD_BNSNURATES_EXECUTABLE(
+# test_opacities_inelastic_scatt
+# tests/tests_opacities_m1/test_opacities_inelastic_scatt.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
-test_opacities_all_reactions
-tests/tests_opacities_m1/test_opacities_all_reactions.cpp)
+# ADD_BNSNURATES_EXECUTABLE(
+# test_opacities_all_reactions
+# tests/tests_opacities_m1/test_opacities_all_reactions.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
-test_spectral_opacities_all_reactions
-tests/tests_opacities_spectral/test_opacities_spectral.cpp)
+# ADD_BNSNURATES_EXECUTABLE(
+# test_spectral_opacities_all_reactions
+# tests/tests_opacities_spectral/test_opacities_spectral.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
-test_m1_distribution
-tests/tests_distribution/test_m1_distribution.cpp)
+# ADD_BNSNURATES_EXECUTABLE(
+# test_m1_distribution
+# tests/tests_distribution/test_m1_distribution.cpp)

@@ -10,8 +10,8 @@
 // scattering using Eq. (43) from Mezzacappa & Bruenn, ApJ v.410, p.740 (1993)
 // https://ui.adsabs.harvard.edu/abs/1993ApJ...410..740M/abstract
 
-#ifndef BNS_NURATES_INCLUDE_KERNEL_NEPS_HPP_
-#define BNS_NURATES_INCLUDE_KERNEL_NEPS_HPP_
+#ifndef BNS_NURATES_INCLUDE_KERNEL_NES_HPP_
+#define BNS_NURATES_INCLUDE_KERNEL_NES_HPP_
 
 #include "bns_nurates.hpp"
 #include "functions.hpp"
@@ -356,44 +356,4 @@ MyKernelOutput InelasticScattKernels(InelasticScattKernelParams* kernel_params,
     return tot_kernel;
 }
 
-KOKKOS_INLINE_FUNCTION
-void InelasticKernelsTable(const int n, BS_REAL* nu_array,
-                           GreyOpacityParams* grey_pars, M1MatrixKokkos2D* out)
-{
-    MyKernelOutput inel_1, inel_2;
-
-    InelasticScattKernelParams inelastic_pars =
-        grey_pars->kernel_pars.inelastic_kernel_params;
-    for (int i = 0; i < n; ++i)
-    {
-
-        for (int j = i; j < n; ++j)
-        {
-
-            // compute the pair kernels
-            inelastic_pars.omega       = nu_array[i];
-            inelastic_pars.omega_prime = nu_array[j];
-            inel_1 =
-                InelasticScattKernels(&inelastic_pars, &grey_pars->eos_pars);
-
-            inelastic_pars.omega       = nu_array[j];
-            inelastic_pars.omega_prime = nu_array[i];
-            inel_2 =
-                InelasticScattKernels(&inelastic_pars, &grey_pars->eos_pars);
-
-
-            for (int idx = 0; idx < total_num_species; ++idx)
-            {
-                out->m1_mat_em[idx][i][j] = inel_1.em[idx];
-                out->m1_mat_em[idx][j][i] = inel_2.em[idx];
-
-                out->m1_mat_ab[idx][i][j] = inel_1.abs[idx];
-                out->m1_mat_ab[idx][j][i] = inel_2.abs[idx];
-            }
-        }
-    }
-
-    return;
-}
-
-#endif // BNS_NURATES_INCLUDE_KERNEL_NEPS_HPP_
+#endif // BNS_NURATES_INCLUDE_KERNEL_NES_HPP_

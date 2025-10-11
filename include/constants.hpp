@@ -1,5 +1,5 @@
-#ifndef BNS_NURATES_SRC_CONSTANTS_H_
-#define BNS_NURATES_SRC_CONSTANTS_H_
+#ifndef BNS_NURATES_SRC_CONSTANTS_HPP_
+#define BNS_NURATES_SRC_CONSTANTS_HPP_
 
 #include "bns_nurates.hpp"
 
@@ -7,7 +7,7 @@
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
-//! \file constants.h
+//! \file constants.hpp
 //  \brief constants used throughout the code
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -240,4 +240,4 @@ inline constexpr BS_REAL kBS_PiHalfToFiveHalves =
     3.09242868139914350627854469835251;
 
 
-#endif // BNS_NURATES_SRC_CONSTANTS_H_
+#endif // BNS_NURATES_SRC_CONSTANTS_HPP_

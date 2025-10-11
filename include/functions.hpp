@@ -2,8 +2,8 @@
 // Created by maitraya on 6/2/23.
 //
 
-#ifndef BNS_NURATES_SRC_FUNCTIONS_FUNCTIONS_H_
-#define BNS_NURATES_SRC_FUNCTIONS_FUNCTIONS_H_
+#ifndef BNS_NURATES_SRC_FUNCTIONS_FUNCTIONS_HPP_
+#define BNS_NURATES_SRC_FUNCTIONS_FUNCTIONS_HPP_
 
 #include "bns_nurates.hpp"
 #include "constants.hpp"
@@ -4810,4 +4810,4 @@ void FreeM1Matrix(M1Matrix* mat, const int n)
 
     return;
 }
-#endif // BNS_NURATES_SRC_FUNCTIONS_FUNCTIONS_H_
+#endif // BNS_NURATES_SRC_FUNCTIONS_FUNCTIONS_HPP_

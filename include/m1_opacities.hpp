@@ -1,5 +1,5 @@
-#ifndef BNS_NURATES_SRC_OPACITIES_M1_OPACITIES_H_
-#define BNS_NURATES_SRC_OPACITIES_M1_OPACITIES_H_
+#ifndef BNS_NURATES_SRC_OPACITIES_M1_OPACITIES_HPP_
+#define BNS_NURATES_SRC_OPACITIES_M1_OPACITIES_HPP_
 
 //=================================================
 // bns-nurates neutrino opacities code
@@ -347,7 +347,7 @@ void AddBremKernelsToIntegrand(int n, BS_REAL* nu_array,
 {
     MyKernelOutput brem_ker;
 
-    if (grey_pars->opacity_pars.use_BRT_brem == true)
+    if (grey_pars->opacity_pars.brem_implementation == "BRT06")
     {
         for (int i = 0; i < 2 * n; ++i)
         {
@@ -387,7 +387,7 @@ void AddBremKernelsToIntegrand(int n, BS_REAL* nu_array,
             }
         }
     }
-    else
+    else if (grey_pars->opacity_pars.brem_implementation == "HR98")
     {
         grey_pars->kernel_pars.brem_kernel_params.l = 0;
         grey_pars->kernel_pars.brem_kernel_params.use_NN_medium_corr =
@@ -429,6 +429,50 @@ void AddBremKernelsToIntegrand(int n, BS_REAL* nu_array,
                 }
             }
         }
+    }
+    else if (grey_pars->opacity_pars.brem_implementation == "GP19")
+    {
+        for (int i = 0; i < 2 * n; ++i)
+        {
+
+            grey_pars->kernel_pars.brem_kernel_params.omega       = nu_array[i];
+            grey_pars->kernel_pars.brem_kernel_params.omega_prime = nu_array[i];
+
+            // compute the brem kernels
+            brem_ker =
+                BremKernelAbsGP19(&grey_pars->kernel_pars.brem_kernel_params,
+                                  &grey_pars->eos_pars);
+
+            for (int idx = 0; idx < total_num_species; ++idx)
+            {
+                out->m1_mat_em[idx][i][i] += brem_ker.em[0];
+                out->m1_mat_ab[idx][i][i] += brem_ker.abs[0];
+            }
+
+            for (int j = i + 1; j < 2 * n; ++j)
+            {
+                // compute the brem kernels
+                grey_pars->kernel_pars.brem_kernel_params.omega_prime =
+                    nu_array[j];
+                brem_ker = BremKernelAbsGP19(
+                    &grey_pars->kernel_pars.brem_kernel_params,
+                    &grey_pars->eos_pars);
+
+                for (int idx = 0; idx < total_num_species; ++idx)
+                {
+                    out->m1_mat_em[idx][i][j] += brem_ker.em[0];
+                    out->m1_mat_em[idx][j][i] += brem_ker.em[0];
+
+                    out->m1_mat_ab[idx][i][j] += brem_ker.abs[0];
+                    out->m1_mat_ab[idx][j][i] += brem_ker.abs[0];
+                }
+            }
+        }
+    }
+    else
+    {
+        BS_ASSERT(false, "Unknown bremsstrahlung implementation: %s",
+                  grey_pars->opacity_pars.brem_implementation.c_str());
     }
     return;
 }
@@ -776,8 +820,8 @@ M1MatrixKokkos2D ComputeDoubleIntegrand(const MyQuadrature* quad, BS_REAL t,
     // ////// ONLY FOR COMPARISON WITH NULIB ////////
     // //////////////////////////////////////////////
     // compute the neutrino & anti-neutrino distribution function
-    //BS_REAL g_nu[total_num_species], g_nu_bar[total_num_species];
-    //BS_REAL block_factor_nu[total_num_species],
+    // BS_REAL g_nu[total_num_species], g_nu_bar[total_num_species];
+    // BS_REAL block_factor_nu[total_num_species],
     //    block_factor_nu_bar[total_num_species];
     //
     // if (kirchoff_flag)
@@ -1323,13 +1367,13 @@ MyQuadratureIntegrand SpectralIntegrand(BS_REAL* var, void* p)
     {
         my_grey_opacity_params->kernel_pars.brem_kernel_params.omega_prime =
             nu_bar;
-        if (opacity_pars.use_BRT_brem == true)
+        if (opacity_pars.brem_implementation == "BRT06")
         {
             brem_kernels_m1 = BremKernelsBRT06(
                 &my_grey_opacity_params->kernel_pars.brem_kernel_params,
                 &my_eos_params);
         }
-        else
+        else if (opacity_pars.brem_implementation == "HR98")
         {
             my_grey_opacity_params->kernel_pars.brem_kernel_params.l = 0;
             my_grey_opacity_params->kernel_pars.brem_kernel_params
@@ -1338,6 +1382,17 @@ MyQuadratureIntegrand SpectralIntegrand(BS_REAL* var, void* p)
             brem_kernels_m1 = BremKernelsLegCoeff(
                 &my_grey_opacity_params->kernel_pars.brem_kernel_params,
                 &my_eos_params);
+        }
+        else if (opacity_pars.brem_implementation == "GP19")
+        {
+            brem_kernels_m1 = BremKernelAbsGP19(
+                &my_grey_opacity_params->kernel_pars.brem_kernel_params,
+                &my_eos_params);
+        }
+        else
+        {
+            BS_ASSERT(false, "Unknown bremsstrahlung implementation: %s",
+                      opacity_pars.brem_implementation.c_str());
         }
     }
 
@@ -1481,8 +1536,8 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
         g_nu[idx] = TotalNuF(nu, &my_grey_opacity_params->distr_pars, idx);
     }
 
-    //const BS_REAL eta_e = my_grey_opacity_params->eos_pars.mu_e /
-    //                      my_grey_opacity_params->eos_pars.temp;
+    // const BS_REAL eta_e = my_grey_opacity_params->eos_pars.mu_e /
+    //                       my_grey_opacity_params->eos_pars.temp;
 
     constexpr BS_REAL temp_multiple = 0.5 * 4.364;
 
@@ -1604,4 +1659,4 @@ ComputeSpectralOpacitiesStimulatedAbs(const BS_REAL nu, MyQuadrature* quad_1d,
     return spec_opacs;
 }
 
-#endif // BNS_NURATES_SRC_OPACITIES_M1_OPACITIES_H_
+#endif // BNS_NURATES_SRC_OPACITIES_M1_OPACITIES_HPP_

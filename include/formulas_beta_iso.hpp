@@ -2,11 +2,11 @@
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
-//! \file opacities.h
+//! \file formulas_beta_iso.hpp
 //  \brief header files for opacity functions
 
-#ifndef BNS_NURATES_SRC_OPACITIES_OPACITIES_H_
-#define BNS_NURATES_SRC_OPACITIES_OPACITIES_H_
+#ifndef BNS_NURATES_SRC_OPACITIES_OPACITIES_HPP_
+#define BNS_NURATES_SRC_OPACITIES_OPACITIES_HPP_
 
 #include "bns_nurates.hpp"
 #include "constants.hpp"
@@ -132,8 +132,8 @@ BS_REAL EtaPN(const BS_REAL nn, const BS_REAL np, const BS_REAL mu_hat,
  * Inputs:
  *    omega [MeV], mLep [MeV], muLep [MeV]
  * Outputs: j_x and 1/lambda_x for neutrino and antineutrino
- *    out[0]: c/lambda_nu [s^-1], out[1]: j_nu [s^-1], out[2]: c/lambda_anu [s^-1],
- * out[3]: j_anu [s^-1]
+ *    out[0]: c/lambda_nu [s^-1], out[1]: j_nu [s^-1], out[2]: c/lambda_anu
+ * [s^-1], out[3]: j_anu [s^-1]
  */
 KOKKOS_INLINE_FUNCTION
 void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
@@ -340,48 +340,6 @@ MyOpacity StimAbsOpacity(const BS_REAL omega, OpacityParams* opacity_pars,
     return abs_opacity;
 }
 
-KOKKOS_INLINE_FUNCTION
-void BetaOpacitiesTable(MyQuadrature* quad, MyEOSParams* eos_pars,
-                        OpacityParams* opacity_pars, BS_REAL t,
-                        M1MatrixKokkos2D* out)
-{
-    const int n = quad->nx;
-
-    MyOpacity beta_1, beta_2;
-
-    for (int i = 0; i < n; ++i)
-    {
-
-        beta_1 = StimAbsOpacity(t * quad->points[i], opacity_pars, eos_pars);
-        beta_2 = StimAbsOpacity(t / quad->points[i], opacity_pars, eos_pars);
-
-        for (int idx = 0; idx < total_num_species; ++idx)
-        {
-            out->m1_mat_ab[idx][0][i] = beta_1.abs[idx];
-            out->m1_mat_em[idx][0][i] = beta_1.em[idx];
-
-            out->m1_mat_ab[idx][0][n + i] = beta_2.abs[idx];
-            out->m1_mat_em[idx][0][n + i] = beta_2.em[idx];
-        }
-    }
-
-    return;
-}
-
-/*
-// (Anti)neutrino absorption on nucleons
-MyOpacity AbsOpacity(const BS_REAL omega, OpacityParams* opacity_pars,
-                     MyEOSParams* eos_pars);
-
-// Stimulated absoption version
-MyOpacity StimAbsOpacity(const BS_REAL omega, OpacityParams* opacity_pars,
-                         MyEOSParams* eos_pars);
-
-// Build matrix for integration
-void BetaOpacitiesTable(MyQuadrature* quad, MyEOSParams* eos_pars,
-                        OpacityParams* opacity_pars, BS_REAL t, M1Matrix* out);
-
-*/
 /*===========================================================================*/
 
 // nu_scatt_iso.c
@@ -627,4 +585,4 @@ MyKernelQuantity BremOpacitiesFermi(MyQuadrature* quad,
                                     MyKernelParams* my_kernel_params);
 #endif // GSL_INCLUDES_H
 
-#endif // BNS_NURATES_SRC_OPACITIES_OPACITIES_H_
+#endif // BNS_NURATES_SRC_OPACITIES_OPACITIES_HPP_

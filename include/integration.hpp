@@ -1,11 +1,11 @@
-#ifndef BNS_NURATES_SRC_INTEGRATION_INTEGRATION_H_
-#define BNS_NURATES_SRC_INTEGRATION_INTEGRATION_H_
+#ifndef BNS_NURATES_SRC_INTEGRATION_INTEGRATION_HPP_
+#define BNS_NURATES_SRC_INTEGRATION_INTEGRATION_HPP_
 
 //=================================================
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
-//! \file  integration.h
+//! \file  integration.hpp
 //  \brief header file for all integration routines
 
 #include "bns_nurates.hpp"
@@ -939,4 +939,4 @@ inline MyQuadratureIntegrand GaussLegendreIntegrate2DFiniteInterval(
     return result;
 }
 
-#endif // BNS_NURATES_SRC_INTEGRATION_INTEGRATION_H_
+#endif // BNS_NURATES_SRC_INTEGRATION_INTEGRATION_HPP_

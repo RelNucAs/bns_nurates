@@ -2,14 +2,14 @@
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
-//! \file distribution.h
+//! \file distribution.hpp
 //  \brief header file for distribution function reconstruction from M1
 //  parameters
 //         supports three different species: electron neutrino, electron
 //         anti-neutrino and mu/tau neutrino/antineutrino
 
-#ifndef BNS_NURATES_SRC_DISTRIBUTION_DISTRIBUTION_H_
-#define BNS_NURATES_SRC_DISTRIBUTION_DISTRIBUTION_H_
+#ifndef BNS_NURATES_SRC_DISTRIBUTION_DISTRIBUTION_HPP_
+#define BNS_NURATES_SRC_DISTRIBUTION_DISTRIBUTION_HPP_
 
 #include "bns_nurates.hpp"
 #include "constants.hpp"
@@ -52,7 +52,7 @@ KOKKOS_INLINE_FUNCTION
 void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
                                 NuDistributionParams* out_distribution_pars)
 {
-    //constexpr BS_REAL zero         = 0;
+    // constexpr BS_REAL zero         = 0;
     constexpr BS_REAL one          = 1;
     constexpr BS_REAL three_halves = 1.5;
     constexpr BS_REAL one_third    = 1. / 3.;
@@ -468,4 +468,4 @@ void ComputeM1DensitiesEq(const MyEOSParams* eos_pars,
     return;
 }
 
-#endif // BNS_NURATES_SRC_DISTRIBUTION_DISTRIBUTION_H_
+#endif // BNS_NURATES_SRC_DISTRIBUTION_DISTRIBUTION_HPP_
