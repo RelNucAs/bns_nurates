@@ -72,6 +72,8 @@ KOKKOS_INLINE_FUNCTION
 BS_REAL gp19_interpolator(const BS_REAL nb, const BS_REAL Ye, const BS_REAL T,
                           const BS_REAL w)
 {
+    constexpr BS_REAL one = 1;
+
     int i0, i1, j0, j1, k0, k1, l0, l1;
     BS_REAL tx, ty, tz, tw;
 
@@ -113,10 +115,10 @@ BS_REAL gp19_interpolator(const BS_REAL nb, const BS_REAL Ye, const BS_REAL T,
     BS_REAL c1110 = GP19_data[IDX(i1, j1, k1, l0)];
     BS_REAL c1111 = GP19_data[IDX(i1, j1, k1, l1)];
 
-    BS_REAL a0 = (1 - tx), a1 = tx;
-    BS_REAL b0 = (1 - ty), b1 = ty;
-    BS_REAL c0 = (1 - tz), c1 = tz;
-    BS_REAL d0 = (1 - tw), d1 = tw;
+    BS_REAL a0 = (one - tx), a1 = tx;
+    BS_REAL b0 = (one - ty), b1 = ty;
+    BS_REAL c0 = (one - tz), c1 = tz;
+    BS_REAL d0 = (one - tw), d1 = tw;
 
     BS_REAL c = c0000 * a0 * b0 * c0 * d0 + c0001 * a0 * b0 * c0 * d1 +
                 c0010 * a0 * b0 * c1 * d0 + c0011 * a0 * b0 * c1 * d1 +
@@ -154,12 +156,13 @@ KOKKOS_INLINE_FUNCTION
 BS_REAL gp19_BremKernel_in_ranges(const BS_REAL nb, const BS_REAL Ye,
                                   const BS_REAL T, const BS_REAL w)
 {
+    constexpr BS_REAL fm2nm_3 = 1e+18;
 
     // Interpolation of the 4D table
     const BS_REAL S_value = gp19_interpolator(nb, Ye, T, w);
 
     const BS_REAL kernel =
-        kBS_Brem_Const * (nb * 1e+18) * S_value; // [nm^3 s^-1]
+        kBS_Brem_Const * (nb * fm2nm_3) * S_value; // [nm^3 s^-1]
 
     return kernel;
 }
