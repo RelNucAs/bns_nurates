@@ -351,12 +351,15 @@ KOKKOS_INLINE_FUNCTION
 MyKernelOutput BremKernelAbsGP19(const BremKernelParams* bremParams,
                                  const MyEOSParams* eos)
 {
+    constexpr BS_REAL three = 3;
+    constexpr BS_REAL nm2fm_3 = 1e-18;
+
     BS_REAL nb_nm = eos->nb;                                     // [nm^-3]
     BS_REAL Ye    = eos->ye;                                     // [/]
     BS_REAL T     = eos->temp;                                   // [MeV]
     BS_REAL w     = bremParams->omega + bremParams->omega_prime; // [MeV]
 
-    BS_REAL nb = nb_nm / 1e+18; // [fm^-3]
+    BS_REAL nb = nb_nm * nm2fm_3; // [fm^-3]
 
     // Min & Max definition
     const BS_REAL nb_max = GP19_nb_axis[GP19_nb_dims - 1]; // [1     fm^-3]
@@ -441,6 +444,12 @@ MyKernelOutput BremKernelAbsGP19(const BremKernelParams* bremParams,
     {
         s_abs = gp19_HighTemperatureExtrapolation(nb, Ye, T, w);
     }
+
+    // The factor of three comes from the fact that this is the 0th order term
+    // of the Legendre expansion, e.g. the angular-independent one. Confront
+    // with the analogue factors present in the HR98 verion of the
+    // Bremsstrahlung kernel.
+    s_abs *= three;
 
     // Production kernel from detailed balance
     BS_REAL s_em = s_abs * SafeExp(-w / T);
