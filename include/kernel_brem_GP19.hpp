@@ -52,7 +52,7 @@ int gp19_find_bracketing_indices(const BS_REAL value, const BS_REAL* axis,
         }
     }
 
-    // Note found
+    // Not found
     return -1;
 }
 
@@ -354,13 +354,18 @@ KOKKOS_INLINE_FUNCTION
 MyKernelOutput BremKernelAbsGP19(const BremKernelParams* bremParams,
                                  const MyEOSParams* eos)
 {
-    constexpr BS_REAL three = 3;
+    constexpr BS_REAL three   = 3;
     constexpr BS_REAL nm2fm_3 = 1e-18;
 
     BS_REAL nb_nm = eos->nb;                                     // [nm^-3]
     BS_REAL Ye    = eos->ye;                                     // [/]
     BS_REAL T     = eos->temp;                                   // [MeV]
     BS_REAL w     = bremParams->omega + bremParams->omega_prime; // [MeV]
+    // w_original is the energy of the neutrino pair as passed to this
+    // function, while w gets clipped to the limits of the Guo-Pinedo
+    // table. w_original is used in calculation of the datailed balance,
+    // where clipping is not necessary and indeed unphysical.
+    const BS_REAL w_original = w;
 
     BS_REAL nb = nb_nm * nm2fm_3; // [fm^-3]
 
@@ -374,7 +379,7 @@ MyKernelOutput BremKernelAbsGP19(const BremKernelParams* bremParams,
     const BS_REAL w_min  = GP19_w_axis[0];                 // [~0.05 MeV]
 
     //==================================//
-    // --- Manual shifts / clipping --- //
+    // ---     Manual clipping      --- //
     //==================================//
 
     // High Ye
@@ -394,9 +399,8 @@ MyKernelOutput BremKernelAbsGP19(const BremKernelParams* bremParams,
     {
         w = w_max;
     }
-
     // Low w
-    if (w < w_min)
+    else if (w < w_min)
     {
         w = w_min;
     }
@@ -455,7 +459,7 @@ MyKernelOutput BremKernelAbsGP19(const BremKernelParams* bremParams,
     s_abs *= three;
 
     // Production kernel from detailed balance
-    BS_REAL s_em = s_abs * SafeExp(-w / T);
+    const BS_REAL s_em = s_abs * SafeExp(-w_original / T);
 
     MyKernelOutput brem_kernel;
     for (int idx = 0; idx < total_num_species; ++idx)
