@@ -458,6 +458,11 @@ MyKernelOutput BremKernelAbsGP19(const BremKernelParams* bremParams,
     // Bremsstrahlung kernel.
     s_abs *= three;
 
+    // Ensure that the result is non-negative. It can become negative due to
+    // extrapolation when evaluated at high temperatures, but can be safely set
+    // to zero since it is very small in that regime.
+    s_abs = fabs(s_abs);
+
     // Production kernel from detailed balance
     const BS_REAL s_em = s_abs * SafeExp(-w_original / T);
 
