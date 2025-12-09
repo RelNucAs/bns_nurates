@@ -33,7 +33,7 @@
 KOKKOS_INLINE_FUNCTION
 BS_REAL BremKernelS(BS_REAL x, BS_REAL y, BS_REAL eta_star)
 {
-    constexpr BS_REAL zero   = 0;
+    [[maybe_unused]] constexpr BS_REAL zero   = 0;
     constexpr BS_REAL one    = 1;
     constexpr BS_REAL two    = 2;
     constexpr BS_REAL three  = 3;
@@ -165,7 +165,7 @@ BS_REAL BremKernelS(BS_REAL x, BS_REAL y, BS_REAL eta_star)
 KOKKOS_INLINE_FUNCTION
 BS_REAL BremKernelG(BS_REAL y, BS_REAL eta_star)
 {
-    constexpr BS_REAL zero       = 0;
+    [[maybe_unused]] constexpr BS_REAL zero       = 0;
     constexpr BS_REAL one        = 1;
     constexpr BS_REAL two        = 2;
     constexpr BS_REAL half       = 0.5;

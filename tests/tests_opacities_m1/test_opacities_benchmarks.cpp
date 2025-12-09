@@ -33,7 +33,6 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx, OpacityFlags* opacity_flags,
 {
     constexpr BS_REAL amu        = kBS_Mu;
     constexpr BS_REAL dm         = kBS_Q;
-    constexpr BS_REAL mev_to_erg = kBS_MeV;
     constexpr BS_REAL nm3_to_cm3 = 1e-21;
 
     // Load data from file
@@ -293,8 +292,8 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx, OpacityFlags* opacity_flags,
             }
 
             // Compute gray emissivities and opacities
-            M1Opacities coeffs = ComputeM1Opacities(&gpu_quad, &gpu_quad,
-                                                    &my_grey_opacity_params);
+            // M1Opacities coeffs = ComputeM1Opacities(&gpu_quad, &gpu_quad,
+            //                                         &my_grey_opacity_params);
 
             // // Save results to Kokkos views
             // d_coeffs_eta_0(j, id_nue)  = coeffs.eta_0[id_nue];
