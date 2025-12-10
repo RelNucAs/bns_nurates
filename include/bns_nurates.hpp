@@ -53,7 +53,7 @@ typedef REAL_TYPE BS_REAL;
 #define dim_pair_t 100
 
 // Define maximum number of quadrature points
-#define BS_N_MAX 40
+#define BS_N_MAX 20
 
 /* ==================================================================================
  * Integration structures
