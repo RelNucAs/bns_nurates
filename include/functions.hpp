@@ -263,7 +263,7 @@ static BS_REAL psics_data[23] = {
     -.000000000000023475, .000000000000004027,  -.000000000000000691,
     .000000000000000118,  -.000000000000000020};
 
-static ChebSeries psi_cs = {psics_data, 22, -1, 1, 17};
+[[maybe_unused]] static ChebSeries psi_cs = {psics_data, 22, -1, 1, 17};
 
 static BS_REAL apsics_data[16] = {
     -.0204749044678185, -.0101801271534859, .0000559718725387,
@@ -273,7 +273,7 @@ static BS_REAL apsics_data[16] = {
     .0000000000000045,  -.0000000000000009, .0000000000000002,
     -.0000000000000000};
 
-static ChebSeries apsi_cs = {apsics_data, 15, -1, 1, 9};
+[[maybe_unused]] static ChebSeries apsi_cs = {apsics_data, 15, -1, 1, 9};
 
 // Evaluation of the Chebyshev series cs at a given point x
 KOKKOS_INLINE_FUNCTION
@@ -4455,7 +4455,7 @@ BS_REAL Gammln(const BS_REAL xx)
 KOKKOS_INLINE_FUNCTION
 BS_REAL GammaStirling(const BS_REAL x)
 {
-    constexpr BS_REAL zero  = 0;
+    [[maybe_unused]] constexpr BS_REAL zero  = 0;
     constexpr BS_REAL e     = 2.718281828459045235360287471352;
     constexpr BS_REAL twopi = 6.283185307179586;
 
@@ -4480,7 +4480,7 @@ BS_REAL W0(const BS_REAL x)
     constexpr BS_REAL zero = 0;
     constexpr BS_REAL one  = 1;
     constexpr BS_REAL e    = 2.718281828459045235360287471352;
-    constexpr BS_REAL ie   = one / e;
+    [[maybe_unused]] constexpr BS_REAL ie   = one / e;
     BS_REAL beta;
 
     BS_ASSERT(x > -ie);

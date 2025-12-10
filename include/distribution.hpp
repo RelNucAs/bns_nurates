@@ -55,7 +55,7 @@ void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
     //constexpr BS_REAL zero         = 0;
     constexpr BS_REAL one          = 1;
     constexpr BS_REAL three_halves = 1.5;
-    constexpr BS_REAL one_third    = 1. / 3.;
+    [[maybe_unused]] constexpr BS_REAL one_third    = 1. / 3.;
 
     constexpr BS_REAL twenty = 20;
     constexpr BS_REAL thirty = 30;
@@ -204,11 +204,11 @@ KOKKOS_INLINE_FUNCTION
 void CalculateThinParamsFromM1(const M1Quantities* M1_pars,
                                NuDistributionParams* out_distribution_pars)
 {
-    constexpr BS_REAL zero      = 0;
+    [[maybe_unused]] constexpr BS_REAL zero      = 0;
     constexpr BS_REAL one       = 1;
     constexpr BS_REAL three     = 3;
     constexpr BS_REAL half      = 0.5;
-    constexpr BS_REAL one_third = 1. / 3.;
+    [[maybe_unused]] constexpr BS_REAL one_third = 1. / 3.;
 
     constexpr BS_REAL c_f = CONST_C_F;
 
@@ -251,7 +251,7 @@ NuDistributionParams NuEquilibriumParams(const MyEOSParams* eos_pars)
 {
     constexpr BS_REAL zero     = 0;
     constexpr BS_REAL one      = 1;
-    constexpr BS_REAL thousand = 1e3;
+    [[maybe_unused]] constexpr BS_REAL thousand = 1e3;
 
     constexpr BS_REAL c_f = CONST_C_F;
 
@@ -295,7 +295,7 @@ KOKKOS_INLINE_FUNCTION
 BS_REAL TotalNuF(const BS_REAL omega, const NuDistributionParams* distr_pars,
                  const int nuid)
 {
-    constexpr BS_REAL zero = 0;
+    [[maybe_unused]] constexpr BS_REAL zero = 0;
 
     BS_ASSERT(omega >= zero, "Neutrino energy is negative.");
     BS_ASSERT(nuid >= 0 && nuid < total_num_species,

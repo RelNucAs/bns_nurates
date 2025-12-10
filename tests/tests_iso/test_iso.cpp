@@ -120,7 +120,7 @@ void test_iso()
     char line[1500];
 
     // Read in the neutrino energy
-    auto val = fgets(line, sizeof(line), fptr_in);
+    [[maybe_unused]] auto val = fgets(line, sizeof(line), fptr_in);
     sscanf(line + 14, "%lf\n", &omega);
 
     printf("Neutrino energy: %.5e MeV\n", omega);

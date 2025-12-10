@@ -11,20 +11,6 @@
 
 int main(int argc, char* argv[])
 {
-    double cactus2cgsRho = 6.1762691458861632e+17;
-    double cactus2cgsEps = 8.987551787368178e+20;
-
-    double cgs2cactusRho    = 1.619100425158886e-18;
-    double cgs2cactusPress  = 1.8014921788094724e-39;
-    double cgs2cactusEps    = 1.112650056053618e-21;
-    double cgs2cactusMass   = 5.0278543128934301e-34;
-    double cgs2cactusEnergy = 5.5942423830703013e-55;
-    double cgs2cactusTime   = 203012.91587112966e0;
-    double cgs2cactusLength = 6.7717819596091924e-06;
-
-    double mev_to_erg = 1.60217733e-6;
-    double erg_to_mev = 6.24150636e5;
-
     // char* name[6] = {"A", "B", "C", "D", "E", "F"};
     double rho[6]    = {6.9e14, 9.81e13, 9.87e12, 1e12, 1e11, 1.01e10};
     double T[6]      = {12.39, 16.63, 8.74, 6.61, 3.60, 2.17};
@@ -42,8 +28,8 @@ int main(int argc, char* argv[])
     // double chianue[6] = {0.33, 0.33, 0.33, 0.33, 0.37, 0.57};
     // double chinux[6]  = {0.33, 0.33, 0.33, 0.33, 0.36, 0.59};
     double deltau[6] = {1.9e1, 3.48e1, 4.98, 0.47, 0.45e-1, 0.72e-3};
-    double mn[6]     = {2.81e2, 7.36e2, 9.16e2, 9.37e2, 9.39e2, 9.40e2};
-    double mp[6]     = {2.80e2, 7.35e2, 9.15e2, 9.36e2, 9.38e2, 9.38e2};
+    // double mn[6]     = {2.81e2, 7.36e2, 9.16e2, 9.37e2, 9.39e2, 9.40e2};
+    // double mp[6]     = {2.80e2, 7.35e2, 9.15e2, 9.36e2, 9.38e2, 9.38e2};
     double hatmu[6]  = {2.10e2, 9.9e1, 4.11e1, 1.76e1, 8.44, 4.57};
     double mue[6]    = {1.87e2, 8.23e1, 3.65e1, 1.94e1, 9.05, 4.17};
 
