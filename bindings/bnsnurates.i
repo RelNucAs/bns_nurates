@@ -223,7 +223,7 @@ def print_corrections(opacity_pars):
 def print_neutrino_quantities(m1_pars):
     print("    nue            anue            nux            anux");
     print("n  %13.6e  %13.6e   %13.6e  %13.6e     (cm^-3)" %(m1_pars.n[0]  , m1_pars.n[1]  , m1_pars.n[2]  , m1_pars.n[3]))
-    print("J  %13.6e  %13.6e   %13.6e  %13.6e (MeV cm^-3)" %(m1_pars.n[0]  , m1_pars.J[1]  , m1_pars.J[2]  , m1_pars.J[3]))
+    print("J  %13.6e  %13.6e   %13.6e  %13.6e (MeV cm^-3)" %(m1_pars.J[0]  , m1_pars.J[1]  , m1_pars.J[2]  , m1_pars.J[3]))
     print("chi %12.10f   %12.10f    %12.10f   %12.10f"   %(m1_pars.chi[0], m1_pars.chi[1], m1_pars.chi[2], m1_pars.chi[3]))
     print("")
 

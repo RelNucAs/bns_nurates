@@ -296,9 +296,9 @@ int main(int argc, char* argv[])
            "Spectral imfp 'kappa'/'kappa_s' :          cm^-1\n"
            "Gray number emissivity 'eta0'   :     cm^-3 s^-1\n"
            "Gray energy emissivity 'eta1'   : MeV cm^-3 s^-1\n"
-           "Gray number opacity 'kappa0'    :     cm^-1 s^-1\n"
-           "Gray energy opacity 'kappa1'    : MeV cm^-1 s^-1\n"
-           "Gray scattering opacity 'scat1' : MeV cm^-1 s^-1\n");
+           "Gray number opacity 'kappa0'    :          cm^-1\n"
+           "Gray energy opacity 'kappa1'    :          cm^-1\n"
+           "Gray scattering opacity 'scat1' :          cm^-1\n");
 
     return 0;
 }
