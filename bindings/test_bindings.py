@@ -113,7 +113,6 @@ distr_pars = bns.NuEquilibriumParams(eos_pars)
 m1_pars = bns.M1Quantities()
 bns.ComputeM1DensitiesEq(eos_pars, distr_pars, m1_pars)
 m1_pars.chi = [1./3., 1./3., 1./3., 1./3.]
-m1_pars.J = [x * bns.kBS_MeV for x in m1_pars.J] # restore to input units (from MeV nm^-3 to g s^-2 nm^-1)
 
 ## Restore units of cm^-3 and MeV cm^-3 for printing
 n_eq = [x * 1e21 for x in m1_pars.n]
@@ -159,7 +158,7 @@ gray_rates['eta']       = [x * 1e21 for x in gray_rates['eta']]
 gray_rates['eta_0']     = [x * 1e21 for x in gray_rates['eta_0']]
 gray_rates['kappa_a']   = [x * 1e7  for x in gray_rates['kappa_a']]
 gray_rates['kappa_0_a'] = [x * 1e7  for x in gray_rates['kappa_0_a']]
-gray_rates['kappa_0_s'] = [x * 1e7  for x in gray_rates['kappa_s']]
+gray_rates['kappa_s']   = [x * 1e7  for x in gray_rates['kappa_s']]
 
 print("Gray rates assuming equilibrium")
 print("------------------------------")
@@ -171,8 +170,8 @@ bns.print_integrated_rates(gray_rates)
 ####################################################################
 
 ## Set neutrino number and energy densities
-m1_pars.n = [x * 1e-21 for x in n_m1]               # nm^-3
-m1_pars.J = [x * 1e-21 * bns.kBS_MeV for x in J_m1] # g s^-2 nm^-1
+m1_pars.n = [x * 1e-21 for x in n_m1]   # nm^-3
+m1_pars.J = [x * 1e-21 for x in J_m1]   # Mev nm^-3
 m1_pars.chi = chi_m1
 
 ## Compute neutrino distribution parameters from neutrino number/energy densities
@@ -202,7 +201,7 @@ gray_rates['eta']       = [x * 1e21 for x in gray_rates['eta']]
 gray_rates['eta_0']     = [x * 1e21 for x in gray_rates['eta_0']]
 gray_rates['kappa_a']   = [x * 1e7  for x in gray_rates['kappa_a']]
 gray_rates['kappa_0_a'] = [x * 1e7  for x in gray_rates['kappa_0_a']]
-gray_rates['kappa_0_s'] = [x * 1e7  for x in gray_rates['kappa_s']]
+gray_rates['kappa_s']   = [x * 1e7  for x in gray_rates['kappa_s']]
 
 print("Gray rates reconstructing distribution function");
 print("----------------------------------------------");
@@ -214,8 +213,8 @@ print("Units\n"
       "Spectral imfp 'kappa'/'kappa_s' :          cm^-1\n"
       "Gray number emissivity 'eta0'   :     cm^-3 s^-1\n"
       "Gray energy emissivity 'eta1'   : MeV cm^-3 s^-1\n"
-      "Gray number opacity 'kappa0'    :     cm^-1 s^-1\n"
-      "Gray energy opacity 'kappa1'    : MeV cm^-1 s^-1\n"
-      "Gray scattering opacity 'scat1' : MeV cm^-1 s^-1\n")
+      "Gray number opacity 'kappa0'    :          cm^-1\n"
+      "Gray energy opacity 'kappa1'    :          cm^-1\n"
+      "Gray scattering opacity 'scat1' :          cm^-1\n")
 
 
