@@ -32,6 +32,9 @@
 inline constexpr double kBS_MeV_double = 1.6021766341182763e+8;
 inline constexpr BS_REAL kBS_MeV       = kBS_MeV_double;
 
+// erg to MeV
+inline constexpr double erg_to_MeV = 6.241509e+5;
+
 
 ////////////////////////
 // PHYSICAL CONSTANTS //
