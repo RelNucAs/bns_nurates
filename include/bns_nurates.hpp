@@ -2,11 +2,11 @@
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
-//! \file bns_nurates.h
+//! \file bns_nurates.hpp
 //  \brief essential data structures for the library
 
-#ifndef BNS_NURATES_SRC_BNS_NURATES_H_
-#define BNS_NURATES_SRC_BNS_NURATES_H_
+#ifndef BNS_NURATES_SRC_BNS_NURATES_HPP_
+#define BNS_NURATES_SRC_BNS_NURATES_HPP_
 
 #include <float.h>
 #include <math.h>
@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits>
+#include <string>
 
 #define POW0(X) ((1))
 #define POW1(X) ((X))
@@ -112,8 +113,8 @@ struct MyQuadrature
     points[BS_N_MAX]; // points for the quadrature scheme (store points in the
                       // points direction, then y and z in one flat array)
     BS_REAL
-        w[BS_N_MAX]; // weights for the quadrature scheme (store points in the
-                     // points direction, then y and z in one flat array)
+    w[BS_N_MAX]; // weights for the quadrature scheme (store points in the
+                 // points direction, then y and z in one flat array)
 };
 typedef struct MyQuadrature MyQuadrature;
 __attribute__((unused)) static MyQuadrature quadrature_default = {.type =
@@ -327,8 +328,8 @@ struct OpacityParams
     bool use_WM_ab;  // flag for WM correction (and related) on absorption rates
     bool use_WM_sc;  // flag for WM correction (and related) on scattering rates
     bool use_decay;  // flag for inclusion of nucleon decay rates
-    bool use_BRT_brem; // flag for computing NN brem rates using BRT06 instead
-                       // of HR98
+    std::string brem_implementation; // choice of brem implementation: "HR98",
+                                     // "BRT06" or "GP19"
     bool use_NN_medium_corr; // flag for inclusion of medium correction to HR98
                              // NN brem kernel as in Fischer16
     bool neglect_blocking;   // flag for neglecting blocking factor of
@@ -336,23 +337,23 @@ struct OpacityParams
 };
 typedef struct OpacityParams OpacityParams;
 __attribute__((unused)) static OpacityParams opacity_params_default_all = {
-    .use_dU             = true,
-    .use_dm_eff         = true,
-    .use_WM_ab          = true,
-    .use_WM_sc          = true,
-    .use_decay          = true,
-    .use_BRT_brem       = true,
-    .use_NN_medium_corr = true,
-    .neglect_blocking   = true};
+    .use_dU              = true,
+    .use_dm_eff          = true,
+    .use_WM_ab           = true,
+    .use_WM_sc           = true,
+    .use_decay           = true,
+    .brem_implementation = "HR98",
+    .use_NN_medium_corr  = true,
+    .neglect_blocking    = true};
 __attribute__((unused)) static OpacityParams opacity_params_default_none = {
-    .use_dU             = false,
-    .use_dm_eff         = false,
-    .use_WM_ab          = false,
-    .use_WM_sc          = false,
-    .use_decay          = false,
-    .use_BRT_brem       = false,
-    .use_NN_medium_corr = false,
-    .neglect_blocking   = false};
+    .use_dU              = false,
+    .use_dm_eff          = false,
+    .use_WM_ab           = false,
+    .use_WM_sc           = false,
+    .use_decay           = false,
+    .brem_implementation = "HR98",
+    .use_NN_medium_corr  = false,
+    .neglect_blocking    = false};
 
 /* ==================================================================================
  * M1 structures
@@ -570,4 +571,4 @@ inline void BS_do_assert(const char* snippet, const char* file, int line,
 #endif
 
 
-#endif // BNS_NURATES_SRC_BNS_NURATES_H_
+#endif // BNS_NURATES_SRC_BNS_NURATES_HPP_

@@ -1,11 +1,11 @@
-#ifndef BNS_NURATES_SRC_INTEGRATION_INTEGRATION_H_
-#define BNS_NURATES_SRC_INTEGRATION_INTEGRATION_H_
+#ifndef BNS_NURATES_SRC_INTEGRATION_INTEGRATION_HPP_
+#define BNS_NURATES_SRC_INTEGRATION_INTEGRATION_HPP_
 
 //=================================================
 // bns-nurates neutrino opacities code
 // Copyright(C) XXX, licensed under the YYY License
 // ================================================
-//! \file  integration.h
+//! \file  integration.hpp
 //  \brief header file for all integration routines
 
 #include "bns_nurates.hpp"
@@ -222,11 +222,11 @@ GaussLegendreIntegrateZeroInfSpecial(MyQuadrature* quad,
                     f2_vals.abs_x / (quad->points[i] * quad->points[i]);
             }
             f_em_e_y[j]  = t * (DoIntegration(quad->nx, quad->w, f1_em_e) +
-                               DoIntegration(quad->nx, quad->w, f2_em_e));
+                                DoIntegration(quad->nx, quad->w, f2_em_e));
             f_abs_e_y[j] = t * (DoIntegration(quad->nx, quad->w, f1_abs_e) +
                                 DoIntegration(quad->nx, quad->w, f2_abs_e));
             f_em_x_y[j]  = t * (DoIntegration(quad->nx, quad->w, f1_em_x) +
-                               DoIntegration(quad->nx, quad->w, f2_em_x));
+                                DoIntegration(quad->nx, quad->w, f2_em_x));
             f_abs_x_y[j] = t * (DoIntegration(quad->nx, quad->w, f1_abs_x) +
                                 DoIntegration(quad->nx, quad->w, f2_abs_x));
             w_y[j]       = quad->w[quad->nx + j];
@@ -939,4 +939,4 @@ inline MyQuadratureIntegrand GaussLegendreIntegrate2DFiniteInterval(
     return result;
 }
 
-#endif // BNS_NURATES_SRC_INTEGRATION_INTEGRATION_H_
+#endif // BNS_NURATES_SRC_INTEGRATION_INTEGRATION_HPP_

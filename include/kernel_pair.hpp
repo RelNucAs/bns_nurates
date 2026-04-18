@@ -215,45 +215,4 @@ void PairKernels(const MyEOSParams* eos_pars,
     out_inv->abs[id_anux] = out_for->abs[id_nux];
 }
 
-KOKKOS_INLINE_FUNCTION
-void PairKernelsTable(const int n, const BS_REAL* nu_array,
-                      GreyOpacityParams* grey_pars, M1MatrixKokkos2D* out)
-{
-    constexpr BS_REAL zero = 0;
-    constexpr BS_REAL one  = 1;
-
-    MyKernelOutput pair_1, pair_2;
-
-    grey_pars->kernel_pars.pair_kernel_params.cos_theta = one;
-    grey_pars->kernel_pars.pair_kernel_params.filter    = zero;
-    grey_pars->kernel_pars.pair_kernel_params.lmax      = zero;
-    grey_pars->kernel_pars.pair_kernel_params.mu        = one;
-    grey_pars->kernel_pars.pair_kernel_params.mu_prime  = one;
-
-    for (int i = 0; i < n; ++i)
-    {
-        grey_pars->kernel_pars.pair_kernel_params.omega = nu_array[i];
-
-        for (int j = i; j < n; ++j)
-        {
-            grey_pars->kernel_pars.pair_kernel_params.omega_prime = nu_array[j];
-
-            PairKernels(&grey_pars->eos_pars,
-                        &grey_pars->kernel_pars.pair_kernel_params, &pair_1,
-                        &pair_2);
-
-            for (int idx = 0; idx < total_num_species; ++idx)
-            {
-                out->m1_mat_em[idx][i][j] = pair_1.em[idx];
-                out->m1_mat_em[idx][j][i] = pair_2.em[idx];
-
-                out->m1_mat_ab[idx][i][j] = pair_1.abs[idx];
-                out->m1_mat_ab[idx][j][i] = pair_2.abs[idx];
-            }
-        }
-    }
-
-    return;
-}
-
 #endif // BNS_NURATES_INCLUDE_KERNEL_PAIR_HPP_

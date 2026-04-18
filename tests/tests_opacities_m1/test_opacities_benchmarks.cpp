@@ -126,8 +126,8 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx, OpacityFlags* opacity_flags,
     std::uniform_int_distribution<> uniform_int_distribution(0, num_data - 1);
     for (int i = 0; i < npts; i++)
     {
-        int index   = uniform_int_distribution(generate);
-        //mb_h_idx(i) = index;
+        int index = uniform_int_distribution(generate);
+        // mb_h_idx(i) = index;
 
         mb_h_rho(i)    = rho[index];
         mb_h_T(i)      = temp[index];
@@ -150,7 +150,7 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx, OpacityFlags* opacity_flags,
     Kokkos::View<int*, LayoutWrapper, HostMemSpace> h_opacity_flags(
         "opacity_flags", 5);
     Kokkos::View<bool*, LayoutWrapper, HostMemSpace> h_opacity_pars(
-        "opacity_pars", 8);
+        "opacity_pars", 7);
 
     h_opacity_flags(0) = opacity_flags->use_abs_em;
     h_opacity_flags(1) = opacity_flags->use_pair;
@@ -163,14 +163,13 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx, OpacityFlags* opacity_flags,
     h_opacity_pars(2) = opacity_pars->use_WM_ab;
     h_opacity_pars(3) = opacity_pars->use_WM_sc;
     h_opacity_pars(4) = opacity_pars->use_decay;
-    h_opacity_pars(5) = opacity_pars->use_BRT_brem;
-    h_opacity_pars(6) = opacity_pars->use_NN_medium_corr;
-    h_opacity_pars(7) = opacity_pars->neglect_blocking;
+    h_opacity_pars(5) = opacity_pars->use_NN_medium_corr;
+    h_opacity_pars(6) = opacity_pars->neglect_blocking;
 
     Kokkos::View<int*, LayoutWrapper, DevMemSpace> d_opacity_flags(
         "opacity_flags", 5);
     Kokkos::View<bool*, LayoutWrapper, DevMemSpace> d_opacity_pars(
-        "opacity_pars", 8);
+        "opacity_pars", 7);
 
     Kokkos::deep_copy(d_opacity_flags, h_opacity_flags);
     Kokkos::deep_copy(d_opacity_pars, h_opacity_pars);
@@ -248,14 +247,14 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx, OpacityFlags* opacity_flags,
 
             // Populate OpacityParams data
             my_grey_opacity_params.opacity_pars = {
-                .use_dU             = d_opacity_pars(0),
-                .use_dm_eff         = d_opacity_pars(1),
-                .use_WM_ab          = d_opacity_pars(2),
-                .use_WM_sc          = d_opacity_pars(3),
-                .use_decay          = d_opacity_pars(4),
-                .use_BRT_brem       = d_opacity_pars(5),
-                .use_NN_medium_corr = d_opacity_pars(6),
-                .neglect_blocking   = d_opacity_pars(7)};
+                .use_dU              = d_opacity_pars(0),
+                .use_dm_eff          = d_opacity_pars(1),
+                .use_WM_ab           = d_opacity_pars(2),
+                .use_WM_sc           = d_opacity_pars(3),
+                .use_decay           = d_opacity_pars(4),
+                .brem_implementation = "HR98",
+                .use_NN_medium_corr  = d_opacity_pars(5),
+                .neglect_blocking    = d_opacity_pars(6)};
 
             // Populate EOS parameters
             my_grey_opacity_params.eos_pars.mu_e = mb_d_mu_e(j);
@@ -354,17 +353,19 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx, OpacityFlags* opacity_flags,
     //            "%.15le %.15le %.15le %.15le %.15le %.15le %.15le "
     //            "%.15le %.15le %.15le %.15le %.15le\n",
     //             i, mb_h_idx(i), h_coeffs_eta_0(i, id_nue) * 1e21,
-    //             h_coeffs_eta_0(i, id_anue) * 1e21, h_coeffs_eta_0(i, id_nux) * 1e21,
-    //             h_coeffs_eta_0(i, id_anux) * 1e21, h_coeffs_eta(i, id_nue) * 1e21,
-    //             h_coeffs_eta(i, id_anue) * 1e21 , h_coeffs_eta(i, id_nux) * 1e21,
-    //             h_coeffs_eta(i, id_anux) * 1e21 , h_coeffs_kappa_0_a(i, id_nue) * 1e21,
+    //             h_coeffs_eta_0(i, id_anue) * 1e21, h_coeffs_eta_0(i, id_nux)
+    //             * 1e21, h_coeffs_eta_0(i, id_anux) * 1e21, h_coeffs_eta(i,
+    //             id_nue) * 1e21, h_coeffs_eta(i, id_anue) * 1e21 ,
+    //             h_coeffs_eta(i, id_nux) * 1e21, h_coeffs_eta(i, id_anux) *
+    //             1e21 , h_coeffs_kappa_0_a(i, id_nue) * 1e21,
     //             h_coeffs_kappa_0_a(i, id_anue) * 1e7,
     //             h_coeffs_kappa_0_a(i, id_nux) * 1e7,
-    //             h_coeffs_kappa_0_a(i, id_anux) * 1e7, h_coeffs_kappa_a(i, id_nue) * 1e7,
-    //             h_coeffs_kappa_a(i, id_anue) * 1e7, h_coeffs_kappa_a(i, id_nux) * 1e7,
-    //             h_coeffs_kappa_a(i, id_anux) * 1e7, h_coeffs_kappa_s(i, id_nue) * 1e7,
-    //             h_coeffs_kappa_s(i, id_anue) * 1e7, h_coeffs_kappa_s(i, id_nux) * 1e7,
-    //             h_coeffs_kappa_s(i, id_anux) * 1e7);
+    //             h_coeffs_kappa_0_a(i, id_anux) * 1e7, h_coeffs_kappa_a(i,
+    //             id_nue) * 1e7, h_coeffs_kappa_a(i, id_anue) * 1e7,
+    //             h_coeffs_kappa_a(i, id_nux) * 1e7, h_coeffs_kappa_a(i,
+    //             id_anux) * 1e7, h_coeffs_kappa_s(i, id_nue) * 1e7,
+    //             h_coeffs_kappa_s(i, id_anue) * 1e7, h_coeffs_kappa_s(i,
+    //             id_nux) * 1e7, h_coeffs_kappa_s(i, id_anux) * 1e7);
     // }
 
     printf("Opacities computed.\n");

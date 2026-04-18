@@ -196,11 +196,11 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
 
     if (my_quad.nx * 2 > BS_N_MAX)
     {
-       std::cerr << "Number of quadrature points exceeds BS_N_MAX!"
-                 << std::endl;
-       std::cerr << "2 * nx = " << 2 * my_quad.nx << std::endl;
-       std::cerr << "BS_N_MAX = " << BS_N_MAX << std::endl;
-       return;
+        std::cerr << "Number of quadrature points exceeds BS_N_MAX!"
+                  << std::endl;
+        std::cerr << "2 * nx = " << 2 * my_quad.nx << std::endl;
+        std::cerr << "BS_N_MAX = " << BS_N_MAX << std::endl;
+        return;
     }
 
     GaussLegendre(&my_quad);
@@ -237,7 +237,7 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
     Kokkos::View<int*, LayoutWrapper, HostMemSpace> h_opacity_flags(
         "opacity_flags", 5);
     Kokkos::View<bool*, LayoutWrapper, HostMemSpace> h_opacity_pars(
-        "opacity_pars", 8);
+        "opacity_pars", 7);
 
     h_opacity_flags(0) = opacity_flags->use_abs_em;
     h_opacity_flags(1) = opacity_flags->use_pair;
@@ -250,14 +250,13 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
     h_opacity_pars(2) = opacity_pars->use_WM_ab;
     h_opacity_pars(3) = opacity_pars->use_WM_sc;
     h_opacity_pars(4) = opacity_pars->use_decay;
-    h_opacity_pars(5) = opacity_pars->use_BRT_brem;
-    h_opacity_pars(6) = opacity_pars->use_NN_medium_corr;
-    h_opacity_pars(7) = opacity_pars->neglect_blocking;
+    h_opacity_pars(5) = opacity_pars->use_NN_medium_corr;
+    h_opacity_pars(6) = opacity_pars->neglect_blocking;
 
     Kokkos::View<int*, LayoutWrapper, DevMemSpace> d_opacity_flags(
         "opacity_flags", 5);
     Kokkos::View<bool*, LayoutWrapper, DevMemSpace> d_opacity_pars(
-        "opacity_pars", 8);
+        "opacity_pars", 7);
 
     Kokkos::deep_copy(d_opacity_flags, h_opacity_flags);
     Kokkos::deep_copy(d_opacity_pars, h_opacity_pars);
@@ -286,14 +285,14 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
 
             // Opacity parameters (corrections all switched off)
             my_grey_opacity_params.opacity_pars = {
-                .use_dU             = d_opacity_pars(0),
-                .use_dm_eff         = d_opacity_pars(1),
-                .use_WM_ab          = d_opacity_pars(2),
-                .use_WM_sc          = d_opacity_pars(3),
-                .use_decay          = d_opacity_pars(4),
-                .use_BRT_brem       = d_opacity_pars(5),
-                .use_NN_medium_corr = d_opacity_pars(6),
-                .neglect_blocking   = d_opacity_pars(7)};
+                .use_dU              = d_opacity_pars(0),
+                .use_dm_eff          = d_opacity_pars(1),
+                .use_WM_ab           = d_opacity_pars(2),
+                .use_WM_sc           = d_opacity_pars(3),
+                .use_decay           = d_opacity_pars(4),
+                .brem_implementation = "HR98",
+                .use_NN_medium_corr  = d_opacity_pars(5),
+                .neglect_blocking    = d_opacity_pars(6)};
 
             // populate EOS parameters from table
             my_grey_opacity_params.eos_pars.mu_e = d_mu_e(i);
@@ -391,41 +390,57 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
     {
         if constexpr (std::is_same_v<BS_REAL, float>)
         {
-            printf("%.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e "
-                   "%.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e "
-                   "%.15e %.15e %.15e "
-                   "%.15e\n",
-                   h_r(i), h_diff_distribution(i), h_coeffs_eta_0(i, id_nue) * 1e21,
-                   h_coeffs_eta_0(i, id_anue) * 1e21, h_coeffs_eta_0(i, id_nux) * 1e21,
-                   h_coeffs_eta_0(i, id_anux) * 1e21, h_coeffs_eta(i, id_nue) * 1e21,
-                   h_coeffs_eta(i, id_anue) * 1e21 , h_coeffs_eta(i, id_nux) * 1e21,
-                   h_coeffs_eta(i, id_anux) * 1e21 , h_coeffs_kappa_0_a(i, id_nue) * 1e21,
-                   h_coeffs_kappa_0_a(i, id_anue) * 1e7,
-                   h_coeffs_kappa_0_a(i, id_nux) * 1e7,
-                   h_coeffs_kappa_0_a(i, id_anux) * 1e7, h_coeffs_kappa_a(i, id_nue) * 1e7,
-                   h_coeffs_kappa_a(i, id_anue) * 1e7, h_coeffs_kappa_a(i, id_nux) * 1e7,
-                   h_coeffs_kappa_a(i, id_anux) * 1e7, h_coeffs_kappa_s(i, id_nue) * 1e7,
-                   h_coeffs_kappa_s(i, id_anue) * 1e7, h_coeffs_kappa_s(i, id_nux) * 1e7,
-                   h_coeffs_kappa_s(i, id_anux) * 1e7);
+            printf(
+                "%.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e "
+                "%.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e "
+                "%.15e %.15e %.15e "
+                "%.15e\n",
+                h_r(i), h_diff_distribution(i),
+                h_coeffs_eta_0(i, id_nue) * 1e21,
+                h_coeffs_eta_0(i, id_anue) * 1e21,
+                h_coeffs_eta_0(i, id_nux) * 1e21,
+                h_coeffs_eta_0(i, id_anux) * 1e21,
+                h_coeffs_eta(i, id_nue) * 1e21, h_coeffs_eta(i, id_anue) * 1e21,
+                h_coeffs_eta(i, id_nux) * 1e21, h_coeffs_eta(i, id_anux) * 1e21,
+                h_coeffs_kappa_0_a(i, id_nue) * 1e21,
+                h_coeffs_kappa_0_a(i, id_anue) * 1e7,
+                h_coeffs_kappa_0_a(i, id_nux) * 1e7,
+                h_coeffs_kappa_0_a(i, id_anux) * 1e7,
+                h_coeffs_kappa_a(i, id_nue) * 1e7,
+                h_coeffs_kappa_a(i, id_anue) * 1e7,
+                h_coeffs_kappa_a(i, id_nux) * 1e7,
+                h_coeffs_kappa_a(i, id_anux) * 1e7,
+                h_coeffs_kappa_s(i, id_nue) * 1e7,
+                h_coeffs_kappa_s(i, id_anue) * 1e7,
+                h_coeffs_kappa_s(i, id_nux) * 1e7,
+                h_coeffs_kappa_s(i, id_anux) * 1e7);
         }
         else
         {
-            printf("%.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le "
-                   "%.15le %.15le %.15le %.15le %.15le %.15le %.15le "
-                   "%.15le %.15le %.15le %.15le %.15le %.15le "
-                   "%.15le\n",
-                   h_r(i), h_diff_distribution(i), h_coeffs_eta_0(i, id_nue) * 1e21,
-                   h_coeffs_eta_0(i, id_anue) * 1e21, h_coeffs_eta_0(i, id_nux) * 1e21,
-                   h_coeffs_eta_0(i, id_anux) * 1e21, h_coeffs_eta(i, id_nue) * 1e21,
-                   h_coeffs_eta(i, id_anue) * 1e21 , h_coeffs_eta(i, id_nux) * 1e21,
-                   h_coeffs_eta(i, id_anux) * 1e21 , h_coeffs_kappa_0_a(i, id_nue) * 1e21,
-                   h_coeffs_kappa_0_a(i, id_anue) * 1e7,
-                   h_coeffs_kappa_0_a(i, id_nux) * 1e7,
-                   h_coeffs_kappa_0_a(i, id_anux) * 1e7, h_coeffs_kappa_a(i, id_nue) * 1e7,
-                   h_coeffs_kappa_a(i, id_anue) * 1e7, h_coeffs_kappa_a(i, id_nux) * 1e7,
-                   h_coeffs_kappa_a(i, id_anux) * 1e7, h_coeffs_kappa_s(i, id_nue) * 1e7,
-                   h_coeffs_kappa_s(i, id_anue) * 1e7, h_coeffs_kappa_s(i, id_nux) * 1e7,
-                   h_coeffs_kappa_s(i, id_anux) * 1e7);
+            printf(
+                "%.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le "
+                "%.15le %.15le %.15le %.15le %.15le %.15le %.15le "
+                "%.15le %.15le %.15le %.15le %.15le %.15le "
+                "%.15le\n",
+                h_r(i), h_diff_distribution(i),
+                h_coeffs_eta_0(i, id_nue) * 1e21,
+                h_coeffs_eta_0(i, id_anue) * 1e21,
+                h_coeffs_eta_0(i, id_nux) * 1e21,
+                h_coeffs_eta_0(i, id_anux) * 1e21,
+                h_coeffs_eta(i, id_nue) * 1e21, h_coeffs_eta(i, id_anue) * 1e21,
+                h_coeffs_eta(i, id_nux) * 1e21, h_coeffs_eta(i, id_anux) * 1e21,
+                h_coeffs_kappa_0_a(i, id_nue) * 1e21,
+                h_coeffs_kappa_0_a(i, id_anue) * 1e7,
+                h_coeffs_kappa_0_a(i, id_nux) * 1e7,
+                h_coeffs_kappa_0_a(i, id_anux) * 1e7,
+                h_coeffs_kappa_a(i, id_nue) * 1e7,
+                h_coeffs_kappa_a(i, id_anue) * 1e7,
+                h_coeffs_kappa_a(i, id_nux) * 1e7,
+                h_coeffs_kappa_a(i, id_anux) * 1e7,
+                h_coeffs_kappa_s(i, id_nue) * 1e7,
+                h_coeffs_kappa_s(i, id_anue) * 1e7,
+                h_coeffs_kappa_s(i, id_nux) * 1e7,
+                h_coeffs_kappa_s(i, id_anux) * 1e7);
         }
     }
 }
@@ -437,13 +452,13 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200], const int nx,
 
     if (nx * 2 > BS_N_MAX)
     {
-       std::cerr << "Number of quadrature points exceeds BS_N_MAX!"
-                 << std::endl;
-       std::cerr << "2 * nx = " << 2 * nx << std::endl;
-       std::cerr << "BS_N_MAX = " << BS_N_MAX << std::endl;
-       return;
+        std::cerr << "Number of quadrature points exceeds BS_N_MAX!"
+                  << std::endl;
+        std::cerr << "2 * nx = " << 2 * nx << std::endl;
+        std::cerr << "BS_N_MAX = " << BS_N_MAX << std::endl;
+        return;
     }
-    
+
     char filepath[300] = {'\0'};
     char filedir[300]  = SOURCE_DIR;
     char outname[200]  = "/inputs/CCSN/thermo_points_with_neutrinos.txt";
@@ -635,7 +650,7 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200], const int nx,
     Kokkos::View<int*, LayoutWrapper, HostMemSpace> h_opacity_flags(
         "opacity_flags", 5);
     Kokkos::View<bool*, LayoutWrapper, HostMemSpace> h_opacity_pars(
-        "opacity_pars", 8);
+        "opacity_pars", 7);
 
     h_opacity_flags(0) = opacity_flags->use_abs_em;
     h_opacity_flags(1) = opacity_flags->use_pair;
@@ -648,14 +663,13 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200], const int nx,
     h_opacity_pars(2) = opacity_pars->use_WM_ab;
     h_opacity_pars(3) = opacity_pars->use_WM_sc;
     h_opacity_pars(4) = opacity_pars->use_decay;
-    h_opacity_pars(5) = opacity_pars->use_BRT_brem;
-    h_opacity_pars(6) = opacity_pars->use_NN_medium_corr;
-    h_opacity_pars(7) = opacity_pars->neglect_blocking;
+    h_opacity_pars(5) = opacity_pars->use_NN_medium_corr;
+    h_opacity_pars(6) = opacity_pars->neglect_blocking;
 
     Kokkos::View<int*, LayoutWrapper, DevMemSpace> d_opacity_flags(
         "opacity_flags", 5);
     Kokkos::View<bool*, LayoutWrapper, DevMemSpace> d_opacity_pars(
-        "opacity_pars", 8);
+        "opacity_pars", 7);
 
     Kokkos::deep_copy(d_opacity_flags, h_opacity_flags);
     Kokkos::deep_copy(d_opacity_pars, h_opacity_pars);
@@ -684,14 +698,14 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200], const int nx,
 
             // Opacity parameters (corrections all switched off)
             my_grey_opacity_params.opacity_pars = {
-                .use_dU             = d_opacity_pars(0),
-                .use_dm_eff         = d_opacity_pars(1),
-                .use_WM_ab          = d_opacity_pars(2),
-                .use_WM_sc          = d_opacity_pars(3),
-                .use_decay          = d_opacity_pars(4),
-                .use_BRT_brem       = d_opacity_pars(5),
-                .use_NN_medium_corr = d_opacity_pars(6),
-                .neglect_blocking   = d_opacity_pars(7)};
+                .use_dU              = d_opacity_pars(0),
+                .use_dm_eff          = d_opacity_pars(1),
+                .use_WM_ab           = d_opacity_pars(2),
+                .use_WM_sc           = d_opacity_pars(3),
+                .use_decay           = d_opacity_pars(4),
+                .brem_implementation = "HR98",
+                .use_NN_medium_corr  = d_opacity_pars(5),
+                .neglect_blocking    = d_opacity_pars(6)};
 
             // populate EOS parameters from table
             my_grey_opacity_params.eos_pars.mu_e = d_mu_e(i);
@@ -789,41 +803,57 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200], const int nx,
     {
         if constexpr (std::is_same_v<BS_REAL, float>)
         {
-            printf("%d %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e "
-                   "%.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e "
-                   "%.15e %.15e "
-                   "%.15e\n",
-                   h_zone(i), h_diff_distribution(i), h_coeffs_eta_0(i, id_nue) * 1e21,
-                   h_coeffs_eta_0(i, id_anue) * 1e21, h_coeffs_eta_0(i, id_nux) * 1e21,
-                   h_coeffs_eta_0(i, id_anux) * 1e21, h_coeffs_eta(i, id_nue) * 1e21,
-                   h_coeffs_eta(i, id_anue) * 1e21 , h_coeffs_eta(i, id_nux) * 1e21,
-                   h_coeffs_eta(i, id_anux) * 1e21 , h_coeffs_kappa_0_a(i, id_nue) * 1e21,
-                   h_coeffs_kappa_0_a(i, id_anue) * 1e7,
-                   h_coeffs_kappa_0_a(i, id_nux) * 1e7,
-                   h_coeffs_kappa_0_a(i, id_anux) * 1e7, h_coeffs_kappa_a(i, id_nue) * 1e7,
-                   h_coeffs_kappa_a(i, id_anue) * 1e7, h_coeffs_kappa_a(i, id_nux) * 1e7,
-                   h_coeffs_kappa_a(i, id_anux) * 1e7, h_coeffs_kappa_s(i, id_nue) * 1e7,
-                   h_coeffs_kappa_s(i, id_anue) * 1e7, h_coeffs_kappa_s(i, id_nux) * 1e7,
-                   h_coeffs_kappa_s(i, id_anux) * 1e7);
+            printf(
+                "%d %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e "
+                "%.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e "
+                "%.15e %.15e "
+                "%.15e\n",
+                h_zone(i), h_diff_distribution(i),
+                h_coeffs_eta_0(i, id_nue) * 1e21,
+                h_coeffs_eta_0(i, id_anue) * 1e21,
+                h_coeffs_eta_0(i, id_nux) * 1e21,
+                h_coeffs_eta_0(i, id_anux) * 1e21,
+                h_coeffs_eta(i, id_nue) * 1e21, h_coeffs_eta(i, id_anue) * 1e21,
+                h_coeffs_eta(i, id_nux) * 1e21, h_coeffs_eta(i, id_anux) * 1e21,
+                h_coeffs_kappa_0_a(i, id_nue) * 1e21,
+                h_coeffs_kappa_0_a(i, id_anue) * 1e7,
+                h_coeffs_kappa_0_a(i, id_nux) * 1e7,
+                h_coeffs_kappa_0_a(i, id_anux) * 1e7,
+                h_coeffs_kappa_a(i, id_nue) * 1e7,
+                h_coeffs_kappa_a(i, id_anue) * 1e7,
+                h_coeffs_kappa_a(i, id_nux) * 1e7,
+                h_coeffs_kappa_a(i, id_anux) * 1e7,
+                h_coeffs_kappa_s(i, id_nue) * 1e7,
+                h_coeffs_kappa_s(i, id_anue) * 1e7,
+                h_coeffs_kappa_s(i, id_nux) * 1e7,
+                h_coeffs_kappa_s(i, id_anux) * 1e7);
         }
         else
         {
-            printf("%d %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le "
-                   "%.15le %.15le %.15le %.15le %.15le %.15le %.15le "
-                   "%.15le %.15le %.15le %.15le %.15le "
-                   "%.15le\n",
-                   h_zone(i), h_diff_distribution(i), h_coeffs_eta_0(i, id_nue) * 1e21,
-                   h_coeffs_eta_0(i, id_anue) * 1e21, h_coeffs_eta_0(i, id_nux) * 1e21,
-                   h_coeffs_eta_0(i, id_anux) * 1e21, h_coeffs_eta(i, id_nue) * 1e21,
-                   h_coeffs_eta(i, id_anue) * 1e21 , h_coeffs_eta(i, id_nux) * 1e21,
-                   h_coeffs_eta(i, id_anux) * 1e21 , h_coeffs_kappa_0_a(i, id_nue) * 1e21,
-                   h_coeffs_kappa_0_a(i, id_anue) * 1e7,
-                   h_coeffs_kappa_0_a(i, id_nux) * 1e7,
-                   h_coeffs_kappa_0_a(i, id_anux) * 1e7, h_coeffs_kappa_a(i, id_nue) * 1e7,
-                   h_coeffs_kappa_a(i, id_anue) * 1e7, h_coeffs_kappa_a(i, id_nux) * 1e7,
-                   h_coeffs_kappa_a(i, id_anux) * 1e7, h_coeffs_kappa_s(i, id_nue) * 1e7,
-                   h_coeffs_kappa_s(i, id_anue) * 1e7, h_coeffs_kappa_s(i, id_nux) * 1e7,
-                   h_coeffs_kappa_s(i, id_anux) * 1e7);
+            printf(
+                "%d %.15le %.15le %.15le %.15le %.15le %.15le %.15le %.15le "
+                "%.15le %.15le %.15le %.15le %.15le %.15le %.15le "
+                "%.15le %.15le %.15le %.15le %.15le "
+                "%.15le\n",
+                h_zone(i), h_diff_distribution(i),
+                h_coeffs_eta_0(i, id_nue) * 1e21,
+                h_coeffs_eta_0(i, id_anue) * 1e21,
+                h_coeffs_eta_0(i, id_nux) * 1e21,
+                h_coeffs_eta_0(i, id_anux) * 1e21,
+                h_coeffs_eta(i, id_nue) * 1e21, h_coeffs_eta(i, id_anue) * 1e21,
+                h_coeffs_eta(i, id_nux) * 1e21, h_coeffs_eta(i, id_anux) * 1e21,
+                h_coeffs_kappa_0_a(i, id_nue) * 1e21,
+                h_coeffs_kappa_0_a(i, id_anue) * 1e7,
+                h_coeffs_kappa_0_a(i, id_nux) * 1e7,
+                h_coeffs_kappa_0_a(i, id_anux) * 1e7,
+                h_coeffs_kappa_a(i, id_nue) * 1e7,
+                h_coeffs_kappa_a(i, id_anue) * 1e7,
+                h_coeffs_kappa_a(i, id_nux) * 1e7,
+                h_coeffs_kappa_a(i, id_anux) * 1e7,
+                h_coeffs_kappa_s(i, id_nue) * 1e7,
+                h_coeffs_kappa_s(i, id_anue) * 1e7,
+                h_coeffs_kappa_s(i, id_nux) * 1e7,
+                h_coeffs_kappa_s(i, id_anux) * 1e7);
         }
     }
 }
@@ -998,14 +1028,14 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
                             .z2     = -42.,
                             .points = {0},
                             .w      = {0}};
-    
+
     if (my_quad.nx * 2 > BS_N_MAX)
     {
-       std::cerr << "Number of quadrature points exceeds BS_N_MAX!"
-                 << std::endl;
-       std::cerr << "2 * nx = " << 2 * my_quad.nx << std::endl;
-       std::cerr << "BS_N_MAX = " << BS_N_MAX << std::endl;
-       return;
+        std::cerr << "Number of quadrature points exceeds BS_N_MAX!"
+                  << std::endl;
+        std::cerr << "2 * nx = " << 2 * my_quad.nx << std::endl;
+        std::cerr << "BS_N_MAX = " << BS_N_MAX << std::endl;
+        return;
     }
 
     GaussLegendre(&my_quad);
@@ -1042,7 +1072,7 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
     Kokkos::View<int*, LayoutWrapper, HostMemSpace> h_opacity_flags(
         "opacity_flags", 5);
     Kokkos::View<bool*, LayoutWrapper, HostMemSpace> h_opacity_pars(
-        "opacity_pars", 8);
+        "opacity_pars", 7);
 
     h_opacity_flags(0) = opacity_flags->use_abs_em;
     h_opacity_flags(1) = opacity_flags->use_pair;
@@ -1055,14 +1085,13 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
     h_opacity_pars(2) = opacity_pars->use_WM_ab;
     h_opacity_pars(3) = opacity_pars->use_WM_sc;
     h_opacity_pars(4) = opacity_pars->use_decay;
-    h_opacity_pars(5) = opacity_pars->use_BRT_brem;
-    h_opacity_pars(6) = opacity_pars->use_NN_medium_corr;
-    h_opacity_pars(7) = opacity_pars->neglect_blocking;
+    h_opacity_pars(5) = opacity_pars->use_NN_medium_corr;
+    h_opacity_pars(6) = opacity_pars->neglect_blocking;
 
     Kokkos::View<int*, LayoutWrapper, DevMemSpace> d_opacity_flags(
         "opacity_flags", 5);
     Kokkos::View<bool*, LayoutWrapper, DevMemSpace> d_opacity_pars(
-        "opacity_pars", 8);
+        "opacity_pars", 7);
 
     Kokkos::deep_copy(d_opacity_flags, h_opacity_flags);
     Kokkos::deep_copy(d_opacity_pars, h_opacity_pars);
@@ -1092,14 +1121,14 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
 
             // Opacity parameters (corrections all switched off)
             my_grey_opacity_params.opacity_pars = {
-                .use_dU             = d_opacity_pars(0),
-                .use_dm_eff         = d_opacity_pars(1),
-                .use_WM_ab          = d_opacity_pars(2),
-                .use_WM_sc          = d_opacity_pars(3),
-                .use_decay          = d_opacity_pars(4),
-                .use_BRT_brem       = d_opacity_pars(5),
-                .use_NN_medium_corr = d_opacity_pars(6),
-                .neglect_blocking   = d_opacity_pars(7)};
+                .use_dU              = d_opacity_pars(0),
+                .use_dm_eff          = d_opacity_pars(1),
+                .use_WM_ab           = d_opacity_pars(2),
+                .use_WM_sc           = d_opacity_pars(3),
+                .use_decay           = d_opacity_pars(4),
+                .brem_implementation = "HR98",
+                .use_NN_medium_corr  = d_opacity_pars(5),
+                .neglect_blocking    = d_opacity_pars(6)};
 
             printf("# Generating and populating quadrature on GPU\n");
             MyQuadrature gpu_quad;
@@ -1197,30 +1226,34 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
         {
             if constexpr (std::is_same_v<BS_REAL, float>)
             {
-                printf("%.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e "
-                       "%.15e %.15e %.15e %.15e %.15e %.15e %.15e ",
-                       h_j(j, i, id_nue), h_j(j, i, id_anue), h_j(j, i, id_nux),
-                       h_j(j, i, id_anux), h_j_s(j, i, id_nue),
-                       h_j_s(j, i, id_anue), h_j_s(j, i, id_nux),
-                       h_j_s(j, i, id_anux), h_kappa(j, i, id_nue) * 1e7,
-                       h_kappa(j, i, id_anue) * 1e7, h_kappa(j, i, id_nux) * 1e7,
-                       h_kappa(j, i, id_anux) * 1e7, h_kappa_s(j, i, id_nue) * 1e7,
-                       h_kappa_s(j, i, id_anue) * 1e7, h_kappa_s(j, i, id_nux) * 1e7,
-                       h_kappa_s(j, i, id_anux) * 1e7);
+                printf(
+                    "%.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e %.15e "
+                    "%.15e %.15e %.15e %.15e %.15e %.15e %.15e ",
+                    h_j(j, i, id_nue), h_j(j, i, id_anue), h_j(j, i, id_nux),
+                    h_j(j, i, id_anux), h_j_s(j, i, id_nue),
+                    h_j_s(j, i, id_anue), h_j_s(j, i, id_nux),
+                    h_j_s(j, i, id_anux), h_kappa(j, i, id_nue) * 1e7,
+                    h_kappa(j, i, id_anue) * 1e7, h_kappa(j, i, id_nux) * 1e7,
+                    h_kappa(j, i, id_anux) * 1e7, h_kappa_s(j, i, id_nue) * 1e7,
+                    h_kappa_s(j, i, id_anue) * 1e7,
+                    h_kappa_s(j, i, id_nux) * 1e7,
+                    h_kappa_s(j, i, id_anux) * 1e7);
             }
             else
             {
-                printf("%.15le %.15le %.15le %.15le %.15le %.15le %.15le "
-                       "%.15le %.15le %.15le %.15le %.15le %.15le %.15le "
-                       "%.15le %.15le ",
-                       h_j(j, i, id_nue), h_j(j, i, id_anue), h_j(j, i, id_nux),
-                       h_j(j, i, id_anux), h_j_s(j, i, id_nue),
-                       h_j_s(j, i, id_anue), h_j_s(j, i, id_nux),
-                       h_j_s(j, i, id_anux), h_kappa(j, i, id_nue) * 1e7,
-                       h_kappa(j, i, id_anue) * 1e7, h_kappa(j, i, id_nux) * 1e7,
-                       h_kappa(j, i, id_anux) * 1e7, h_kappa_s(j, i, id_nue) * 1e7,
-                       h_kappa_s(j, i, id_anue) * 1e7, h_kappa_s(j, i, id_nux) * 1e7,
-                       h_kappa_s(j, i, id_anux) * 1e7);
+                printf(
+                    "%.15le %.15le %.15le %.15le %.15le %.15le %.15le "
+                    "%.15le %.15le %.15le %.15le %.15le %.15le %.15le "
+                    "%.15le %.15le ",
+                    h_j(j, i, id_nue), h_j(j, i, id_anue), h_j(j, i, id_nux),
+                    h_j(j, i, id_anux), h_j_s(j, i, id_nue),
+                    h_j_s(j, i, id_anue), h_j_s(j, i, id_nux),
+                    h_j_s(j, i, id_anux), h_kappa(j, i, id_nue) * 1e7,
+                    h_kappa(j, i, id_anue) * 1e7, h_kappa(j, i, id_nux) * 1e7,
+                    h_kappa(j, i, id_anux) * 1e7, h_kappa_s(j, i, id_nue) * 1e7,
+                    h_kappa_s(j, i, id_anue) * 1e7,
+                    h_kappa_s(j, i, id_nux) * 1e7,
+                    h_kappa_s(j, i, id_anux) * 1e7);
             }
         }
         printf("\n");

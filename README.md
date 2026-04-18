@@ -110,11 +110,14 @@ BNS_NURATES implements the following neutrino reactions (see also [^fn1]):
 
 
 
-  * Nucleon-nucleon bremsstrahlung (implemented as in [^fn7], including the medium modification from [^fn8])
+  * Nucleon-nucleon bremsstrahlung
+    - implementation 1: as [^fn7], including the in-medium modification from [^fn8]
+    - implementation 2: as [^fn10]
+    - implementation 3: as [^fn11]
     ### $N + N \leftrightarrow N + N + \nu + \bar{\nu}$
 
 - **Scattering processes**
-   
+
   * Isoenergetic scattering off nucleons (implemented as in [^fn2], including phase-space, recoil and weak magnetism effects as in 
     [^fn5])
     ### $\nu + N \rightarrow \nu + N$
@@ -133,3 +136,4 @@ BNS_NURATES implements the following neutrino reactions (see also [^fn1]):
 [^fn8]: [T. Fischer, Astron. Astrophys. 593, A103 (2016)](https://doi.org/10.1051/0004-6361/201628991)
 [^fn9]: [A. Mezzacappa and S. W. Bruenn, Astrophys. J. 410, 740 (1993)](https://doi.org/10.1086/172791)
 [^fn10]:[A. Burrows, S. Reddy, and T. A. Thompson, Nucl. Phys. A777, 356 (2006)](https://doi.org/10.1016/j.nuclphysa.2004.06.012)
+[^fn11]:[Guo G. and Martínez-Pinedo G., ApJ 887 58 (2019)](https://doi.org/10.3847/1538-4357/ab536d)

@@ -64,7 +64,7 @@ endif()
 add_definitions(-DSOURCE_DIR="${CMAKE_SOURCE_DIR}")
 
 include_directories(include)
-include_directories(tests)
+# include_directories(tests)
 
 ################################################################################
 macro(ADD_BNSNURATES_EXECUTABLE NAME PATH)

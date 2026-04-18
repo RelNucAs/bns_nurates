@@ -12,8 +12,8 @@
 #include <Kokkos_Core.hpp>
 
 #include "constants.hpp"
+#include "kernel_brem_HR98.hpp"
 #include "bns_nurates.hpp"
-#include "kernel_brem.hpp"
 
 using DevExeSpace  = Kokkos::DefaultExecutionSpace;
 using DevMemSpace  = Kokkos::DefaultExecutionSpace::memory_space;
