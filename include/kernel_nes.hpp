@@ -189,9 +189,9 @@ MyKernelOutput NESKernels(InelasticScattKernelParams* kernel_params,
             FDI_0(eta_e - x) + y * FermiDistr(zero, one, eta_e - x) / six,
             FDI_0(eta_e) - y * FermiDistr(zero, one, eta_e) / six};
 
-        output.abs[id_nue] = kBS_NEPS_Const * POW2(T) *
-                             MezzacappaIntOneEnergy(x, y, sign, kBS_NEPS_BPlus,
-                                                    kBS_NEPS_BZero, fdis);
+        output.abs[id_nue]  = kBS_NEPS_Const * POW2(T) *
+                              MezzacappaIntOneEnergy(x, y, sign, kBS_NEPS_BPlus,
+                                                     kBS_NEPS_BZero, fdis);
         output.abs[id_anue] = kBS_NEPS_Const * POW2(T) *
                               MezzacappaIntOneEnergy(x, y, sign, kBS_NEPS_BZero,
                                                      kBS_NEPS_BPlus, fdis);
@@ -290,15 +290,15 @@ MyKernelOutput NPSKernels(InelasticScattKernelParams* kernel_params,
             FDI_0(eta_p - x) + y * FermiDistr(zero, one, eta_p - x) / six,
             FDI_0(eta_p) - y * FermiDistr(zero, one, eta_p) / six};
 
-        output.abs[id_nue] = kBS_NEPS_Const * POW2(T) *
-                             MezzacappaIntOneEnergy(x, y, sign, kBS_NEPS_BZero,
-                                                    kBS_NEPS_BPlus, fdis);
+        output.abs[id_nue]  = kBS_NEPS_Const * POW2(T) *
+                              MezzacappaIntOneEnergy(x, y, sign, kBS_NEPS_BZero,
+                                                     kBS_NEPS_BPlus, fdis);
         output.abs[id_anue] = kBS_NEPS_Const * POW2(T) *
                               MezzacappaIntOneEnergy(x, y, sign, kBS_NEPS_BPlus,
                                                      kBS_NEPS_BZero, fdis);
-        output.abs[id_nux] = kBS_NEPS_Const * POW2(T) *
-                             MezzacappaIntOneEnergy(x, y, sign, kBS_NEPS_BZero,
-                                                    kBS_NEPS_BMinus, fdis);
+        output.abs[id_nux]  = kBS_NEPS_Const * POW2(T) *
+                              MezzacappaIntOneEnergy(x, y, sign, kBS_NEPS_BZero,
+                                                     kBS_NEPS_BMinus, fdis);
         output.abs[id_anux] =
             kBS_NEPS_Const * POW2(T) *
             MezzacappaIntOneEnergy(x, y, sign, kBS_NEPS_BMinus, kBS_NEPS_BZero,

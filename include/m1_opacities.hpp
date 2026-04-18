@@ -1585,15 +1585,15 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
 
     SpectralOpacities sp_opacities;
 
-    sp_opacities.j[id_nue] = abs_em_beta.em[id_nue] +
-                             kBS_FourPi_hc3 * (integrals_pair_1d.integrand[0] +
-                                               integrals_neps_1d.integrand[0]);
+    sp_opacities.j[id_nue]  = abs_em_beta.em[id_nue] +
+                              kBS_FourPi_hc3 * (integrals_pair_1d.integrand[0] +
+                                                integrals_neps_1d.integrand[0]);
     sp_opacities.j[id_anue] = abs_em_beta.em[id_anue] +
                               kBS_FourPi_hc3 * (integrals_pair_1d.integrand[1] +
                                                 integrals_neps_1d.integrand[1]);
-    sp_opacities.j[id_nux] = abs_em_beta.em[id_nux] +
-                             kBS_FourPi_hc3 * (integrals_pair_1d.integrand[2] +
-                                               integrals_neps_1d.integrand[2]);
+    sp_opacities.j[id_nux]  = abs_em_beta.em[id_nux] +
+                              kBS_FourPi_hc3 * (integrals_pair_1d.integrand[2] +
+                                                integrals_neps_1d.integrand[2]);
     sp_opacities.j[id_anux] = abs_em_beta.em[id_anux] +
                               kBS_FourPi_hc3 * (integrals_pair_1d.integrand[3] +
                                                 integrals_neps_1d.integrand[3]);

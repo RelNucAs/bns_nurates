@@ -93,58 +93,58 @@ ADD_BNSNURATES_EXECUTABLE(
 point_out
 utils/point_out.cpp)
 
-# ADD_BNSNURATES_EXECUTABLE(
-# test_opacities_benchmarks
-# tests/tests_opacities_m1/test_opacities_benchmarks.cpp)
+ADD_BNSNURATES_EXECUTABLE(
+test_opacities_benchmarks
+tests/tests_opacities_m1/test_opacities_benchmarks.cpp)
 
-# ADD_BNSNURATES_EXECUTABLE(
-# test_beta
-# tests/tests_beta/test_beta.cpp)
+ADD_BNSNURATES_EXECUTABLE(
+test_beta
+tests/tests_beta/test_beta.cpp)
 
-# ADD_BNSNURATES_EXECUTABLE(
-# test_iso
-# tests/tests_iso/test_iso.cpp)
+ADD_BNSNURATES_EXECUTABLE(
+test_iso
+tests/tests_iso/test_iso.cpp)
 
-# ADD_BNSNURATES_EXECUTABLE(
-# test_brem
-# tests/tests_brem/test_brem.cpp)
+ADD_BNSNURATES_EXECUTABLE(
+test_brem
+tests/tests_brem/test_brem.cpp)
 
-# ADD_BNSNURATES_EXECUTABLE(
-# test_pair_kernels
-# tests/tests_pair/test_pair_kernels.cpp)
+ADD_BNSNURATES_EXECUTABLE(
+test_pair_kernels
+tests/tests_pair/test_pair_kernels.cpp)
 
-# ADD_BNSNURATES_EXECUTABLE(
-# test_gauss_legendre_1d
-# tests/tests_quadrature_integrate/test_gauss_legendre_1d.cpp)
+ADD_BNSNURATES_EXECUTABLE(
+test_gauss_legendre_1d
+tests/tests_quadrature_integrate/test_gauss_legendre_1d.cpp)
 
-# ADD_BNSNURATES_EXECUTABLE(
-# test_opacities_electron_capture
-# tests/tests_opacities_m1/test_opacities_electron_capture.cpp)
+ADD_BNSNURATES_EXECUTABLE(
+test_opacities_electron_capture
+tests/tests_opacities_m1/test_opacities_electron_capture.cpp)
 
-# ADD_BNSNURATES_EXECUTABLE(
-# test_opacities_isoscatt
-# tests/tests_opacities_m1/test_opacities_isoscatt.cpp)
+ADD_BNSNURATES_EXECUTABLE(
+test_opacities_isoscatt
+tests/tests_opacities_m1/test_opacities_isoscatt.cpp)
 
-# ADD_BNSNURATES_EXECUTABLE(
-# test_opacities_brem
-# tests/tests_opacities_m1/test_opacities_brem.cpp)
+ADD_BNSNURATES_EXECUTABLE(
+test_opacities_brem
+tests/tests_opacities_m1/test_opacities_brem.cpp)
 
-# ADD_BNSNURATES_EXECUTABLE(
-# test_opacities_pair
-# tests/tests_opacities_m1/test_opacities_pair.cpp)
+ADD_BNSNURATES_EXECUTABLE(
+test_opacities_pair
+tests/tests_opacities_m1/test_opacities_pair.cpp)
 
-# ADD_BNSNURATES_EXECUTABLE(
-# test_opacities_inelastic_scatt
-# tests/tests_opacities_m1/test_opacities_inelastic_scatt.cpp)
+ADD_BNSNURATES_EXECUTABLE(
+test_opacities_inelastic_scatt
+tests/tests_opacities_m1/test_opacities_inelastic_scatt.cpp)
 
-# ADD_BNSNURATES_EXECUTABLE(
-# test_opacities_all_reactions
-# tests/tests_opacities_m1/test_opacities_all_reactions.cpp)
+ADD_BNSNURATES_EXECUTABLE(
+test_opacities_all_reactions
+tests/tests_opacities_m1/test_opacities_all_reactions.cpp)
 
-# ADD_BNSNURATES_EXECUTABLE(
-# test_spectral_opacities_all_reactions
-# tests/tests_opacities_spectral/test_opacities_spectral.cpp)
+ADD_BNSNURATES_EXECUTABLE(
+test_spectral_opacities_all_reactions
+tests/tests_opacities_spectral/test_opacities_spectral.cpp)
 
-# ADD_BNSNURATES_EXECUTABLE(
-# test_m1_distribution
-# tests/tests_distribution/test_m1_distribution.cpp)
+ADD_BNSNURATES_EXECUTABLE(
+test_m1_distribution
+tests/tests_distribution/test_m1_distribution.cpp)

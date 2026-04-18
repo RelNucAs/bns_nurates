@@ -237,7 +237,7 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
     Kokkos::View<int*, LayoutWrapper, HostMemSpace> h_opacity_flags(
         "opacity_flags", 5);
     Kokkos::View<bool*, LayoutWrapper, HostMemSpace> h_opacity_pars(
-        "opacity_pars", 8);
+        "opacity_pars", 7);
 
     h_opacity_flags(0) = opacity_flags->use_abs_em;
     h_opacity_flags(1) = opacity_flags->use_pair;
@@ -250,14 +250,13 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
     h_opacity_pars(2) = opacity_pars->use_WM_ab;
     h_opacity_pars(3) = opacity_pars->use_WM_sc;
     h_opacity_pars(4) = opacity_pars->use_decay;
-    h_opacity_pars(5) = opacity_pars->use_BRT_brem;
-    h_opacity_pars(6) = opacity_pars->use_NN_medium_corr;
-    h_opacity_pars(7) = opacity_pars->neglect_blocking;
+    h_opacity_pars(5) = opacity_pars->use_NN_medium_corr;
+    h_opacity_pars(6) = opacity_pars->neglect_blocking;
 
     Kokkos::View<int*, LayoutWrapper, DevMemSpace> d_opacity_flags(
         "opacity_flags", 5);
     Kokkos::View<bool*, LayoutWrapper, DevMemSpace> d_opacity_pars(
-        "opacity_pars", 8);
+        "opacity_pars", 7);
 
     Kokkos::deep_copy(d_opacity_flags, h_opacity_flags);
     Kokkos::deep_copy(d_opacity_pars, h_opacity_pars);
@@ -286,14 +285,14 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
 
             // Opacity parameters (corrections all switched off)
             my_grey_opacity_params.opacity_pars = {
-                .use_dU             = d_opacity_pars(0),
-                .use_dm_eff         = d_opacity_pars(1),
-                .use_WM_ab          = d_opacity_pars(2),
-                .use_WM_sc          = d_opacity_pars(3),
-                .use_decay          = d_opacity_pars(4),
-                .use_BRT_brem       = d_opacity_pars(5),
-                .use_NN_medium_corr = d_opacity_pars(6),
-                .neglect_blocking   = d_opacity_pars(7)};
+                .use_dU              = d_opacity_pars(0),
+                .use_dm_eff          = d_opacity_pars(1),
+                .use_WM_ab           = d_opacity_pars(2),
+                .use_WM_sc           = d_opacity_pars(3),
+                .use_decay           = d_opacity_pars(4),
+                .brem_implementation = "HR98",
+                .use_NN_medium_corr  = d_opacity_pars(5),
+                .neglect_blocking    = d_opacity_pars(6)};
 
             // populate EOS parameters from table
             my_grey_opacity_params.eos_pars.mu_e = d_mu_e(i);
@@ -651,7 +650,7 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200], const int nx,
     Kokkos::View<int*, LayoutWrapper, HostMemSpace> h_opacity_flags(
         "opacity_flags", 5);
     Kokkos::View<bool*, LayoutWrapper, HostMemSpace> h_opacity_pars(
-        "opacity_pars", 8);
+        "opacity_pars", 7);
 
     h_opacity_flags(0) = opacity_flags->use_abs_em;
     h_opacity_flags(1) = opacity_flags->use_pair;
@@ -664,14 +663,13 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200], const int nx,
     h_opacity_pars(2) = opacity_pars->use_WM_ab;
     h_opacity_pars(3) = opacity_pars->use_WM_sc;
     h_opacity_pars(4) = opacity_pars->use_decay;
-    h_opacity_pars(5) = opacity_pars->use_BRT_brem;
-    h_opacity_pars(6) = opacity_pars->use_NN_medium_corr;
-    h_opacity_pars(7) = opacity_pars->neglect_blocking;
+    h_opacity_pars(5) = opacity_pars->use_NN_medium_corr;
+    h_opacity_pars(6) = opacity_pars->neglect_blocking;
 
     Kokkos::View<int*, LayoutWrapper, DevMemSpace> d_opacity_flags(
         "opacity_flags", 5);
     Kokkos::View<bool*, LayoutWrapper, DevMemSpace> d_opacity_pars(
-        "opacity_pars", 8);
+        "opacity_pars", 7);
 
     Kokkos::deep_copy(d_opacity_flags, h_opacity_flags);
     Kokkos::deep_copy(d_opacity_pars, h_opacity_pars);
@@ -700,14 +698,14 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200], const int nx,
 
             // Opacity parameters (corrections all switched off)
             my_grey_opacity_params.opacity_pars = {
-                .use_dU             = d_opacity_pars(0),
-                .use_dm_eff         = d_opacity_pars(1),
-                .use_WM_ab          = d_opacity_pars(2),
-                .use_WM_sc          = d_opacity_pars(3),
-                .use_decay          = d_opacity_pars(4),
-                .use_BRT_brem       = d_opacity_pars(5),
-                .use_NN_medium_corr = d_opacity_pars(6),
-                .neglect_blocking   = d_opacity_pars(7)};
+                .use_dU              = d_opacity_pars(0),
+                .use_dm_eff          = d_opacity_pars(1),
+                .use_WM_ab           = d_opacity_pars(2),
+                .use_WM_sc           = d_opacity_pars(3),
+                .use_decay           = d_opacity_pars(4),
+                .brem_implementation = "HR98",
+                .use_NN_medium_corr  = d_opacity_pars(5),
+                .neglect_blocking    = d_opacity_pars(6)};
 
             // populate EOS parameters from table
             my_grey_opacity_params.eos_pars.mu_e = d_mu_e(i);
@@ -1074,7 +1072,7 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
     Kokkos::View<int*, LayoutWrapper, HostMemSpace> h_opacity_flags(
         "opacity_flags", 5);
     Kokkos::View<bool*, LayoutWrapper, HostMemSpace> h_opacity_pars(
-        "opacity_pars", 8);
+        "opacity_pars", 7);
 
     h_opacity_flags(0) = opacity_flags->use_abs_em;
     h_opacity_flags(1) = opacity_flags->use_pair;
@@ -1087,14 +1085,13 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
     h_opacity_pars(2) = opacity_pars->use_WM_ab;
     h_opacity_pars(3) = opacity_pars->use_WM_sc;
     h_opacity_pars(4) = opacity_pars->use_decay;
-    h_opacity_pars(5) = opacity_pars->use_BRT_brem;
-    h_opacity_pars(6) = opacity_pars->use_NN_medium_corr;
-    h_opacity_pars(7) = opacity_pars->neglect_blocking;
+    h_opacity_pars(5) = opacity_pars->use_NN_medium_corr;
+    h_opacity_pars(6) = opacity_pars->neglect_blocking;
 
     Kokkos::View<int*, LayoutWrapper, DevMemSpace> d_opacity_flags(
         "opacity_flags", 5);
     Kokkos::View<bool*, LayoutWrapper, DevMemSpace> d_opacity_pars(
-        "opacity_pars", 8);
+        "opacity_pars", 7);
 
     Kokkos::deep_copy(d_opacity_flags, h_opacity_flags);
     Kokkos::deep_copy(d_opacity_pars, h_opacity_pars);
@@ -1124,14 +1121,14 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
 
             // Opacity parameters (corrections all switched off)
             my_grey_opacity_params.opacity_pars = {
-                .use_dU             = d_opacity_pars(0),
-                .use_dm_eff         = d_opacity_pars(1),
-                .use_WM_ab          = d_opacity_pars(2),
-                .use_WM_sc          = d_opacity_pars(3),
-                .use_decay          = d_opacity_pars(4),
-                .use_BRT_brem       = d_opacity_pars(5),
-                .use_NN_medium_corr = d_opacity_pars(6),
-                .neglect_blocking   = d_opacity_pars(7)};
+                .use_dU              = d_opacity_pars(0),
+                .use_dm_eff          = d_opacity_pars(1),
+                .use_WM_ab           = d_opacity_pars(2),
+                .use_WM_sc           = d_opacity_pars(3),
+                .use_decay           = d_opacity_pars(4),
+                .brem_implementation = "HR98",
+                .use_NN_medium_corr  = d_opacity_pars(5),
+                .neglect_blocking    = d_opacity_pars(6)};
 
             printf("# Generating and populating quadrature on GPU\n");
             MyQuadrature gpu_quad;

@@ -53,8 +53,8 @@ MyKernelOutput BremKernelsBRT06(BremKernelParams* kernel_params,
     const BS_REAL q_nb =
         QBrem_BRT06(eos_pars->nb, temp, eos_pars->yn, eos_pars->yp);
 
-    const BS_REAL tmp = kBS_HClight6FourPiSquared * kBS_Brem_C4BRT06 *
-                        (q_nb / POW7(temp)) * bessk1(x) / x;
+    const BS_REAL tmp   = kBS_HClight6FourPiSquared * kBS_Brem_C4BRT06 *
+                          (q_nb / POW7(temp)) * bessk1(x) / x;
     const BS_REAL s_em  = tmp * SafeExp(-x);
     const BS_REAL s_abs = tmp * SafeExp(x);
 
