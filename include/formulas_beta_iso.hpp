@@ -76,7 +76,7 @@ BS_REAL EtaNNAbs(const BS_REAL n_in, const BS_REAL n_out, const BS_REAL mu_hat,
     constexpr BS_REAL mu_thres = CONST_MU_THRES;
 
     // if mu_hat too small, neglect nucleon degeneracy as backup
-    if (fabs(mu_hat) < mu_thres)
+    if (Kokkos::fabs(mu_hat) < mu_thres)
     {
         return n_in;
     }
@@ -196,7 +196,7 @@ void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
     // @TODO: HeavisideTanhApprox is 0.5 instead of 1 in E = m
     if (E_e - mass_lepton >= zero)
     {
-        cap_term = E_e_squared * sqrt(one - mass_lepton_squared / E_e_squared) *
+        cap_term = E_e_squared * Kokkos::sqrt(one - mass_lepton_squared / E_e_squared) *
                    R; // * HeavisideTanhApprox(E_e - mass_lepton)
     }
 
@@ -205,7 +205,7 @@ void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
         if (E_p - mass_lepton >= zero)
         {
             dec_term = E_p_squared *
-                       sqrt(one - mass_lepton_squared /
+                       Kokkos::sqrt(one - mass_lepton_squared /
                                       E_p_squared); // * HeavisideTanhApprox(E_p
                                                     // - mass_lepton)
         }
@@ -224,7 +224,7 @@ void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
     // out[0] = kAbsEmConst * etanp * (cap_term * (1. - fd_e) + dec_term *
     // fd_p); // Neutrino absorptivity [s-1], Eq.(C13) BS_REAL mu_nue =
     // (eos_pars->mu_e - eos_pars->mu_n + eos_pars->mu_p) / temp; out[0] =
-    // kAbsEmConst * etanp * cap_term / (1. + exp(eos_pars->mu_e / temp -
+    // kAbsEmConst * etanp * cap_term / (1. + Kokkos::exp(eos_pars->mu_e / temp -
     // FDI_p5(mu_nue)/FDI_p4(mu_nue)));
 
     cap_term = zero;
@@ -241,7 +241,7 @@ void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
 
     if (E_p - mass_lepton >= zero)
     {
-        cap_term = E_p_squared * sqrt(one - mass_lepton_squared / E_p_squared) *
+        cap_term = E_p_squared * Kokkos::sqrt(one - mass_lepton_squared / E_p_squared) *
                    Rbar; // * HeavisideTanhApprox(E_p - mass_lepton)
     }
 
@@ -250,7 +250,7 @@ void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
         if (E_e - mass_lepton >= zero)
         {
             dec_term = E_e_squared *
-                       sqrt(one - mass_lepton_squared /
+                       Kokkos::sqrt(one - mass_lepton_squared /
                                       E_e_squared); // * HeavisideTanhApprox(E_e
                                                     // - mass_lepton)
         }
@@ -388,10 +388,10 @@ BS_REAL EtaNNSc(const BS_REAL nb, const BS_REAL temp, const BS_REAL yN)
     // Linear interpolation between degenerate and non-degnerate limit in
     // Eq.(C37)
     // Fermi energy computation
-    const BS_REAL eFN = kBS_Iso_eF * pow(nN, two_thirds); // [MeV]
+    const BS_REAL eFN = kBS_Iso_eF * Kokkos::pow(nN, two_thirds); // [MeV]
     const BS_REAL aux = three_halves * temp / eFN;
 
-    return nN * aux / sqrt(one + POW2(aux)); // [nm-3]
+    return nN * aux / Kokkos::sqrt(one + POW2(aux)); // [nm-3]
 }
 
 /**

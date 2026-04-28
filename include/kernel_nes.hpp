@@ -30,7 +30,7 @@ KOKKOS_INLINE_FUNCTION
 void ComputeFDIForInelastic(BS_REAL w, BS_REAL wp, BS_REAL eta,
                             BS_REAL* fdi_diff_w, BS_REAL* fdi_diff_abs)
 {
-    BS_REAL abs_val = fabs(w - wp);
+    BS_REAL abs_val = Kokkos::fabs(w - wp);
 
     fdi_diff_w[0] = FDI_p1(eta - wp) - FDI_p1(eta - w);
     fdi_diff_w[1] = FDI_p2(eta - wp) - FDI_p2(eta - w);
@@ -143,8 +143,9 @@ MyKernelOutput NESKernels(InelasticScattKernelParams* kernel_params,
     const BS_REAL T                    = eos_params->temp;
     const BS_REAL w                    = kernel_params->omega / T;
     const BS_REAL wp                   = kernel_params->omega_prime / T;
-    const BS_REAL x                    = fmax(w, wp);
-    const BS_REAL y                    = fmin(w, wp);
+    // Use ternary instead of fmax/fmin: fmax(NaN,x)=NaN on IEEE-compliant hardware (Intel SYCL).
+    const BS_REAL x                    = (w > wp) ? w : wp;
+    const BS_REAL y                    = (w < wp) ? w : wp;
     const BS_REAL eta_e                = eos_params->mu_e / T;
     const BS_REAL exp_factor           = NEPSExpFunc(wp - w);
     const BS_REAL exp_factor_exchanged = NEPSExpFunc(w - wp);
@@ -244,8 +245,9 @@ MyKernelOutput NPSKernels(InelasticScattKernelParams* kernel_params,
     const BS_REAL T                    = eos_params->temp;
     const BS_REAL w                    = kernel_params->omega / T;
     const BS_REAL wp                   = kernel_params->omega_prime / T;
-    const BS_REAL x                    = fmax(w, wp);
-    const BS_REAL y                    = fmin(w, wp);
+    // Use ternary instead of fmax/fmin: fmax(NaN,x)=NaN on IEEE-compliant hardware (Intel SYCL).
+    const BS_REAL x                    = (w > wp) ? w : wp;
+    const BS_REAL y                    = (w < wp) ? w : wp;
     const BS_REAL eta_p                = -eos_params->mu_e / T;
     const BS_REAL exp_factor           = NEPSExpFunc(wp - w);
     const BS_REAL exp_factor_exchanged = NEPSExpFunc(w - wp);

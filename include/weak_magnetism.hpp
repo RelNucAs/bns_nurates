@@ -63,7 +63,7 @@ void NucFrmFac(const BS_REAL E, BS_REAL* cv, BS_REAL* ca, BS_REAL* F2,
 
     const BS_REAL tau = half * POW2(ehor) / (one + ehor); // Eq.(B10)
     const BS_REAL eta = one / (one + c1 * tau);           // Eq.(B16)
-    const BS_REAL G   = one / pow(one + c2 * tau, two);   // Eq.(B17)
+    const BS_REAL G   = one / Kokkos::pow(one + c2 * tau, two);   // Eq.(B17)
     const BS_REAL Fp1 =
         (one + tau * (one + lamp)) * G / (one + tau);               // Eq.(B11)
     const BS_REAL Fp2 = lamp * G / (one + tau);                     // Eq.(B12)

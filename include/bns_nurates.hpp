@@ -40,6 +40,18 @@ typedef REAL_TYPE BS_REAL;
 #else
 #define KOKKOS_INLINE_FUNCTION inline
 #define BS_PRINTF printf
+// Shim: expose standard math functions under the Kokkos:: namespace so that
+// code using Kokkos::XXX calls (required for Intel SYCL device code)
+// also compiles in pure C++ builds such as the Python bindings
+#include <cmath>
+namespace Kokkos {
+    using std::exp;   using std::sqrt;  using std::log;   using std::log2;
+    using std::log10; using std::pow;   using std::fabs;  using std::atan;
+    using std::atan2; using std::hypot; using std::cbrt;  using std::tanh;
+    using std::sinh;  using std::cosh;  using std::sin;   using std::cos;
+    using std::floor; using std::ceil;  using std::round; using std::fmin;
+    using std::fmax;
+}
 #endif
 
 // Define indices of neutrino species
