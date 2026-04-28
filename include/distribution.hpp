@@ -91,8 +91,9 @@ void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
 
     for (int nuid = 0; nuid < total_num_species; ++nuid)
     {
-        const BS_REAL n   = fmax(1e-100, M1_pars->n[nuid]); // [nm^-3]
-        const BS_REAL J   = fmax(1e-100, M1_pars->J[nuid]); // [MeV nm^-3]
+        // Use ternary instead of fmax: fmax(floor, NaN) returns NaN on IEEE-compliant hardware (Intel SYCL).
+        const BS_REAL n   = (M1_pars->n[nuid] > 1e-100) ? M1_pars->n[nuid] : 1e-100; // [nm^-3]
+        const BS_REAL J   = (M1_pars->J[nuid] > 1e-100) ? M1_pars->J[nuid] : 1e-100; // [MeV nm^-3]
         const BS_REAL chi = M1_pars->chi[nuid];
 
         // BS_ASSERT(
@@ -109,7 +110,7 @@ void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
         if (y < y1)
         {
             out_distribution_pars->eta_t[nuid] =
-                log((y * (y * (y * (y * (y * (y + kBS_ThickDistr_num_1[0]) +
+                Kokkos::log((y * (y * (y * (y * (y * (y + kBS_ThickDistr_num_1[0]) +
                                          kBS_ThickDistr_num_1[1]) +
                                     kBS_ThickDistr_num_1[2]) +
                                kBS_ThickDistr_num_1[3]) +
@@ -143,7 +144,7 @@ void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
         else if (y > y2 && y < y3)
         {
             out_distribution_pars->eta_t[nuid] =
-                exp((y * (y * (y * (y * (y * (kBS_ThickDistr_num_3[0] * y -
+                Kokkos::exp((y * (y * (y * (y * (y * (kBS_ThickDistr_num_3[0] * y -
                                               kBS_ThickDistr_num_3[1]) +
                                          kBS_ThickDistr_num_3[2]) +
                                     kBS_ThickDistr_num_3[3]) +
@@ -162,8 +163,10 @@ void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
             out_distribution_pars->eta_t[nuid] = twenty;
         }
 
+        // Use ternary instead of fmin: fmin(NaN, x) = NaN on Intel SYCL.
         out_distribution_pars->eta_t[nuid] =
-            fmin(out_distribution_pars->eta_t[nuid], twenty);
+            (out_distribution_pars->eta_t[nuid] < twenty)
+                ? out_distribution_pars->eta_t[nuid] : twenty;
 
         out_distribution_pars->temp_t[nuid] =
             FDI_p2(out_distribution_pars->eta_t[nuid]) * J /
@@ -191,7 +194,7 @@ BS_REAL NuFThin(const BS_REAL omega, const NuDistributionParams* distr_pars,
     const BS_REAL c_f    = distr_pars->c_f[nuid];
     const BS_REAL beta_f = distr_pars->beta_f[nuid];
 
-    return beta_f * pow(omega, c_f) * exp(-omega / T_f);
+    return beta_f * Kokkos::pow(omega, c_f) * Kokkos::exp(-omega / T_f);
 }
 
 /* Recover distribution function parameters for optically thin regime from M1
@@ -214,8 +217,9 @@ void CalculateThinParamsFromM1(const M1Quantities* M1_pars,
 
     for (int nuid = 0; nuid < total_num_species; ++nuid)
     {
-        const BS_REAL n   = fmax(1e-100, M1_pars->n[nuid]); // [nm^-3]
-        const BS_REAL J   = fmax(1e-100, M1_pars->J[nuid]); // [MeV nm^-3]
+        // Use ternary instead of fmax: fmax(floor, NaN) returns NaN on IEEE-compliant hardware (Intel SYCL).
+        const BS_REAL n   = (M1_pars->n[nuid] > 1e-100) ? M1_pars->n[nuid] : 1e-100; // [nm^-3]
+        const BS_REAL J   = (M1_pars->J[nuid] > 1e-100) ? M1_pars->J[nuid] : 1e-100; // [MeV nm^-3]
         const BS_REAL chi = M1_pars->chi[nuid];
 
         // BS_ASSERT(
@@ -234,7 +238,7 @@ void CalculateThinParamsFromM1(const M1Quantities* M1_pars,
 
         out_distribution_pars->beta_f[nuid] =
             n / (kBS_FourPi_hc3 * GammaStirling(c_f + three) *
-                 pow(Tnu, c_f + three));
+                 Kokkos::pow(Tnu, c_f + three));
     }
 }
 
@@ -367,8 +371,8 @@ inline MyQuadratureIntegrand NuNumber(NuDistributionParams* distr_pars)
 
     BS_REAL s[total_num_species];
 
-    s[id_nue]  = fabs(distr_pars->temp_t[id_nue] * distr_pars->eta_t[id_nue]);
-    s[id_anue] = fabs(distr_pars->temp_t[id_anue] * distr_pars->eta_t[id_anue]);
+    s[id_nue]  = Kokkos::fabs(distr_pars->temp_t[id_nue] * distr_pars->eta_t[id_nue]);
+    s[id_anue] = Kokkos::fabs(distr_pars->temp_t[id_anue] * distr_pars->eta_t[id_anue]);
     s[id_nux]  = s[id_nue]; // @TODO: cannot be equal to zero
     s[id_anux] = s[id_nue]; // @TODO: cannot be equal to zero
 
@@ -421,8 +425,8 @@ inline MyQuadratureIntegrand NuEnergy(NuDistributionParams* distr_pars)
 
     BS_REAL s[total_num_species];
 
-    s[id_nue]  = fabs(distr_pars->temp_t[id_nue] * distr_pars->eta_t[id_nue]);
-    s[id_anue] = fabs(distr_pars->temp_t[id_anue] * distr_pars->eta_t[id_anue]);
+    s[id_nue]  = Kokkos::fabs(distr_pars->temp_t[id_nue] * distr_pars->eta_t[id_nue]);
+    s[id_anue] = Kokkos::fabs(distr_pars->temp_t[id_anue] * distr_pars->eta_t[id_anue]);
     s[id_nux]  = s[id_nue]; // @TODO: cannot be equal to zero
     s[id_anux] = s[id_nue]; // @TODO: cannot be equal to zero
 

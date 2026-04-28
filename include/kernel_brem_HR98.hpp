@@ -80,19 +80,19 @@ BS_REAL BremKernelS(BS_REAL x, BS_REAL y, BS_REAL eta_star)
 
     // Compute non-degenerate approximation, s_nd in Eqn. (45)
     const BS_REAL s_nd_numerator =
-        two * kBS_SqrtPi * pow(x + two - SafeExp(-y / twelve), three_halves) *
+        two * kBS_SqrtPi * Kokkos::pow(x + two - SafeExp(-y / twelve), three_halves) *
         (POW2(x) + two * x * y + five * POW2(y) / three + one);
     const BS_REAL s_nd_denominator =
         kBS_SqrtPi + POW4(kBS_Pi2OneEighth + x + y);
     const BS_REAL s_nd = s_nd_numerator / s_nd_denominator;
 
     // Compute degenerate approximation, s_d in Eqn. (46)
-    const BS_REAL u     = sqrt(y / (two * eta_star)) + ten_minus_ten;
+    const BS_REAL u     = Kokkos::sqrt(y / (two * eta_star)) + ten_minus_ten;
     const BS_REAL u2    = POW2(u);
-    const BS_REAL u_arg = u2 / (two * sqrt(two * u2 + four));
+    const BS_REAL u_arg = u2 / (two * Kokkos::sqrt(two * u2 + four));
     BS_REAL f_u =
-        (one - five * u * atan(two / u) / six + u2 / (three * (u2 + four)) +
-         atan(one / u_arg) * u_arg / three);
+        (one - five * u * Kokkos::atan(two / u) / six + u2 / (three * (u2 + four)) +
+         Kokkos::atan(one / u_arg) * u_arg / three);
 
     BS_REAL fu_threshold;
 
@@ -107,43 +107,43 @@ BS_REAL BremKernelS(BS_REAL x, BS_REAL y, BS_REAL eta_star)
 
     // @TODO: check this fix! Doing this to prevent s_d from being a large
     // negative number
-    f_u = (fabs(f_u) < fu_threshold) ? fu_threshold : f_u;
+    f_u = (Kokkos::fabs(f_u) < fu_threshold) ? fu_threshold : f_u;
 
     const BS_REAL s_d = three * kBS_PiHalfToFiveHalves *
-                        pow(eta_star, -five_halves) *
+                        Kokkos::pow(eta_star, -five_halves) *
                         (POW2(x) + kBS_FourPiSquared) * x * f_u /
                         (kBS_FourPiSquared * (one - SafeExp(-x)));
 
-    const BS_REAL pow_x_1_1 = pow(x, eleven_tenth);
+    const BS_REAL pow_x_1_1 = Kokkos::pow(x, eleven_tenth);
 
     // F, Eqn. (50)
     const BS_REAL f_denominator =
-        (three + POW2(x - twelve_tenth) + pow(x, -four)) *
+        (three + POW2(x - twelve_tenth) + Kokkos::pow(x, -four)) *
         (one + POW2(eta_star)) * (one + POW4(y));
     // Eq.(50)
     const BS_REAL f_brem = one + one / f_denominator;
 
     // G, Eqn. (50)
     const BS_REAL g_brem = one - c1 * pow_x_1_1 * y /
-                                     (four_fifth + six_hundreds * pow(y, c2)) *
-                                     sqrt(eta_star) / (eta_star + one_fifth);
+                                     (four_fifth + six_hundreds * Kokkos::pow(y, c2)) *
+                                     Kokkos::sqrt(eta_star) / (eta_star + one_fifth);
 
     // h and C, Eqn. (50)
     const BS_REAL h_brem =
-        one_tenth * eta_star / (c4 + one_tenth * pow(eta_star, eleven_tenth));
+        one_tenth * eta_star / (c4 + one_tenth * Kokkos::pow(eta_star, eleven_tenth));
     const BS_REAL c_brem =
         eleven_tenth * pow_x_1_1 * h_brem /
-        (twentythree_tenth + h_brem * pow(x, ninetythree_hundreds) +
-         c3 * pow(x, twelve_tenth)) *
-        thirty / (thirty + five_thousands * pow(x, fourteen_fifth));
+        (twentythree_tenth + h_brem * Kokkos::pow(x, ninetythree_hundreds) +
+         c3 * Kokkos::pow(x, twelve_tenth)) *
+        thirty / (thirty + five_thousands * Kokkos::pow(x, fourteen_fifth));
 
     // p, Eqn. (50)
     const BS_REAL p_brem =
-        sixtyseven_hundreds + eighteen_hundreds * pow(y, two_fifth);
+        sixtyseven_hundreds + eighteen_hundreds * Kokkos::pow(y, two_fifth);
 
     // interpolated formula for s in Eqn. (49)
     const BS_REAL s_brem =
-        pow(pow(s_nd, -p_brem) + pow(s_d, -p_brem), -one / p_brem) * f_brem *
+        Kokkos::pow(Kokkos::pow(s_nd, -p_brem) + Kokkos::pow(s_d, -p_brem), -one / p_brem) * f_brem *
         (one + c_brem * g_brem);
 
     BS_ASSERT(s_brem >= zero);
@@ -207,10 +207,10 @@ BS_REAL BremKernelG(BS_REAL y, BS_REAL eta_star)
         (half + eta_star / c1) * twentyfive * y2 / alpha_1_denom;
 
     // alpha_2, Eqn. (53)
-    const BS_REAL alpha_2 = (c2 + four_hundreds * pow(eta_star, c3)) /
-                            (one + two_hundreds * pow(eta_star, five_halves));
+    const BS_REAL alpha_2 = (c2 + four_hundreds * Kokkos::pow(eta_star, c3)) /
+                            (one + two_hundreds * Kokkos::pow(eta_star, five_halves));
 
-    const BS_REAL pow_eta_star_1_5 = pow(eta_star, three_halves);
+    const BS_REAL pow_eta_star_1_5 = Kokkos::pow(eta_star, three_halves);
 
     // alpha_3, Eqn. (53)
     const BS_REAL alpha_3 =
@@ -227,8 +227,8 @@ BS_REAL BremKernelG(BS_REAL y, BS_REAL eta_star)
 
     // g, Eqn. (52)
     const BS_REAL g =
-        (alpha_1 + alpha_2 * pow(y, p_1)) /
-        (one + alpha_3 * pow(y, p_2) + alpha_2 * pow(y, p_1 + two) / c5);
+        (alpha_1 + alpha_2 * Kokkos::pow(y, p_1)) /
+        (one + alpha_3 * Kokkos::pow(y, p_2) + alpha_2 * Kokkos::pow(y, p_1 + two) / c5);
 
     BS_ASSERT(g >= zero);
 
@@ -269,11 +269,11 @@ BS_REAL BremSingleChannelAbsKernel(const BS_REAL n_nuc, const BS_REAL m_nuc,
 
     // Nucleon effective degeneracy parameter, Eqn. (36) using baryon number
     // density instead of matter density
-    const BS_REAL eta_star = pow(three * kBS_PiSquared * n_nuc, two_thirds) *
+    const BS_REAL eta_star = Kokkos::pow(three * kBS_PiSquared * n_nuc, two_thirds) *
                              kBS_Brem_Aux1 / (two * m_nuc * T);
 
     // Spin-fluctuation rate gamma, Eqn. (37)
-    const BS_REAL gamma = c1 * pow(eta_star, three_halves) * T_10;
+    const BS_REAL gamma = c1 * Kokkos::pow(eta_star, three_halves) * T_10;
 
     // Pion mass parameter y, Eqn. (38)
     const BS_REAL y = c2 / T_10;
@@ -304,7 +304,7 @@ BS_REAL BremAllChannelsAbsKernel(BremKernelParams* kernel_params,
     const BS_REAL xp = eos_params->yp; // proton abundance/mass fraction
 
     const BS_REAL x_mean =
-        sqrt(xn * xp); // geometric mean of nucleon abundances/mass fractions
+        Kokkos::sqrt(xn * xp); // geometric mean of nucleon abundances/mass fractions
 
     const BS_REAL nn = nb * xn; // neutron number density [nm^-3]
     const BS_REAL np = nb * xp; // protron number density [nm^-3]
@@ -331,7 +331,7 @@ BS_REAL BremAllChannelsAbsKernel(BremKernelParams* kernel_params,
     if (kernel_params->use_NN_medium_corr == true)
     {
         s_abs_tot =
-            s_abs_tot / POW6((one + cbrt(nb / kBS_Saturation_n) / three));
+            s_abs_tot / POW6((one + Kokkos::cbrt(nb / kBS_Saturation_n) / three));
     }
 
     return s_abs_tot;

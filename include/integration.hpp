@@ -41,7 +41,7 @@ inline void GaussLegendre(MyQuadrature* quad)
 
     for (int i = 0; i < m; ++i)
     {
-        z = cos(kBS_Pi * (i + 0.75) / (n + 0.5));
+        z = Kokkos::cos(kBS_Pi * (i + 0.75) / (n + 0.5));
         do
         {
             p1 = 1.0;
@@ -58,7 +58,7 @@ inline void GaussLegendre(MyQuadrature* quad)
             z1 = z;
             z  = z1 - p1 / pp;
 
-        } while (fabs(z - z1) > kEps);
+        } while (Kokkos::fabs(z - z1) > kEps);
 
         quad->points[i]         = xm - xl * z;
         quad->points[n - 1 - i] = xm + xl * z;
@@ -266,7 +266,7 @@ inline BS_REAL GaussLaguerreIntegrateZeroInf(MyQuadrature* quad,
         for (int i = 0; i < quad->nx; ++i)
         {
             f[i] = func->function(&quad->points[i],
-                                  func->params); // * exp(quad->points[i]);
+                                  func->params); // * Kokkos::exp(quad->points[i]);
         }
     }
     else
@@ -274,7 +274,7 @@ inline BS_REAL GaussLaguerreIntegrateZeroInf(MyQuadrature* quad,
         for (int i = 0; i < quad->nx; ++i)
             f[i] = func->function(
                 &quad->points[i],
-                func->params); // * exp(quad->points[i]) / pow(quad->points[i],
+                func->params); // * Kokkos::exp(quad->points[i]) / Kokkos::pow(quad->points[i],
                                // quad->alpha);
     }
 
