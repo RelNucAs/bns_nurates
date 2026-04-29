@@ -8,7 +8,7 @@ BS_REAL = "double" # float
 
 bnsnurates_mod = Extension(
     "_bnsnurates",                                                               # Name of the extension module
-    swig_opts=['-python', '-c++', f'-DREAL_TYPE={BS_REAL:s}', '-I../include/'],  # SWIG options: generate Python bindings and use C++
+    swig_opts=['-c++', f'-DREAL_TYPE={BS_REAL:s}', '-I../include/'],              # SWIG options: generate Python bindings and use C++
     sources=['bnsnurates.i'],                                                    # SWIG wrapper file and C++ code
     include_dirs = ["../include/"],                                              # Include directory
     extra_compile_args=['-std=c++17', f'-DREAL_TYPE={BS_REAL:s}'],               # Additional compilation arguments

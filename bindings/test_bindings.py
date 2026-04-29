@@ -72,7 +72,7 @@ bns.print_reactions(opacity_flags)
 - neglect_blocking   : neglect blocking factors
 - use_NN_medium_corr : medium correction to bremsstrahlung as Fischer+16
 '''
-opacity_pars = {'use_dU': True, 'use_dm_eff': False, 'use_WM_ab': True, 'use_WM_sc': True, 'use_decay': True, 'use_BRT_brem': False, 'neglect_blocking': False, 'use_NN_medium_corr': True}
+opacity_pars = {'use_dU': True, 'use_dm_eff': False, 'use_WM_ab': True, 'use_WM_sc': True, 'use_decay': True, 'brem_implementation': 'HR98', 'neglect_blocking': False, 'use_NN_medium_corr': True}
 bns.print_corrections(opacity_pars)
 
 print("\nInput parameters")

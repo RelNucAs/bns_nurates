@@ -15,7 +15,9 @@
 #include "constants.hpp"
 #include "functions.hpp"
 
+#if !defined(__CUDA_ARCH__) && !defined(__SYCL_DEVICE_ONLY__)
 #include "GP19Table.hpp"
+#endif
 
 //===================================//
 // --- 4D interpolator structure --- //
@@ -55,6 +57,8 @@ int gp19_find_bracketing_indices(const BS_REAL value, const BS_REAL* axis,
     // Not found
     return -1;
 }
+
+#if !defined(__CUDA_ARCH__) && !defined(__SYCL_DEVICE_ONLY__)  // GP19 table data lives in CPU memory only
 
 /* 4D linear interpolation of the numerical table of the response function
  *
@@ -475,5 +479,17 @@ MyKernelOutput BremKernelAbsGP19(const BremKernelParams* bremParams,
 
     return brem_kernel;
 }
+
+#else  // __CUDA_ARCH__ || __SYCL_DEVICE_ONLY__ — GP19 is host-only; provide a stub so device code links
+
+KOKKOS_INLINE_FUNCTION
+MyKernelOutput BremKernelAbsGP19(const BremKernelParams* /*bremParams*/,
+                                 const MyEOSParams* /*eos*/)
+{
+    MyKernelOutput brem_kernel = {0};
+    return brem_kernel;
+}
+
+#endif  // !__CUDA_ARCH__ && !__SYCL_DEVICE_ONLY__
 
 #endif // BNS_NURATES_INCLUDE_KERNEL_BREM_GP19_HPP_
