@@ -1,1 +1,0 @@
-/opt/cray/pe/craype/2.7.32/bin/CC  -v -dynamic CMakeFiles/cmTC_1a6fb.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_1a6fb 
