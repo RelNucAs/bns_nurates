@@ -19,9 +19,9 @@ int main(int argc, char* argv[])
     const double nb   = 4.208366627847035e+38; // Baryon number density [cm-3]
     const double T    = 12.406403541564941;    // Temperature [MeV]
     const double ye   = 0.07158458232879639;   // Electron fraction
-    const double mu_e = 187.1814489;   // Electron chemical potential [MeV]
-    const double mu_p = 1011.01797737; // Proton chemical potential [MeV]
-    const double mu_n = 1221.59013681; // Neutron chemical potential [MeV]
+    const double mu_e = 1.871814489040245e+02; // Electron chemical potential [MeV]
+    const double mu_p = 1.011017977368873e+03; // Proton chemical potential [MeV]
+    const double mu_n = 1.221590136808168e+03; // Neutron chemical potential [MeV]
     const double dU =
         18.92714728; // Nucleon interaction potential difference (Un-Up) [MeV]
     const double mp_eff = 278.87162217; // Proton effective mass [MeV]
@@ -34,20 +34,20 @@ int main(int argc, char* argv[])
     // distribution functions
     //       and as normalization factors for energy-averaged opacities
     const double n_nue =
-        3.739749408027436e+33; // Electron neutrino number density [cm-3]
+        3.776741015683965e+33; // Electron neutrino number density [cm-3]
     const double n_anue =
-        1.2174961961689319e+35; // Electron antineutrino number density [cm-3]
+        1.205553071624256e+35; // Electron antineutrino number density [cm-3]
     const double n_nux =
-        2.2438496448164613e+34; // Heavy-type neutrino number density [cm-3]
+        2.271245089833032e+34; // Heavy-type neutrino number density [cm-3]
     const double n_anux =
-        2.2438496448164613e+34; // Heavy-type antineutrino number density [cm-3]
+        2.271245089833032e+34; // Heavy-type antineutrino number density [cm-3]
     const double j_nue =
-        1.246583136009145e+35; // Electron neutrino energy density [MeV cm-3]
-    const double j_anue = 5.360307484839323e+36; // Electron antineutrino number
+        1.404570452828258e+35; // Electron neutrino energy density [MeV cm-3]
+    const double j_anue = 5.320827032977899e+36; // Electron antineutrino number
                                                  // density [MeV cm-3]
     const double j_nux =
-        8.726081952064015e+35; // Heavy-type neutrino energy density [MeV cm-3]
-    const double j_anux = 8.726081952064015e+35; // Heavy-type antineutrino
+        8.885618224045794e+35; // Heavy-type neutrino energy density [MeV cm-3]
+    const double j_anux = 8.885618224045794e+35; // Heavy-type antineutrino
                                                  // energy density [MeV cm-3]
     const double chi_nue  = 1. / 3.; // Electron neutrino Eddington factor
     const double chi_anue = 1. / 3.; // Electron antineutrino Eddington factor
