@@ -34,7 +34,7 @@ BS_REAL QBrem_BRT06(const BS_REAL nb, const BS_REAL T, const BS_REAL xn,
     const BS_REAL rho                      = nb * mb; // mass density [g nm-3]
     return kBS_Brem_BRT06_Const * half * kBS_MeV *
            (POW2(xn) + POW2(xp) + twentyeight_thirds * xn * xp) * POW2(rho) *
-           pow(T, eleven_halves); // [MeV nm-3 s-1]
+           Kokkos::pow(T, eleven_halves); // [MeV nm-3 s-1]
 }
 
 // Bremsstrahlung kernel from BRT06 Eq.(143) rewritten consistently

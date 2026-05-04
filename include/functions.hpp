@@ -66,7 +66,12 @@ void NRcatch(NRerror err)
 KOKKOS_INLINE_FUNCTION
 BS_REAL SafeExp(const BS_REAL x)
 {
-    return exp(fmin(fmax(x, kBS_ExpLowLim), kBS_ExpUppLim));
+    // Use ternary instead of fmin/fmax: on IEEE-compliant hardware (Intel SYCL),
+    // fmax(NaN, x) = NaN, so a NaN input would propagate through. With ternaries,
+    // (NaN > kBS_ExpLowLim) is false, so NaN is safely replaced by the lower bound.
+    const BS_REAL clamped_lo = (x > kBS_ExpLowLim) ? x : kBS_ExpLowLim;
+    const BS_REAL clamped    = (clamped_lo < kBS_ExpUppLim) ? clamped_lo : kBS_ExpUppLim;
+    return Kokkos::exp(clamped);
 }
 
 /*===========================================================================*/
@@ -109,7 +114,7 @@ BS_REAL bessi1(const BS_REAL x)
                               -0.362018e-2, 0.163801e-2,   -0.1031555e-1};
 
 
-    if ((ax = fabs(x)) < fifteen_fourths)
+    if ((ax = Kokkos::fabs(x)) < fifteen_fourths)
     {
         y = x / fifteen_fourths, y = y * y;
         ans =
@@ -124,7 +129,7 @@ BS_REAL bessi1(const BS_REAL x)
         ans = B[0] + y * (B[1] + y * (B[2] - y * B[3]));
         ans =
             B[4] + y * (B[5] + y * (B[6] + y * (B[7] + y * (B[8] + y * ans))));
-        ans *= (exp(ax) / sqrt(ax));
+        ans *= (Kokkos::exp(ax) / Kokkos::sqrt(ax));
     }
 
     return x < zero ? -ans : ans;
@@ -154,7 +159,7 @@ BS_REAL bessk1(const BS_REAL x)
     {
         y = x * x / four;
         ans =
-            (log(x / two) * bessi1(x)) +
+            (Kokkos::log(x / two) * bessi1(x)) +
             (A[0] / x) *
                 (A[1] +
                  y * (A[2] +
@@ -164,7 +169,7 @@ BS_REAL bessk1(const BS_REAL x)
     else
     {
         y   = two / x;
-        ans = (exp(-x) / sqrt(x)) *
+        ans = (Kokkos::exp(-x) / Kokkos::sqrt(x)) *
               (B[0] +
                y * (B[1] +
                     y * (B[2] +
@@ -195,11 +200,11 @@ BS_REAL k1(const BS_REAL x) {
     // Returns the modiﬁed Bessel function K1(x) for positive real x.
     if (x <= 1.0) {  // Use two rational approximations.
         const BS_REAL z=x*x;
-        const BS_REAL term = poly(k1pi,4,z)*log(x)/poly(k1qi,2,1.-z);
+        const BS_REAL term = poly(k1pi,4,z)*Kokkos::log(x)/poly(k1qi,2,1.-z);
         return x*(poly(k1p,4,z)/poly(k1q,2,1.-z)+term)+1./x;
-    } else {         // Rational approximation with e^{-x}/sqrt(x) factored out.
+    } else {         // Rational approximation with e^{-x}/Kokkos::sqrt(x) factored out.
         const BS_REAL z=1.0/x;
-        return exp(-x)*poly(k1pp,7,z)/(poly(k1qq,7,z)*sqrt(x));
+        return Kokkos::exp(-x)*poly(k1pp,7,z)/(poly(k1qq,7,z)*Kokkos::sqrt(x));
     }
 }
 
@@ -296,18 +301,18 @@ void ChebEvalE(const ChebSeries* cs, const BS_REAL x, SFResult* result)
     {
         BS_REAL temp = d;
         d            = y2 * d - dd + cs->c[j];
-        e += fabs(y2 * temp) + fabs(dd) + fabs(cs->c[j]);
+        e += Kokkos::fabs(y2 * temp) + Kokkos::fabs(dd) + Kokkos::fabs(cs->c[j]);
         dd = temp;
     }
 
     {
         BS_REAL temp = d;
         d            = y * d - dd + half * cs->c[0];
-        e += fabs(y * temp) + fabs(dd) + half * fabs(cs->c[0]);
+        e += Kokkos::fabs(y * temp) + Kokkos::fabs(dd) + half * Kokkos::fabs(cs->c[0]);
     }
 
     result->val = d;
-    result->err = kBS_dbl_epsilon * e + fabs(cs->c[cs->order]);
+    result->err = kBS_dbl_epsilon * e + Kokkos::fabs(cs->c[cs->order]);
 
     return; // GSL_SUCCESS;
 }
@@ -322,7 +327,7 @@ void ChebEvalE(const ChebSeries* cs, const BS_REAL x, SFResult* result)
 KOKKOS_INLINE_FUNCTION
 void SFPsiOutput(const BS_REAL x, SFResult* result)
 {
-    const BS_REAL y = fabs(x);
+    const BS_REAL y = Kokkos::fabs(x);
 
     if (x == 0.0 || x == -1.0 || x == -2.0)
     {
@@ -338,9 +343,9 @@ void SFPsiOutput(const BS_REAL x, SFResult* result)
         ChebEvalE(&apsi_cs, t, &result_c);
         if (x < 0.0)
         {
-            const BS_REAL s = sin(kBS_Pi * x);
-            const BS_REAL c = cos(kBS_Pi * x);
-            if (fabs(s) < 2.0 * sqrt(DBL_MIN))
+            const BS_REAL s = Kokkos::sin(kBS_Pi * x);
+            const BS_REAL c = Kokkos::cos(kBS_Pi * x);
+            if (Kokkos::fabs(s) < 2.0 * Kokkos::sqrt(DBL_MIN))
             {
                 // result->val = std::nan;
                 // result->err = std::nan;
@@ -349,18 +354,18 @@ void SFPsiOutput(const BS_REAL x, SFResult* result)
             }
             else
             {
-                result->val = log(y) - 0.5 / x + result_c.val - kBS_Pi * c / s;
-                result->err = kBS_Pi * fabs(x) * DBL_EPSILON / (s * s);
+                result->val = Kokkos::log(y) - 0.5 / x + result_c.val - kBS_Pi * c / s;
+                result->err = kBS_Pi * Kokkos::fabs(x) * DBL_EPSILON / (s * s);
                 result->err += result_c.err;
-                result->err += DBL_EPSILON * fabs(result->val);
+                result->err += DBL_EPSILON * Kokkos::fabs(result->val);
                 return; // GSL_SUCCESS;
             }
         }
         else
         {
-            result->val = log(y) - 0.5 / x + result_c.val;
+            result->val = Kokkos::log(y) - 0.5 / x + result_c.val;
             result->err = result_c.err;
-            result->err += DBL_EPSILON * fabs(result->val);
+            result->err += DBL_EPSILON * Kokkos::fabs(result->val);
             return; // GSL_SUCCESS;
         }
     }
@@ -377,10 +382,10 @@ void SFPsiOutput(const BS_REAL x, SFResult* result)
             ChebEvalE(&psi_cs, 2.0 * v - 1.0, &result_c);
 
             result->val = -(t1 + t2 + t3) + result_c.val;
-            result->err = DBL_EPSILON * (fabs(t1) + fabs(x / (t2 * t2)) +
-                                         fabs(x / (t3 * t3)));
+            result->err = DBL_EPSILON * (Kokkos::fabs(t1) + Kokkos::fabs(x / (t2 * t2)) +
+                                         Kokkos::fabs(x / (t3 * t3)));
             result->err += result_c.err;
-            result->err += DBL_EPSILON * fabs(result->val);
+            result->err += DBL_EPSILON * Kokkos::fabs(result->val);
             return; // GSL_SUCCESS;
         }
         else if (x < 0.0)
@@ -391,9 +396,9 @@ void SFPsiOutput(const BS_REAL x, SFResult* result)
             ChebEvalE(&psi_cs, 2.0 * v - 1.0, &result_c);
 
             result->val = -(t1 + t2) + result_c.val;
-            result->err = DBL_EPSILON * (fabs(t1) + fabs(x / (t2 * t2)));
+            result->err = DBL_EPSILON * (Kokkos::fabs(t1) + Kokkos::fabs(x / (t2 * t2)));
             result->err += result_c.err;
-            result->err += DBL_EPSILON * fabs(result->val);
+            result->err += DBL_EPSILON * Kokkos::fabs(result->val);
             return; // GSL_SUCCESS;
         }
         else if (x < 1.0)
@@ -404,7 +409,7 @@ void SFPsiOutput(const BS_REAL x, SFResult* result)
             result->val = -t1 + result_c.val;
             result->err = DBL_EPSILON * t1;
             result->err += result_c.err;
-            result->err += DBL_EPSILON * fabs(result->val);
+            result->err += DBL_EPSILON * Kokkos::fabs(result->val);
             return; // GSL_SUCCESS;
         }
         else
@@ -521,7 +526,7 @@ BS_REAL FDI_m92(const BS_REAL x)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
 
         fd = ex *
@@ -686,7 +691,7 @@ BS_REAL FDI_m92(const BS_REAL x)
     {
         w  = one / (x * x);
         s  = one - onethousandsixhundred * w;
-        fd = factor / (sqrt(x) * x * x * x) *
+        fd = factor / (Kokkos::sqrt(x) * x * x * x) *
              (H[0] +
               w *
                   (H[1] +
@@ -786,7 +791,7 @@ BS_REAL FDI_m72(const BS_REAL x)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
 
         fd = ex *
@@ -940,7 +945,7 @@ BS_REAL FDI_m72(const BS_REAL x)
     {
         w  = one / (x * x);
         s  = one - onethousandsixhundred * w;
-        fd = factor / (sqrt(x) * x * x) *
+        fd = factor / (Kokkos::sqrt(x) * x * x) *
              (H[0] +
               w * (H[1] + s * (H[2] + s * (H[3] + s * (H[4] + s * H[5])))) /
                   (H[6] + s * (H[7] + s * (H[8] + s * (H[9] + s)))));
@@ -1019,7 +1024,7 @@ BS_REAL FDI_m52(const BS_REAL x)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
 
         fd = ex *
@@ -1154,7 +1159,7 @@ BS_REAL FDI_m52(const BS_REAL x)
         w = one / (x * x);
         s = one - onethousandsixhundred * w;
 
-        fd = factor / (sqrt(x) * x) *
+        fd = factor / (Kokkos::sqrt(x) * x) *
              (H[0] + w * (H[1] + s * (H[2] + s * (H[3] + s * H[4]))) /
                          (H[5] + s * (H[6] + s * (H[7] + s * (H[8] + s)))));
     }
@@ -1229,7 +1234,7 @@ BS_REAL FDI_m32(const BS_REAL x)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
 
         fd = ex *
@@ -1352,7 +1357,7 @@ BS_REAL FDI_m32(const BS_REAL x)
         w = one / (x * x);
         s = one - onethousandsixhundred * w;
 
-        fd = factor / sqrt(x) *
+        fd = factor / Kokkos::sqrt(x) *
              (H[0] + w * (H[1] + s * (H[2] + s * (H[3] + s * H[4]))) /
                          (H[5] + s * (H[6] + s * (H[7] + s))));
     }
@@ -1422,7 +1427,7 @@ BS_REAL FDI_m12(const BS_REAL x)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
 
         fd = ex *
@@ -1530,7 +1535,7 @@ BS_REAL FDI_m12(const BS_REAL x)
         w = one / (x * x);
         t = onethousandsixhundred * w;
 
-        fd = sqrt(x) * factor *
+        fd = Kokkos::sqrt(x) * factor *
              (H[0] -
               w * (H[1] +
                    t * (H[2] +
@@ -1548,7 +1553,7 @@ BS_REAL FDI_0(const BS_REAL y)
     BS_REAL x, ex, t, s;
     BS_REAL fd = 0.;
 
-    x = -fabs(y);
+    x = -Kokkos::fabs(y);
 
     constexpr BS_REAL A[10] = {1,
                                22696.2126132366633,
@@ -1571,7 +1576,7 @@ BS_REAL FDI_0(const BS_REAL y)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
 
         fd = ex *
@@ -1666,7 +1671,7 @@ BS_REAL FDI_p12(const BS_REAL x)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
 
         fd = ex *
@@ -1777,7 +1782,7 @@ BS_REAL FDI_p12(const BS_REAL x)
         w = one / (x * x);
         s = one - onethousandsixhundred * w;
 
-        fd = x * sqrt(x) * H[0] *
+        fd = x * Kokkos::sqrt(x) * H[0] *
              (H[1] +
               w * (H[2] + s * (H[3] + s * H[4])) / (H[5] + s * (H[6] + s)));
     }
@@ -1793,7 +1798,7 @@ BS_REAL FDI_p1(const BS_REAL y)
     BS_REAL x, ex, t, s;
     BS_REAL fd = 0.;
 
-    x = -fabs(y);
+    x = -Kokkos::fabs(y);
 
     constexpr BS_REAL A[10] = {1,
                                22189.1070807945062,
@@ -1817,7 +1822,7 @@ BS_REAL FDI_p1(const BS_REAL y)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
 
         fd = ex *
@@ -1917,7 +1922,7 @@ BS_REAL FDI_p32(const BS_REAL x)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
 
         fd = ex * (A[0] - ex * (A[1] + t * (A[2] + t * (A[3] + t * A[4]))) /
@@ -2033,7 +2038,7 @@ BS_REAL FDI_p32(const BS_REAL x)
     {
         w  = one / (x * x);
         s  = one - onethousandsixhundred * w;
-        fd = x * x * sqrt(x) * factor *
+        fd = x * x * Kokkos::sqrt(x) * factor *
              (H[0] +
               w * (H[1] + s * (H[2] + s * (H[3] + s * (H[4] - s * H[5])))));
     }
@@ -2049,7 +2054,7 @@ BS_REAL FDI_p2(const BS_REAL y)
     BS_REAL x, ex, t, s;
     BS_REAL fd = 0.;
 
-    x = -fabs(y);
+    x = -Kokkos::fabs(y);
 
     constexpr BS_REAL A[8]  = {2,
                                1914.06748184935743,
@@ -2071,7 +2076,7 @@ BS_REAL FDI_p2(const BS_REAL y)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
 
         fd = ex * (A[0] - ex * (A[1] + t * (A[2] + t * (A[3] + t * A[4]))) /
@@ -2167,7 +2172,7 @@ BS_REAL FDI_p52(const BS_REAL x)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
 
         fd = ex * (A[0] - ex * (A[1] + t * (A[2] + t * (A[3] + t * A[4]))) /
@@ -2275,7 +2280,7 @@ BS_REAL FDI_p52(const BS_REAL x)
         w = one / (x * x);
         t = onethousandsixhundred * w;
 
-        fd = x * x * x * sqrt(x) * factor *
+        fd = x * x * x * Kokkos::sqrt(x) * factor *
              (H[0] +
               w * (H[1] + t * (H[2] + t * (H[3] + t * (H[4] + t * H[5])))));
     }
@@ -2291,7 +2296,7 @@ BS_REAL FDI_p3(const BS_REAL y)
     BS_REAL x, ex, t, s, y2;
     BS_REAL fd = 0.;
 
-    x = -fabs(y);
+    x = -Kokkos::fabs(y);
 
     constexpr BS_REAL A[8]  = {6,
                                5121.6401850302408,
@@ -2312,7 +2317,7 @@ BS_REAL FDI_p3(const BS_REAL y)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
 
         fd = ex * (A[0] - ex * (A[1] + t * (A[2] + t * (A[3] + t * A[4]))) /
@@ -2406,7 +2411,7 @@ BS_REAL FDI_p72(const BS_REAL x)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
 
         fd = ex * (A[0] - ex * (A[1] + t * (A[2] + t * (A[3] + t * A[4]))) /
@@ -2517,7 +2522,7 @@ BS_REAL FDI_p72(const BS_REAL x)
     {
         w  = one / (x * x);
         t  = onethousandsixhundred * w;
-        fd = x * x * x * x * sqrt(x) * factor *
+        fd = x * x * x * x * Kokkos::sqrt(x) * factor *
              (H[0] +
               w * (H[1] + t * (H[2] + t * (H[3] + t * (H[4] - t * H[5])))));
     }
@@ -2533,7 +2538,7 @@ BS_REAL FDI_p4(const BS_REAL y)
     BS_REAL x, ex, t, s, y2;
     BS_REAL fd = 0.;
 
-    x = -fabs(y);
+    x = -Kokkos::fabs(y);
 
     constexpr BS_REAL A[8]  = {24,
                                18247.2542465629199,
@@ -2554,7 +2559,7 @@ BS_REAL FDI_p4(const BS_REAL y)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
 
         fd = ex * (A[0] - ex * (A[1] + t * (A[2] + t * (A[3] + t * A[4]))) /
@@ -2648,7 +2653,7 @@ BS_REAL FDI_p92(const BS_REAL x)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
 
         fd = ex * (A[0] - ex * (A[1] + t * (A[2] + t * (A[3] + t * A[4]))) /
@@ -2760,7 +2765,7 @@ BS_REAL FDI_p92(const BS_REAL x)
         w = one / (x * x);
         t = onethousandsixhundred * w;
 
-        fd = x * x * x * x * x * sqrt(x) * factor *
+        fd = x * x * x * x * x * Kokkos::sqrt(x) * factor *
              (H[0] +
               w * (H[1] + t * (H[2] + t * (H[3] + t * (H[4] + t * H[5])))));
     }
@@ -2776,7 +2781,7 @@ BS_REAL FDI_p5(const BS_REAL y)
     BS_REAL x, ex, t, s, y2;
     BS_REAL fd = 0.;
 
-    x = -fabs(y);
+    x = -Kokkos::fabs(y);
 
     constexpr BS_REAL A[8]  = {120,
                                81190.938912603315,
@@ -2798,7 +2803,7 @@ BS_REAL FDI_p5(const BS_REAL y)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
 
         fd = ex * (A[0] - ex * (A[1] + t * (A[2] + t * (A[3] + t * A[4]))) /
@@ -2894,7 +2899,7 @@ BS_REAL FDI_p112(const BS_REAL x)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
 
         fd = ex * (A[0] - ex * (A[1] + t * (A[2] + t * (A[3] + t * A[4]))) /
@@ -3010,7 +3015,7 @@ BS_REAL FDI_p112(const BS_REAL x)
         w = one / (x * x);
         t = onethousandsixhundred * w;
 
-        fd = x * x * x * x * x * x * sqrt(x) * factor *
+        fd = x * x * x * x * x * x * Kokkos::sqrt(x) * factor *
              (H[0] +
               w * (H[1] + t * (H[2] + t * (H[3] + t * (H[4] - t * H[5])))));
     }
@@ -3026,7 +3031,7 @@ BS_REAL FDI_p6(const BS_REAL y)
     BS_REAL x, ex, t, s, y2;
     BS_REAL fd = 0.;
 
-    x = -fabs(y);
+    x = -Kokkos::fabs(y);
 
     constexpr BS_REAL A[8]  = {720,
                                433290.557356514403,
@@ -3048,7 +3053,7 @@ BS_REAL FDI_p6(const BS_REAL y)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
 
         fd = ex * (A[0] - ex * (A[1] + t * (A[2] + t * (A[3] + t * A[4]))) /
@@ -3144,7 +3149,7 @@ BS_REAL FDI_p132(const BS_REAL x)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
 
         s = one - t;
@@ -3277,7 +3282,7 @@ BS_REAL FDI_p132(const BS_REAL x)
         w = one / (x * x);
         t = onethousandsixhundred * w;
 
-        fd = x * x * x * x * x * x * x * sqrt(x) * factor *
+        fd = x * x * x * x * x * x * x * Kokkos::sqrt(x) * factor *
              (H[0] +
               w * (H[1] + t * (H[2] + t * (H[3] + t * (H[4] + t * H[5])))));
     }
@@ -3293,7 +3298,7 @@ BS_REAL FDI_p7(const BS_REAL y)
     BS_REAL x, ex, t, s, y2;
     BS_REAL fd = 0.;
 
-    x = -fabs(y);
+    x = -Kokkos::fabs(y);
 
     constexpr BS_REAL A[7]  = {5040,
                                19.5849162780581217,
@@ -3314,7 +3319,7 @@ BS_REAL FDI_p7(const BS_REAL y)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
         s  = one - t;
 
@@ -3413,7 +3418,7 @@ BS_REAL FDI_p152(const BS_REAL x)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
 
         fd = ex * (A[0] - ex * (A[1] + t * (A[2] + t * A[3])) /
@@ -3545,7 +3550,7 @@ BS_REAL FDI_p152(const BS_REAL x)
         w = one / (x * x);
         t = onethousandsixhundred * w;
 
-        fd = x * x * x * x * x * x * x * x * sqrt(x) * factor *
+        fd = x * x * x * x * x * x * x * x * Kokkos::sqrt(x) * factor *
              (H[0] +
               w * (H[1] + t * (H[2] + t * (H[3] + t * (H[4] - t * H[5])))));
     }
@@ -3561,7 +3566,7 @@ BS_REAL FDI_p8(const BS_REAL y)
     BS_REAL x, ex, t, s, y2;
     BS_REAL fd = 0.;
 
-    x = -fabs(y);
+    x = -Kokkos::fabs(y);
 
     constexpr BS_REAL A[6]  = {40320,
                                438381.668209835602,
@@ -3582,7 +3587,7 @@ BS_REAL FDI_p8(const BS_REAL y)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
 
         fd = ex * (A[0] - ex * (A[1] + t * (A[2] + t * A[3])) /
@@ -3676,7 +3681,7 @@ BS_REAL FDI_p172(const BS_REAL x)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
         s  = one - t;
 
@@ -3806,7 +3811,7 @@ BS_REAL FDI_p172(const BS_REAL x)
         w = one / (x * x);
         t = onethousandsixhundred * w;
 
-        fd = x * x * x * x * x * x * x * x * x * sqrt(x) * factor *
+        fd = x * x * x * x * x * x * x * x * x * Kokkos::sqrt(x) * factor *
              (H[0] +
               w * (H[1] + t * (H[2] + t * (H[3] + t * (H[4] + t * H[5])))));
     }
@@ -3822,7 +3827,7 @@ BS_REAL FDI_p9(const BS_REAL y)
     BS_REAL x, ex, t, s, y2;
     BS_REAL fd = 0.;
 
-    x = -fabs(y);
+    x = -Kokkos::fabs(y);
 
     constexpr BS_REAL A[6]  = {362880,
                                3.11619728815890900e6,
@@ -3843,7 +3848,7 @@ BS_REAL FDI_p9(const BS_REAL y)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
         fd = ex * (A[0] - ex * (A[1] + t * (A[2] + t * A[3])) /
                               (A[4] + t * (A[5] + t)));
@@ -3937,7 +3942,7 @@ BS_REAL FDI_p192(const BS_REAL x)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
         s  = one - t;
 
@@ -4073,7 +4078,7 @@ BS_REAL FDI_p192(const BS_REAL x)
         w = one / (x * x);
         t = onethousandsixhundred * w;
 
-        fd = x * x * x * x * x * x * x * x * x * x * sqrt(x) * factor *
+        fd = x * x * x * x * x * x * x * x * x * x * Kokkos::sqrt(x) * factor *
              (H[0] +
               w * (H[1] +
                    t * (H[2] +
@@ -4091,7 +4096,7 @@ BS_REAL FDI_p10(const BS_REAL y)
     BS_REAL x, ex, t, s, y2;
     BS_REAL fd = 0.;
 
-    x = -fabs(y);
+    x = -Kokkos::fabs(y);
 
     constexpr BS_REAL A[6]  = {3628800,
                                1769.11836499240874,
@@ -4112,7 +4117,7 @@ BS_REAL FDI_p10(const BS_REAL y)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
         s  = one - t;
 
@@ -4211,7 +4216,7 @@ BS_REAL FDI_p212(const BS_REAL x)
 
     if (x < -two)
     {
-        ex = exp(x);
+        ex = Kokkos::exp(x);
         t  = ex * fdi_litconst;
         s  = one - t;
 
@@ -4347,7 +4352,7 @@ BS_REAL FDI_p212(const BS_REAL x)
         w = one / (x * x);
         t = onethousandsixhundred * w;
 
-        fd = x * x * x * x * x * x * x * x * x * x * x * sqrt(x) * factor *
+        fd = x * x * x * x * x * x * x * x * x * x * x * Kokkos::sqrt(x) * factor *
              (H[0] +
               w * (H[1] +
                    t * (H[2] +
@@ -4396,7 +4401,7 @@ BS_REAL FermiDistr(const BS_REAL e, const BS_REAL temp, const BS_REAL mu)
 KOKKOS_INLINE_FUNCTION
 BS_REAL NEPSExpFunc(BS_REAL x)
 {
-    const BS_REAL exp_ = SafeExp(-fabs(x));
+    const BS_REAL exp_ = SafeExp(-Kokkos::fabs(x));
     const int is_x_neg = signbit(x);
 
     constexpr BS_REAL zero = 0;
@@ -4440,7 +4445,7 @@ BS_REAL Gammln(const BS_REAL xx)
 
     y = x = xx;
     tmp   = x + a;
-    tmp   = (x + b) * log(tmp) - tmp;
+    tmp   = (x + b) * Kokkos::log(tmp) - tmp;
     ser   = c;
 
     for (j = 0; j < 14; j++)
@@ -4448,7 +4453,7 @@ BS_REAL Gammln(const BS_REAL xx)
         ser += cof[j] / ++y;
     }
 
-    return tmp + log(d * ser / x);
+    return tmp + Kokkos::log(d * ser / x);
 }
 
 // Compute the Gamma function using Serling's approximation
@@ -4461,7 +4466,7 @@ BS_REAL GammaStirling(const BS_REAL x)
 
     BS_ASSERT(x > zero);
 
-    return sqrt(twopi / x) * pow(x / e, x);
+    return Kokkos::sqrt(twopi / x) * Kokkos::pow(x / e, x);
 }
 
 /*===========================================================================*/
@@ -4488,8 +4493,8 @@ BS_REAL W0(const BS_REAL x)
     // Initial guess for recursion
     if (x > e)
     {
-        BS_REAL log_x = log(x);
-        beta          = log_x - log(log_x);
+        BS_REAL log_x = Kokkos::log(x);
+        beta          = log_x - Kokkos::log(log_x);
     }
     else if (x > zero)
     {
@@ -4498,14 +4503,14 @@ BS_REAL W0(const BS_REAL x)
     else
     { // if(x > -ie)
         BS_REAL tmp_1 = e * x;
-        BS_REAL tmp_2 = sqrt(one + tmp_1);
+        BS_REAL tmp_2 = Kokkos::sqrt(one + tmp_1);
         BS_REAL tmp_3 = one + tmp_2;
-        beta          = tmp_1 * log(tmp_3) / (tmp_2 * tmp_3);
+        beta          = tmp_1 * Kokkos::log(tmp_3) / (tmp_2 * tmp_3);
     }
 
-    beta = beta / (one + beta) * (one + log(x / beta));
-    beta = beta / (one + beta) * (one + log(x / beta));
-    beta = beta / (one + beta) * (one + log(x / beta));
+    beta = beta / (one + beta) * (one + Kokkos::log(x / beta));
+    beta = beta / (one + beta) * (one + Kokkos::log(x / beta));
+    beta = beta / (one + beta) * (one + Kokkos::log(x / beta));
 
     return beta;
 }
@@ -4566,7 +4571,7 @@ BS_REAL MNewt1d(BS_REAL guess, BS_REAL x1, BS_REAL x2, BS_REAL f0,
     }
 
     BS_REAL rts   = guess; // 0.5*(x1+x2);  // Initialize the guess for root,
-    BS_REAL dxold = fabs(x2 - x1); // the “stepsize before last,”
+    BS_REAL dxold = Kokkos::fabs(x2 - x1); // the “stepsize before last,”
     BS_REAL dx    = dxold;         // and the last step.
 
     BS_REAL f  = func->function(&rts, func->params) - f0;
@@ -4575,7 +4580,7 @@ BS_REAL MNewt1d(BS_REAL guess, BS_REAL x1, BS_REAL x2, BS_REAL f0,
     for (int j = 0; j < ntrial_1d; j++)
     { // Loop over allowed iterations.
         if ((((rts - xh) * df - f) * ((rts - xl) * df - f) > zero) ||
-            (fabs(two * f) > fabs(dxold * df)))
+            (Kokkos::fabs(two * f) > Kokkos::fabs(dxold * df)))
         { // Bisect if Newton out of range, or not decreasing fast enough.
             dxold = dx;
             dx    = half * (xh - xl);
@@ -4593,7 +4598,7 @@ BS_REAL MNewt1d(BS_REAL guess, BS_REAL x1, BS_REAL x2, BS_REAL f0,
                 return rts;
         }
 
-        if (fabs(dx) < xacc_1d)
+        if (Kokkos::fabs(dx) < xacc_1d)
             return rts; // Convergence criterion.
 
         f  = func->function(&rts, func->params) -
@@ -4677,7 +4682,7 @@ void MNewt2d(BS_REAL* x, BS_REAL C[2],
         fdf(x, C, fvec, fjac);
         BS_REAL errf = 0.0;
         for (i = 0; i < n; i++)
-            errf += fabs(fvec[i]);
+            errf += Kokkos::fabs(fvec[i]);
         if (errf <= tolf_2d)
             return;
         Invert2DMat(fjac, finv);
@@ -4687,7 +4692,7 @@ void MNewt2d(BS_REAL* x, BS_REAL C[2],
         BS_REAL errx = 0.0;
         for (i = 0; i < n; i++)
         {
-            errx += fabs(p[i]);
+            errx += Kokkos::fabs(p[i]);
             x[i] += p[i];
             // BS_PRINTF("x[%d] = %.3e\n", i, x[i]);
         }
@@ -4746,7 +4751,7 @@ BS_REAL HeavisideTanhApprox(const BS_REAL x)
     }
 
     return half *
-           (one + tanh(two * kBS_aHeaviside * x / (fabs(x) + kBS_REAL_MIN)));
+           (one + Kokkos::tanh(two * kBS_aHeaviside * x / (Kokkos::fabs(x) + kBS_REAL_MIN)));
 }
 
 /*===========================================================================*/

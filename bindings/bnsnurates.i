@@ -12,7 +12,9 @@
 #include "formulas_beta_iso.hpp"
 #include "functions.hpp"
 #include "integration.hpp"
-#include "kernel_brem.hpp"
+#include "kernel_brem_HR98.hpp"
+#include "kernel_brem_BRT06.hpp"
+#include "kernel_brem_GP19.hpp"
 #include "kernel_nes.hpp"
 #include "kernel_pair.hpp"
 #include "kernels.hpp"
@@ -71,7 +73,11 @@
     tmp.use_WM_ab = PyInt_AsLong(PyDict_GetItemString($input, "use_WM_ab"));
     tmp.use_WM_sc = PyInt_AsLong(PyDict_GetItemString($input, "use_WM_sc"));
     tmp.use_decay = PyInt_AsLong(PyDict_GetItemString($input, "use_decay"));
-    tmp.use_BRT_brem = PyInt_AsLong(PyDict_GetItemString($input, "use_BRT_brem"));
+    {
+        const char* _bs = PyUnicode_AsUTF8(PyDict_GetItemString($input, "brem_implementation"));
+        tmp.brem_implementation = (strncmp(_bs, "BRT06", 5) == 0) ? BREM_BRT06 :
+                                  (strncmp(_bs, "GP19",  4) == 0) ? BREM_GP19  : BREM_HR98;
+    }
     tmp.use_NN_medium_corr = PyInt_AsLong(PyDict_GetItemString($input, "use_NN_medium_corr"));
     tmp.neglect_blocking = PyInt_AsLong(PyDict_GetItemString($input, "neglect_blocking"));
 
@@ -114,7 +120,9 @@
     PyDict_SetItemString(out_dict, "use_WM_ab", PyInt_FromLong(in_var->use_WM_ab)); 
     PyDict_SetItemString(out_dict, "use_WM_sc", PyInt_FromLong(in_var->use_WM_sc)); 
     PyDict_SetItemString(out_dict, "use_decay", PyInt_FromLong(in_var->use_decay)); 
-    PyDict_SetItemString(out_dict, "use_BRT_brem", PyInt_FromLong(in_var->use_BRT_brem)); 
+    PyDict_SetItemString(out_dict, "brem_implementation", PyUnicode_FromString(
+        in_var->brem_implementation == BREM_BRT06 ? "BRT06" :
+        in_var->brem_implementation == BREM_GP19  ? "GP19"  : "HR98"));
     PyDict_SetItemString(out_dict, "use_NN_medium_corr", PyInt_FromLong(in_var->use_NN_medium_corr)); 
     PyDict_SetItemString(out_dict, "neglect_blocking", PyInt_FromLong(in_var->neglect_blocking)); 
     
@@ -216,7 +224,7 @@ def print_corrections(opacity_pars):
     print('# Weak magnetism on neutral reactions  : %d' %opacity_pars["use_WM_sc"])
     print('# Include (inverse) nucleon decays     : %d' %opacity_pars["use_decay"])
     print('# Neglect blocking factors             : %d' %opacity_pars["neglect_blocking"])
-    print('# Bremsstrahlung as in Burrows+2006    : %d' %opacity_pars["use_BRT_brem"])
+    print('# Bremsstrahlung implementation        : %s' %opacity_pars["brem_implementation"])
     print('# Medium Fischer+16 correction to brem : %d' %opacity_pars["use_NN_medium_corr"])
     print("")
 
@@ -252,7 +260,9 @@ def print_integrated_rates(gray_rates):
 %include "formulas_beta_iso.hpp"
 %include "functions.hpp"
 %include "integration.hpp"
-%include "kernel_brem.hpp"
+%include "kernel_brem_HR98.hpp"
+%include "kernel_brem_BRT06.hpp"
+%include "kernel_brem_GP19.hpp"
 %include "kernel_nes.hpp"
 %include "kernel_pair.hpp"
 %include "kernels.hpp"

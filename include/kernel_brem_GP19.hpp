@@ -15,7 +15,9 @@
 #include "constants.hpp"
 #include "functions.hpp"
 
+#if !defined(__CUDA_ARCH__) && !defined(__SYCL_DEVICE_ONLY__)
 #include "GP19Table.hpp"
+#endif
 
 //===================================//
 // --- 4D interpolator structure --- //
@@ -56,6 +58,8 @@ int gp19_find_bracketing_indices(const BS_REAL value, const BS_REAL* axis,
     return -1;
 }
 
+#if !defined(__CUDA_ARCH__) && !defined(__SYCL_DEVICE_ONLY__)  // GP19 table data lives in CPU memory only
+
 /* 4D linear interpolation of the numerical table of the response function
  *
  *      Inputs:
@@ -78,8 +82,8 @@ BS_REAL gp19_interpolator(const BS_REAL nb, const BS_REAL Ye, const BS_REAL T,
     BS_REAL tx, ty, tz, tw;
 
     // log-linear for nb e w
-    BS_REAL log_nb = log(nb);
-    BS_REAL log_w  = log(w);
+    BS_REAL log_nb = Kokkos::log(nb);
+    BS_REAL log_w  = Kokkos::log(w);
 
     if (gp19_find_bracketing_indices(log_nb, GP19_lognb_axis, GP19_nb_dims, &i0,
                                      &i1, &tx) < 0 or
@@ -195,17 +199,17 @@ BS_REAL gp19_LowTemperatureExtrapolation(const BS_REAL nb, const BS_REAL Ye,
     constexpr BS_REAL Thalf    = 0.5;                // [MeV]
     constexpr BS_REAL T2       = 2.0;                // [MeV]
     constexpr BS_REAL T4       = 4.0;                // [MeV]
-    constexpr BS_REAL ilogT4T2 = 1.4426950408889634; // 1 / log(4 / 2)
+    constexpr BS_REAL ilogT4T2 = 1.4426950408889634; // 1 / Kokkos::log(4 / 2)
 
     const BS_REAL kernel_T2 =
         gp19_BremKernel_in_ranges(nb, Ye, T2, w); // [nm3 s-1]
     const BS_REAL kernel_T4 =
         gp19_BremKernel_in_ranges(nb, Ye, T4, w); // [nm3 s-1]
 
-    const BS_REAL m = log(kernel_T4 / kernel_T2) * ilogT4T2;
+    const BS_REAL m = Kokkos::log(kernel_T4 / kernel_T2) * ilogT4T2;
 
     // Power law
-    const BS_REAL kernel_extra = kernel_T2 * pow(T_below * Thalf, m);
+    const BS_REAL kernel_extra = kernel_T2 * Kokkos::pow(T_below * Thalf, m);
 
     return kernel_extra;
 }
@@ -221,14 +225,14 @@ BS_REAL gp19_LowDensity_and_LowTemperatureExtrapolation(const BS_REAL nb_below,
     constexpr BS_REAL Thalf    = 0.5;                // [MeV]
     constexpr BS_REAL T2       = 2.0;                // [MeV]
     constexpr BS_REAL T4       = 4.0;                // [MeV]
-    constexpr BS_REAL ilogT4T2 = 1.4426950408889634; // 1 / log(4 / 2)
+    constexpr BS_REAL ilogT4T2 = 1.4426950408889634; // 1 / Kokkos::log(4 / 2)
 
     BS_REAL kernel_LowDensity_T2 =
         gp19_LowDensityExtrapolation(nb_below, Ye, T2, w); // [nm3 s-1]
     BS_REAL kernel_LowDensity_T4 =
         gp19_LowDensityExtrapolation(nb_below, Ye, T4, w); // [nm3 s-1]
 
-    // Small floor value to avoid log(0)
+    // Small floor value to avoid Kokkos::log(0)
     constexpr BS_REAL eps = 1e-30;
     if (kernel_LowDensity_T2 < eps)
     {
@@ -240,9 +244,9 @@ BS_REAL gp19_LowDensity_and_LowTemperatureExtrapolation(const BS_REAL nb_below,
     }
 
     const BS_REAL m =
-        log(kernel_LowDensity_T4 / kernel_LowDensity_T2) * ilogT4T2;
+        Kokkos::log(kernel_LowDensity_T4 / kernel_LowDensity_T2) * ilogT4T2;
 
-    BS_REAL kernel_extra = kernel_LowDensity_T2 * pow(T_below * Thalf, m);
+    BS_REAL kernel_extra = kernel_LowDensity_T2 * Kokkos::pow(T_below * Thalf, m);
 
     // Guarantees a minimum kernel
     if (kernel_extra < eps)
@@ -299,7 +303,7 @@ BS_REAL gp19_HighTemperatureExtrapolation(const BS_REAL nb, const BS_REAL Ye,
     const BS_REAL Lor_den2 = (nb_nm_squared / (four * T_above)) * gamma;
     const BS_REAL inv_den_Lorentzian = one / (Lor_den1 + Lor_den2);
 
-    const BS_REAL Lor_scaling = (beta * nb_nm) / (T_above * sqrt(T_above));
+    const BS_REAL Lor_scaling = (beta * nb_nm) / (T_above * Kokkos::sqrt(T_above));
 
     const BS_REAL S_Lorentzian = Lor_scaling * inv_den_Lorentzian; // [MeV^-1]
 
@@ -461,7 +465,7 @@ MyKernelOutput BremKernelAbsGP19(const BremKernelParams* bremParams,
     // Ensure that the result is non-negative. It can become negative due to
     // extrapolation when evaluated at high temperatures, but can be safely set
     // to zero since it is very small in that regime.
-    s_abs = fabs(s_abs);
+    s_abs = Kokkos::fabs(s_abs);
 
     // Production kernel from detailed balance
     const BS_REAL s_em = s_abs * SafeExp(-w_original / T);
@@ -475,5 +479,17 @@ MyKernelOutput BremKernelAbsGP19(const BremKernelParams* bremParams,
 
     return brem_kernel;
 }
+
+#else  // __CUDA_ARCH__ || __SYCL_DEVICE_ONLY__ — GP19 is host-only; provide a stub so device code links
+
+KOKKOS_INLINE_FUNCTION
+MyKernelOutput BremKernelAbsGP19(const BremKernelParams* /*bremParams*/,
+                                 const MyEOSParams* /*eos*/)
+{
+    MyKernelOutput brem_kernel = {0};
+    return brem_kernel;
+}
+
+#endif  // !__CUDA_ARCH__ && !__SYCL_DEVICE_ONLY__
 
 #endif // BNS_NURATES_INCLUDE_KERNEL_BREM_GP19_HPP_

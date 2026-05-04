@@ -347,7 +347,7 @@ void AddBremKernelsToIntegrand(int n, BS_REAL* nu_array,
 {
     MyKernelOutput brem_ker;
 
-    if (grey_pars->opacity_pars.brem_implementation == "BRT06")
+    if (grey_pars->opacity_pars.brem_implementation == BREM_BRT06)
     {
         for (int i = 0; i < 2 * n; ++i)
         {
@@ -387,7 +387,7 @@ void AddBremKernelsToIntegrand(int n, BS_REAL* nu_array,
             }
         }
     }
-    else if (grey_pars->opacity_pars.brem_implementation == "HR98")
+    else if (grey_pars->opacity_pars.brem_implementation == BREM_HR98)
     {
         grey_pars->kernel_pars.brem_kernel_params.l = 0;
         grey_pars->kernel_pars.brem_kernel_params.use_NN_medium_corr =
@@ -430,7 +430,7 @@ void AddBremKernelsToIntegrand(int n, BS_REAL* nu_array,
             }
         }
     }
-    else if (grey_pars->opacity_pars.brem_implementation == "GP19")
+    else if (grey_pars->opacity_pars.brem_implementation == BREM_GP19)
     {
         for (int i = 0; i < 2 * n; ++i)
         {
@@ -471,8 +471,8 @@ void AddBremKernelsToIntegrand(int n, BS_REAL* nu_array,
     }
     else
     {
-        BS_ASSERT(false, "Unknown bremsstrahlung implementation: %s",
-                  grey_pars->opacity_pars.brem_implementation.c_str());
+        BS_ASSERT(false, "Unknown bremsstrahlung implementation: %d",
+                  (int)grey_pars->opacity_pars.brem_implementation);
     }
     return;
 }
@@ -1367,13 +1367,13 @@ MyQuadratureIntegrand SpectralIntegrand(BS_REAL* var, void* p)
     {
         my_grey_opacity_params->kernel_pars.brem_kernel_params.omega_prime =
             nu_bar;
-        if (opacity_pars.brem_implementation == "BRT06")
+        if (opacity_pars.brem_implementation == BREM_BRT06)
         {
             brem_kernels_m1 = BremKernelsBRT06(
                 &my_grey_opacity_params->kernel_pars.brem_kernel_params,
                 &my_eos_params);
         }
-        else if (opacity_pars.brem_implementation == "HR98")
+        else if (opacity_pars.brem_implementation == BREM_HR98)
         {
             my_grey_opacity_params->kernel_pars.brem_kernel_params.l = 0;
             my_grey_opacity_params->kernel_pars.brem_kernel_params
@@ -1383,7 +1383,7 @@ MyQuadratureIntegrand SpectralIntegrand(BS_REAL* var, void* p)
                 &my_grey_opacity_params->kernel_pars.brem_kernel_params,
                 &my_eos_params);
         }
-        else if (opacity_pars.brem_implementation == "GP19")
+        else if (opacity_pars.brem_implementation == BREM_GP19)
         {
             brem_kernels_m1 = BremKernelAbsGP19(
                 &my_grey_opacity_params->kernel_pars.brem_kernel_params,
@@ -1391,8 +1391,8 @@ MyQuadratureIntegrand SpectralIntegrand(BS_REAL* var, void* p)
         }
         else
         {
-            BS_ASSERT(false, "Unknown bremsstrahlung implementation: %s",
-                      opacity_pars.brem_implementation.c_str());
+            BS_ASSERT(false, "Unknown bremsstrahlung implementation: %d",
+                      (int)opacity_pars.brem_implementation);
         }
     }
 

@@ -16,7 +16,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits>
-#include <string>
 
 #define POW0(X) ((1))
 #define POW1(X) ((X))
@@ -40,6 +39,18 @@ typedef REAL_TYPE BS_REAL;
 #else
 #define KOKKOS_INLINE_FUNCTION inline
 #define BS_PRINTF printf
+// Shim: expose standard math functions under the Kokkos:: namespace so that
+// code using Kokkos::XXX calls (required for Intel SYCL device code)
+// also compiles in pure C++ builds such as the Python bindings
+#include <cmath>
+namespace Kokkos {
+    using std::exp;   using std::sqrt;  using std::log;   using std::log2;
+    using std::log10; using std::pow;   using std::fabs;  using std::atan;
+    using std::atan2; using std::hypot; using std::cbrt;  using std::tanh;
+    using std::sinh;  using std::cosh;  using std::sin;   using std::cos;
+    using std::floor; using std::ceil;  using std::round; using std::fmin;
+    using std::fmax;
+}
 #endif
 
 // Define indices of neutrino species
@@ -317,6 +328,9 @@ struct MyOpacity
 };
 typedef struct MyOpacity MyOpacity;
 
+/* BremImpl enum: choice of bremsstrahlung implementation (device-compatible) */
+enum BremImpl { BREM_HR98 = 0, BREM_BRT06 = 1, BREM_GP19 = 2 };
+
 /* OpacityParams struct
  *
  * Store additional flags when computing opacities
@@ -328,8 +342,8 @@ struct OpacityParams
     bool use_WM_ab;  // flag for WM correction (and related) on absorption rates
     bool use_WM_sc;  // flag for WM correction (and related) on scattering rates
     bool use_decay;  // flag for inclusion of nucleon decay rates
-    std::string brem_implementation; // choice of brem implementation: "HR98",
-                                     // "BRT06" or "GP19"
+    BremImpl brem_implementation; // choice of brem implementation: BREM_HR98,
+                                  // BREM_BRT06 or BREM_GP19
     bool use_NN_medium_corr; // flag for inclusion of medium correction to HR98
                              // NN brem kernel as in Fischer16
     bool neglect_blocking;   // flag for neglecting blocking factor of
@@ -342,7 +356,7 @@ __attribute__((unused)) static OpacityParams opacity_params_default_all = {
     .use_WM_ab           = true,
     .use_WM_sc           = true,
     .use_decay           = true,
-    .brem_implementation = "HR98",
+    .brem_implementation = BREM_HR98,
     .use_NN_medium_corr  = true,
     .neglect_blocking    = true};
 __attribute__((unused)) static OpacityParams opacity_params_default_none = {
@@ -351,7 +365,7 @@ __attribute__((unused)) static OpacityParams opacity_params_default_none = {
     .use_WM_ab           = false,
     .use_WM_sc           = false,
     .use_decay           = false,
-    .brem_implementation = "HR98",
+    .brem_implementation = BREM_HR98,
     .use_NN_medium_corr  = false,
     .neglect_blocking    = false};
 
