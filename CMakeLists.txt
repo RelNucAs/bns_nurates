@@ -44,6 +44,11 @@ if(ENABLE_KOKKOS AND ENABLE_OPENMP)
     set(Kokkos_ENABLE_OPENMP ON CACHE BOOL "Compile Kokkos with OpenMP")
 endif()
 
+# Declare BUILD_TESTING before add_subdirectory(kokkos): Kokkos's
+# fake_tribits.cmake does include(CTest), which would otherwise cache
+# BUILD_TESTING=ON before we get a chance to set the default.
+option(BUILD_TESTING "Build the testing tree." OFF)
+
 if(ENABLE_KOKKOS)
     add_subdirectory(kokkos)
     include_directories(${Kokkos_INCLUDE_DIRS_RET})
@@ -83,6 +88,11 @@ if (${GSL_FOUND})
 endif()
 target_link_libraries(${NAME} m)
 endmacro()
+
+macro(ADD_BNSNURATES_TEST NAME PATH)
+ADD_BNSNURATES_EXECUTABLE(${NAME} ${PATH})
+add_test(NAME ${NAME} COMMAND ${NAME})
+endmacro()
 ################################################################################
 
 ADD_BNSNURATES_EXECUTABLE(
@@ -93,58 +103,63 @@ ADD_BNSNURATES_EXECUTABLE(
 point_out
 utils/point_out.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
+if(BUILD_TESTING)
+include(CTest)
+
+ADD_BNSNURATES_TEST(
 test_opacities_benchmarks
 tests/tests_opacities_m1/test_opacities_benchmarks.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
+ADD_BNSNURATES_TEST(
 test_beta
 tests/tests_beta/test_beta.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
+ADD_BNSNURATES_TEST(
 test_iso
 tests/tests_iso/test_iso.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
+ADD_BNSNURATES_TEST(
 test_brem
 tests/tests_brem/test_brem.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
+ADD_BNSNURATES_TEST(
 test_pair_kernels
 tests/tests_pair/test_pair_kernels.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
+ADD_BNSNURATES_TEST(
 test_gauss_legendre_1d
 tests/tests_quadrature_integrate/test_gauss_legendre_1d.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
+ADD_BNSNURATES_TEST(
 test_opacities_electron_capture
 tests/tests_opacities_m1/test_opacities_electron_capture.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
+ADD_BNSNURATES_TEST(
 test_opacities_isoscatt
 tests/tests_opacities_m1/test_opacities_isoscatt.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
+ADD_BNSNURATES_TEST(
 test_opacities_brem
 tests/tests_opacities_m1/test_opacities_brem.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
+ADD_BNSNURATES_TEST(
 test_opacities_pair
 tests/tests_opacities_m1/test_opacities_pair.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
+ADD_BNSNURATES_TEST(
 test_opacities_inelastic_scatt
 tests/tests_opacities_m1/test_opacities_inelastic_scatt.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
+ADD_BNSNURATES_TEST(
 test_opacities_all_reactions
 tests/tests_opacities_m1/test_opacities_all_reactions.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
+ADD_BNSNURATES_TEST(
 test_spectral_opacities_all_reactions
 tests/tests_opacities_spectral/test_opacities_spectral.cpp)
 
-ADD_BNSNURATES_EXECUTABLE(
+ADD_BNSNURATES_TEST(
 test_m1_distribution
 tests/tests_distribution/test_m1_distribution.cpp)
+
+endif()
