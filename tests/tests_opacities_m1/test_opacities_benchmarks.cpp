@@ -21,6 +21,8 @@
 #include "constants.hpp"
 #include "functions.hpp"
 
+#pragma GCC diagnostic ignored "-Wformat"
+
 #define num_data 102 // number of data points in input profile
 
 using DevExeSpace   = Kokkos::DefaultExecutionSpace;
@@ -252,7 +254,7 @@ void TestM1OpacitiesBenchmarks(int nx, int mb_nx, OpacityFlags* opacity_flags,
                 .use_WM_ab           = d_opacity_pars(2),
                 .use_WM_sc           = d_opacity_pars(3),
                 .use_decay           = d_opacity_pars(4),
-                .brem_implementation = "HR98",
+                .brem_implementation = BREM_HR98,
                 .use_NN_medium_corr  = d_opacity_pars(5),
                 .neglect_blocking    = d_opacity_pars(6)};
 

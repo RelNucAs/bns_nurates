@@ -8,6 +8,8 @@
 #ifndef BNS_NURATES_TESTS_TESTS_HPP_
 #define BNS_NURATES_TESTS_TESTS_HPP_
 
+#pragma GCC diagnostic ignored "-Wformat"
+
 #include <iostream>
 #include <Kokkos_Core.hpp>
 
@@ -290,7 +292,7 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
                 .use_WM_ab           = d_opacity_pars(2),
                 .use_WM_sc           = d_opacity_pars(3),
                 .use_decay           = d_opacity_pars(4),
-                .brem_implementation = "HR98",
+                .brem_implementation = BREM_HR98,
                 .use_NN_medium_corr  = d_opacity_pars(5),
                 .neglect_blocking    = d_opacity_pars(6)};
 
@@ -703,7 +705,7 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200], const int nx,
                 .use_WM_ab           = d_opacity_pars(2),
                 .use_WM_sc           = d_opacity_pars(3),
                 .use_decay           = d_opacity_pars(4),
-                .brem_implementation = "HR98",
+                .brem_implementation = BREM_HR98,
                 .use_NN_medium_corr  = d_opacity_pars(5),
                 .neglect_blocking    = d_opacity_pars(6)};
 
@@ -1126,7 +1128,7 @@ inline void TestSpectralOpacities(OpacityFlags* opacity_flags,
                 .use_WM_ab           = d_opacity_pars(2),
                 .use_WM_sc           = d_opacity_pars(3),
                 .use_decay           = d_opacity_pars(4),
-                .brem_implementation = "HR98",
+                .brem_implementation = BREM_HR98,
                 .use_NN_medium_corr  = d_opacity_pars(5),
                 .neglect_blocking    = d_opacity_pars(6)};
 
