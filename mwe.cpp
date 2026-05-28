@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
     my_grey_opacity_params.opacity_pars.use_WM_sc =
         1; // Activate isoenergetic scattering weak magnetism correction
     my_grey_opacity_params.opacity_pars.brem_implementation =
-        BREM_HR98; // Select bremsstrahlung implementation: Guo and Pinedo 2019
+        BREM_GP19; // Select bremsstrahlung implementation: Guo and Pinedo 2019
     my_grey_opacity_params.opacity_pars.use_NN_medium_corr =
         1; // Activate NN bremsstrahlung medium correction as in Fischer+16
 
@@ -109,6 +109,7 @@ int main(int argc, char* argv[])
     my_grey_opacity_params.eos_pars.nb =
         nb * 1e-21; // Set baryon number density (in baryon/nm^3)
     my_grey_opacity_params.eos_pars.temp = T;       // Set temperature (in MeV)
+    my_grey_opacity_params.eos_pars.ye   = ye;      // Set electron fraction
     my_grey_opacity_params.eos_pars.yp   = ye;      // Set proton fraction
     my_grey_opacity_params.eos_pars.yn   = 1. - ye; // Set neutron fraction
     my_grey_opacity_params.eos_pars.mu_e =
