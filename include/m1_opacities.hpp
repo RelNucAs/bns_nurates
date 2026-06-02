@@ -1057,8 +1057,12 @@ M1MatrixKokkos2D ComputeNEPSIntegrand(const MyQuadrature* quad, BS_REAL t,
 }
 
 
-/* Computes the opacities for the M1 code
+/* Computes the opacities for the M1 code, with thermal and
+ * non-thermal processes treated together.
  *
+ * NEPS is treated together with other reactions.
+ * NEPS is considered for computation of number emissivity (eta_0) 
+ * and absorsivity (kappa_0_a).
  */
 KOKKOS_INLINE_FUNCTION
 M1Opacities ComputeM1OpacitiesGenericFormalism(
@@ -1296,8 +1300,12 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
 }
 
 
-/* Computes the opacities for the M1 code
- * Separate non-thermal processes from thermal ones.
+/* Computes the opacities for the M1 code, with thermal and
+ * non-thermal processes treated separately.
+ *
+ * NEPS is treated separately from other reactions.
+ * NEPS is NOT considered for computation of number emissivity (eta_0) 
+ * and absorsivity (kappa_0_a).
  */
 KOKKOS_INLINE_FUNCTION
 M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSeparated(
@@ -1420,7 +1428,7 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     for (int idx = 0; idx < total_num_species; ++idx)
     {
         m1_opacities_non_th_separated.kappa_0_a[idx]      = zero;
-        m1_opacities_non_th_separated.kappa_a_th[idx]        = zero;
+        m1_opacities_non_th_separated.kappa_a_th[idx]     = zero;
         m1_opacities_non_th_separated.kappa_a_non_th[idx] = zero;
         m1_opacities_non_th_separated.kappa_s[idx]        = zero;
     }

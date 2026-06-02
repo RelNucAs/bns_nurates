@@ -459,6 +459,8 @@ typedef struct GreyOpacityParams GreyOpacityParams;
  * Stores the emissivity, absorption and scattering coefficients
  * for electron neutrino (nue), electron anti-neutrino (anue) and mu/tau
  * neutrinos (nux) as in Radice et al. (2022)
+ * 
+ * NEPS is included in all the quantities (excluded kappa_s).
  */
 struct M1Opacities
 {
@@ -474,12 +476,15 @@ struct M1Opacities
 typedef struct M1Opacities M1Opacities;
 
 
-/* M1Opacities struct with separated non-thermal processes
+/* M1OpacitiesNonThermalSeparated struct
  *
  * Stores the emissivity, absorption and scattering coefficients
  * for electron neutrino (nue), electron anti-neutrino (anue) and mu/tau
  * neutrinos (nux) as in Radice et al. (2022)
- * Take care about the non-thermal processes, stored using different coefficients.
+ * 
+ * NEPS is treated separately from other reactions.
+ * NEPS is not considered for computation of number emissivity (eta_0) 
+ * and absorsivity (kappa_0_a).
  */
 struct M1OpacitiesNonThermalSeparated
 {

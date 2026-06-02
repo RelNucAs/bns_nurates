@@ -262,7 +262,7 @@ int main(int argc, char* argv[])
                                     &my_grey_opacity_params);
 
     // The numerical factors restore usual units (see output)
-    printf("Gray rates assuming equilibrium ALL TOGETHER\n");
+    printf("Gray rates assuming equilibrium, NEPS INCLUDED\n");
     printf("------------------------------\n");
     printf(
         "     eta0          eta1          kappa0        kappa1        scat1\n");
@@ -288,14 +288,14 @@ int main(int argc, char* argv[])
     // Compute and output gray emissivities and opacities (Eqs. (19)-(23) in
     // Chiesa+25 PRD)
     // THERMAL and NON-THERMAL SEPARATED
-    gray_rates_non_th_separated = ComputeM1OpacitiesNonThermalSeparated(&my_quadrature, &my_quadrature,
-                                    &my_grey_opacity_params);
+    gray_rates_non_th_separated = ComputeM1OpacitiesNonThermalSeparated(
+                        &my_quadrature, &my_quadrature, &my_grey_opacity_params);
 
     // The numerical factors restore usual units (see output)
-    printf("Gray rates assuming equilibrium NON-THERMAL SEPARATED\n");
+    printf("Gray rates assuming equilibrium, NEPS SEPARATED\n");
     printf("------------------------------\n");
     printf(
-        "     eta0          eta1_th      eta1_non_th    kappa0          kappa1_th        kappa1_non_th        scat1\n");
+        "     eta0          eta1_th       eta1_non_th   kappa0        kappa1_th     kappa1_non_th scat1\n");
     printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
            gray_rates_non_th_separated.eta_0[id_nue] * 1e21, 
            gray_rates_non_th_separated.eta_th[id_nue] * 1e21,
@@ -377,13 +377,14 @@ int main(int argc, char* argv[])
            spectral_rates.kappa[id_anux] * 1e7,
            spectral_rates.kappa_s[id_anux] * 1e7);
 
+
     // Compute and output gray emissivities and opacities (Eqs. (19)-(23) in
     // Chiesa+25 PRD)
     gray_rates = ComputeM1Opacities(&my_quadrature, &my_quadrature,
                                     &my_grey_opacity_params);
 
     // The numerical factors restore usual units (see output)
-    printf("Gray rates reconstructing distribution function\n");
+    printf("Gray rates reconstructing distribution function, NEPS INCLUDED\n");
     printf("----------------------------------------------\n");
     printf(
         "     eta0          eta1          kappa0        kappa1        scat1\n");
@@ -406,15 +407,59 @@ int main(int argc, char* argv[])
            gray_rates.kappa_a[id_anux] * 1e7,
            gray_rates.kappa_s[id_anux] * 1e7);
 
+
+    // Compute and output gray emissivities and opacities (Eqs. (19)-(23) in
+    // Chiesa+25 PRD) 
+    gray_rates_non_th_separated = ComputeM1OpacitiesNonThermalSeparated(
+                            &my_quadrature, &my_quadrature, &my_grey_opacity_params);
+
+    // The numerical factors restore usual units (see output)
+    printf("Gray rates reconstructing distribution function, NEPS SEPARATED\n");
+    printf("------------------------------\n");
+    printf(
+        "     eta0          eta1_th       eta1_non_th   kappa0        kappa1_th     kappa1_non_th scat1\n");
+    printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+           gray_rates_non_th_separated.eta_0[id_nue] * 1e21, 
+           gray_rates_non_th_separated.eta_th[id_nue] * 1e21,
+           gray_rates_non_th_separated.eta_non_th[id_nue] * 1e21,
+           gray_rates_non_th_separated.kappa_0_a[id_nue] * 1e7, 
+           gray_rates_non_th_separated.kappa_a_th[id_nue] * 1e7,
+           gray_rates_non_th_separated.kappa_a_non_th[id_nue] * 1e7,
+           gray_rates_non_th_separated.kappa_s[id_nue] * 1e7);
+    printf("anue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+           gray_rates_non_th_separated.eta_0[id_anue] * 1e21, 
+           gray_rates_non_th_separated.eta_th[id_anue] * 1e21,
+           gray_rates_non_th_separated.eta_non_th[id_anue] * 1e21,
+           gray_rates_non_th_separated.kappa_0_a[id_anue] * 1e7,
+           gray_rates_non_th_separated.kappa_a_th[id_anue] * 1e7,
+           gray_rates_non_th_separated.kappa_a_non_th[id_anue] * 1e7,
+           gray_rates_non_th_separated.kappa_s[id_anue] * 1e7);
+    printf(" nux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+           gray_rates_non_th_separated.eta_0[id_nux] * 1e21, 
+           gray_rates_non_th_separated.eta_th[id_nux] * 1e21,
+           gray_rates_non_th_separated.eta_non_th[id_nux] * 1e21,
+           gray_rates_non_th_separated.kappa_0_a[id_nux] * 1e7, 
+           gray_rates_non_th_separated.kappa_a_th[id_nux] * 1e7,
+           gray_rates_non_th_separated.kappa_a_non_th[id_nux] * 1e7,
+           gray_rates_non_th_separated.kappa_s[id_nux] * 1e7);
+    printf("anux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n\n",
+           gray_rates_non_th_separated.eta_0[id_anux] * 1e21, 
+           gray_rates_non_th_separated.eta_th[id_anux] * 1e21,
+           gray_rates_non_th_separated.eta_non_th[id_anux] * 1e21,
+           gray_rates_non_th_separated.kappa_0_a[id_anux] * 1e7,
+           gray_rates_non_th_separated.kappa_a_th[id_anux] * 1e7,
+           gray_rates_non_th_separated.kappa_a_non_th[id_anux] * 1e7,
+           gray_rates_non_th_separated.kappa_s[id_anux] * 1e7);
+
     printf("Units\n"
            "-----\n"
-           "Spectral emissivity 'j'/'j_s'   :           s^-1\n"
-           "Spectral imfp 'kappa'/'kappa_s' :          cm^-1\n"
-           "Gray number emissivity 'eta0'   :     cm^-3 s^-1\n"
-           "Gray energy emissivity 'eta1'   : MeV cm^-3 s^-1\n"
-           "Gray number opacity 'kappa0'    :          cm^-1\n"
-           "Gray energy opacity 'kappa1'    :          cm^-1\n"
-           "Gray scattering opacity 'scat1' :          cm^-1\n");
+           "Spectral emissivity 'j'/'j_s'                 :           s^-1\n"
+           "Spectral imfp 'kappa'/'kappa_s'               :          cm^-1\n"
+           "Gray number emissivity 'eta0'                 :     cm^-3 s^-1\n"
+           "Gray energy emissivity 'eta1'(th and non-th) : MeV cm^-3 s^-1\n"
+           "Gray number opacity 'kappa0'                  :          cm^-1\n"
+           "Gray energy opacity 'kappa1'(th and non-th)  :          cm^-1\n"
+           "Gray scattering opacity 'scat1'               :          cm^-1\n");
 
     return 0;
 }
