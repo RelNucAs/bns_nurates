@@ -1056,6 +1056,7 @@ M1MatrixKokkos2D ComputeNEPSIntegrand(const MyQuadrature* quad, BS_REAL t,
     return out;
 }
 
+
 /* Computes the opacities for the M1 code
  *
  */
@@ -1294,6 +1295,276 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     return m1_opacities;
 }
 
+
+/* Computes the opacities for the M1 code
+ * Separate non-thermal processes from thermal ones.
+ */
+KOKKOS_INLINE_FUNCTION
+M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSeparated(
+                const MyQuadrature* quad_1d, const MyQuadrature* quad_2d,
+                GreyOpacityParams* my_grey_opacity_params, const int stim_abs)
+{
+    constexpr BS_REAL four    = 4;
+    constexpr BS_REAL c_light = kBS_Clight;
+
+    BS_REAL n[total_num_species];
+    BS_REAL J[total_num_species];
+
+    for (int idx = 0; idx < total_num_species; ++idx)
+    {
+        // m1_pars.n and m1_pars.J are assumed to be parsed in [nm^-3]
+        // and [MeV nm^-3]
+        n[idx] = my_grey_opacity_params->m1_pars.n[idx];
+        J[idx] = my_grey_opacity_params->m1_pars.J[idx];
+    }
+
+    const BS_REAL temp  = my_grey_opacity_params->eos_pars.temp;
+    const BS_REAL eta_e = my_grey_opacity_params->eos_pars.mu_e / temp;
+
+    constexpr BS_REAL three_halves  = 1.5;
+    constexpr BS_REAL five_sixths   = 0.8333333333333333;
+    constexpr BS_REAL five          = 5;
+    constexpr BS_REAL temp_multiple = 0.5 * 4.364;
+    const BS_REAL s_pair            = temp_multiple * temp;
+    // const BS_REAL s_pair              = temp * (FDI_p4(eta_e) / FDI_p3(eta_e)
+    // + FDI_p4(-eta_e) / FDI_p3(-eta_e));
+    const BS_REAL s_nux  = three_halves * temp;
+    const BS_REAL s_neps = temp_multiple * temp;
+
+    BS_REAL s_beta[total_num_species] = {0}, s_iso[total_num_species] = {0};
+
+    if (eta_e > -30. and eta_e < 30.)
+    {
+        s_beta[id_nue]  = temp * FDI_p5(eta_e) / FDI_p4(eta_e);
+        s_beta[id_anue] = temp * FDI_p5(-eta_e) / FDI_p4(-eta_e);
+    }
+    else if (eta_e > 30.)
+    {
+        s_beta[id_nue]  = temp * eta_e * five_sixths;
+        s_beta[id_anue] = temp * five;
+    }
+    else
+    {
+        s_beta[id_nue]  = temp * five;
+        s_beta[id_anue] = temp * eta_e * five_sixths;
+    }
+
+    for (int idx = 0; idx < total_num_species; ++idx)
+    {
+        s_iso[idx] = (n[idx] > THRESHOLD_N) ? (J[idx] / n[idx]) : s_nux;
+    }
+
+
+    MyQuadratureIntegrand iso_integrals = {0};
+    if (my_grey_opacity_params->opacity_flags.use_iso == 1)
+    {
+        BS_REAL out_iso[total_num_species][BS_N_MAX];
+        Scattering1DIntegrand(quad_1d, my_grey_opacity_params, s_iso, out_iso);
+        iso_integrals = GaussLegendreIntegrate1DMatrix(
+            quad_1d, total_num_species, out_iso, s_iso);
+    }
+
+    MyQuadratureIntegrand beta_n_em_integrals  = {0};
+    MyQuadratureIntegrand beta_j_em_integrals  = {0};
+    MyQuadratureIntegrand beta_n_abs_integrals = {0};
+    MyQuadratureIntegrand beta_j_abs_integrals = {0};
+
+    if (my_grey_opacity_params->opacity_flags.use_abs_em == 1)
+    {
+        BS_REAL out_beta_em[total_num_species][BS_N_MAX];
+        BS_REAL out_beta_ab[total_num_species][BS_N_MAX];
+
+        Beta1DIntegrand(quad_1d, my_grey_opacity_params, s_beta, out_beta_em,
+                        out_beta_ab, stim_abs);
+
+        GaussLegendreIntegrate1DMatrixOnlyNumber(quad_1d, 2, out_beta_em,
+                                                 s_beta, &beta_n_em_integrals,
+                                                 &beta_j_em_integrals);
+        GaussLegendreIntegrate1DMatrixOnlyNumber(quad_1d, 2, out_beta_ab,
+                                                 s_beta, &beta_n_abs_integrals,
+                                                 &beta_j_abs_integrals);
+    }
+
+
+    MyQuadratureIntegrand n_integrals_2d = {0};
+    MyQuadratureIntegrand e_integrals_2d = {0};
+
+    if ((my_grey_opacity_params->opacity_flags.use_pair == 1) ||
+        (my_grey_opacity_params->opacity_flags.use_brem == 1))
+    {
+        M1MatrixKokkos2D out_pair = ComputeDoubleIntegrand(
+            quad_2d, s_pair, my_grey_opacity_params, stim_abs);
+        GaussLegendreIntegrate2DMatrixForM1Coeffs(
+            quad_2d, &out_pair, s_pair, &n_integrals_2d, &e_integrals_2d);
+    }
+
+    MyQuadratureIntegrand n_neps_2d = {0};
+    MyQuadratureIntegrand e_neps_2d = {0};
+
+    if (my_grey_opacity_params->opacity_flags.use_inelastic_scatt == 1)
+    {
+        M1MatrixKokkos2D out_inel = ComputeNEPSIntegrand(
+            quad_2d, four * s_neps, my_grey_opacity_params, stim_abs);
+        GaussLegendreIntegrate2DMatrixForNEPS(quad_2d, &out_inel, four * s_neps,
+                                              &n_neps_2d, &e_neps_2d);
+    }
+
+    M1OpacitiesNonThermalSeparated m1_opacities_non_th_separated = {0};
+
+    /* Set all opacities to zero. They'll be left as 0 if the neutrino
+    number/energy density is too low (to avoid inf/nan, since the number/energy
+    density appears in the denominator). Note that emissivities do no need this
+    precaution (and it also make sense physically: you can produce neutrinos
+    even if there are none to start with). */
+    constexpr BS_REAL zero = 0;
+    for (int idx = 0; idx < total_num_species; ++idx)
+    {
+        m1_opacities_non_th_separated.kappa_0_a[idx]      = zero;
+        m1_opacities_non_th_separated.kappa_a_th[idx]        = zero;
+        m1_opacities_non_th_separated.kappa_a_non_th[idx] = zero;
+        m1_opacities_non_th_separated.kappa_s[idx]        = zero;
+    }
+
+    /* Electron neutrinos */
+    m1_opacities_non_th_separated.eta_0[id_nue] =
+        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * n_integrals_2d.integrand[0] +
+                          beta_n_em_integrals.integrand[id_nue]);
+
+    m1_opacities_non_th_separated.eta_th[id_nue] =
+        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * e_integrals_2d.integrand[0] +
+                          beta_j_em_integrals.integrand[id_nue]);
+
+    m1_opacities_non_th_separated.eta_non_th[id_nue] =
+        kBS_FourPi_hc3 * kBS_FourPi_hc3 * e_neps_2d.integrand[0];
+
+    if (n[id_nue] > THRESHOLD_N)
+    {
+        m1_opacities_non_th_separated.kappa_0_a[id_nue] =
+            kBS_FourPi_hc3 / (c_light * n[id_nue]) *
+            (kBS_FourPi_hc3 * n_integrals_2d.integrand[4] +
+             beta_n_abs_integrals.integrand[id_nue]);
+    }
+    if (J[id_nue] > THRESHOLD_J)
+    {
+        m1_opacities_non_th_separated.kappa_a_th[id_nue] =
+            n[id_nue] == zero ?
+                zero :
+                kBS_FourPi_hc3 / (c_light * J[id_nue]) *
+                    (kBS_FourPi_hc3 * e_integrals_2d.integrand[4] +
+                     beta_j_abs_integrals.integrand[id_nue]);
+
+        m1_opacities_non_th_separated.kappa_a_non_th[id_nue] =
+            n[id_nue] == zero ?
+                zero :
+                kBS_FourPi_hc3 / (c_light * J[id_nue]) *
+                    (kBS_FourPi_hc3 * e_neps_2d.integrand[4]);
+
+        m1_opacities_non_th_separated.kappa_s[id_nue] = kBS_FourPi_hc3 / (c_light * J[id_nue]) *
+                                       iso_integrals.integrand[id_nue];
+    }
+
+    /* Electron anti-neutrinos */
+    m1_opacities_non_th_separated.eta_0[id_anue] =
+        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * n_integrals_2d.integrand[1] +
+                          beta_n_em_integrals.integrand[id_anue]);
+
+    m1_opacities_non_th_separated.eta_th[id_anue] =
+        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * e_integrals_2d.integrand[1] +
+                          beta_j_em_integrals.integrand[id_anue]);
+
+    m1_opacities_non_th_separated.eta_non_th[id_anue] =
+        kBS_FourPi_hc3 * kBS_FourPi_hc3 * e_neps_2d.integrand[1];
+
+    if (n[id_anue] > THRESHOLD_N)
+    {
+        m1_opacities_non_th_separated.kappa_0_a[id_anue] =
+            kBS_FourPi_hc3 / (c_light * n[id_anue]) *
+            (kBS_FourPi_hc3 * n_integrals_2d.integrand[5] +
+             beta_n_abs_integrals.integrand[id_anue]);
+    }
+    if (J[id_anue] > THRESHOLD_J)
+    {
+        m1_opacities_non_th_separated.kappa_a_th[id_anue] =
+            kBS_FourPi_hc3 / (c_light * J[id_anue]) *
+            (kBS_FourPi_hc3 * e_integrals_2d.integrand[5] +
+             beta_j_abs_integrals.integrand[id_anue]);
+
+        m1_opacities_non_th_separated.kappa_a_non_th[id_anue] =
+            kBS_FourPi_hc3 / (c_light * J[id_anue]) *
+            (kBS_FourPi_hc3 * e_neps_2d.integrand[5]);
+
+        m1_opacities_non_th_separated.kappa_s[id_anue] = kBS_FourPi_hc3 /
+                                        (c_light * J[id_anue]) *
+                                        iso_integrals.integrand[id_anue];
+    }
+
+    /* Heavy neutrinos */
+    m1_opacities_non_th_separated.eta_0[id_nux] =
+        kBS_FourPi_hc3_sqr * n_integrals_2d.integrand[2];
+
+    m1_opacities_non_th_separated.eta_th[id_nux] =
+        kBS_FourPi_hc3_sqr * e_integrals_2d.integrand[2];
+
+    m1_opacities_non_th_separated.eta_non_th[id_nux] =
+        kBS_FourPi_hc3_sqr * e_neps_2d.integrand[2];
+
+    if (n[id_nux] > THRESHOLD_N)
+    {
+        m1_opacities_non_th_separated.kappa_0_a[id_nux] =
+            kBS_FourPi_hc3_sqr / (c_light * n[id_nux]) *
+            n_integrals_2d.integrand[6];
+    }
+    if (J[id_nux] > THRESHOLD_J)
+    {
+        m1_opacities_non_th_separated.kappa_a_th[id_nux] =
+            kBS_FourPi_hc3_sqr / (c_light * J[id_nux]) *
+            e_integrals_2d.integrand[6];
+
+        m1_opacities_non_th_separated.kappa_a_non_th[id_nux] =
+            kBS_FourPi_hc3_sqr / (c_light * J[id_nux]) *
+            e_neps_2d.integrand[6];
+
+        m1_opacities_non_th_separated.kappa_s[id_nux] = kBS_FourPi_hc3 / (c_light * J[id_nux]) *
+                                       iso_integrals.integrand[id_nux];
+    }
+
+    /* Heavy anti-neutrinos */
+    m1_opacities_non_th_separated.eta_0[id_anux] =
+        kBS_FourPi_hc3_sqr * n_integrals_2d.integrand[3];
+
+    m1_opacities_non_th_separated.eta_th[id_anux] =
+        kBS_FourPi_hc3_sqr * e_integrals_2d.integrand[3];
+
+    m1_opacities_non_th_separated.eta_non_th[id_anux] =
+        kBS_FourPi_hc3_sqr * e_neps_2d.integrand[3];
+
+    if (n[id_anux] > THRESHOLD_N)
+    {
+        m1_opacities_non_th_separated.kappa_0_a[id_anux] =
+            n[id_anux] == zero ?
+                zero :
+                kBS_FourPi_hc3_sqr / (c_light * n[id_anux]) *
+                    n_integrals_2d.integrand[7];
+    }
+    if (J[id_anux] > THRESHOLD_J)
+    {
+        m1_opacities_non_th_separated.kappa_a_th[id_anux] =
+            kBS_FourPi_hc3_sqr / (c_light * J[id_anux]) *
+            e_integrals_2d.integrand[7];
+
+        m1_opacities_non_th_separated.kappa_a_non_th[id_anux] =
+            kBS_FourPi_hc3_sqr / (c_light * J[id_anux]) *
+            e_neps_2d.integrand[7];
+
+        m1_opacities_non_th_separated.kappa_s[id_anux] = kBS_FourPi_hc3 /
+                                        (c_light * J[id_anux]) *
+                                        iso_integrals.integrand[id_anux];
+    }
+
+    return m1_opacities_non_th_separated;
+}
+
+
 KOKKOS_INLINE_FUNCTION
 M1Opacities
 ComputeM1OpacitiesNotStimulated(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
@@ -1303,6 +1574,7 @@ ComputeM1OpacitiesNotStimulated(MyQuadrature* quad_1d, MyQuadrature* quad_2d,
                                               my_grey_opacity_params, 0);
 }
 
+
 KOKKOS_INLINE_FUNCTION
 M1Opacities ComputeM1Opacities(const MyQuadrature* quad_1d,
                                const MyQuadrature* quad_2d,
@@ -1311,6 +1583,29 @@ M1Opacities ComputeM1Opacities(const MyQuadrature* quad_1d,
     return ComputeM1OpacitiesGenericFormalism(quad_1d, quad_2d,
                                               my_grey_opacity_params, 1);
 }
+
+
+KOKKOS_INLINE_FUNCTION
+M1OpacitiesNonThermalSeparated
+ComputeM1OpacitiesNotStimulatedNonThermalSeparated(
+                    MyQuadrature* quad_1d, MyQuadrature* quad_2d,
+                    GreyOpacityParams* my_grey_opacity_params)
+{
+    return ComputeM1OpacitiesGenericFormalismNonThermalSeparated(
+                        quad_1d, quad_2d, my_grey_opacity_params, 0);
+}
+
+
+KOKKOS_INLINE_FUNCTION
+M1OpacitiesNonThermalSeparated 
+ComputeM1OpacitiesNonThermalSeparated(
+            const MyQuadrature* quad_1d, const MyQuadrature* quad_2d, 
+            GreyOpacityParams* my_grey_opacity_params)
+{
+    return ComputeM1OpacitiesGenericFormalismNonThermalSeparated(
+                                quad_1d, quad_2d, my_grey_opacity_params, 1);
+}
+
 
 /* Compute the integrands for the computation of the spectral emissivity and
  * inverse mean free path */

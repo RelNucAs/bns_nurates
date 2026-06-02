@@ -474,6 +474,33 @@ struct M1Opacities
 typedef struct M1Opacities M1Opacities;
 
 
+/* M1Opacities struct with separated non-thermal processes
+ *
+ * Stores the emissivity, absorption and scattering coefficients
+ * for electron neutrino (nue), electron anti-neutrino (anue) and mu/tau
+ * neutrinos (nux) as in Radice et al. (2022)
+ * Take care about the non-thermal processes, stored using different coefficients.
+ */
+struct M1OpacitiesNonThermalSeparated
+{
+    /* Number coefficients */
+    BS_REAL eta_0[total_num_species];     // number emissivity coefficient
+    BS_REAL kappa_0_a[total_num_species]; // number absorption coefficient
+
+    /* Energy coefficients */
+    BS_REAL eta_th[total_num_species];          // energy emissivity coefficient 
+                                                // for thermal processes
+    BS_REAL eta_non_th[total_num_species];      // energy emissivity coefficient 
+                                                // for non-thermal processes
+    BS_REAL kappa_a_th[total_num_species];      // energy absorption coefficient
+                                                // for thermal processes
+    BS_REAL kappa_a_non_th[total_num_species];  // energy absorption coefficient
+                                                // for thermal processes
+    BS_REAL kappa_s[total_num_species];         // scattering coefficient
+};
+typedef struct M1OpacitiesNonThermalSeparated M1OpacitiesNonThermalSeparated;
+
+
 /* M1Matrix struct
  *
  * Stores quantities related to the computation of M1 source
