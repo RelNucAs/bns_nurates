@@ -228,6 +228,7 @@ int main(int argc, char* argv[])
            my_grey_opacity_params.m1_pars.chi[id_nux],
            my_grey_opacity_params.m1_pars.chi[id_anux]);
 
+
     // Compute and output spectral emissivities and inverse mean free paths (not
     // in the stimulated absorption formalism)
     spectral_rates = ComputeSpectralOpacitiesNotStimulatedAbs(
@@ -255,14 +256,17 @@ int main(int argc, char* argv[])
            spectral_rates.kappa[id_anux] * 1e7,
            spectral_rates.kappa_s[id_anux] * 1e7);
 
+
     // Compute and output gray emissivities and opacities (Eqs. (19)-(23) in
     // Chiesa+25 PRD)
-    // THERMAL and NON-THERMAL ALL TOGETHER
+    // Thermal and non-thermal processes are all together.
+    // NEPS is included in the total emissivities/absorsivities.
+    // NEPS contribution is included in number quantities (eta0 and kappa0).
     gray_rates = ComputeM1Opacities(&my_quadrature, &my_quadrature,
                                     &my_grey_opacity_params);
 
     // The numerical factors restore usual units (see output)
-    printf("Gray rates assuming equilibrium, NEPS INCLUDED\n");
+    printf("Gray rates assuming equilibrium, NEPS INCLUDED (also in eta0 and kappa0)\n");
     printf("------------------------------\n");
     printf(
         "     eta0          eta1          kappa0        kappa1        scat1\n");
@@ -285,14 +289,18 @@ int main(int argc, char* argv[])
            gray_rates.kappa_a[id_anux] * 1e7,
            gray_rates.kappa_s[id_anux] * 1e7);
 
+
     // Compute and output gray emissivities and opacities (Eqs. (19)-(23) in
     // Chiesa+25 PRD)
-    // THERMAL and NON-THERMAL SEPARATED
+    // Thermal and non-thermal processes are separated.
+    // NEPS emissivity and absorsivity are separated from ones related to 
+    // other processes.
+    // NEPS contribution is NOT included in number quantities (eta0 and kappa0).
     gray_rates_non_th_separated = ComputeM1OpacitiesNonThermalSeparated(
                         &my_quadrature, &my_quadrature, &my_grey_opacity_params);
 
     // The numerical factors restore usual units (see output)
-    printf("Gray rates assuming equilibrium, NEPS SEPARATED\n");
+    printf("Gray rates assuming equilibrium, NEPS SEPARATED, NEPS NOT INCLUDED in eta0 and kappa0\n");
     printf("------------------------------\n");
     printf(
         "     eta0          eta1_th       eta1_non_th   kappa0        kappa1_th     kappa1_non_th scat1\n");
@@ -380,11 +388,14 @@ int main(int argc, char* argv[])
 
     // Compute and output gray emissivities and opacities (Eqs. (19)-(23) in
     // Chiesa+25 PRD)
+    // Thermal and non-thermal processes are all together.
+    // NEPS is included in the total emissivities/absorsivities.
+    // NEPS contribution is included in number quantities (eta0 and kappa0).
     gray_rates = ComputeM1Opacities(&my_quadrature, &my_quadrature,
                                     &my_grey_opacity_params);
 
     // The numerical factors restore usual units (see output)
-    printf("Gray rates reconstructing distribution function, NEPS INCLUDED\n");
+    printf("Gray rates reconstructing distribution function, NEPS INCLUDED (also in eta0 and kappa0)\n");
     printf("----------------------------------------------\n");
     printf(
         "     eta0          eta1          kappa0        kappa1        scat1\n");
@@ -409,12 +420,16 @@ int main(int argc, char* argv[])
 
 
     // Compute and output gray emissivities and opacities (Eqs. (19)-(23) in
-    // Chiesa+25 PRD) 
+    // Chiesa+25 PRD)
+    // Thermal and non-thermal processes are separated.
+    // NEPS emissivity and absorsivity are separated from ones related to 
+    // other processes.
+    // NEPS contribution is NOT included in number quantities (eta0 and kappa0).
     gray_rates_non_th_separated = ComputeM1OpacitiesNonThermalSeparated(
                             &my_quadrature, &my_quadrature, &my_grey_opacity_params);
 
     // The numerical factors restore usual units (see output)
-    printf("Gray rates reconstructing distribution function, NEPS SEPARATED\n");
+    printf("Gray rates reconstructing distribution function, NEPS SEPARATED, NEPS NOT INCLUDED in eta0 and kappa0\n");
     printf("------------------------------\n");
     printf(
         "     eta0          eta1_th       eta1_non_th   kappa0        kappa1_th     kappa1_non_th scat1\n");
@@ -456,9 +471,9 @@ int main(int argc, char* argv[])
            "Spectral emissivity 'j'/'j_s'                 :           s^-1\n"
            "Spectral imfp 'kappa'/'kappa_s'               :          cm^-1\n"
            "Gray number emissivity 'eta0'                 :     cm^-3 s^-1\n"
-           "Gray energy emissivity 'eta1'(th and non-th) : MeV cm^-3 s^-1\n"
+           "Gray energy emissivity 'eta1'(th and non-th)  : MeV cm^-3 s^-1\n"
            "Gray number opacity 'kappa0'                  :          cm^-1\n"
-           "Gray energy opacity 'kappa1'(th and non-th)  :          cm^-1\n"
+           "Gray energy opacity 'kappa1'(th and non-th)   :          cm^-1\n"
            "Gray scattering opacity 'scat1'               :          cm^-1\n");
 
     return 0;
