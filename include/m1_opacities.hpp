@@ -1166,7 +1166,7 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     MyQuadratureIntegrand n_neps_2d = {0};
     MyQuadratureIntegrand e_neps_2d = {0};
 
-    if (my_grey_opacity_params->opacity_flags.use_inelastic_scatt == 1)
+    if (my_grey_opacity_params->opacity_flags.use_inelastic_NEPS == 1)
     {
         M1MatrixKokkos2D out_inel = ComputeNEPSIntegrand(
             quad_2d, four * s_neps, my_grey_opacity_params, stim_abs);
@@ -1409,7 +1409,7 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     MyQuadratureIntegrand n_neps_2d = {0};
     MyQuadratureIntegrand e_neps_2d = {0};
 
-    if (my_grey_opacity_params->opacity_flags.use_inelastic_scatt == 1)
+    if (my_grey_opacity_params->opacity_flags.use_inelastic_NEPS == 1)
     {
         M1MatrixKokkos2D out_inel = ComputeNEPSIntegrand(
             quad_2d, four * s_neps, my_grey_opacity_params, stim_abs);
@@ -1701,7 +1701,7 @@ MyQuadratureIntegrand SpectralIntegrand(BS_REAL* var, void* p)
 
     // compute the inelastic NES/NPS kernels
     MyKernelOutput inelastic_kernels_m1 = {0};
-    if (opacity_flags.use_inelastic_scatt)
+    if (opacity_flags.use_inelastic_NEPS)
     {
         my_grey_opacity_params->kernel_pars.inelastic_kernel_params
             .omega_prime     = nu_bar;
@@ -1821,7 +1821,7 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
     my_grey_opacity_params->kernel_pars.inelastic_kernel_params.omega = nu;
 
     GreyOpacityParams local_grey_params = *my_grey_opacity_params;
-    local_grey_params.opacity_flags.use_inelastic_scatt = 0;
+    local_grey_params.opacity_flags.use_inelastic_NEPS = 0;
 
     // set up 1d integration
     MyFunctionMultiD integrand_m1_1d;
@@ -1862,10 +1862,10 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
         GaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s_pair);
 
     MyQuadratureIntegrand integrals_neps_1d = {0};
-    if (my_grey_opacity_params->opacity_flags.use_inelastic_scatt == 1)
+    if (my_grey_opacity_params->opacity_flags.use_inelastic_NEPS == 1)
     {
         local_grey_params.opacity_flags                     = {0};
-        local_grey_params.opacity_flags.use_inelastic_scatt = 1;
+        local_grey_params.opacity_flags.use_inelastic_NEPS = 1;
         integrand_m1_1d.params = &local_grey_params;
         integrals_neps_1d =
             GaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s_neps);

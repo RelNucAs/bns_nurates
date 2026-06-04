@@ -296,8 +296,7 @@ struct MyEOSParams
     BS_REAL mu_p;  // proton chemical potential
     BS_REAL mu_n;  // neutron chemical potential
     BS_REAL mu_e;  // electron chemical potential
-    BS_REAL mu_mu; // muon chemical potential (this will be needed when
-                   // including muon-dependent reactions)
+    BS_REAL mu_mu; // muon chemical potential
     BS_REAL dU; // nonrelativistic mean field intereaction potential difference
                 // (as in Hempel 2015, Oertel et al. 2020)
     BS_REAL
@@ -331,6 +330,9 @@ typedef struct MyOpacity MyOpacity;
 /* BremImpl enum: choice of bremsstrahlung implementation (device-compatible) */
 enum BremImpl { BREM_HR98 = 0, BREM_BRT06 = 1, BREM_GP19 = 2 };
 
+/* NMSImpl enum: choice of NMS implementation (device-compatible) */
+enum NMSImpl { NMS_KernelInterp = 0, NMS_SemiAnalytical = 1 };
+
 /* OpacityParams struct
  *
  * Store additional flags when computing opacities
@@ -344,6 +346,8 @@ struct OpacityParams
     bool use_decay;  // flag for inclusion of nucleon decay rates
     BremImpl brem_implementation; // choice of brem implementation: BREM_HR98,
                                   // BREM_BRT06 or BREM_GP19
+    NMSImpl NMS_implementation; // choice of NMS implementation:
+                                  // NMS_KernelInterp or NMS_SemiAnalytical
     bool use_NN_medium_corr; // flag for inclusion of medium correction to HR98
                              // NN brem kernel as in Fischer16
     bool neglect_blocking;   // flag for neglecting blocking factor of
@@ -357,6 +361,7 @@ __attribute__((unused)) static OpacityParams opacity_params_default_all = {
     .use_WM_sc           = true,
     .use_decay           = true,
     .brem_implementation = BREM_HR98,
+    .NMS_implementation = NMS_KernelInterp,
     .use_NN_medium_corr  = true,
     .neglect_blocking    = true};
 __attribute__((unused)) static OpacityParams opacity_params_default_none = {
@@ -366,6 +371,7 @@ __attribute__((unused)) static OpacityParams opacity_params_default_none = {
     .use_WM_sc           = false,
     .use_decay           = false,
     .brem_implementation = BREM_HR98,
+    .NMS_implementation = NMS_KernelInterp,
     .use_NN_medium_corr  = false,
     .neglect_blocking    = false};
 
@@ -420,7 +426,8 @@ struct OpacityFlags
     int use_abs_em;
     int use_pair;
     int use_brem;
-    int use_inelastic_scatt;
+    int use_inelastic_NEPS;
+    int use_inelastic_NMS;
     int use_iso;
 };
 typedef struct OpacityFlags OpacityFlags;
@@ -428,13 +435,15 @@ __attribute__((unused)) static OpacityFlags opacity_flags_default_all = {
     .use_abs_em          = 1,
     .use_pair            = 1,
     .use_brem            = 1,
-    .use_inelastic_scatt = 1,
+    .use_inelastic_NEPS = 1,
+    .use_inelastic_NMS = 1,
     .use_iso             = 1};
 __attribute__((unused)) static OpacityFlags opacity_flags_default_none = {
     .use_abs_em          = 0,
     .use_pair            = 0,
     .use_brem            = 0,
-    .use_inelastic_scatt = 0,
+    .use_inelastic_NEPS = 0,
+    .use_inelastic_NMS = 0,
     .use_iso             = 0};
 
 /* GreyOpacityParams struct

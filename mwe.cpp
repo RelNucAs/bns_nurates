@@ -16,12 +16,13 @@ int main(int argc, char* argv[])
 
     // Input thermodynamic quantities (corresponding to point A in Chiesa+25
     // PRD) N.B.: chemical potentials include the rest mass contribution
-    const double nb   = 4.208366627847035e+38; // Baryon number density [cm-3]
-    const double T    = 12.406403541564941;    // Temperature [MeV]
-    const double ye   = 0.07158458232879639;   // Electron fraction
-    const double mu_e = 1.871814489040245e+02; // Electron chemical potential [MeV]
-    const double mu_p = 1.011017977368873e+03; // Proton chemical potential [MeV]
-    const double mu_n = 1.221590136808168e+03; // Neutron chemical potential [MeV]
+    const double nb   = 4.208366627847035e+38;  // Baryon number density [cm-3]
+    const double T    = 12.406403541564941;     // Temperature [MeV]
+    const double ye   = 0.07158458232879639;    // Electron fraction
+    const double mu_e = 1.871814489040245e+02;  // Electron chemical potential [MeV]
+    const double mu_mu = 1.871814489040245e+02; // Muon chemical potential [MeV]
+    const double mu_p = 1.011017977368873e+03;  // Proton chemical potential [MeV]
+    const double mu_n = 1.221590136808168e+03;  // Neutron chemical potential [MeV]
     const double dU =
         18.92714728; // Nucleon interaction potential difference (Un-Up) [MeV]
     const double mp_eff = 278.87162217; // Proton effective mass [MeV]
@@ -87,8 +88,10 @@ int main(int argc, char* argv[])
         1; // Activate pair processes
     my_grey_opacity_params.opacity_flags.use_iso =
         1; // Activate scattering on nucleons
-    my_grey_opacity_params.opacity_flags.use_inelastic_scatt =
-        1; // Activate scattering on leptons
+    my_grey_opacity_params.opacity_flags.use_inelastic_NEPS =
+        1; // Activate scattering on electrons/positrons
+    my_grey_opacity_params.opacity_flags.use_inelastic_NMS =
+        1; // Activate scattering on muons
 
     // Select corrections to rates
     my_grey_opacity_params.opacity_pars.use_dm_eff =
@@ -103,6 +106,8 @@ int main(int argc, char* argv[])
         1; // Activate isoenergetic scattering weak magnetism correction
     my_grey_opacity_params.opacity_pars.brem_implementation =
         BREM_GP19; // Select bremsstrahlung implementation: Guo and Pinedo 2019
+    my_grey_opacity_params.opacity_pars.NMS_implementation =
+        NMS_KernelInterp; // Select NMS implementation: direct kernel interpolation
     my_grey_opacity_params.opacity_pars.use_NN_medium_corr =
         1; // Activate NN bremsstrahlung medium correction as in Fischer+16
 
@@ -114,6 +119,8 @@ int main(int argc, char* argv[])
     my_grey_opacity_params.eos_pars.yn   = 1. - ye; // Set neutron fraction
     my_grey_opacity_params.eos_pars.mu_e =
         mu_e; // Set electron chemical potential (in MeV)
+    my_grey_opacity_params.eos_pars.mu_mu =
+        mu_mu; // Set muon chemical potential (in MeV)
     my_grey_opacity_params.eos_pars.mu_p =
         mu_p; // Set proton chemical potential (in MeV) (NOTE: reactions only
               // depend on the difference between mu_n and mu_p)
@@ -139,6 +146,9 @@ int main(int argc, char* argv[])
     printf(
         "Relativistic electron chemical potential           : %13.6e (MeV)\n",
         mu_e);
+    printf(
+        "Relativistic muon chemical potential               : %13.6e (MeV)\n",
+        mu_mu);
     printf(
         "Relativistic proton chemical potential             : %13.6e (MeV)\n",
         mu_p);

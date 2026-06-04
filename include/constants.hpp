@@ -2,6 +2,9 @@
 #define BNS_NURATES_SRC_CONSTANTS_HPP_
 
 #include "bns_nurates.hpp"
+// to define constants for GL NMS integrals:
+//#include "nms_kernel_table.hpp"
+//#include "nms_semi_analytical_table.hpp"
 
 //=================================================
 // bns-nurates neutrino opacities code
@@ -195,6 +198,36 @@ inline constexpr BS_REAL kBS_NEPS_BPlus  = POW2(2. * kBS_SinThW2 + 1.);
 inline constexpr BS_REAL kBS_NEPS_BMinus = POW2(2. * kBS_SinThW2 - 1.);
 inline constexpr BS_REAL kBS_NEPS_BZero  = 4. * POW2(kBS_SinThW2);
 
+
+/////////////////////////////////////////////////////
+// NEUTRINO-MUON SCATTERING CONSTANTS              //
+/////////////////////////////////////////////////////
+
+// Muon_neutrino scattering
+inline constexpr BS_REAL kBS_NMS_C1_numu = POW2(kBS_Gf0) * POW2(1. + 2. * kBS_SinThW2) /
+                                             (2. * kBS_Pi);
+inline constexpr BS_REAL kBS_NMS_C2_numu = 2. * POW2(kBS_Gf0) * POW2(kBS_SinThW2) / kBS_Pi;
+inline constexpr BS_REAL kBS_NMS_C3_numu = - 2. * POW2(kBS_Gf0) * POW2(kBS_Mmu) *
+                                             (kBS_SinThW2 + 2. * POW2(kBS_SinThW2)) / kBS_Pi; 
+// Electron and Tauon scattering
+inline constexpr BS_REAL kBS_NMS_C1_nue = POW2(kBS_Gf0) * POW2(1. - 2. * kBS_SinThW2) /
+                                             (2. * kBS_Pi);
+inline constexpr BS_REAL kBS_NMS_C2_nue = 2. * POW2(kBS_Gf0) * POW2(kBS_SinThW2) / kBS_Pi;
+inline constexpr BS_REAL kBS_NMS_C3_nue = 2. * POW2(kBS_Gf0) * POW2(kBS_Mmu) *
+                                             (kBS_SinThW2 - 2. * POW2(kBS_SinThW2)) / kBS_Pi;
+// Conversion constant, from [MeV^-2] to [nm^3 s^-1]
+inline constexpr BS_REAL kBS_NMS_Conv_Const = kBS_Clight * POW2(kBS_Hbar * kBS_Clight);
+
+/*
+// Constants for Gauss-Legendre integration, coming from table boundaries
+// We HAVE TO consider w and w' axis with same extremals
+inline constexpr BS_REAL DirectInterp_min_const = NMS_w_max - NMS_wp_min;
+inline constexpr BS_REAL SemiAnalytical_min_const = NMSParams_w_max - NMSParams_wp_min;
+inline constexpr BS_REAL DirectInterp_lower_bound = NMS_w_min + NMS_wp_min;
+inline constexpr BS_REAL DirectInterp_larger_bound = NMS_w_max + NMS_wp_max;
+inline constexpr BS_REAL SemiAnalytical_lower_bound = NMSParams_w_min + NMSParams_wp_min;
+inline constexpr BS_REAL SemiAnalytical_larger_bound = NMSParams_w_max + NMSParams_wp_max;
+*/
 
 /////////////////////////////
 // MISCELLANEOUS CONSTANTS //

@@ -4815,4 +4815,62 @@ void FreeM1Matrix(M1Matrix* mat, const int n)
 
     return;
 }
+
+
+
+//====================================//
+// --- NMS Interpolator Structure --- //
+//====================================//
+/* Finds the idx such that the chosen value is bracketed
+ *
+ *      Inputs:
+ *           value:     value to interpolate    [any]
+ *           axis:      1D axis of the table    [any]
+ *           size:      size of the 1D axis     [/]
+ *           i0:        index 0                 [/]
+ *           i1:        index 1                 [/]
+ *           t:         relative distance       [/]
+ */
+// If a point is ouside the grid, we clamp it to stay within the borders
+
+KOKKOS_INLINE_FUNCTION
+int NMS_find_bracketing_indices(const BS_REAL value, const BS_REAL* axis,
+                                 const int size, int* i0, int* i1, BS_REAL* t)
+{
+    // Points under the minimum limit of the grid
+    if (value <= axis[0]) 
+    { 
+        *i0 = 0; 
+        *i1 = 1; 
+        *t  = 0.0; 
+        return 0;
+    }
+
+    // Points above the maximum limit of the grid
+    if (value >= axis[size - 1]) 
+    { 
+        *i0 = size - 2; 
+        *i1 = size - 1; 
+        *t  = 1.0; 
+        return 0;
+    }
+
+    // Points inside the limits of the grid
+    for (int i = 0; i < size - 1; ++i)
+    {
+        if (value >= axis[i] and value <= axis[i + 1])
+        {
+            *i0 = i;
+            *i1 = i + 1;
+            *t  = (value - axis[i]) / (axis[i + 1] - axis[i]);
+
+            return 0;
+        }
+    }
+
+    // Not found
+    return -1;
+}
+
+
 #endif // BNS_NURATES_SRC_FUNCTIONS_FUNCTIONS_HPP_
