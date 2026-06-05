@@ -12,7 +12,7 @@
 int main(int argc, char* argv[])
 {
     // Fix the neutrino energy for computation of spectral rates
-    const double nu_energy = 10.; // [MeV]
+    const double nu_energy = 300.; // [MeV]
 
     // Input thermodynamic quantities (corresponding to point A in Chiesa+25
     // PRD) N.B.: chemical potentials include the rest mass contribution
@@ -81,15 +81,15 @@ int main(int argc, char* argv[])
 
     // Select active reactions
     my_grey_opacity_params.opacity_flags.use_abs_em =
-        1; // Activate beta processes
+        0; // Activate beta processes
     my_grey_opacity_params.opacity_flags.use_brem =
-        1; // Activate Bremsstrahlung
+        0; // Activate Bremsstrahlung
     my_grey_opacity_params.opacity_flags.use_pair =
-        1; // Activate pair processes
+        0; // Activate pair processes
     my_grey_opacity_params.opacity_flags.use_iso =
-        1; // Activate scattering on nucleons
+        0; // Activate scattering on nucleons
     my_grey_opacity_params.opacity_flags.use_inelastic_NEPS =
-        1; // Activate scattering on electrons/positrons
+        0; // Activate scattering on electrons/positrons
     my_grey_opacity_params.opacity_flags.use_inelastic_NMS =
         1; // Activate scattering on muons
 
@@ -97,19 +97,21 @@ int main(int argc, char* argv[])
     my_grey_opacity_params.opacity_pars.use_dm_eff =
         0; // Do not use effective mass correction to beta processes
     my_grey_opacity_params.opacity_pars.use_dU =
-        1; // Use effective potential correction to beta processes
+        0; // Use effective potential correction to beta processes
     my_grey_opacity_params.opacity_pars.use_decay =
-        1; // Include (inverse) nucleon decays to beta processes
+        0; // Include (inverse) nucleon decays to beta processes
     my_grey_opacity_params.opacity_pars.use_WM_ab =
-        1; // Activate beta-processes weak magnetism correction
+        0; // Activate beta-processes weak magnetism correction
     my_grey_opacity_params.opacity_pars.use_WM_sc =
-        1; // Activate isoenergetic scattering weak magnetism correction
+        0; // Activate isoenergetic scattering weak magnetism correction
     my_grey_opacity_params.opacity_pars.brem_implementation =
         BREM_GP19; // Select bremsstrahlung implementation: Guo and Pinedo 2019
     my_grey_opacity_params.opacity_pars.NMS_implementation =
         NMS_KernelInterp; // Select NMS implementation: direct kernel interpolation
     my_grey_opacity_params.opacity_pars.use_NN_medium_corr =
-        1; // Activate NN bremsstrahlung medium correction as in Fischer+16
+        0; // Activate NN bremsstrahlung medium correction as in Fischer+16
+    my_grey_opacity_params.opacity_pars.neglect_blocking =
+        true;   // Select 'true' to neglect neutrino blocking factors
 
     // Pass thermodynamic conditions
     my_grey_opacity_params.eos_pars.nb =

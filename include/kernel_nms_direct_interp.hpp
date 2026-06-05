@@ -186,7 +186,7 @@ NMS_KernelResult NMS_direct_interpolator(const BS_REAL T, const BS_REAL mu, cons
 // Calculates and saves the neutrino muon scattering in and out kernel
 // @TODO: GENERALIZE TO 6 NEUTRINO SPECIES (nue, nut are equal)
 KOKKOS_INLINE_FUNCTION
-MyKernelOutput InelasticMuonScattKernels_DirectInterp(InelasticScattKernelParams* kernel_params,
+MyKernelOutput InelasticNMSKernels_DirectInterp(InelasticScattKernelParams* kernel_params,
                                         MyEOSParams* eos_params)
 {
     const BS_REAL T                    = eos_params->temp;

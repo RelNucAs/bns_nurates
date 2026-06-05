@@ -224,9 +224,9 @@ struct PairKernelParams
 };
 typedef struct PairKernelParams PairKernelParams;
 
-/* PairKernelParams struct
+/* InelasticScattParams struct
  *
- * Parameters for the inelastic NES/NPS kernel
+ * Parameters for the inelastic NEPS and NMS kernel
  */
 struct InelasticScattKernelParams
 {

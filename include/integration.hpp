@@ -545,6 +545,55 @@ GaussLegendreIntegrate1D(MyQuadrature* quad, MyFunctionMultiD* func, BS_REAL* t)
     return result;
 }
 
+
+/* Perform 1d integration of multiple functions using a Gauss-Legendre
+ * quadrature, FOR MUON REACTIONS.
+ * We interpolate a grid with fixed boundaries, from 1 to 300 MeV.
+ *
+ * quad:    must be a properly populated quadrature (upto 2d)
+ * func:    the function(s) to be integrated
+ * t:       the value at which to break the integral into two
+ */
+KOKKOS_INLINE_FUNCTION
+MyQuadratureIntegrand
+MuonReactionsGaussLegendreIntegrate1D(MyQuadrature* quad, 
+                        MyFunctionMultiD* func, BS_REAL* t)
+{
+
+    int num_integrands = func->my_quadrature_integrand.n;
+    BS_ASSERT(num_integrands <= num_max_integrands);
+    BS_REAL f1_x[num_max_integrands][BS_N_MAX],
+        f2_x[num_max_integrands][BS_N_MAX];
+    BS_REAL var[2];
+    MyQuadratureIntegrand result;
+
+    result.n = num_integrands;
+
+    for (int k = 0; k < num_integrands; ++k)
+    {
+
+        for (int i = 0; i < quad->nx; ++i)
+        {
+
+            var[0]                        = 1. + (t[k] - 1.) * quad->points[i];      // 1 + (t-1)x 
+            MyQuadratureIntegrand f1_vals = func->function(var, func->params);
+            f1_x[k][i]                    = f1_vals.integrand[k];                    // G(1 + (t-1)x)
+
+            var[0]                        = t[k] + (300. - t[k]) * quad->points[i];  // t + (300-t)x
+            MyQuadratureIntegrand f2_vals = func->function(var, func->params);
+            f2_x[k][i] = f2_vals.integrand[k];                                       // G(t + (300-t)x)
+        }
+
+        result.integrand[k] =
+            (t[k] - 1.) * DoIntegration(quad->nx, quad->w, f1_x[k]) +
+                (300. - t[k]) * DoIntegration(quad->nx, quad->w, f2_x[k]);  
+        //(t-1) * G(1+(t-1)x) + (300-t) * G(t+(300-t)x) 
+    }
+
+    return result;
+}
+
+
 KOKKOS_INLINE_FUNCTION
 MyQuadratureIntegrand
 GaussLegendreIntegrate2DMatrix(const MyQuadrature* quad,

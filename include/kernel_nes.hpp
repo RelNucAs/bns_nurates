@@ -341,7 +341,7 @@ MyKernelOutput NPSKernels(InelasticScattKernelParams* kernel_params,
 
 // Calculates the full in and out kernels
 KOKKOS_INLINE_FUNCTION
-MyKernelOutput InelasticScattKernels(InelasticScattKernelParams* kernel_params,
+MyKernelOutput InelasticNEPSKernels(InelasticScattKernelParams* kernel_params,
                                      MyEOSParams* eos_params)
 {
     MyKernelOutput nes_kernel = NESKernels(kernel_params, eos_params);

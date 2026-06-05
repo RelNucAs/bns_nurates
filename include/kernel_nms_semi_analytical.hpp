@@ -249,7 +249,7 @@ NMS_Kernel_DiffFlavors NMS_SemiAnalytical(const BS_REAL T, const BS_REAL mu,
 // @TODO: ADD PARAMETER INTERPOLATION FOR OTHER FLAVORS
 // @TODO: GENERALIZE TO 6 NEUTRINO SPECIES (nue, nut are equal)
 KOKKOS_INLINE_FUNCTION
-MyKernelOutput InelasticMuonScattKernels_SemiAnalytical(InelasticScattKernelParams* kernel_params,
+MyKernelOutput InelasticNMSKernels_SemiAnalytical(InelasticScattKernelParams* kernel_params,
                                         MyEOSParams* eos_params)
 {
     const BS_REAL T                    = eos_params->temp;
