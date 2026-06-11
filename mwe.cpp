@@ -12,17 +12,40 @@
 int main(int argc, char* argv[])
 {
     // Fix the neutrino energy for computation of spectral rates
-    const double nu_energy = 300.; // [MeV]
+    const double nu_energy = 20.; // [MeV]
+
+    const char TDpoint = 'E';
+    double nb, T, ye, mu_e, mu_mu, mu_p, mu_n;
 
     // Input thermodynamic quantities (corresponding to point A in Chiesa+25
     // PRD) N.B.: chemical potentials include the rest mass contribution
-    const double nb   = 4.208366627847035e+38;  // Baryon number density [cm-3]
-    const double T    = 12.406403541564941;     // Temperature [MeV]
-    const double ye   = 0.07158458232879639;    // Electron fraction
-    const double mu_e = 1.871814489040245e+02;  // Electron chemical potential [MeV]
-    const double mu_mu = 1.871814489040245e+02; // Muon chemical potential [MeV]
-    const double mu_p = 1.011017977368873e+03;  // Proton chemical potential [MeV]
-    const double mu_n = 1.221590136808168e+03;  // Neutron chemical potential [MeV]
+    if (TDpoint == 'A'){
+        nb   = 4.208366627847035e+38;  // Baryon number density [cm-3]
+        T    = 12.406403541564941;     // Temperature [MeV]
+        ye   = 0.07158458232879639;    // Electron fraction
+        mu_e = 1.871814489040245e+02;  // Electron chemical potential [MeV]
+        mu_mu = 1.871814489040245e+02; // Muon chemical potential [MeV]
+        mu_p = 1.011017977368873e+03;  // Proton chemical potential [MeV]
+        mu_n = 1.221590136808168e+03;  // Neutron chemical potential [MeV]
+    }
+    else if (TDpoint == 'C'){
+        nb   = (9.87e+12 / 1.66053906892e-24);  // Baryon number density [cm-3]
+        T    = 8.74;                            // Temperature [MeV]
+        ye   = 0.06;                            // Electron fraction
+        mu_e = 36.5;                            // Electron chemical potential [MeV]
+        mu_mu = 36.5;                           // Muon chemical potential [MeV]
+        mu_p = 1.011017977368873e+03;           // Proton chemical potential [MeV]
+        mu_n = mu_p + 41.4;                     // Neutron chemical potential [MeV]
+    }
+    else if (TDpoint == 'E'){
+        nb   = (1.00e+11 / 1.66053906892e-24);  // Baryon number density [cm-3]
+        T    = 3.60;                            // Temperature [MeV]
+        ye   = 0.14;                            // Electron fraction
+        mu_e = 9.05;                            // Electron chemical potential [MeV]
+        mu_mu = 9.05;                           // Muon chemical potential [MeV]
+        mu_p = 1.011017977368873e+03;           // Proton chemical potential [MeV]
+        mu_n = mu_p + 8.44;                     // Neutron chemical potential [MeV]
+    }
     const double dU =
         18.92714728; // Nucleon interaction potential difference (Un-Up) [MeV]
     const double mp_eff = 278.87162217; // Proton effective mass [MeV]
@@ -107,7 +130,8 @@ int main(int argc, char* argv[])
     my_grey_opacity_params.opacity_pars.brem_implementation =
         BREM_GP19; // Select bremsstrahlung implementation: Guo and Pinedo 2019
     my_grey_opacity_params.opacity_pars.NMS_implementation =
-        NMS_KernelInterp; // Select NMS implementation: direct kernel interpolation
+        NMS_KernelInterp; // Select NMS implementation: NMS_KernelInterp or 
+                          // NMS_SemiAnalytical
     my_grey_opacity_params.opacity_pars.use_NN_medium_corr =
         0; // Activate NN bremsstrahlung medium correction as in Fischer+16
     my_grey_opacity_params.opacity_pars.neglect_blocking =
@@ -278,7 +302,7 @@ int main(int argc, char* argv[])
                                     &my_grey_opacity_params);
 
     // The numerical factors restore usual units (see output)
-    printf("Gray rates assuming equilibrium, NEPS INCLUDED (also in eta0 and kappa0)\n");
+    printf("Gray rates assuming equilibrium, NLS INCLUDED (also in eta0 and kappa0)\n");
     printf("------------------------------\n");
     printf(
         "     eta0          eta1          kappa0        kappa1        scat1\n");
@@ -312,7 +336,7 @@ int main(int argc, char* argv[])
                         &my_quadrature, &my_quadrature, &my_grey_opacity_params);
 
     // The numerical factors restore usual units (see output)
-    printf("Gray rates assuming equilibrium, NEPS SEPARATED, NEPS NOT INCLUDED in eta0 and kappa0\n");
+    printf("Gray rates assuming equilibrium, NLS SEPARATED, NLS NOT INCLUDED in eta0 and kappa0\n");
     printf("------------------------------\n");
     printf(
         "     eta0          eta1_th       eta1_non_th   kappa0        kappa1_th     kappa1_non_th scat1\n");
@@ -407,7 +431,7 @@ int main(int argc, char* argv[])
                                     &my_grey_opacity_params);
 
     // The numerical factors restore usual units (see output)
-    printf("Gray rates reconstructing distribution function, NEPS INCLUDED (also in eta0 and kappa0)\n");
+    printf("Gray rates reconstructing distribution function, NLS INCLUDED (also in eta0 and kappa0)\n");
     printf("----------------------------------------------\n");
     printf(
         "     eta0          eta1          kappa0        kappa1        scat1\n");
@@ -441,7 +465,7 @@ int main(int argc, char* argv[])
                             &my_quadrature, &my_quadrature, &my_grey_opacity_params);
 
     // The numerical factors restore usual units (see output)
-    printf("Gray rates reconstructing distribution function, NEPS SEPARATED, NEPS NOT INCLUDED in eta0 and kappa0\n");
+    printf("Gray rates reconstructing distribution function, NLS SEPARATED, NLS NOT INCLUDED in eta0 and kappa0\n");
     printf("------------------------------\n");
     printf(
         "     eta0          eta1_th       eta1_non_th   kappa0        kappa1_th     kappa1_non_th scat1\n");

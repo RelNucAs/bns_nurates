@@ -816,6 +816,98 @@ void GaussLegendreIntegrate2DMatrixForNEPS(const MyQuadrature* quad,
     return;
 }
 
+//@TODO: Modify this to handle double integration within [1, 300]
+KOKKOS_INLINE_FUNCTION
+void GaussLegendreIntegrate2DMatrixForNMS(const MyQuadrature* quad,
+                                           const M1MatrixKokkos2D* mat,
+                                           BS_REAL t,
+                                           MyQuadratureIntegrand* result_1,
+                                           MyQuadratureIntegrand* result_2)
+{
+    constexpr BS_REAL half = 0.5;
+    constexpr BS_REAL one  = 1;
+
+    const int n              = quad->nx;
+    const int num_integrands = 2 * total_num_species;
+
+    BS_REAL w_i, w_j, w_ij;
+    BS_REAL x_i, x_j;
+    BS_REAL u1, u2;
+    BS_REAL min1, min2;
+    BS_REAL prefactor1, prefactor2;
+    BS_REAL aux_1, aux_2, aux_3, aux_4;
+
+    for (int idx = 0; idx < total_num_species; ++idx)
+    {
+
+        for (int i = 0; i < n; ++i)
+        {
+
+            x_i  = quad->points[i];
+            w_i  = quad->w[i];
+
+            // @TODO: compute numbers from grid boundaries (not hardcoded)
+            u1 = 2. + (t - 2.) * x_i;
+            u2 = t + (600. - t) * x_i;
+            min1 = std::min(u1, 299.);
+            min2 = std::min(u2, 299.);
+            prefactor1 = (t - 2.) * min1;
+            prefactor2 = (600. - t) * min2;
+
+            for (int j = 0; j < n; ++j)
+            {
+
+                x_j = quad->points[j];
+                w_j = quad->w[j];
+
+                w_ij = w_i * w_j;
+
+                aux_1 = half * (u1 - min1 * x_j);
+                aux_2 = half * (u1 + min1 * x_j);
+                aux_3 = half * (u2 - min2 * x_j);
+                aux_4 = half * (u2 + min2 * x_j);
+
+                result_1->integrand[0 + idx] +=
+                    w_ij * (prefactor1 * (mat->m1_mat_em[idx][i][j] +
+                                   mat->m1_mat_em[idx][i][n + j]) +
+                            prefactor2 * (mat->m1_mat_em[idx][n + i][j] +
+                             mat->m1_mat_em[idx][n + i][n + j])
+                            );
+
+                result_1->integrand[total_num_species + idx] +=
+                    w_ij * (prefactor1 * (mat->m1_mat_ab[idx][i][j] +
+                                   mat->m1_mat_ab[idx][i][n + j]) +
+                            prefactor2 * (mat->m1_mat_ab[idx][n + i][j] +
+                             mat->m1_mat_ab[idx][n + i][n + j])
+                            );
+
+                result_2->integrand[0 + idx] +=
+                    w_ij * (prefactor1 * (aux_1 * mat->m1_mat_em[idx][i][j] +
+                                   aux_2 * mat->m1_mat_em[idx][i][n + j]) +
+                            prefactor2 * (aux_3 * mat->m1_mat_em[idx][n + i][j] +
+                             aux_4 * mat->m1_mat_em[idx][n + i][n + j])
+                            );
+
+                result_2->integrand[total_num_species + idx] +=
+                    w_ij * (prefactor1 * (aux_1 * mat->m1_mat_ab[idx][i][j] +
+                                   aux_2 * mat->m1_mat_ab[idx][i][n + j]) +
+                            prefactor2 * (aux_3 * mat->m1_mat_ab[idx][n + i][j] +
+                             aux_4 * mat->m1_mat_ab[idx][n + i][n + j])
+                            );
+            }
+        }
+    }
+
+    for (int idx = 0; idx < num_integrands; ++idx)
+    {
+        result_1->integrand[idx] *= half;
+        result_2->integrand[idx] *= half;
+    }
+
+    return;
+}
+
+
 KOKKOS_INLINE_FUNCTION
 MyQuadratureIntegrand
 GaussLegendreIntegrate1DMatrix(const MyQuadrature* quad,
@@ -896,7 +988,8 @@ void GaussLegendreIntegrate1DMatrixOnlyNumber(const MyQuadrature* quad,
  * Gauss-Legendre quadrature
  *
  * quad:    must be a properly populated 1d quadrature generated from between
- * interval of integration func:    the function(s) to be integrated
+ *          interval of integration 
+ * func:    the function(s) to be integrated
  */
 inline MyQuadratureIntegrand
 GaussLegendreIntegrate1DFiniteInterval(MyQuadrature* quad,
@@ -933,7 +1026,8 @@ GaussLegendreIntegrate1DFiniteInterval(MyQuadrature* quad,
  * variable is integrated from 0 to inf
  *
  * quad:    must be a properly populated 2d quadrature generated from between
- * interval of integration func:    the function(s) to be integrated
+ *          interval of integration 
+ * func:    the function(s) to be integrated
  */
 inline MyQuadratureIntegrand GaussLegendreIntegrate2DFiniteInterval(
     MyQuadrature* quad, MyFunctionMultiD* func, BS_REAL* tx, BS_REAL* ty)
