@@ -4818,9 +4818,9 @@ void FreeM1Matrix(M1Matrix* mat, const int n)
 
 
 
-//====================================//
-// --- NMS Interpolator Structure --- //
-//====================================//
+//===========================================//
+// --- NMS Linear Interpolator Structure --- //
+//===========================================//
 /* Finds the idx such that the chosen value is bracketed
  *
  *      Inputs:
@@ -4834,7 +4834,7 @@ void FreeM1Matrix(M1Matrix* mat, const int n)
 // If a point is ouside the grid, we clamp it to stay within the borders
 
 KOKKOS_INLINE_FUNCTION
-int NMS_find_bracketing_indices(const BS_REAL value, const BS_REAL* axis,
+int NMSLinear_find_bracketing_indices(const BS_REAL value, const BS_REAL* axis,
                                  const int size, int* i0, int* i1, BS_REAL* t)
 {
     // Points under the minimum limit of the grid
@@ -4867,6 +4867,64 @@ int NMS_find_bracketing_indices(const BS_REAL value, const BS_REAL* axis,
             return 0;
         }
     }
+
+    // Not found
+    return -1;
+}
+
+
+//===========================================//
+// --- NMS Nearest Interpolator Structure --- //
+//===========================================//
+/* Finds the idx such that the chosen value is bracketed
+ *
+ *      Inputs:
+ *           value:     value to interpolate    [any]
+ *           axis:      1D axis of the table    [any]
+ *           size:      size of the 1D axis     [/]
+ *           i0:        index 0                 [/]
+ *           i1:        index 1                 [/]
+ *           t:         relative distance       [/]
+ */
+// If a point is ouside the grid, we clamp it to stay within the borders
+
+KOKKOS_INLINE_FUNCTION
+int NMSNearest_find_nearest_index(const BS_REAL value, const BS_REAL* axis,
+                                 const int size, int* i_nearest)
+{
+    // Points under the minimum limit of the grid
+    if (value <= axis[0]) 
+    { 
+        *i_nearest = 0;  
+        return 0;
+    }
+
+    // Points above the maximum limit of the grid
+    if (value >= axis[size - 1]) 
+    { 
+        *i_nearest = size - 1; 
+        return 0;
+    }
+
+    // Points inside the limits of the grid
+    BS_REAL left_distance, right_distance;
+    for (int i = 0; i < size - 1; ++i)
+    {
+          if (value >= axis[i] and value <= axis[i + 1])
+          {
+               left_distance = value - axis[i];
+               right_distance = axis[i + 1] - value;
+
+               if (left_distance <= right_distance){
+                    *i_nearest = i;
+               }
+               else{
+                    *i_nearest = i + 1;
+               }
+
+               return 0;
+          }
+     }
 
     // Not found
     return -1;

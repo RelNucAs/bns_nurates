@@ -28,7 +28,7 @@ constexpr BS_REAL NMSParams_mu_axis[40] = {
 };
 constexpr int NMSParams_mu_dims = 40;
 
-// Incoming neutrino energy (40 points between [1,300] MeV, log scale)
+// Incoming neutrino energy (39 points between [1,300] MeV, log scale)
 constexpr BS_REAL NMSParams_w_axis[39] = {
     1.0,          1.15748649,   1.33977497,   1.55077142,   1.79499696,
     2.07768473,   2.404892,     2.78362999,   3.2220141,    3.72943778,
@@ -41,199 +41,18 @@ constexpr BS_REAL NMSParams_w_axis[39] = {
 };
 constexpr int NMSParams_w_dims = 39;
 
+/*
 constexpr BS_REAL NMSParams_w_max = *std::max_element(std::begin(NMSParams_w_axis), 
                                         std::end(NMSParams_w_axis));
 constexpr BS_REAL NMSParams_w_min = *std::min_element(std::begin(NMSParams_w_axis), 
                                         std::end(NMSParams_w_axis));
 constexpr BS_REAL NMSParams_wp_max = NMSParams_w_max;
 constexpr BS_REAL NMSParams_wp_min = NMSParams_w_min;
-
-
-// @TODO: THINK AT THE FASTEST WAY TO IMPLEMENT THIS OBJECT
-// Analytical approximation of numu-muon scattering kernel   [MeV^-2]
-BS_REAL NMS_analytical_kernel_nu_mu(const BS_REAL T, const BS_REAL mu,
-                                        const BS_REAL w, const BS_REAL wp, const BS_REAL u)
-{
-    const BS_REAL x0 = POW2(w);
-    const BS_REAL x1 = POW2(wp);
-    const BS_REAL x2 = w + wp;
-    const BS_REAL x3 = 2. * w;
-    const BS_REAL x4 = x3 * wp;
-    const BS_REAL x5 = x0 + x1;
-    const BS_REAL x6 = x4 + x5;
-    const BS_REAL x7 = POW2(kBS_Mmu);
-    const BS_REAL x8 = 2. * kBS_SinThW2 + 1.;
-    const BS_REAL x9 = abs(w - wp);
-    const BS_REAL x10 = abs(x2);
-    const BS_REAL x11 = w * wp;
-    const BS_REAL x12 = x10 * x11;
-    const BS_REAL x13 = x0 * x9;
-    const BS_REAL x14 = -x0 * x10 - x1 * x10 + x1 * x9 + x13;
-    
-    const BS_REAL E_ = 0.5 * (
-                            wp - w + sqrt( 
-                                (x5 - 2. * x11 * u) * ( 1. + ((2. * POW2(kBS_Mmu)) / (x11 * (1. - u))) )
-                            )
-                        );
-    const BS_REAL eta = mu / T;
-    const BS_REAL arg1 = float(eta - E_ / T);
-    const BS_REAL arg2 = float(eta + (wp - w) / T - E_ / T);
-    const BS_REAL F0eta = FDI_0(arg1);
-    const BS_REAL F1eta = FDI_p1(arg1);
-    const BS_REAL F2eta = FDI_p2(arg1);
-    const BS_REAL F0eta2 = FDI_0(arg2);
-    const BS_REAL F1eta2 = FDI_p1(arg2);
-    const BS_REAL F2eta2 = FDI_p2(arg2);
-
-    const BS_REAL x15 = F0eta - F0eta2;
-    const BS_REAL x16 = T * (F1eta - F1eta2);
-    const BS_REAL x17 = x2 * x6 * (POW2(E_) * x15 + 2. * E_ * x16 + POW2(T) * (F2eta - F2eta2)) * 
-                        (x11 * x9 + x12 + x14);
-    const BS_REAL x18 = POW4(wp);
-    const BS_REAL x19 = x10 * x18;
-    const BS_REAL x20 = x18 * x9;
-    const BS_REAL x21 = POW4(w);
-    const BS_REAL x22 = x10 * x21;
-    const BS_REAL x23 = x21 * x9;
-    const BS_REAL x24 = 2. * x1;
-    const BS_REAL x25 = x13 * x24;
-    const BS_REAL x26 = POW3(w);
-    const BS_REAL x27 = 4. * x26;
-    const BS_REAL x28 = x10 * wp;
-    const BS_REAL x29 = POW3(wp);
-    const BS_REAL x30 = x29 * x9;
-    const BS_REAL x31 = 2. * wp;
-    const BS_REAL x32 = x26 * x9;
-    const BS_REAL x33 = -x3 * x30 + x31 * x32;
-    const BS_REAL x34 = x6 * (E_ * x15 + x16);
-    const BS_REAL x35 = POW6(wp);
-    const BS_REAL x36 = x10 * x35;
-    const BS_REAL x37 = x35 * x9;
-    const BS_REAL x38 = POW6(w);
-    const BS_REAL x39 = x38 * x9;
-    const BS_REAL x40 = POW5(wp);
-    const BS_REAL x41 = POW5(w);
-    const BS_REAL x42 = x1 * x21;
-    const BS_REAL x43 = abs( (w - wp) * POW2((w + wp)) );
-    const BS_REAL x44 = 45. * x43;
-    const BS_REAL x45 = 15. * x43;
-    const BS_REAL x46 = x10 * x38;
-    const BS_REAL x47 = x10 * x42;
-    const BS_REAL x48 = x0 * x20;
-    const BS_REAL x49 = w * x29;
-    const BS_REAL x50 = x28 * x41;
-    const BS_REAL x51 = abs(x0 - x1);
-    const BS_REAL x52 = 15. * x51;
-    const BS_REAL x53 = w * x40;
-    const BS_REAL x54 = x10 * x53;
-    const BS_REAL x55 = x26 * wp;
-    const BS_REAL x56 = x0 * x19;
-    const BS_REAL x57 = 45. * x51;
-    const BS_REAL x58 = x42 * x9;
-    const BS_REAL x59 = x32 * wp;
-    const BS_REAL x60 = w * x30;
-    const BS_REAL x61 = 40. * x7;
-    const BS_REAL x62 = 3. * x9;
-    const BS_REAL x63 = 30. * x1;
-    const BS_REAL x64 = x10 * x49;
-    const BS_REAL x65 = 120. * x7;
-    const BS_REAL x66 = x0 * x43 * x63 + 160. * x1 * x13 * x7 + 130. * x10 * x26 * x29 - x13 * x51 * x63 
-                      - x19 * x61 + x20 * x61 - x22 * x61 + x23 * x61 - x26 * x28 * x61 + 6. * x26 * x30 
-                      - x41 * x62 * wp - x53 * x62 + x59 * x65 + x60 * x65 - x61 * x64;
-
-    const BS_REAL numerator = POW2(kBS_Gf0) * T * (
-            POW2(kBS_SinThW2) * (
-                4. * x15 * x2 * (
-                    -x18 * x45 + x20 * x52 - x21 * x44 + x23 * x57 + x36 - x37
-                    - 51. * x39 + x44 * x55 - x45 * x49 + 51. * x46 - 185. * x47
-                    - 49. * x48 - 9. * x50 + x52 * x60 + 31. * x54 + 45. * x56
-                    - x57 * x59 + 101. * x58 + x66
-                )
-                - 640. * x17
-                - 320. * x34 * (x19 - x20 - 3. * x22 + 3. * x23 - x25 + x27 * x28 + x33)
-            )
-            - 80. * kBS_SinThW2 * x15 * x2 * x6 * x7 * x8 * (4. * x12 + x14 - x4 * x9)
-            + POW2(x8) * (
-                x15 * x2 * (
-                    -x18 * x44 + x20 * x57 - x21 * x45 + x23 * x52 + 51. * x36
-                    - 51. * x37 - x39 + x44 * x49 - x45 * x55 + x46 + 45. * x47
-                    + 101. * x48 + 31. * x50 + x52 * x59 - 9. * x54 - 185. * x56
-                    - x57 * x60 - 49. * x58 + x66
-                )
-                - 160. * x17
-                - 80. * x34 * (3. * x19 - 3. * x20 - x22 + x23 + x25 + x33 - 4. * x64)
-            )
-        );
-
-    const BS_REAL denominator = 240. * kBS_Pi * x0 * x1 * x2 * x6 * (1. - SafeExp((-w + wp) / T));
-
-    return numerator / denominator;
-}
-
-
-BS_REAL smoothstep(const BS_REAL wp, const BS_REAL wpzero, const BS_REAL epsilon){
-
-    return (3. * POW2( (wp - (wpzero - epsilon)) / (2. * epsilon) ) 
-                - 2. * POW3( (wp - (wpzero - epsilon)) / (2. * epsilon) )
-    );
-}
-
-
-BS_REAL min(const BS_REAL x, const BS_REAL y){
-    if (x >= y)
-        return y;
-    else
-        return x;  
-}
-
-
-BS_REAL max(const BS_REAL x, const BS_REAL y){
-    if (x >= y)
-        return x;
-    else
-        return y;
-}
-
-
-BS_REAL NMS_semi_analytical_kernel(const BS_REAL T, const BS_REAL mu, const BS_REAL w, const BS_REAL wp,
-                        const BS_REAL alpha, const BS_REAL beta, const BS_REAL gamma, const BS_REAL delta,
-                        const BS_REAL wpbar, const BS_REAL wpzero)
-{
-    BS_REAL min_val = min(wpbar, w);
-    BS_REAL max_val = max(wpbar, w);
-    BS_REAL epsilon = 0.2 * wpzero;
-
-    if (wp <= wpzero - epsilon){
-        return NMS_analytical_kernel_nu_mu(T, mu, w, wp, -0.4);
-    }
-    else if (wpzero - epsilon < wp < wpzero + epsilon){
-        return ( NMS_analytical_kernel_nu_mu(T, mu, w, wp, 0.0) * smoothstep(wp, wpzero, epsilon) 
-                + NMS_analytical_kernel_nu_mu(T, mu, w, wp, -0.4) * (1 - smoothstep(wp, wpzero, epsilon)) ); 
-    }
-    else if (wpzero + epsilon <= wp <= min_val){
-        return NMS_analytical_kernel_nu_mu(T, mu, w, wp, 0.0);
-    }
-    else if (min_val < wp <= max_val){
-        BS_REAL inv_min = 1. / min_val;
-        BS_REAL prefactor1 = NMS_analytical_kernel_nu_mu(T, mu, w, min_val, 0.0);
-        return prefactor1 * pow(wp * inv_min, gamma) * SafeExp(delta * (min_val - wp));
-    }
-    else if (wp > max_val){
-        BS_REAL inv_min = 1. / min_val;
-        BS_REAL inv_max = 1. / max_val;
-        BS_REAL prefactor2 = NMS_analytical_kernel_nu_mu(T, mu, w, min_val, 0.0) 
-                            * pow(max_val * inv_min, gamma) * SafeExp(delta * (min_val - max_val));
-        return prefactor2 * pow(wp * inv_max, alpha) * SafeExp(beta * (max_val - wp));
-    }
-    else{  //fallback
-        return 0.0;
-    }
-}
-
+*/
 
 
 // Alpha nu_mu (dimensionless)
-constexpr BS_REAL alpha_numu_data[32000] = {
+constexpr BS_REAL alpha_numu_data[31200] = {
     -3.34631, -5.28277, 3.98370, 4.77959, 4.81123,
     3.65691, 4.30537, 4.44153, 3.50441, 4.70060,
     4.65582, 4.44602, 4.95276, 4.00595, 4.62015,
@@ -6477,8 +6296,9 @@ constexpr BS_REAL alpha_numu_data[32000] = {
 
 
 
+
 // Beta nu_mu (dimensionless)
-constexpr BS_REAL beta_numu_data[32000] = {
+constexpr BS_REAL beta_numu_data[31200] = {
     9.96654, 8.25922, 9.99337, 9.06982, 7.89346,
     6.45538, 5.88197, 5.16264, 4.35644, 4.04499,
     3.54920, 3.11545, 2.82849, 2.42564, 2.22970,
@@ -12722,8 +12542,10 @@ constexpr BS_REAL beta_numu_data[32000] = {
 
 
 
+
+
 // Gamma nu_mu (dimensionless)
-constexpr BS_REAL gamma_numu_data[32000] = {
+constexpr BS_REAL gamma_numu_data[31200] = {
     0.73137, 6.33716, -30.61780, -13.21965, 26.24451,
     25.69070, -23.87671, -27.29784, 19.56006, 24.07369,
     24.71536, 24.83255, 24.78925, 25.56298, 25.00000,
@@ -18967,8 +18789,10 @@ constexpr BS_REAL gamma_numu_data[32000] = {
 
 
 
+
+
 // Delta nu_mu (dimensionless)
-constexpr BS_REAL delta_numu_data[32000] = {
+constexpr BS_REAL delta_numu_data[31200] = {
     9.92641, 12.94502, -30.98561, -14.67998, 11.18743,
     9.43767, -13.98461, -13.30310, 4.00450, 4.98544,
     4.54205, 4.00223, 3.53837, 3.23584, 2.78482,
@@ -25212,8 +25036,10 @@ constexpr BS_REAL delta_numu_data[32000] = {
 
 
 
-// wp_bar (nu_mu) [MeV]
-constexpr BS_REAL wpbar_numu_data[32000] = {
+
+
+// Wp_bar nu_mu (dimensionless)
+constexpr BS_REAL wpbar_numu_data[31200] = {
     1.46929, 2.30058, 1.07610, 1.22192, 1.29306,
     1.50056, 1.92294, 2.23408, 2.34298, 2.70076,
     3.12090, 3.60414, 4.18236, 4.81469, 5.58517,
@@ -31457,8 +31283,10 @@ constexpr BS_REAL wpbar_numu_data[32000] = {
 
 
 
-// wp_zero (nu_mu) [MeV]
-constexpr BS_REAL wpzero_numu_data[32000] = {
+
+
+// Wp_zero nu_mu (dimensionless)
+constexpr BS_REAL wpzero_numu_data[31200] = {
     0.93138, 0.81956, 0.82569, 1.00058, 1.11644,
     1.28273, 1.50471, 1.74810, 2.00351, 2.31338,
     2.68388, 3.10657, 3.59602, 4.15764, 4.81389,
@@ -37699,3 +37527,5 @@ constexpr BS_REAL wpzero_numu_data[32000] = {
     20.08280, 21.33324, 24.52453, 36.35740, 10.49802,
     24.79981, 40.91424, 40.17945, 34.05158, 27.19964,
     51.03985, 88.90409, 113.67583, 131.31267, 173.13437};
+
+

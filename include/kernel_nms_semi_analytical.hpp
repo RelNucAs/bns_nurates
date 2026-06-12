@@ -19,9 +19,10 @@
 #include "functions.hpp"
 #include "constants.hpp"
 #include "nms_semi_analytical_table.hpp"
+#include <iostream>
 
 
-/* 3D linear interpolation of the numerical table of the semi-analytical parameters
+/* 3D nearest interpolation of the numerical table of the semi-analytical parameters
  *
  *      Inputs:
  *          T:            temperature                [MeV]
@@ -56,127 +57,25 @@ NMS_Parameters NMS_parameters_interpolator(const BS_REAL T, const BS_REAL mu, co
 
     NMS_Parameters parameters = {0};
 
-    int i0, i1, j0, j1, k0, k1;
-    BS_REAL tx, ty, tz;
+    int i_nearest, j_nearest, k_nearest;
 
-    if (NMS_find_bracketing_indices(T, NMSParams_T_axis, NMSParams_T_dims, &i0, &i1, &tx) < 0 or
-        NMS_find_bracketing_indices(mu, NMSParams_mu_axis, NMSParams_mu_dims, &j0, &j1, &ty) < 0 or
-        NMS_find_bracketing_indices(w, NMSParams_w_axis, NMSParams_w_dims, &k0, &k1, &tz) < 0)
+    if (NMSNearest_find_nearest_index(T, NMSParams_T_axis, NMSParams_T_dims, &i_nearest) < 0 or
+        NMSNearest_find_nearest_index(mu, NMSParams_mu_axis, NMSParams_mu_dims, &j_nearest) < 0 or
+        NMSNearest_find_nearest_index(w, NMSParams_w_axis, NMSParams_w_dims, &k_nearest) < 0)
     {
         return parameters;
     }
 
 // macro to access the 1D array
 #define NMSParams_IDX(i, j, k)                                                        \
-    ((i * NMS_mu_dims + j) * NMS_w_dims + k)
+    ((i * NMSParams_mu_dims + j) * NMSParams_w_dims + k)
 
-    // extract the 8 vertexes of the hypercube for the parameters
-    // Alpha
-    BS_REAL alpha_numu_c000 = alpha_numu_data[NMSParams_IDX(i0, j0, k0)];
-    BS_REAL alpha_numu_c001 = alpha_numu_data[NMSParams_IDX(i0, j0, k1)];
-    BS_REAL alpha_numu_c010 = alpha_numu_data[NMSParams_IDX(i0, j1, k0)];
-    BS_REAL alpha_numu_c011 = alpha_numu_data[NMSParams_IDX(i0, j1, k1)];
-    BS_REAL alpha_numu_c100 = alpha_numu_data[NMSParams_IDX(i1, j0, k0)];
-    BS_REAL alpha_numu_c101 = alpha_numu_data[NMSParams_IDX(i1, j0, k1)];
-    BS_REAL alpha_numu_c110 = alpha_numu_data[NMSParams_IDX(i1, j1, k0)];
-    BS_REAL alpha_numu_c111 = alpha_numu_data[NMSParams_IDX(i1, j1, k1)];
-
-    // Beta
-    BS_REAL beta_numu_c000 = beta_numu_data[NMSParams_IDX(i0, j0, k0)];
-    BS_REAL beta_numu_c001 = beta_numu_data[NMSParams_IDX(i0, j0, k1)];
-    BS_REAL beta_numu_c010 = beta_numu_data[NMSParams_IDX(i0, j1, k0)];
-    BS_REAL beta_numu_c011 = beta_numu_data[NMSParams_IDX(i0, j1, k1)];
-    BS_REAL beta_numu_c100 = beta_numu_data[NMSParams_IDX(i1, j0, k0)];
-    BS_REAL beta_numu_c101 = beta_numu_data[NMSParams_IDX(i1, j0, k1)];
-    BS_REAL beta_numu_c110 = beta_numu_data[NMSParams_IDX(i1, j1, k0)];
-    BS_REAL beta_numu_c111 = beta_numu_data[NMSParams_IDX(i1, j1, k1)];
-
-    // Gamma
-    BS_REAL gamma_numu_c000 = gamma_numu_data[NMSParams_IDX(i0, j0, k0)];
-    BS_REAL gamma_numu_c001 = gamma_numu_data[NMSParams_IDX(i0, j0, k1)];
-    BS_REAL gamma_numu_c010 = gamma_numu_data[NMSParams_IDX(i0, j1, k0)];
-    BS_REAL gamma_numu_c011 = gamma_numu_data[NMSParams_IDX(i0, j1, k1)];
-    BS_REAL gamma_numu_c100 = gamma_numu_data[NMSParams_IDX(i1, j0, k0)];
-    BS_REAL gamma_numu_c101 = gamma_numu_data[NMSParams_IDX(i1, j0, k1)];
-    BS_REAL gamma_numu_c110 = gamma_numu_data[NMSParams_IDX(i1, j1, k0)];
-    BS_REAL gamma_numu_c111 = gamma_numu_data[NMSParams_IDX(i1, j1, k1)];
-
-    // Delta
-    BS_REAL delta_numu_c000 = delta_numu_data[NMSParams_IDX(i0, j0, k0)];
-    BS_REAL delta_numu_c001 = delta_numu_data[NMSParams_IDX(i0, j0, k1)];
-    BS_REAL delta_numu_c010 = delta_numu_data[NMSParams_IDX(i0, j1, k0)];
-    BS_REAL delta_numu_c011 = delta_numu_data[NMSParams_IDX(i0, j1, k1)];
-    BS_REAL delta_numu_c100 = delta_numu_data[NMSParams_IDX(i1, j0, k0)];
-    BS_REAL delta_numu_c101 = delta_numu_data[NMSParams_IDX(i1, j0, k1)];
-    BS_REAL delta_numu_c110 = delta_numu_data[NMSParams_IDX(i1, j1, k0)];
-    BS_REAL delta_numu_c111 = delta_numu_data[NMSParams_IDX(i1, j1, k1)];
-
-    // Wp_bar
-    BS_REAL wpbar_numu_c000 = wpbar_numu_data[NMSParams_IDX(i0, j0, k0)];
-    BS_REAL wpbar_numu_c001 = wpbar_numu_data[NMSParams_IDX(i0, j0, k1)];
-    BS_REAL wpbar_numu_c010 = wpbar_numu_data[NMSParams_IDX(i0, j1, k0)];
-    BS_REAL wpbar_numu_c011 = wpbar_numu_data[NMSParams_IDX(i0, j1, k1)];
-    BS_REAL wpbar_numu_c100 = wpbar_numu_data[NMSParams_IDX(i1, j0, k0)];
-    BS_REAL wpbar_numu_c101 = wpbar_numu_data[NMSParams_IDX(i1, j0, k1)];
-    BS_REAL wpbar_numu_c110 = wpbar_numu_data[NMSParams_IDX(i1, j1, k0)];
-    BS_REAL wpbar_numu_c111 = wpbar_numu_data[NMSParams_IDX(i1, j1, k1)];
-
-    // Wp_zero
-    BS_REAL wpzero_numu_c000 = wpzero_numu_data[NMSParams_IDX(i0, j0, k0)];
-    BS_REAL wpzero_numu_c001 = wpzero_numu_data[NMSParams_IDX(i0, j0, k1)];
-    BS_REAL wpzero_numu_c010 = wpzero_numu_data[NMSParams_IDX(i0, j1, k0)];
-    BS_REAL wpzero_numu_c011 = wpzero_numu_data[NMSParams_IDX(i0, j1, k1)];
-    BS_REAL wpzero_numu_c100 = wpzero_numu_data[NMSParams_IDX(i1, j0, k0)];
-    BS_REAL wpzero_numu_c101 = wpzero_numu_data[NMSParams_IDX(i1, j0, k1)];
-    BS_REAL wpzero_numu_c110 = wpzero_numu_data[NMSParams_IDX(i1, j1, k0)];
-    BS_REAL wpzero_numu_c111 = wpzero_numu_data[NMSParams_IDX(i1, j1, k1)];
-
-    BS_REAL a0 = (one - tx), a1 = tx;
-    BS_REAL b0 = (one - ty), b1 = ty;
-    BS_REAL c0 = (one - tz), c1 = tz;
-
-    // Alpha
-    BS_REAL alpha_numu = alpha_numu_c000 * a0 * b0 * c0 + alpha_numu_c001 * a0 * b0 * c1 +
-                        alpha_numu_c010 * a0 * b1 * c0 + alpha_numu_c011 * a0 * b1 * c1 +
-                        alpha_numu_c100 * a1 * b0 * c0 + alpha_numu_c101 * a1 * b0 * c1 +
-                        alpha_numu_c110 * a1 * b1 * c0 + alpha_numu_c111 * a1 * b1 * c1;
-
-    // Beta
-    BS_REAL beta_numu = beta_numu_c000 * a0 * b0 * c0 + beta_numu_c001 * a0 * b0 * c1 +
-                        beta_numu_c010 * a0 * b1 * c0 + beta_numu_c011 * a0 * b1 * c1 +
-                        beta_numu_c100 * a1 * b0 * c0 + beta_numu_c101 * a1 * b0 * c1 +
-                        beta_numu_c110 * a1 * b1 * c0 + beta_numu_c111 * a1 * b1 * c1;
-
-    // Gamma
-    BS_REAL gamma_numu = gamma_numu_c000 * a0 * b0 * c0 + gamma_numu_c001 * a0 * b0 * c1 +
-                        gamma_numu_c010 * a0 * b1 * c0 + gamma_numu_c011 * a0 * b1 * c1 +
-                        gamma_numu_c100 * a1 * b0 * c0 + gamma_numu_c101 * a1 * b0 * c1 +
-                        gamma_numu_c110 * a1 * b1 * c0 + gamma_numu_c111 * a1 * b1 * c1;
-
-    // Delta
-    BS_REAL delta_numu = delta_numu_c000 * a0 * b0 * c0 + delta_numu_c001 * a0 * b0 * c1 +
-                        delta_numu_c010 * a0 * b1 * c0 + delta_numu_c011 * a0 * b1 * c1 +
-                        delta_numu_c100 * a1 * b0 * c0 + delta_numu_c101 * a1 * b0 * c1 +
-                        delta_numu_c110 * a1 * b1 * c0 + delta_numu_c111 * a1 * b1 * c1;
-
-    // Wp_bar
-    BS_REAL wpbar_numu = wpbar_numu_c000 * a0 * b0 * c0 + wpbar_numu_c001 * a0 * b0 * c1 +
-                        wpbar_numu_c010 * a0 * b1 * c0 + wpbar_numu_c011 * a0 * b1 * c1 +
-                        wpbar_numu_c100 * a1 * b0 * c0 + wpbar_numu_c101 * a1 * b0 * c1 +
-                        wpbar_numu_c110 * a1 * b1 * c0 + wpbar_numu_c111 * a1 * b1 * c1;
-
-    // Wp_zero
-    BS_REAL wpzero_numu = wpzero_numu_c000 * a0 * b0 * c0 + wpzero_numu_c001 * a0 * b0 * c1 +
-                        wpzero_numu_c010 * a0 * b1 * c0 + wpzero_numu_c011 * a0 * b1 * c1 +
-                        wpzero_numu_c100 * a1 * b0 * c0 + wpzero_numu_c101 * a1 * b0 * c1 +
-                        wpzero_numu_c110 * a1 * b1 * c0 + wpzero_numu_c111 * a1 * b1 * c1;
-
-    parameters.alpha = alpha_numu;
-    parameters.beta = beta_numu;
-    parameters.gamma = gamma_numu;
-    parameters.delta = delta_numu;
-    parameters.wpbar = wpbar_numu;
-    parameters.wpzero = wpzero_numu;
+    parameters.alpha = alpha_numu_data[NMSParams_IDX(i_nearest, j_nearest, k_nearest)];
+    parameters.beta = beta_numu_data[NMSParams_IDX(i_nearest, j_nearest, k_nearest)];
+    parameters.gamma = gamma_numu_data[NMSParams_IDX(i_nearest, j_nearest, k_nearest)];
+    parameters.delta = delta_numu_data[NMSParams_IDX(i_nearest, j_nearest, k_nearest)];
+    parameters.wpbar = wpbar_numu_data[NMSParams_IDX(i_nearest, j_nearest, k_nearest)];
+    parameters.wpzero = wpzero_numu_data[NMSParams_IDX(i_nearest, j_nearest, k_nearest)];
 
 #undef NMSParams_IDX
 
@@ -184,66 +83,174 @@ NMS_Parameters NMS_parameters_interpolator(const BS_REAL T, const BS_REAL mu, co
 }
 
 
-//=========================================================//
-// --- Inelastic Neutrino Scattering off muons Kernel  --- //
-// ---           via SEMI-ANALYTICAL KERNEL            --- //
-//=========================================================//
-/* Interpolate the parameters grid via 3D linear interpolation
- *
- * NOTE: this function is just for points inside the ranges of the 3D table!
- *
- *      Inputs:
- *          T:          temperature                [MeV]
- *          mu:         muon chemical potential    [MeV]
- *          w:          incoming neutrino energy   [MeV]
- *          wp:         outgoing neutrino energy   [MeV]
- * 
- *      Output:
- *           kernel nu_mu [MeV^-2]
- *           kernel anu_mu [MeV^-2]
- *           kernel nu_e [MeV^-2]
- *           kernel anu_e [MeV^-2]
- */
-
-/*
-struct NMS_Kernel_DiffFlavors{
-    BS_REAL R[total_num_species];
-};
-
-KOKKOS_INLINE_FUNCTION
-NMS_Kernel_DiffFlavors NMS_SemiAnalytical(const BS_REAL T, const BS_REAL mu,
-                                  const BS_REAL w, const BS_REAL wp)
+// Analytical approximation of numu-muon scattering kernel   [MeV^-2]
+BS_REAL NMS_analytical_kernel_nu_mu(const BS_REAL T, const BS_REAL mu,
+                                        const BS_REAL w, const BS_REAL wp_in, const BS_REAL u)
 {
 
-    NMS_Kernel_DiffFlavors kernels_diff_flavors = {};
+    // Protection for the elastic case (w=wp), to avoid divergences
+    const BS_REAL wp = (std::abs(w - wp_in) <= 1e-6) ? (w * 0.99999) : wp_in;
 
-    // Interpolation of the 4D table
-    const NMS_Parameters parameters_values = NMS_parameters_interpolator(T, mu, w);
+    const BS_REAL x0 = POW2(w);
+    const BS_REAL x1 = POW2(wp);
+    const BS_REAL x2 = w + wp;
+    const BS_REAL x3 = 2. * w;
+    const BS_REAL x4 = x3 * wp;
+    const BS_REAL x5 = x0 + x1;
+    const BS_REAL x6 = x4 + x5;
+    const BS_REAL x7 = POW2(kBS_Mmu);
+    const BS_REAL x8 = 2. * kBS_SinThW2 + 1.;
+    const BS_REAL x9 = std::abs(w - wp);
+    const BS_REAL x10 = std::abs(x2);
+    const BS_REAL x11 = w * wp;
+    const BS_REAL x12 = x10 * x11;
+    const BS_REAL x13 = x0 * x9;
+    const BS_REAL x14 = -x0 * x10 - x1 * x10 + x1 * x9 + x13;
+    
+    const BS_REAL E_ = 0.5 * (
+                            wp - w + std::sqrt( 
+                                (x5 - 2. * x11 * u) * ( 1. + ((2. * POW2(kBS_Mmu)) / (x11 * (1. - u))) )
+                            )
+                        );
+    const BS_REAL eta = mu / T;
+    const BS_REAL arg1 = eta - E_ / T;
+    const BS_REAL arg2 = eta + (wp - w) / T - E_ / T;
+    const BS_REAL F0eta = FDI_0(arg1);
+    const BS_REAL F1eta = FDI_p1(arg1);
+    const BS_REAL F2eta = FDI_p2(arg1);
+    const BS_REAL F0eta2 = FDI_0(arg2);
+    const BS_REAL F1eta2 = FDI_p1(arg2);
+    const BS_REAL F2eta2 = FDI_p2(arg2);
 
-    // Neutrino-flavor dependent kernel
-    //nu_e, nu_t
-    kernels_diff_flavors.R[0] = NMS_semi_analytical_kernel(T, mu, w, wp, parameters_values.alpha, 
-                                parameters_values.beta, parameters_values.gamma, parameters_values.delta,
-                                parameters_values.wpbar, parameters_values.wpzero);
-    
-    //anu_e, anu_t
-    kernels_diff_flavors.R[1] = NMS_semi_analytical_kernel(T, mu, w, wp, parameters_values.alpha, 
-                                parameters_values.beta, parameters_values.gamma, parameters_values.delta,
-                                parameters_values.wpbar, parameters_values.wpzero);
-    
-    //nu_mu==nu_x
-    kernels_diff_flavors.R[2] = NMS_semi_analytical_kernel(T, mu, w, wp, parameters_values.alpha, 
-                                parameters_values.beta, parameters_values.gamma, parameters_values.delta,
-                                parameters_values.wpbar, parameters_values.wpzero);
-    
-    //anu_mu==anu_x
-    kernels_diff_flavors.R[3] = NMS_semi_analytical_kernel(T, mu, w, wp, parameters_values.alpha, 
-                                parameters_values.beta, parameters_values.gamma, parameters_values.delta,
-                                parameters_values.wpbar, parameters_values.wpzero);
-    
-    return kernels_diff_flavors;
+    const BS_REAL x15 = F0eta - F0eta2;
+    const BS_REAL x16 = T * (F1eta - F1eta2);
+    const BS_REAL x17 = x2 * x6 * (POW2(E_) * x15 + 2. * E_ * x16 + POW2(T) * (F2eta - F2eta2)) * 
+                        (x11 * x9 + x12 + x14);
+    const BS_REAL x18 = POW4(wp);
+    const BS_REAL x19 = x10 * x18;
+    const BS_REAL x20 = x18 * x9;
+    const BS_REAL x21 = POW4(w);
+    const BS_REAL x22 = x10 * x21;
+    const BS_REAL x23 = x21 * x9;
+    const BS_REAL x24 = 2. * x1;
+    const BS_REAL x25 = x13 * x24;
+    const BS_REAL x26 = POW3(w);
+    const BS_REAL x27 = 4. * x26;
+    const BS_REAL x28 = x10 * wp;
+    const BS_REAL x29 = POW3(wp);
+    const BS_REAL x30 = x29 * x9;
+    const BS_REAL x31 = 2. * wp;
+    const BS_REAL x32 = x26 * x9;
+    const BS_REAL x33 = -x3 * x30 + x31 * x32;
+    const BS_REAL x34 = x6 * (E_ * x15 + x16);
+    const BS_REAL x35 = POW6(wp);
+    const BS_REAL x36 = x10 * x35;
+    const BS_REAL x37 = x35 * x9;
+    const BS_REAL x38 = POW6(w);
+    const BS_REAL x39 = x38 * x9;
+    const BS_REAL x40 = POW5(wp);
+    const BS_REAL x41 = POW5(w);
+    const BS_REAL x42 = x1 * x21;
+    const BS_REAL x43 = std::abs( (w - wp) * POW2((w + wp)) );
+    const BS_REAL x44 = 45. * x43;
+    const BS_REAL x45 = 15. * x43;
+    const BS_REAL x46 = x10 * x38;
+    const BS_REAL x47 = x10 * x42;
+    const BS_REAL x48 = x0 * x20;
+    const BS_REAL x49 = w * x29;
+    const BS_REAL x50 = x28 * x41;
+    const BS_REAL x51 = std::abs(x0 - x1);
+    const BS_REAL x52 = 15. * x51;
+    const BS_REAL x53 = w * x40;
+    const BS_REAL x54 = x10 * x53;
+    const BS_REAL x55 = x26 * wp;
+    const BS_REAL x56 = x0 * x19;
+    const BS_REAL x57 = 45. * x51;
+    const BS_REAL x58 = x42 * x9;
+    const BS_REAL x59 = x32 * wp;
+    const BS_REAL x60 = w * x30;
+    const BS_REAL x61 = 40. * x7;
+    const BS_REAL x62 = 3. * x9;
+    const BS_REAL x63 = 30. * x1;
+    const BS_REAL x64 = x10 * x49;
+    const BS_REAL x65 = 120. * x7;
+    const BS_REAL x66 = x0 * x43 * x63 + 160. * x1 * x13 * x7 + 130. * x10 * x26 * x29 - x13 * x51 * x63 
+                      + (- x19 + x20 - x22 + x23 - x26 * x28 - x64) * x61 + 6. * x26 * x30 
+                      - x41 * x62 * wp - x53 * x62 + x59 * x65 + x60 * x65;
+
+    const BS_REAL numerator = POW2(kBS_Gf0) * T * (
+            POW2(kBS_SinThW2) * (
+                4. * x15 * x2 * (
+                    -x18 * x45 + x20 * x52 - x21 * x44 + x23 * x57 + x36 - x37
+                    - 51. * x39 + x44 * x55 - x45 * x49 + 51. * x46 - 185. * x47
+                    - 49. * x48 - 9. * x50 + x52 * x60 + 31. * x54 + 45. * x56
+                    - x57 * x59 + 101. * x58 + x66
+                )
+                - 640. * x17
+                - 320. * x34 * (x19 - x20 - 3. * x22 + 3. * x23 - x25 + x27 * x28 + x33)
+            )
+            - 80. * kBS_SinThW2 * x15 * x2 * x6 * x7 * x8 * (4. * x12 + x14 - x4 * x9)
+            + POW2(x8) * (
+                x15 * x2 * (
+                    -x18 * x44 + x20 * x57 - x21 * x45 + x23 * x52 + 51. * x36
+                    - 51. * x37 - x39 + x44 * x49 - x45 * x55 + x46 + 45. * x47
+                    + 101. * x48 + 31. * x50 + x52 * x59 - 9. * x54 - 185. * x56
+                    - x57 * x60 - 49. * x58 + x66
+                )
+                - 160. * x17
+                - 80. * x34 * (3. * x19 - 3. * x20 - x22 + x23 + x25 + x33 - 4. * x64)
+            )
+        );
+
+    const BS_REAL denominator = 240. * kBS_Pi * x0 * x1 * x2 * x6 * (1. - SafeExp((-w + wp) / T));
+
+    return numerator / denominator;
 }
-*/
+
+BS_REAL smoothstep(const BS_REAL wp, const BS_REAL wpzero, const BS_REAL epsilon){
+
+    return (3. * POW2( (wp - (wpzero - epsilon)) / (2. * epsilon) ) 
+                - 2. * POW3( (wp - (wpzero - epsilon)) / (2. * epsilon) )
+    );
+}
+
+
+// Semi-Analytical expression of the NMS kernel  [MeV^-2]
+BS_REAL NMS_SemiAnalyticalKernel(const BS_REAL T, const BS_REAL mu, const BS_REAL w, const BS_REAL wp,
+                        const BS_REAL alpha, const BS_REAL beta, const BS_REAL gamma, const BS_REAL delta,
+                        const BS_REAL wpbar, const BS_REAL wpzero)
+{
+    BS_REAL min_val = std::min(wpbar, w);
+    BS_REAL max_val = std::max(wpbar, w);
+    BS_REAL epsilon = 0.2 * wpzero;
+
+    if (wp <= (wpzero - epsilon)){
+        return NMS_analytical_kernel_nu_mu(T, mu, w, wp, -0.4);
+    }
+    else if (wp > (wpzero - epsilon) && wp < (wpzero + epsilon)){
+        return ( NMS_analytical_kernel_nu_mu(T, mu, w, wp, 0.0) * smoothstep(wp, wpzero, epsilon) 
+                + NMS_analytical_kernel_nu_mu(T, mu, w, wp, -0.4) * (1 - smoothstep(wp, wpzero, epsilon)) ); 
+    }
+    else if (wp >= (wpzero + epsilon) && wp <= min_val){
+        return NMS_analytical_kernel_nu_mu(T, mu, w, wp, 0.0);
+    }
+    else if (wp > min_val && wp <= max_val){
+        BS_REAL inv_min = 1. / min_val;
+        BS_REAL prefactor1 = NMS_analytical_kernel_nu_mu(T, mu, w, min_val, 0.0);
+        return prefactor1 * std::pow(wp * inv_min, gamma) * SafeExp(delta * (min_val - wp));
+    }
+    else if (wp > max_val){
+        BS_REAL inv_min = 1. / min_val;
+        BS_REAL inv_max = 1. / max_val;
+        BS_REAL prefactor2 = NMS_analytical_kernel_nu_mu(T, mu, w, min_val, 0.0) 
+                            * std::pow(max_val * inv_min, gamma) * SafeExp(delta * (min_val - max_val));
+        return prefactor2 * std::pow(wp * inv_max, alpha) * SafeExp(beta * (max_val - wp));
+    }
+    else{  //fallback
+        return 0.0;
+    }
+}
+
 
 // Calculates and saves the neutrino muon scattering in and out kernel
 // @TODO: ADD PARAMETER INTERPOLATION FOR OTHER FLAVORS
@@ -272,9 +279,9 @@ MyKernelOutput InelasticNMSKernels_SemiAnalytical(InelasticScattKernelParams* ke
     nms_kernel.abs[id_anue] = 0.0;
     
     //nu_mu==nu_x
-    nms_kernel.abs[id_nux] = NMS_semi_analytical_kernel(T, mu_mu, w, wp, parameters_values.alpha, 
-                                parameters_values.beta, parameters_values.gamma, parameters_values.delta,
-                                parameters_values.wpbar, parameters_values.wpzero);
+    nms_kernel.abs[id_nux] = kBS_NMS_Conv_Const * NMS_SemiAnalyticalKernel(T, mu_mu, w, wp, 
+                                parameters_values.alpha, parameters_values.beta, parameters_values.gamma, 
+                                parameters_values.delta, parameters_values.wpbar, parameters_values.wpzero);
     
     //anu_mu==anu_x
     nms_kernel.abs[id_anux] = 0.0;
