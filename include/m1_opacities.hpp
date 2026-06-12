@@ -1088,202 +1088,341 @@ M1MatrixKokkos2D ComputeNMSIntegrand(const MyQuadrature* quad, BS_REAL t,
 
     M1MatrixKokkos2D out = {0};
 
-    for (int i = 0; i < n; ++i)
+    if (grey_pars->opacity_pars.NMS_implementation == NMS_KernelInterp)
     {
 
-        x_i = quad->points[i];
-
-        // @TODO: READ NUMBERS FROM THE GRID BOUNDARIES (not hard-coded)
-        u1 = 2. + (t - 2.) * x_i;
-        u2 = t + (600. - t) * x_i;
-        min1 = std::min(u1, 299.);
-        min2 = std::min(u2, 299.);
-
-        for (int j = 0; j < n; ++j)
+        for (int i = 0; i < n; ++i)
         {
 
-            x_j = quad->points[j];
+            x_i = quad->points[i];
 
-            nu = half * (u1 - min1 * x_j);
-            BS_ASSERT(nu >= 0, "Neutrino energy is negative (nu=%e)", nu);
-            nu_bar = half * (u1 + min1 * x_j);
-            BS_ASSERT(nu_bar >= 0, "Neutrino energy is negative (nu_bar=%e)",
-                      nu_bar);
+            // @TODO: READ NUMBERS FROM THE GRID BOUNDARIES (not hard-coded)
+            u1 = 2. + (t - 2.) * x_i;
+            u2 = t + (600. - t) * x_i;
+            min1 = std::min(u1, 299.);
+            min2 = std::min(u2, 299.);
 
-            nu_fourth = POW2(nu) * POW2(nu_bar);
-
-            for (int idx = 0; idx < total_num_species; ++idx)
+            for (int j = 0; j < n; ++j)
             {
-                g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, idx);
-                g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
 
-                if (grey_pars->opacity_pars.neglect_blocking == false)
+                x_j = quad->points[j];
+
+                nu = half * (u1 - min1 * x_j);
+                BS_ASSERT(nu >= 0, "Neutrino energy is negative (nu=%e)", nu);
+                nu_bar = half * (u1 + min1 * x_j);
+                BS_ASSERT(nu_bar >= 0, "Neutrino energy is negative (nu_bar=%e)",
+                        nu_bar);
+
+                nu_fourth = POW2(nu) * POW2(nu_bar);
+
+                for (int idx = 0; idx < total_num_species; ++idx)
                 {
-                    block_factor_nu[idx]     = one - g_nu[idx];
-                    block_factor_nu_bar[idx] = one - g_nu_bar[idx];
-                }
-                else
-                {
-                    block_factor_nu[idx]     = one;
-                    block_factor_nu_bar[idx] = one;
-                }
-            }
+                    g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, idx);
+                    g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
 
-            // compute the NMS kernels
-            grey_pars->kernel_pars.inelastic_kernel_params.omega       = nu;
-            grey_pars->kernel_pars.inelastic_kernel_params.omega_prime = nu_bar;
+                    if (grey_pars->opacity_pars.neglect_blocking == false)
+                    {
+                        block_factor_nu[idx]     = one - g_nu[idx];
+                        block_factor_nu_bar[idx] = one - g_nu_bar[idx];
+                    }
+                    else
+                    {
+                        block_factor_nu[idx]     = one;
+                        block_factor_nu_bar[idx] = one;
+                    }
+                }
 
-            if (grey_pars->opacity_pars.NMS_implementation == NMS_KernelInterp)
-            {
+                // compute the NMS kernels
+                grey_pars->kernel_pars.inelastic_kernel_params.omega       = nu;
+                grey_pars->kernel_pars.inelastic_kernel_params.omega_prime = nu_bar;
+
                 inel_1 = InelasticNMSKernels_DirectInterp(
-                    &grey_pars->kernel_pars.inelastic_kernel_params,
-                    &grey_pars->eos_pars);
-            }
-            else if (grey_pars->opacity_pars.NMS_implementation == NMS_SemiAnalytical)
-            {
-                inel_1 = InelasticNMSKernels_SemiAnalytical(
-                    &grey_pars->kernel_pars.inelastic_kernel_params,
-                    &grey_pars->eos_pars);
-            }
+                            &grey_pars->kernel_pars.inelastic_kernel_params,
+                            &grey_pars->eos_pars);
 
-            grey_pars->kernel_pars.inelastic_kernel_params.omega       = nu_bar;
-            grey_pars->kernel_pars.inelastic_kernel_params.omega_prime = nu;
+                grey_pars->kernel_pars.inelastic_kernel_params.omega       = nu_bar;
+                grey_pars->kernel_pars.inelastic_kernel_params.omega_prime = nu;
 
-            if (grey_pars->opacity_pars.NMS_implementation == NMS_KernelInterp)
-            {
                 inel_2 = InelasticNMSKernels_DirectInterp(
-                    &grey_pars->kernel_pars.inelastic_kernel_params,
-                    &grey_pars->eos_pars);
-            }
-            else if (grey_pars->opacity_pars.NMS_implementation == NMS_SemiAnalytical)
-            {
-                inel_2 = InelasticNMSKernels_SemiAnalytical(
-                    &grey_pars->kernel_pars.inelastic_kernel_params,
-                    &grey_pars->eos_pars);
-            }
+                            &grey_pars->kernel_pars.inelastic_kernel_params,
+                            &grey_pars->eos_pars);
 
-            for (int idx = 0; idx < total_num_species; ++idx)
-            {
-                tmp_em_1  = inel_1.em[idx] * g_nu_bar[idx];
-                tmp_abs_1 = inel_1.abs[idx] * block_factor_nu_bar[idx];
-
-                tmp_em_2  = inel_2.em[idx] * g_nu[idx];
-                tmp_abs_2 = inel_2.abs[idx] * block_factor_nu[idx];
-
-                if (stim_abs == 1)
+                for (int idx = 0; idx < total_num_species; ++idx)
                 {
-                    out.m1_mat_ab[idx][i][j] =
-                        nu_fourth * g_nu[idx] * (tmp_em_1 + tmp_abs_1);
-                    out.m1_mat_em[idx][i][j] = nu_fourth * tmp_em_1;
+                    tmp_em_1  = inel_1.em[idx] * g_nu_bar[idx];
+                    tmp_abs_1 = inel_1.abs[idx] * block_factor_nu_bar[idx];
 
-                    out.m1_mat_ab[idx][i][n + j] =
-                        nu_fourth * g_nu_bar[idx] * (tmp_em_2 + tmp_abs_2);
-                    out.m1_mat_em[idx][i][n + j] = nu_fourth * tmp_em_2;
+                    tmp_em_2  = inel_2.em[idx] * g_nu[idx];
+                    tmp_abs_2 = inel_2.abs[idx] * block_factor_nu[idx];
+
+                    if (stim_abs == 1)
+                    {
+                        out.m1_mat_ab[idx][i][j] =
+                            nu_fourth * g_nu[idx] * (tmp_em_1 + tmp_abs_1);
+                        out.m1_mat_em[idx][i][j] = nu_fourth * tmp_em_1;
+
+                        out.m1_mat_ab[idx][i][n + j] =
+                            nu_fourth * g_nu_bar[idx] * (tmp_em_2 + tmp_abs_2);
+                        out.m1_mat_em[idx][i][n + j] = nu_fourth * tmp_em_2;
+                    }
+                    else
+                    {
+                        out.m1_mat_ab[idx][i][j] =
+                            nu_fourth * g_nu[idx] * tmp_abs_1;
+                        out.m1_mat_em[idx][i][j] =
+                            nu_fourth * (one - g_nu[idx]) * tmp_em_1;
+
+                        out.m1_mat_ab[idx][i][n + j] =
+                            nu_fourth * g_nu_bar[idx] * tmp_abs_2;
+                        out.m1_mat_em[idx][i][n + j] =
+                            nu_fourth * (one - g_nu_bar[idx]) * tmp_em_2;
+                    }
                 }
-                else
+
+                nu = half * (u2 - min2 * x_j);
+                BS_ASSERT(nu >= 0, "Neutrino energy is negative (nu=%e)", nu);
+                nu_bar = half * (u2 + min2 * x_j);
+                BS_ASSERT(nu_bar >= 0, "Neutrino energy is negative (nu_bar=%e)",
+                        nu_bar);
+
+                nu_fourth = POW2(nu) * POW2(nu_bar);
+
+                for (int idx = 0; idx < total_num_species; ++idx)
                 {
-                    out.m1_mat_ab[idx][i][j] =
-                        nu_fourth * g_nu[idx] * tmp_abs_1;
-                    out.m1_mat_em[idx][i][j] =
-                        nu_fourth * (one - g_nu[idx]) * tmp_em_1;
+                    g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, idx);
+                    g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
 
-                    out.m1_mat_ab[idx][i][n + j] =
-                        nu_fourth * g_nu_bar[idx] * tmp_abs_2;
-                    out.m1_mat_em[idx][i][n + j] =
-                        nu_fourth * (one - g_nu_bar[idx]) * tmp_em_2;
+                    if (grey_pars->opacity_pars.neglect_blocking == false)
+                    {
+                        block_factor_nu[idx]     = one - g_nu[idx];
+                        block_factor_nu_bar[idx] = one - g_nu_bar[idx];
+                    }
+                    else
+                    {
+                        block_factor_nu[idx]     = one;
+                        block_factor_nu_bar[idx] = one;
+                    }
                 }
-            }
 
-            nu = half * (u2 - min2 * x_j);
-            BS_ASSERT(nu >= 0, "Neutrino energy is negative (nu=%e)", nu);
-            nu_bar = half * (u2 + min2 * x_j);
-            BS_ASSERT(nu_bar >= 0, "Neutrino energy is negative (nu_bar=%e)",
-                      nu_bar);
+                // compute the NMS kernels
+                grey_pars->kernel_pars.inelastic_kernel_params.omega       = nu;
+                grey_pars->kernel_pars.inelastic_kernel_params.omega_prime = nu_bar;
 
-            nu_fourth = POW2(nu) * POW2(nu_bar);
-
-            for (int idx = 0; idx < total_num_species; ++idx)
-            {
-                g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, idx);
-                g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
-
-                if (grey_pars->opacity_pars.neglect_blocking == false)
-                {
-                    block_factor_nu[idx]     = one - g_nu[idx];
-                    block_factor_nu_bar[idx] = one - g_nu_bar[idx];
-                }
-                else
-                {
-                    block_factor_nu[idx]     = one;
-                    block_factor_nu_bar[idx] = one;
-                }
-            }
-
-            // compute the NMS kernels
-            grey_pars->kernel_pars.inelastic_kernel_params.omega       = nu;
-            grey_pars->kernel_pars.inelastic_kernel_params.omega_prime = nu_bar;
-
-            if (grey_pars->opacity_pars.NMS_implementation == NMS_KernelInterp)
-            {
                 inel_1 = InelasticNMSKernels_DirectInterp(
-                    &grey_pars->kernel_pars.inelastic_kernel_params,
-                    &grey_pars->eos_pars);
-            }
-            else if (grey_pars->opacity_pars.NMS_implementation == NMS_SemiAnalytical)
-            {
-                inel_1 = InelasticNMSKernels_SemiAnalytical(
-                    &grey_pars->kernel_pars.inelastic_kernel_params,
-                    &grey_pars->eos_pars);
-            }
+                            &grey_pars->kernel_pars.inelastic_kernel_params,
+                            &grey_pars->eos_pars);
 
-            grey_pars->kernel_pars.inelastic_kernel_params.omega       = nu_bar;
-            grey_pars->kernel_pars.inelastic_kernel_params.omega_prime = nu;
+                grey_pars->kernel_pars.inelastic_kernel_params.omega       = nu_bar;
+                grey_pars->kernel_pars.inelastic_kernel_params.omega_prime = nu;
 
-            if (grey_pars->opacity_pars.NMS_implementation == NMS_KernelInterp)
-            {
                 inel_2 = InelasticNMSKernels_DirectInterp(
-                    &grey_pars->kernel_pars.inelastic_kernel_params,
-                    &grey_pars->eos_pars);
-            }
-            else if (grey_pars->opacity_pars.NMS_implementation == NMS_SemiAnalytical)
-            {
-                inel_2 = InelasticNMSKernels_SemiAnalytical(
-                    &grey_pars->kernel_pars.inelastic_kernel_params,
-                    &grey_pars->eos_pars);
-            }
+                            &grey_pars->kernel_pars.inelastic_kernel_params,
+                            &grey_pars->eos_pars);
 
-            for (int idx = 0; idx < total_num_species; ++idx)
-            {
-                tmp_em_1  = inel_1.em[idx] * g_nu_bar[idx];
-                tmp_abs_1 = inel_1.abs[idx] * block_factor_nu_bar[idx];
-
-                tmp_em_2  = inel_2.em[idx] * g_nu[idx];
-                tmp_abs_2 = inel_2.abs[idx] * block_factor_nu[idx];
-
-                if (stim_abs == 1)
+                for (int idx = 0; idx < total_num_species; ++idx)
                 {
-                    out.m1_mat_ab[idx][n + i][j] =
-                        nu_fourth * g_nu[idx] * (tmp_em_1 + tmp_abs_1);
-                    out.m1_mat_em[idx][n + i][j] = nu_fourth * tmp_em_1;
+                    tmp_em_1  = inel_1.em[idx] * g_nu_bar[idx];
+                    tmp_abs_1 = inel_1.abs[idx] * block_factor_nu_bar[idx];
 
-                    out.m1_mat_ab[idx][n + i][n + j] =
-                        nu_fourth * g_nu_bar[idx] * (tmp_em_2 + tmp_abs_2);
-                    out.m1_mat_em[idx][n + i][n + j] = nu_fourth * tmp_em_2;
-                }
-                else
-                {
-                    out.m1_mat_ab[idx][n + i][j] =
-                        nu_fourth * g_nu[idx] * tmp_abs_1;
-                    out.m1_mat_em[idx][n + i][j] =
-                        nu_fourth * (one - g_nu[idx]) * tmp_em_1;
+                    tmp_em_2  = inel_2.em[idx] * g_nu[idx];
+                    tmp_abs_2 = inel_2.abs[idx] * block_factor_nu[idx];
 
-                    out.m1_mat_ab[idx][n + i][n + j] =
-                        nu_fourth * g_nu_bar[idx] * tmp_abs_2;
-                    out.m1_mat_em[idx][n + i][n + j] =
-                        nu_fourth * (one - g_nu_bar[idx]) * tmp_em_2;
+                    if (stim_abs == 1)
+                    {
+                        out.m1_mat_ab[idx][n + i][j] =
+                            nu_fourth * g_nu[idx] * (tmp_em_1 + tmp_abs_1);
+                        out.m1_mat_em[idx][n + i][j] = nu_fourth * tmp_em_1;
+
+                        out.m1_mat_ab[idx][n + i][n + j] =
+                            nu_fourth * g_nu_bar[idx] * (tmp_em_2 + tmp_abs_2);
+                        out.m1_mat_em[idx][n + i][n + j] = nu_fourth * tmp_em_2;
+                    }
+                    else
+                    {
+                        out.m1_mat_ab[idx][n + i][j] =
+                            nu_fourth * g_nu[idx] * tmp_abs_1;
+                        out.m1_mat_em[idx][n + i][j] =
+                            nu_fourth * (one - g_nu[idx]) * tmp_em_1;
+
+                        out.m1_mat_ab[idx][n + i][n + j] =
+                            nu_fourth * g_nu_bar[idx] * tmp_abs_2;
+                        out.m1_mat_em[idx][n + i][n + j] =
+                            nu_fourth * (one - g_nu_bar[idx]) * tmp_em_2;
+                    }
                 }
             }
         }
+    }
+
+    else if (grey_pars->opacity_pars.NMS_implementation == NMS_SemiAnalytical)
+    {
+    
+        for (int i = 0; i < n; ++i)
+        {
+
+            x_i = quad->points[i];
+
+            // @TODO: READ NUMBERS FROM THE GRID BOUNDARIES (not hard-coded)
+            u1 = 2. + (t - 2.) * x_i;
+            u2 = t + (600. - t) * x_i;
+            min1 = std::min(u1, 299.);
+            min2 = std::min(u2, 299.);
+
+            for (int j = 0; j < n; ++j)
+            {
+
+                x_j = quad->points[j];
+
+                nu = half * (u1 - min1 * x_j);
+                BS_ASSERT(nu >= 0, "Neutrino energy is negative (nu=%e)", nu);
+                nu_bar = half * (u1 + min1 * x_j);
+                BS_ASSERT(nu_bar >= 0, "Neutrino energy is negative (nu_bar=%e)",
+                        nu_bar);
+
+                nu_fourth = POW2(nu) * POW2(nu_bar);
+
+                for (int idx = 0; idx < total_num_species; ++idx)
+                {
+                    g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, idx);
+                    g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
+
+                    if (grey_pars->opacity_pars.neglect_blocking == false)
+                    {
+                        block_factor_nu[idx]     = one - g_nu[idx];
+                        block_factor_nu_bar[idx] = one - g_nu_bar[idx];
+                    }
+                    else
+                    {
+                        block_factor_nu[idx]     = one;
+                        block_factor_nu_bar[idx] = one;
+                    }
+                }
+
+                // compute the NMS kernels
+                grey_pars->kernel_pars.inelastic_kernel_params.omega       = nu;
+                grey_pars->kernel_pars.inelastic_kernel_params.omega_prime = nu_bar;
+
+                inel_1 = InelasticNMSKernels_SemiAnalytical(
+                            &grey_pars->kernel_pars.inelastic_kernel_params,
+                            &grey_pars->eos_pars);
+
+                grey_pars->kernel_pars.inelastic_kernel_params.omega       = nu_bar;
+                grey_pars->kernel_pars.inelastic_kernel_params.omega_prime = nu;
+
+                inel_2 = InelasticNMSKernels_SemiAnalytical(
+                            &grey_pars->kernel_pars.inelastic_kernel_params,
+                            &grey_pars->eos_pars);
+
+                for (int idx = 0; idx < total_num_species; ++idx)
+                {
+                    tmp_em_1  = inel_1.em[idx] * g_nu_bar[idx];
+                    tmp_abs_1 = inel_1.abs[idx] * block_factor_nu_bar[idx];
+
+                    tmp_em_2  = inel_2.em[idx] * g_nu[idx];
+                    tmp_abs_2 = inel_2.abs[idx] * block_factor_nu[idx];
+
+                    if (stim_abs == 1)
+                    {
+                        out.m1_mat_ab[idx][i][j] =
+                            nu_fourth * g_nu[idx] * (tmp_em_1 + tmp_abs_1);
+                        out.m1_mat_em[idx][i][j] = nu_fourth * tmp_em_1;
+
+                        out.m1_mat_ab[idx][i][n + j] =
+                            nu_fourth * g_nu_bar[idx] * (tmp_em_2 + tmp_abs_2);
+                        out.m1_mat_em[idx][i][n + j] = nu_fourth * tmp_em_2;
+                    }
+                    else
+                    {
+                        out.m1_mat_ab[idx][i][j] =
+                            nu_fourth * g_nu[idx] * tmp_abs_1;
+                        out.m1_mat_em[idx][i][j] =
+                            nu_fourth * (one - g_nu[idx]) * tmp_em_1;
+
+                        out.m1_mat_ab[idx][i][n + j] =
+                            nu_fourth * g_nu_bar[idx] * tmp_abs_2;
+                        out.m1_mat_em[idx][i][n + j] =
+                            nu_fourth * (one - g_nu_bar[idx]) * tmp_em_2;
+                    }
+                }
+
+                nu = half * (u2 - min2 * x_j);
+                BS_ASSERT(nu >= 0, "Neutrino energy is negative (nu=%e)", nu);
+                nu_bar = half * (u2 + min2 * x_j);
+                BS_ASSERT(nu_bar >= 0, "Neutrino energy is negative (nu_bar=%e)",
+                        nu_bar);
+
+                nu_fourth = POW2(nu) * POW2(nu_bar);
+
+                for (int idx = 0; idx < total_num_species; ++idx)
+                {
+                    g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, idx);
+                    g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
+
+                    if (grey_pars->opacity_pars.neglect_blocking == false)
+                    {
+                        block_factor_nu[idx]     = one - g_nu[idx];
+                        block_factor_nu_bar[idx] = one - g_nu_bar[idx];
+                    }
+                    else
+                    {
+                        block_factor_nu[idx]     = one;
+                        block_factor_nu_bar[idx] = one;
+                    }
+                }
+
+                // compute the NMS kernels
+                grey_pars->kernel_pars.inelastic_kernel_params.omega       = nu;
+                grey_pars->kernel_pars.inelastic_kernel_params.omega_prime = nu_bar;
+
+                inel_1 = InelasticNMSKernels_SemiAnalytical(
+                            &grey_pars->kernel_pars.inelastic_kernel_params,
+                            &grey_pars->eos_pars);
+
+                grey_pars->kernel_pars.inelastic_kernel_params.omega       = nu_bar;
+                grey_pars->kernel_pars.inelastic_kernel_params.omega_prime = nu;
+
+                inel_2 = InelasticNMSKernels_SemiAnalytical(
+                            &grey_pars->kernel_pars.inelastic_kernel_params,
+                            &grey_pars->eos_pars);
+
+                for (int idx = 0; idx < total_num_species; ++idx)
+                {
+                    tmp_em_1  = inel_1.em[idx] * g_nu_bar[idx];
+                    tmp_abs_1 = inel_1.abs[idx] * block_factor_nu_bar[idx];
+
+                    tmp_em_2  = inel_2.em[idx] * g_nu[idx];
+                    tmp_abs_2 = inel_2.abs[idx] * block_factor_nu[idx];
+
+                    if (stim_abs == 1)
+                    {
+                        out.m1_mat_ab[idx][n + i][j] =
+                            nu_fourth * g_nu[idx] * (tmp_em_1 + tmp_abs_1);
+                        out.m1_mat_em[idx][n + i][j] = nu_fourth * tmp_em_1;
+
+                        out.m1_mat_ab[idx][n + i][n + j] =
+                            nu_fourth * g_nu_bar[idx] * (tmp_em_2 + tmp_abs_2);
+                        out.m1_mat_em[idx][n + i][n + j] = nu_fourth * tmp_em_2;
+                    }
+                    else
+                    {
+                        out.m1_mat_ab[idx][n + i][j] =
+                            nu_fourth * g_nu[idx] * tmp_abs_1;
+                        out.m1_mat_em[idx][n + i][j] =
+                            nu_fourth * (one - g_nu[idx]) * tmp_em_1;
+
+                        out.m1_mat_ab[idx][n + i][n + j] =
+                            nu_fourth * g_nu_bar[idx] * tmp_abs_2;
+                        out.m1_mat_em[idx][n + i][n + j] =
+                            nu_fourth * (one - g_nu_bar[idx]) * tmp_em_2;
+                    }
+                }
+            }
+        }
+    }
+
+    //Fallback
+    else{
+        printf("ERROR: NMS implementation is not well specified.");
     }
 
     return out;
