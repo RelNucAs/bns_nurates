@@ -1,10 +1,6 @@
 
+
 #include "bns_nurates.hpp"
-#include "constants.hpp"
-#include "functions.hpp"
-#include <cmath>
-#include <algorithm>
-#include <iterator>
 
 // Temperature (20 points between [1,200] MeV, log scale)
 constexpr BS_REAL NMSParams_T_axis[20] = {
@@ -41,14 +37,12 @@ constexpr BS_REAL NMSParams_w_axis[39] = {
 };
 constexpr int NMSParams_w_dims = 39;
 
-/*
-constexpr BS_REAL NMSParams_w_max = *std::max_element(std::begin(NMSParams_w_axis), 
-                                        std::end(NMSParams_w_axis));
-constexpr BS_REAL NMSParams_w_min = *std::min_element(std::begin(NMSParams_w_axis), 
-                                        std::end(NMSParams_w_axis));
+
+// Max and min values for w and wp axis
+constexpr BS_REAL NMSParams_w_max = NMSParams_w_axis[NMSParams_w_dims - 1];
+constexpr BS_REAL NMSParams_w_min = NMSParams_w_axis[0];
 constexpr BS_REAL NMSParams_wp_max = NMSParams_w_max;
 constexpr BS_REAL NMSParams_wp_min = NMSParams_w_min;
-*/
 
 
 // Alpha nu_mu (dimensionless)

@@ -1091,16 +1091,19 @@ M1MatrixKokkos2D ComputeNMSIntegrand(const MyQuadrature* quad, BS_REAL t,
     if (grey_pars->opacity_pars.NMS_implementation == NMS_KernelInterp)
     {
 
+        constexpr BS_REAL umin = NMS_w_min + NMS_wp_min;
+        constexpr BS_REAL umax = NMS_w_max + NMS_wp_max;
+        constexpr BS_REAL vmax = NMS_w_max - NMS_wp_min;
+
         for (int i = 0; i < n; ++i)
         {
 
             x_i = quad->points[i];
 
-            // @TODO: READ NUMBERS FROM THE GRID BOUNDARIES (not hard-coded)
-            u1 = 2. + (t - 2.) * x_i;
-            u2 = t + (600. - t) * x_i;
-            min1 = std::min(u1, 299.);
-            min2 = std::min(u2, 299.);
+            u1 = umin + (t - umin) * x_i;
+            u2 = t + (umax - t) * x_i;
+            min1 = std::min(u1, vmax);
+            min2 = std::min(u2, vmax);
 
             for (int j = 0; j < n; ++j)
             {
@@ -1256,17 +1259,20 @@ M1MatrixKokkos2D ComputeNMSIntegrand(const MyQuadrature* quad, BS_REAL t,
 
     else if (grey_pars->opacity_pars.NMS_implementation == NMS_SemiAnalytical)
     {
+
+        constexpr BS_REAL umin = NMSParams_w_min + NMSParams_wp_min;
+        constexpr BS_REAL umax = NMSParams_w_max + NMSParams_wp_max;
+        constexpr BS_REAL vmax = NMSParams_w_max - NMSParams_wp_min;
     
         for (int i = 0; i < n; ++i)
         {
 
             x_i = quad->points[i];
 
-            // @TODO: READ NUMBERS FROM THE GRID BOUNDARIES (not hard-coded)
-            u1 = 2. + (t - 2.) * x_i;
-            u2 = t + (600. - t) * x_i;
-            min1 = std::min(u1, 299.);
-            min2 = std::min(u2, 299.);
+            u1 = umin + (t - umin) * x_i;
+            u2 = t + (umax - t) * x_i;
+            min1 = std::min(u1, vmax);
+            min2 = std::min(u2, vmax);
 
             for (int j = 0; j < n; ++j)
             {
@@ -1443,6 +1449,22 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
 {
     constexpr BS_REAL four    = 4;
     constexpr BS_REAL c_light = kBS_Clight;
+    constexpr BS_REAL five_over_six = 5. / 6.;
+    BS_REAL umin, umax, vmax;
+
+    // Extremals for NMS integration
+    if (my_grey_opacity_params->opacity_pars.NMS_implementation == NMS_KernelInterp)
+    {
+        umin = NMS_w_min + NMS_wp_min;
+        umax = NMS_w_max + NMS_wp_max;
+        vmax = NMS_w_max - NMS_wp_min;
+    }
+    else if (my_grey_opacity_params->opacity_pars.NMS_implementation == NMS_SemiAnalytical)
+    {
+        umin = NMSParams_w_min + NMSParams_wp_min;
+        umax = NMSParams_w_max + NMSParams_wp_max;
+        vmax = NMSParams_w_max - NMSParams_wp_min;
+    }
 
     BS_REAL n[total_num_species];
     BS_REAL J[total_num_species];
@@ -1467,8 +1489,8 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     // + FDI_p4(-eta_e) / FDI_p3(-eta_e));
     const BS_REAL s_nux  = three_halves * temp;
     const BS_REAL s_neps = temp_multiple * temp;
-    //@TODO: REPLACE 5. AND 600. WITH CONSTANTS TAKEN FROM THE GRID BOUNDARIES
-    const BS_REAL s_nms = std::max(5., std::min(4. * s_neps, 500.));
+    // s_nms depends on the grid boundaries:
+    const BS_REAL s_nms = std::max(2. * umin, std::min(4. * s_neps, five_over_six * umax));
 
     BS_REAL s_beta[total_num_species] = {0}, s_iso[total_num_species] = {0};
 
@@ -1555,6 +1577,7 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
         M1MatrixKokkos2D out_inel = ComputeNMSIntegrand(
             quad_2d, s_nms, my_grey_opacity_params, stim_abs);
         GaussLegendreIntegrate2DMatrixForNMS(quad_2d, &out_inel, s_nms,
+                                              umin, umax, vmax,
                                               &n_nms_2d, &e_nms_2d);
     }
 
@@ -1725,6 +1748,22 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
 {
     constexpr BS_REAL four    = 4;
     constexpr BS_REAL c_light = kBS_Clight;
+    constexpr BS_REAL five_over_six = 5. / 6.;
+    BS_REAL umin, umax, vmax;
+
+    // Extremals for NMS integration
+    if (my_grey_opacity_params->opacity_pars.NMS_implementation == NMS_KernelInterp)
+    {
+        umin = NMS_w_min + NMS_wp_min;
+        umax = NMS_w_max + NMS_wp_max;
+        vmax = NMS_w_max - NMS_wp_min;
+    }
+    else if (my_grey_opacity_params->opacity_pars.NMS_implementation == NMS_SemiAnalytical)
+    {
+        umin = NMSParams_w_min + NMSParams_wp_min;
+        umax = NMSParams_w_max + NMSParams_wp_max;
+        vmax = NMSParams_w_max - NMSParams_wp_min;
+    }
 
     BS_REAL n[total_num_species];
     BS_REAL J[total_num_species];
@@ -1749,9 +1788,8 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     // + FDI_p4(-eta_e) / FDI_p3(-eta_e));
     const BS_REAL s_nux  = three_halves * temp;
     const BS_REAL s_neps = temp_multiple * temp;
-
-    //@TODO: REPLACE 2. AND 600. WITH CONSTANTS TAKEN FROM THE GRID BOUNDARIES
-    const BS_REAL s_nms = std::max(2., std::min(4. * s_neps, 600.));
+    // s_nms depends on the grid boundaries:
+    const BS_REAL s_nms = std::max(2. * umin, std::min(4. * s_neps, five_over_six * umax));
 
     BS_REAL s_beta[total_num_species] = {0}, s_iso[total_num_species] = {0};
 
@@ -1839,6 +1877,7 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
         M1MatrixKokkos2D out_inel = ComputeNMSIntegrand(
             quad_2d, s_nms, my_grey_opacity_params, stim_abs);
         GaussLegendreIntegrate2DMatrixForNMS(quad_2d, &out_inel, s_nms,
+                                              umin, umax, vmax,
                                               &n_nms_2d, &e_nms_2d);
     }
 
@@ -2270,8 +2309,22 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
 {
     constexpr BS_REAL zero    = 0;
     constexpr BS_REAL one     = 1;
+    constexpr BS_REAL two_over_three = 2. / 3.;
     constexpr BS_REAL four_pi = 4 * kBS_Pi;
     constexpr BS_REAL c_light = kBS_Clight;
+    BS_REAL wmin, wmax;
+
+    // Extremals for NMS integration
+    if (my_grey_opacity_params->opacity_pars.NMS_implementation == NMS_KernelInterp)
+    {
+        wmin = NMS_w_min;
+        wmax = NMS_w_max;
+    }
+    else if (my_grey_opacity_params->opacity_pars.NMS_implementation == NMS_SemiAnalytical)
+    {
+        wmin = NMSParams_w_min;
+        wmax = NMSParams_w_max;
+    }
 
     my_grey_opacity_params->kernel_pars.pair_kernel_params.omega      = nu;
     my_grey_opacity_params->kernel_pars.brem_kernel_params.omega      = nu;
@@ -2309,9 +2362,7 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
         // s[i] = 1.5 * my_grey_opacity_params->eos_pars.temp;
         s_pair[i] = temp_multiple * my_grey_opacity_params->eos_pars.temp;
         s_neps[i] = nu;
-
-        //@TODO: take values directly from the grid boundaries (not hard-coded)
-        s_nms[i] = std::max(3.0, std::min(nu, 200.0));
+        s_nms[i] = std::max(3. * wmin, std::min(nu, two_over_three * wmax));
 
         // s[i] = my_grey_opacity_params->eos_pars.temp;
         // s[i] = 2.425E-03 * my_grey_opacity_params->eos_pars.temp;
@@ -2340,7 +2391,7 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
         local_grey_params.opacity_flags.use_inelastic_NMS = 1;
         integrand_m1_1d.params = &local_grey_params;
         integrals_nms_1d =
-            MuonReactionsGaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s_nms);
+            MuonReactionsGaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s_nms, wmin, wmax);
     }
 
     MyOpacity abs_em_beta = {0};

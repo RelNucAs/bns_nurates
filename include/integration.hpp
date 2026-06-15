@@ -548,7 +548,7 @@ GaussLegendreIntegrate1D(MyQuadrature* quad, MyFunctionMultiD* func, BS_REAL* t)
 
 /* Perform 1d integration of multiple functions using a Gauss-Legendre
  * quadrature, FOR MUON REACTIONS.
- * We interpolate a grid with fixed boundaries, from 1 to 300 MeV.
+ * We interpolate a grid with fixed boundaries, from 1(wmin) to 300 or 259(wmax) MeV.
  *
  * quad:    must be a properly populated quadrature (upto 2d)
  * func:    the function(s) to be integrated
@@ -557,7 +557,7 @@ GaussLegendreIntegrate1D(MyQuadrature* quad, MyFunctionMultiD* func, BS_REAL* t)
 KOKKOS_INLINE_FUNCTION
 MyQuadratureIntegrand
 MuonReactionsGaussLegendreIntegrate1D(MyQuadrature* quad, 
-                        MyFunctionMultiD* func, BS_REAL* t)
+                        MyFunctionMultiD* func, BS_REAL* t, BS_REAL wmin, BS_REAL wmax)
 {
 
     int num_integrands = func->my_quadrature_integrand.n;
@@ -575,18 +575,18 @@ MuonReactionsGaussLegendreIntegrate1D(MyQuadrature* quad,
         for (int i = 0; i < quad->nx; ++i)
         {
 
-            var[0]                        = 1. + (t[k] - 1.) * quad->points[i];      // 1 + (t-1)x 
+            var[0]                        = wmin + (t[k] - wmin) * quad->points[i];      // 1 + (t-1)x 
             MyQuadratureIntegrand f1_vals = func->function(var, func->params);
             f1_x[k][i]                    = f1_vals.integrand[k];                    // G(1 + (t-1)x)
 
-            var[0]                        = t[k] + (300. - t[k]) * quad->points[i];  // t + (300-t)x
+            var[0]                        = t[k] + (wmax - t[k]) * quad->points[i];  // t + (300-t)x
             MyQuadratureIntegrand f2_vals = func->function(var, func->params);
             f2_x[k][i] = f2_vals.integrand[k];                                       // G(t + (300-t)x)
         }
 
         result.integrand[k] =
-            (t[k] - 1.) * DoIntegration(quad->nx, quad->w, f1_x[k]) +
-                (300. - t[k]) * DoIntegration(quad->nx, quad->w, f2_x[k]);  
+            (t[k] - wmin) * DoIntegration(quad->nx, quad->w, f1_x[k]) +
+                (wmax - t[k]) * DoIntegration(quad->nx, quad->w, f2_x[k]);  
         //(t-1) * G(1+(t-1)x) + (300-t) * G(t+(300-t)x) 
     }
 
@@ -733,6 +733,7 @@ void GaussLegendreIntegrate2DMatrixForM1Coeffs(const MyQuadrature* quad,
     return;
 }
 
+
 KOKKOS_INLINE_FUNCTION
 void GaussLegendreIntegrate2DMatrixForNEPS(const MyQuadrature* quad,
                                            const M1MatrixKokkos2D* mat,
@@ -816,11 +817,12 @@ void GaussLegendreIntegrate2DMatrixForNEPS(const MyQuadrature* quad,
     return;
 }
 
-//@TODO: Modify this to handle double integration within [1, 300]
+
 KOKKOS_INLINE_FUNCTION
 void GaussLegendreIntegrate2DMatrixForNMS(const MyQuadrature* quad,
                                            const M1MatrixKokkos2D* mat,
-                                           BS_REAL t,
+                                           BS_REAL t, BS_REAL umin,
+                                           BS_REAL umax, BS_REAL vmax,
                                            MyQuadratureIntegrand* result_1,
                                            MyQuadratureIntegrand* result_2)
 {
@@ -846,13 +848,12 @@ void GaussLegendreIntegrate2DMatrixForNMS(const MyQuadrature* quad,
             x_i  = quad->points[i];
             w_i  = quad->w[i];
 
-            // @TODO: compute numbers from grid boundaries (not hardcoded)
-            u1 = 2. + (t - 2.) * x_i;
-            u2 = t + (600. - t) * x_i;
-            min1 = std::min(u1, 299.);
-            min2 = std::min(u2, 299.);
-            prefactor1 = (t - 2.) * min1;
-            prefactor2 = (600. - t) * min2;
+            u1 = umin + (t - umin) * x_i;
+            u2 = t + (umax - t) * x_i;
+            min1 = std::min(u1, vmax);
+            min2 = std::min(u2, vmax);
+            prefactor1 = (t - umin) * min1;
+            prefactor2 = (umax - t) * min2;
 
             for (int j = 0; j < n; ++j)
             {

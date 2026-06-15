@@ -53,8 +53,6 @@ struct NMS_Parameters{
 KOKKOS_INLINE_FUNCTION
 NMS_Parameters NMS_parameters_interpolator(const BS_REAL T, const BS_REAL mu, const BS_REAL w)
 {
-    constexpr BS_REAL one = 1;
-
     NMS_Parameters parameters = {0};
 
     int i_nearest, j_nearest, k_nearest;
