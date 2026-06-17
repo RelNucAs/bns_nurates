@@ -112,7 +112,7 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
 
             g_nu = TotalNuF(nu, &grey_pars->distr_pars, id_nue);
 
-            abs_em_beta = StimAbsOpacity(nu, &grey_pars->opacity_pars,
+            abs_em_beta = ElStimAbsOpacity(nu, &grey_pars->opacity_pars,
                                          &grey_pars->eos_pars); // [s^-1]
 
 
@@ -129,7 +129,7 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
             nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anue);
 
-            abs_em_beta = StimAbsOpacity(nu, &grey_pars->opacity_pars,
+            abs_em_beta = ElStimAbsOpacity(nu, &grey_pars->opacity_pars,
                                          &grey_pars->eos_pars); // [s^-1]
 
             out_em[id_anue][i] = nu_sqr * abs_em_beta.em[id_anue];
@@ -145,7 +145,7 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
             nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_nue);
 
-            abs_em_beta = StimAbsOpacity(nu, &grey_pars->opacity_pars,
+            abs_em_beta = ElStimAbsOpacity(nu, &grey_pars->opacity_pars,
                                          &grey_pars->eos_pars); // [s^-1]
 
             out_em[id_nue][n + i] = nu_sqr * abs_em_beta.em[id_nue];
@@ -161,7 +161,7 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
             nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anue);
 
-            abs_em_beta = StimAbsOpacity(nu, &grey_pars->opacity_pars,
+            abs_em_beta = ElStimAbsOpacity(nu, &grey_pars->opacity_pars,
                                          &grey_pars->eos_pars); // [s^-1]
 
             out_em[id_anue][n + i] = nu_sqr * abs_em_beta.em[id_anue];
@@ -182,7 +182,7 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
             nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_nue);
 
-            abs_em_beta = AbsOpacity(nu, &grey_pars->opacity_pars,
+            abs_em_beta = ElAbsOpacity(nu, &grey_pars->opacity_pars,
                                      &grey_pars->eos_pars); // [s^-1]
 
 
@@ -197,7 +197,7 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
             nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anue);
 
-            abs_em_beta = AbsOpacity(nu, &grey_pars->opacity_pars,
+            abs_em_beta = ElAbsOpacity(nu, &grey_pars->opacity_pars,
                                      &grey_pars->eos_pars); // [s^-1]
 
             out_em[id_anue][i] = nu_sqr * abs_em_beta.em[id_anue];
@@ -211,7 +211,7 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
             nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_nue);
 
-            abs_em_beta = AbsOpacity(nu, &grey_pars->opacity_pars,
+            abs_em_beta = ElAbsOpacity(nu, &grey_pars->opacity_pars,
                                      &grey_pars->eos_pars); // [s^-1]
 
             out_em[id_nue][n + i] = nu_sqr * abs_em_beta.em[id_nue];
@@ -225,7 +225,7 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
             nu_sqr = POW2(nu);
             g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anue);
 
-            abs_em_beta = AbsOpacity(nu, &grey_pars->opacity_pars,
+            abs_em_beta = ElAbsOpacity(nu, &grey_pars->opacity_pars,
                                      &grey_pars->eos_pars); // [s^-1]
 
             out_em[id_anue][n + i] = nu_sqr * abs_em_beta.em[id_anue];
@@ -250,7 +250,7 @@ void AddBetaReactionToIntegrand(int n, BS_REAL* nu_array,
         {
             nu = nu_array[i];
 
-            abs_em_beta = StimAbsOpacity(nu, &grey_pars->opacity_pars,
+            abs_em_beta = ElStimAbsOpacity(nu, &grey_pars->opacity_pars,
                                          &grey_pars->eos_pars); // [s^-1]
 
             for (int j = 0; i < 2 * n; ++j)
@@ -270,7 +270,7 @@ void AddBetaReactionToIntegrand(int n, BS_REAL* nu_array,
         {
             nu = nu_array[i];
 
-            abs_em_beta = AbsOpacity(nu, &grey_pars->opacity_pars,
+            abs_em_beta = ElAbsOpacity(nu, &grey_pars->opacity_pars,
                                      &grey_pars->eos_pars); // [s^-1]
 
             for (int j = 0; i < 2 * n; ++j)
@@ -2397,7 +2397,14 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
     MyOpacity abs_em_beta = {0};
     if (my_grey_opacity_params->opacity_flags.use_abs_em)
     {
-        abs_em_beta = AbsOpacity(nu, &my_grey_opacity_params->opacity_pars,
+        abs_em_beta = ElAbsOpacity(nu, &my_grey_opacity_params->opacity_pars,
+                                 &my_grey_opacity_params->eos_pars); // [s^-1]
+    }
+
+    MyOpacity abs_em_muonic_beta = {0};
+    if (my_grey_opacity_params->opacity_flags.use_muonic_beta)
+    {
+        abs_em_muonic_beta = MuonAbsOpacity(nu, &my_grey_opacity_params->opacity_pars,
                                  &my_grey_opacity_params->eos_pars); // [s^-1]
     }
 
@@ -2407,7 +2414,6 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
         iso_scatt = IsoScattLegCoeff(nu, &my_grey_opacity_params->opacity_pars,
                                      &my_grey_opacity_params->eos_pars, 0);
     }
-
 
     SpectralOpacities sp_opacities;
 
@@ -2419,11 +2425,11 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
                               kBS_FourPi_hc3 * (integrals_pair_1d.integrand[1] +
                                                 integrals_neps_1d.integrand[1] +
                                                 integrals_nms_1d.integrand[1]);
-    sp_opacities.j[id_nux]  = abs_em_beta.em[id_nux] +
+    sp_opacities.j[id_nux]  = abs_em_muonic_beta.em[id_nux] +
                               kBS_FourPi_hc3 * (integrals_pair_1d.integrand[2] +
                                                 integrals_neps_1d.integrand[2] +
                                                 integrals_nms_1d.integrand[2]);
-    sp_opacities.j[id_anux] = abs_em_beta.em[id_anux] +
+    sp_opacities.j[id_anux] = abs_em_muonic_beta.em[id_anux] +
                               kBS_FourPi_hc3 * (integrals_pair_1d.integrand[3] +
                                                 integrals_neps_1d.integrand[3] +
                                                 integrals_nms_1d.integrand[3]);
@@ -2441,13 +2447,13 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
                            integrals_nms_1d.integrand[5])) /
         c_light;
     sp_opacities.kappa[id_nux] =
-        (abs_em_beta.abs[id_nux] +
+        (abs_em_muonic_beta.abs[id_nux] +
          kBS_FourPi_hc3 * (integrals_pair_1d.integrand[6] +
                            integrals_neps_1d.integrand[6] +
                            integrals_nms_1d.integrand[6])) /
         c_light;
     sp_opacities.kappa[id_anux] =
-        (abs_em_beta.abs[id_anux] +
+        (abs_em_muonic_beta.abs[id_anux] +
          kBS_FourPi_hc3 * (integrals_pair_1d.integrand[7] +
                            integrals_neps_1d.integrand[7] +
                            integrals_nms_1d.integrand[7])) /

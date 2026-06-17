@@ -429,22 +429,25 @@ struct OpacityFlags
     int use_inelastic_NEPS;
     int use_inelastic_NMS;
     int use_iso;
+    int use_muonic_beta;
 };
 typedef struct OpacityFlags OpacityFlags;
 __attribute__((unused)) static OpacityFlags opacity_flags_default_all = {
     .use_abs_em          = 1,
     .use_pair            = 1,
     .use_brem            = 1,
-    .use_inelastic_NEPS = 1,
-    .use_inelastic_NMS = 1,
-    .use_iso             = 1};
+    .use_inelastic_NEPS  = 1,
+    .use_inelastic_NMS   = 1,
+    .use_iso             = 1,
+    .use_muonic_beta     = 1};
 __attribute__((unused)) static OpacityFlags opacity_flags_default_none = {
     .use_abs_em          = 0,
     .use_pair            = 0,
     .use_brem            = 0,
-    .use_inelastic_NEPS = 0,
-    .use_inelastic_NMS = 0,
-    .use_iso             = 0};
+    .use_inelastic_NEPS  = 0,
+    .use_inelastic_NMS   = 0,
+    .use_iso             = 0,
+    .use_muonic_beta     = 0};
 
 /* GreyOpacityParams struct
  *

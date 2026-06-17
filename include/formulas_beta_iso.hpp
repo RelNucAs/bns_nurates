@@ -279,17 +279,19 @@ void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
 }
 
 /* Compute the absortivity and inverse mean free path
+ * (electron case)
  *
  * Outputs:
  *      em_nue = j_nu [s^-1] for nue
  *      ab_nue = 1/lambda_nu [s^-1] for nue
  *      em_anue = j_nu [s^-1] for anue
  *      ab_anue = 1/lambda_nu [s^-1] for anue
+ * 
+ * @TODO: add two more neutrino flavors
  *
- * @TODO: add support for muons
  */
 KOKKOS_INLINE_FUNCTION
-MyOpacity AbsOpacity(const BS_REAL omega, OpacityParams* opacity_pars,
+MyOpacity ElAbsOpacity(const BS_REAL omega, OpacityParams* opacity_pars,
                      MyEOSParams* eos_pars)
 {
     MyOpacity MyOut = {0}; // initialize to zero
@@ -298,47 +300,91 @@ MyOpacity AbsOpacity(const BS_REAL omega, OpacityParams* opacity_pars,
     BS_REAL el_out[4] = {0.0};
     AbsOpacitySingleLep(omega, opacity_pars, eos_pars, kBS_Me, eos_pars->mu_e,
                         el_out);
-
     MyOut.abs[id_nue]  = el_out[0];
     MyOut.em[id_nue]   = el_out[1];
     MyOut.abs[id_anue] = el_out[2];
     MyOut.em[id_anue]  = el_out[3];
 
-    // Uncomment the following when considering also muons
-    // // Muon (anti)neutrino
-    // BS_REAL mu_out[4] = {0.0};
-    // AbsOpacitySingleLep(omega, opacity_pars, eos_pars, kBS_Mmu,
-    // eos_pars->mu_mu, mu_out);
+    return MyOut;
+}
 
-    // MyOut.abs[id_num] = mu_out[0];
-    // MyOut.em[id_num] = mu_out[1];
-    // MyOut.abs[id_anum] = mu_out[2];
-    // MyOut.em[id_anum] = mu_out[3];
+
+/* Compute the absortivity and inverse mean free path
+ * (muon case)
+ *
+ * Outputs:
+ *      em_num = j_nu [s^-1] for numu
+ *      ab_num = 1/lambda_nu [s^-1] for numu
+ *      em_anum = j_nu [s^-1] for anumu
+ *      ab_anum = 1/lambda_nu [s^-1] for anumu
+ * 
+ * @TODO: add two neutrino flavors and change (a)nux --> (a)numu
+ *
+ */
+KOKKOS_INLINE_FUNCTION
+MyOpacity MuonAbsOpacity(const BS_REAL omega, OpacityParams* opacity_pars,
+                     MyEOSParams* eos_pars)
+{
+    MyOpacity MyOut = {0}; // initialize to zero
+
+    // Muon (anti)neutrino
+    BS_REAL mu_out[4] = {0.0};
+    AbsOpacitySingleLep(omega, opacity_pars, eos_pars, kBS_Mmu,
+                        eos_pars->mu_mu, mu_out);
+    MyOut.abs[id_nux] = mu_out[0];
+    MyOut.em[id_nux] = mu_out[1];
+    MyOut.abs[id_anux] = mu_out[2];
+    MyOut.em[id_anux] = mu_out[3];
 
     return MyOut;
 }
 
-/* Compute the stimulated absorption opacities
+
+/* Compute the stimulated absorption opacities (electron case)
  *
  * For all species:
  *      em_nu = j_nu [s^-1]
  *      ab_nu = j_nu + 1/lambda_nu [s^-1]
  *
  * Both opacities are energy dependent
- * @TODO: add support for muons
  */
 KOKKOS_INLINE_FUNCTION
-MyOpacity StimAbsOpacity(const BS_REAL omega, OpacityParams* opacity_pars,
+MyOpacity ElStimAbsOpacity(const BS_REAL omega, OpacityParams* opacity_pars,
                          MyEOSParams* eos_pars)
 {
-    MyOpacity abs_opacity = AbsOpacity(omega, opacity_pars, eos_pars);
+    MyOpacity abs_opacity = ElAbsOpacity(omega, opacity_pars, eos_pars);
 
     abs_opacity.abs[id_nue] = abs_opacity.abs[id_nue] + abs_opacity.em[id_nue];
-    abs_opacity.abs[id_anue] =
-        abs_opacity.abs[id_anue] + abs_opacity.em[id_anue];
+    abs_opacity.abs[id_anue] = abs_opacity.abs[id_anue] + abs_opacity.em[id_anue];
+    abs_opacity.abs[id_nux] = abs_opacity.abs[id_nux] + abs_opacity.em[id_nux];
+    abs_opacity.abs[id_anux] = abs_opacity.abs[id_anux] + abs_opacity.em[id_anux];
 
     return abs_opacity;
 }
+
+
+/* Compute the stimulated absorption opacities (muon case)
+ *
+ * For all species:
+ *      em_nu = j_nu [s^-1]
+ *      ab_nu = j_nu + 1/lambda_nu [s^-1]
+ *
+ * Both opacities are energy dependent
+ */
+KOKKOS_INLINE_FUNCTION
+MyOpacity MuonStimAbsOpacity(const BS_REAL omega, OpacityParams* opacity_pars,
+                         MyEOSParams* eos_pars)
+{
+    MyOpacity abs_opacity = MuonAbsOpacity(omega, opacity_pars, eos_pars);
+
+    abs_opacity.abs[id_nue] = abs_opacity.abs[id_nue] + abs_opacity.em[id_nue];
+    abs_opacity.abs[id_anue] = abs_opacity.abs[id_anue] + abs_opacity.em[id_anue];
+    abs_opacity.abs[id_nux] = abs_opacity.abs[id_nux] + abs_opacity.em[id_nux];
+    abs_opacity.abs[id_anux] = abs_opacity.abs[id_anux] + abs_opacity.em[id_anux];
+
+    return abs_opacity;
+}
+
 
 /*===========================================================================*/
 
