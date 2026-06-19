@@ -1057,6 +1057,299 @@ M1MatrixKokkos2D ComputeNEPSIntegrand(const MyQuadrature* quad, BS_REAL t,
 }
 
 
+// ===========================================================================
+// FUSED 2D integrals (no materialized M1MatrixKokkos2D)
+//
+// The original code path computes a full [species][2n][2n] matrix
+// (M1MatrixKokkos2D, 25.6 KB) on the stack via ComputeDoubleIntegrand /
+// ComputeNEPSIntegrand, then reduces it with GaussLegendreIntegrate2DMatrix*.
+// With one GPU thread per cell that 25.6 KB (x2: pair + NEPS) lives in local
+// memory -> register spill -> near-zero occupancy.
+//
+// The functions below FUSE the fill and the reduction: every matrix entry is
+// weighted and immediately accumulated into the ~16 running integrand values,
+// so the big matrix is never stored.  Results are identical (to round-off) to
+// ComputeDoubleIntegrand + GaussLegendreIntegrate2DMatrixForM1Coeffs and
+// ComputeNEPSIntegrand + GaussLegendreIntegrate2DMatrixForNEPS, but each cell's
+// working set is a handful of registers, restoring full occupancy while keeping
+// the simple one-thread-per-cell parallelism.
+// ===========================================================================
+
+// Fused pair+brem double integral.  Equivalent to:
+//   M1MatrixKokkos2D m = ComputeDoubleIntegrand(quad, t, gop, stim_abs);
+//   GaussLegendreIntegrate2DMatrixForM1Coeffs(quad, &m, t, n2d, e2d);
+// (accumulates into *n2d, *e2d which the caller initialised to zero).
+KOKKOS_INLINE_FUNCTION
+void AddPairBremDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
+                                    GreyOpacityParams* gop, const int stim_abs,
+                                    MyQuadratureIntegrand* n2d,
+                                    MyQuadratureIntegrand* e2d)
+{
+    constexpr BS_REAL one  = 1;
+    const int n  = quad->nx;
+    const int N2 = 2 * n;
+
+    const bool use_pair         = (gop->opacity_flags.use_pair == 1);
+    const bool use_brem         = (gop->opacity_flags.use_brem == 1);
+    const bool neglect_blocking = gop->opacity_pars.neglect_blocking;
+    const BremImpl brem_impl    = gop->opacity_pars.brem_implementation;
+    // blocking partner: nue<->anue, nux<->anux
+    const int pair_partner[total_num_species] = {id_anue, id_nue, id_anux, id_nux};
+
+    BS_REAL acc_n_em[total_num_species] = {0}, acc_n_ab[total_num_species] = {0};
+    BS_REAL acc_e_em[total_num_species] = {0}, acc_e_ab[total_num_species] = {0};
+
+    for (int a = 0; a < N2; ++a)
+    {
+        const int    ia    = (a < n) ? a : a - n;
+        const BS_REAL x_a  = quad->points[ia];
+        const BS_REAL nu_a = (a < n) ? t * x_a : t / x_a;
+        const BS_REAL Jac_a = (a < n) ? one : one / (x_a * x_a);
+        const BS_REAL w_a  = quad->w[ia];
+
+        BS_REAL g_a[total_num_species], bf_a[total_num_species];
+        for (int s = 0; s < total_num_species; ++s)
+        {
+            g_a[s]  = TotalNuF(nu_a, &gop->distr_pars, s);
+            bf_a[s] = neglect_blocking ? one : (one - g_a[s]);
+        }
+
+        for (int b = a; b < N2; ++b)
+        {
+            const int    ib    = (b < n) ? b : b - n;
+            const BS_REAL x_b  = quad->points[ib];
+            const BS_REAL nu_b = (b < n) ? t * x_b : t / x_b;
+            const BS_REAL Jac_b = (b < n) ? one : one / (x_b * x_b);
+            const BS_REAL w_b  = quad->w[ib];
+
+            const BS_REAL nu_fourth = (nu_a * nu_a) * (nu_b * nu_b);
+            const BS_REAL wJ        = w_a * w_b * Jac_a * Jac_b;
+
+            BS_REAL g_b[total_num_species], bf_b[total_num_species];
+            for (int s = 0; s < total_num_species; ++s)
+            {
+                g_b[s]  = TotalNuF(nu_b, &gop->distr_pars, s);
+                bf_b[s] = neglect_blocking ? one : (one - g_b[s]);
+            }
+
+            // Raw (unweighted) kernels for entry [a][b] and its transpose [b][a]
+            BS_REAL em_ab[total_num_species] = {0}, ab_ab[total_num_species] = {0};
+            BS_REAL em_ba[total_num_species] = {0}, ab_ba[total_num_species] = {0};
+
+            if (use_pair)
+            {
+                gop->kernel_pars.pair_kernel_params.cos_theta = one;
+                gop->kernel_pars.pair_kernel_params.filter    = 0;
+                gop->kernel_pars.pair_kernel_params.lmax      = 0;
+                gop->kernel_pars.pair_kernel_params.mu        = one;
+                gop->kernel_pars.pair_kernel_params.mu_prime  = one;
+                gop->kernel_pars.pair_kernel_params.omega       = nu_a;
+                gop->kernel_pars.pair_kernel_params.omega_prime = nu_b;
+                MyKernelOutput pair_1, pair_2;
+                PairKernels(&gop->eos_pars, &gop->kernel_pars.pair_kernel_params,
+                            &pair_1, &pair_2);
+                for (int s = 0; s < total_num_species; ++s)
+                {
+                    em_ab[s] += pair_1.em[s];  ab_ab[s] += pair_1.abs[s];
+                    if (a != b) { em_ba[s] += pair_2.em[s]; ab_ba[s] += pair_2.abs[s]; }
+                }
+            }
+            if (use_brem)
+            {
+                gop->kernel_pars.brem_kernel_params.omega       = nu_a;
+                gop->kernel_pars.brem_kernel_params.omega_prime = nu_b;
+                MyKernelOutput brem_ker;
+                if (brem_impl == BREM_BRT06)
+                {
+                    brem_ker = BremKernelsBRT06(&gop->kernel_pars.brem_kernel_params,
+                                                &gop->eos_pars);
+                }
+                else
+                {
+                    gop->kernel_pars.brem_kernel_params.l = 0;
+                    gop->kernel_pars.brem_kernel_params.use_NN_medium_corr =
+                        gop->opacity_pars.use_NN_medium_corr;
+                    brem_ker = BremKernelsLegCoeff(&gop->kernel_pars.brem_kernel_params,
+                                                   &gop->eos_pars);
+                }
+                for (int s = 0; s < total_num_species; ++s)
+                {
+                    em_ab[s] += brem_ker.em[0];  ab_ab[s] += brem_ker.abs[0];
+                    if (a != b) { em_ba[s] += brem_ker.em[0]; ab_ba[s] += brem_ker.abs[0]; }
+                }
+            }
+
+            // Weight (block factors + nu^4) and accumulate into the integrals.
+            // n-contribution = wJ * value ; e-contribution = wJ * value * nu_row
+            for (int s = 0; s < total_num_species; ++s)
+            {
+                const int pp = pair_partner[s];
+                BS_REAL em_w, ab_w;
+                // entry [a][b]: row = a (energy nu_a), col = b (energy nu_b)
+                if (stim_abs == 1)
+                {
+                    em_w = nu_fourth * em_ab[s] * bf_b[pp];
+                    ab_w = nu_fourth * g_a[s] * (em_ab[s] * bf_b[pp] + ab_ab[s] * g_b[pp]);
+                }
+                else
+                {
+                    em_w = nu_fourth * (one - g_a[s]) * em_ab[s] * bf_b[pp];
+                    ab_w = nu_fourth * g_a[s] * ab_ab[s] * g_b[pp];
+                }
+                acc_n_em[s] += wJ * em_w;          acc_n_ab[s] += wJ * ab_w;
+                acc_e_em[s] += wJ * em_w * nu_a;    acc_e_ab[s] += wJ * ab_w * nu_a;
+
+                if (a != b)
+                {
+                    // entry [b][a]: row = b (energy nu_b), col = a (energy nu_a)
+                    if (stim_abs == 1)
+                    {
+                        em_w = nu_fourth * em_ba[s] * bf_a[pp];
+                        ab_w = nu_fourth * g_b[s] * (em_ba[s] * bf_a[pp] + ab_ba[s] * g_a[pp]);
+                    }
+                    else
+                    {
+                        em_w = nu_fourth * (one - g_b[s]) * em_ba[s] * bf_a[pp];
+                        ab_w = nu_fourth * g_b[s] * ab_ba[s] * g_a[pp];
+                    }
+                    acc_n_em[s] += wJ * em_w;          acc_n_ab[s] += wJ * ab_w;
+                    acc_e_em[s] += wJ * em_w * nu_b;    acc_e_ab[s] += wJ * ab_w * nu_b;
+                }
+            }
+        }
+    }
+
+    const BS_REAL t_sqr = t * t;
+    for (int s = 0; s < total_num_species; ++s)
+    {
+        n2d->integrand[0 + s]                 += acc_n_em[s] * t_sqr;
+        n2d->integrand[total_num_species + s] += acc_n_ab[s] * t_sqr;
+        e2d->integrand[0 + s]                 += acc_e_em[s] * t_sqr;
+        e2d->integrand[total_num_species + s] += acc_e_ab[s] * t_sqr;
+    }
+}
+
+// Helper: weighted NEPS kernel values for one (nu, nu_bar) energy pair.
+// Fills the "[.][j]" cell (em_j/ab_j) and the "[.][n+j]" cell (em_nj/ab_nj),
+// matching the inner body of ComputeNEPSIntegrand.
+KOKKOS_INLINE_FUNCTION
+void NEPSCellFused(GreyOpacityParams* gop, BS_REAL nu, BS_REAL nu_bar,
+                   const int stim_abs, const bool neglect_blocking,
+                   BS_REAL em_j[total_num_species],  BS_REAL ab_j[total_num_species],
+                   BS_REAL em_nj[total_num_species], BS_REAL ab_nj[total_num_species])
+{
+    constexpr BS_REAL one = 1;
+    const BS_REAL nu_fourth = (nu * nu) * (nu_bar * nu_bar);
+
+    BS_REAL g_nu[total_num_species], g_nb[total_num_species];
+    for (int s = 0; s < total_num_species; ++s)
+    {
+        g_nu[s] = TotalNuF(nu,     &gop->distr_pars, s);
+        g_nb[s] = TotalNuF(nu_bar, &gop->distr_pars, s);
+    }
+
+    gop->kernel_pars.inelastic_kernel_params.omega       = nu;
+    gop->kernel_pars.inelastic_kernel_params.omega_prime = nu_bar;
+    MyKernelOutput inel_1 =
+        InelasticScattKernels(&gop->kernel_pars.inelastic_kernel_params, &gop->eos_pars);
+    gop->kernel_pars.inelastic_kernel_params.omega       = nu_bar;
+    gop->kernel_pars.inelastic_kernel_params.omega_prime = nu;
+    MyKernelOutput inel_2 =
+        InelasticScattKernels(&gop->kernel_pars.inelastic_kernel_params, &gop->eos_pars);
+
+    for (int s = 0; s < total_num_species; ++s)
+    {
+        const BS_REAL bf_nu = neglect_blocking ? one : (one - g_nu[s]);
+        const BS_REAL bf_nb = neglect_blocking ? one : (one - g_nb[s]);
+        const BS_REAL te1 = inel_1.em[s]  * g_nb[s];
+        const BS_REAL ta1 = inel_1.abs[s] * bf_nb;
+        const BS_REAL te2 = inel_2.em[s]  * g_nu[s];
+        const BS_REAL ta2 = inel_2.abs[s] * bf_nu;
+        if (stim_abs == 1)
+        {
+            ab_j[s]  = nu_fourth * g_nu[s] * (te1 + ta1);
+            em_j[s]  = nu_fourth * te1;
+            ab_nj[s] = nu_fourth * g_nb[s] * (te2 + ta2);
+            em_nj[s] = nu_fourth * te2;
+        }
+        else
+        {
+            ab_j[s]  = nu_fourth * g_nu[s] * ta1;
+            em_j[s]  = nu_fourth * (one - g_nu[s]) * te1;
+            ab_nj[s] = nu_fourth * g_nb[s] * ta2;
+            em_nj[s] = nu_fourth * (one - g_nb[s]) * te2;
+        }
+    }
+}
+
+// Fused inelastic-scattering (NEPS) double integral.  Equivalent to:
+//   M1MatrixKokkos2D m = ComputeNEPSIntegrand(quad, t, gop, stim_abs);
+//   GaussLegendreIntegrate2DMatrixForNEPS(quad, &m, t, n2d, e2d);
+KOKKOS_INLINE_FUNCTION
+void AddNEPSDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
+                                GreyOpacityParams* gop, const int stim_abs,
+                                MyQuadratureIntegrand* n2d,
+                                MyQuadratureIntegrand* e2d)
+{
+    constexpr BS_REAL half = 0.5, one = 1;
+    const int n = quad->nx;
+    const bool neglect_blocking = gop->opacity_pars.neglect_blocking;
+
+    BS_REAL acc_n_em[total_num_species] = {0}, acc_n_ab[total_num_species] = {0};
+    BS_REAL acc_e_em[total_num_species] = {0}, acc_e_ab[total_num_species] = {0};
+
+    for (int i = 0; i < n; ++i)
+    {
+        const BS_REAL x_i  = quad->points[i];
+        const BS_REAL w_i  = quad->w[i];
+        const BS_REAL x3_i = x_i * x_i * x_i;
+
+        for (int j = 0; j < n; ++j)
+        {
+            const BS_REAL x_j  = quad->points[j];
+            const BS_REAL w_ij = w_i * quad->w[j];
+
+            // variant 1 -> matrix cells [i][j] and [i][n+j]
+            const BS_REAL nu1 = half * t * x_i * (one - x_j);
+            const BS_REAL nb1 = half * t * x_i * (one + x_j);
+            // variant 2 -> matrix cells [n+i][j] and [n+i][n+j]
+            const BS_REAL nu2 = half * t * (one - x_j) / x_i;
+            const BS_REAL nb2 = half * t * (one + x_j) / x_i;
+
+            BS_REAL em_ij[total_num_species],  ab_ij[total_num_species];
+            BS_REAL em_inj[total_num_species], ab_inj[total_num_species];
+            BS_REAL em_nij[total_num_species], ab_nij[total_num_species];
+            BS_REAL em_ninj[total_num_species],ab_ninj[total_num_species];
+            NEPSCellFused(gop, nu1, nb1, stim_abs, neglect_blocking,
+                          em_ij, ab_ij, em_inj, ab_inj);
+            NEPSCellFused(gop, nu2, nb2, stim_abs, neglect_blocking,
+                          em_nij, ab_nij, em_ninj, ab_ninj);
+
+            for (int s = 0; s < total_num_species; ++s)
+            {
+                acc_n_em[s] += w_ij * (x_i * (em_ij[s] + em_inj[s]) +
+                                       (em_nij[s] + em_ninj[s]) / x3_i);
+                acc_n_ab[s] += w_ij * (x_i * (ab_ij[s] + ab_inj[s]) +
+                                       (ab_nij[s] + ab_ninj[s]) / x3_i);
+                acc_e_em[s] += w_ij * (x_i * (nu1 * em_ij[s] + nb1 * em_inj[s]) +
+                                       (nu2 * em_nij[s] + nb2 * em_ninj[s]) / x3_i);
+                acc_e_ab[s] += w_ij * (x_i * (nu1 * ab_ij[s] + nb1 * ab_inj[s]) +
+                                       (nu2 * ab_nij[s] + nb2 * ab_ninj[s]) / x3_i);
+            }
+        }
+    }
+
+    const BS_REAL half_t_sqr = half * t * t;
+    for (int s = 0; s < total_num_species; ++s)
+    {
+        n2d->integrand[0 + s]                 += acc_n_em[s] * half_t_sqr;
+        n2d->integrand[total_num_species + s] += acc_n_ab[s] * half_t_sqr;
+        e2d->integrand[0 + s]                 += acc_e_em[s] * half_t_sqr;
+        e2d->integrand[total_num_species + s] += acc_e_ab[s] * half_t_sqr;
+    }
+}
+
+
 /* Computes the opacities for the M1 code, with thermal and
  * non-thermal processes treated together.
  *
@@ -1157,10 +1450,9 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     if ((my_grey_opacity_params->opacity_flags.use_pair == 1) ||
         (my_grey_opacity_params->opacity_flags.use_brem == 1))
     {
-        M1MatrixKokkos2D out_pair = ComputeDoubleIntegrand(
-            quad_2d, s_pair, my_grey_opacity_params, stim_abs);
-        GaussLegendreIntegrate2DMatrixForM1Coeffs(
-            quad_2d, &out_pair, s_pair, &n_integrals_2d, &e_integrals_2d);
+        // Fused fill+reduce: no 25.6 KB M1MatrixKokkos2D on the stack.
+        AddPairBremDoubleIntegralFused(quad_2d, s_pair, my_grey_opacity_params,
+                                       stim_abs, &n_integrals_2d, &e_integrals_2d);
     }
 
     MyQuadratureIntegrand n_neps_2d = {0};
@@ -1168,10 +1460,9 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
 
     if (my_grey_opacity_params->opacity_flags.use_inelastic_scatt == 1)
     {
-        M1MatrixKokkos2D out_inel = ComputeNEPSIntegrand(
-            quad_2d, four * s_neps, my_grey_opacity_params, stim_abs);
-        GaussLegendreIntegrate2DMatrixForNEPS(quad_2d, &out_inel, four * s_neps,
-                                              &n_neps_2d, &e_neps_2d);
+        // Fused fill+reduce: no 25.6 KB M1MatrixKokkos2D on the stack.
+        AddNEPSDoubleIntegralFused(quad_2d, four * s_neps, my_grey_opacity_params,
+                                   stim_abs, &n_neps_2d, &e_neps_2d);
     }
 
     M1Opacities m1_opacities = {0};
@@ -1400,10 +1691,9 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     if ((my_grey_opacity_params->opacity_flags.use_pair == 1) ||
         (my_grey_opacity_params->opacity_flags.use_brem == 1))
     {
-        M1MatrixKokkos2D out_pair = ComputeDoubleIntegrand(
-            quad_2d, s_pair, my_grey_opacity_params, stim_abs);
-        GaussLegendreIntegrate2DMatrixForM1Coeffs(
-            quad_2d, &out_pair, s_pair, &n_integrals_2d, &e_integrals_2d);
+        // Fused fill+reduce: no 25.6 KB M1MatrixKokkos2D on the stack.
+        AddPairBremDoubleIntegralFused(quad_2d, s_pair, my_grey_opacity_params,
+                                       stim_abs, &n_integrals_2d, &e_integrals_2d);
     }
 
     MyQuadratureIntegrand n_neps_2d = {0};
@@ -1411,10 +1701,9 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
 
     if (my_grey_opacity_params->opacity_flags.use_inelastic_scatt == 1)
     {
-        M1MatrixKokkos2D out_inel = ComputeNEPSIntegrand(
-            quad_2d, four * s_neps, my_grey_opacity_params, stim_abs);
-        GaussLegendreIntegrate2DMatrixForNEPS(quad_2d, &out_inel, four * s_neps,
-                                              &n_neps_2d, &e_neps_2d);
+        // Fused fill+reduce: no 25.6 KB M1MatrixKokkos2D on the stack.
+        AddNEPSDoubleIntegralFused(quad_2d, four * s_neps, my_grey_opacity_params,
+                                   stim_abs, &n_neps_2d, &e_neps_2d);
     }
 
     M1OpacitiesNonThermalSeparated m1_opacities_non_th_separated = {0};
@@ -1962,4 +2251,559 @@ ComputeSpectralOpacitiesStimulatedAbs(const BS_REAL nu, MyQuadrature* quad_1d,
     return spec_opacs;
 }
 
+
+#ifdef KOKKOS_CORE_HPP
+// ===========================================================================
+// Team-parallel opacity computation (GPU-optimized)
+//
+// One Kokkos team per grid cell. The M1MatrixKokkos2D scratch matrix lives in
+// team shared memory instead of per-thread local memory, eliminating register
+// spill. The 2D quadrature fill loops (pair+brem: 210 iters; NEPS: 100 iters)
+// are distributed over TeamThreadRange. Each thread makes a register-local copy
+// of MyKernelParams to avoid the race on omega/omega_prime. Pair+brem weighting
+// (WeightNuNuBar + CommonWeights) is fused into the fill loop. Serial work
+// (1D integrals, integration sums, assembly) runs via Kokkos::single(PerTeam).
+// ===========================================================================
+
+// Decode flat upper-triangular index (row<=col) for an N-wide matrix.
+KOKKOS_INLINE_FUNCTION
+void DecodeUpperTriIdx(int flat, int N, int &row, int &col) {
+    row = 0;
+    while (flat >= N - row) { flat -= N - row; ++row; }
+    col = row + flat;
+}
+
+// ---------------------------------------------------------------------------
+// ComputeDoubleIntegrandFillTeam
+// Team-parallel version of ComputeDoubleIntegrand().
+// Writes the fused (pair+brem+weight+nu^4) integrand into *mat (scratch).
+// Emits a team_barrier before returning so *mat is visible to all threads.
+// ---------------------------------------------------------------------------
+template <class MemberType>
+KOKKOS_INLINE_FUNCTION
+void ComputeDoubleIntegrandFillTeam(const MemberType &team,
+                                    const MyQuadrature *quad, BS_REAL t,
+                                    GreyOpacityParams *gop,
+                                    M1MatrixKokkos2D *mat,
+                                    const int stim_abs) {
+    const int n    = quad->nx;
+    const int N2   = 2 * n;
+    const int N_tri = N2 * (N2 + 1) / 2; // 210 for n=10
+
+    // Zero scratch matrix (3200 doubles = 25600 bytes)
+    const int mat_n = static_cast<int>(sizeof(M1MatrixKokkos2D) / sizeof(BS_REAL));
+    Kokkos::parallel_for(Kokkos::TeamThreadRange(team, mat_n), [&](const int idx) {
+        reinterpret_cast<BS_REAL *>(mat)[idx] = BS_REAL(0);
+    });
+    team.team_barrier();
+
+    const bool use_pair         = (gop->opacity_flags.use_pair == 1);
+    const bool use_brem         = (gop->opacity_flags.use_brem == 1);
+    const bool neglect_blocking = gop->opacity_pars.neglect_blocking;
+    const BremImpl brem_impl    = gop->opacity_pars.brem_implementation;
+    // pair_partner[s]: partner species for blocking (nue<->anue, nux<->anux)
+    constexpr int pair_partner[4] = {id_anue, id_nue, id_anux, id_nux};
+
+    Kokkos::parallel_for(Kokkos::TeamThreadRange(team, N_tri), [&](const int flat) {
+        int row, col;
+        DecodeUpperTriIdx(flat, N2, row, col);
+
+        const BS_REAL nu_row = (row < n) ? t * quad->points[row]
+                                         : t / quad->points[row - n];
+        const BS_REAL nu_col = (col < n) ? t * quad->points[col]
+                                         : t / quad->points[col - n];
+        const BS_REAL nu_fourth = (nu_row * nu_row) * (nu_col * nu_col);
+
+        // Thread-local copy avoids race on gop->kernel_pars.{pair,brem}_kernel_params.omega
+        MyKernelParams kp = gop->kernel_pars;
+
+        BS_REAL em_rc[total_num_species] = {BS_REAL(0)};
+        BS_REAL ab_rc[total_num_species] = {BS_REAL(0)};
+        BS_REAL em_cr[total_num_species] = {BS_REAL(0)};
+        BS_REAL ab_cr[total_num_species] = {BS_REAL(0)};
+
+        if (use_pair) {
+            kp.pair_kernel_params.cos_theta  = BS_REAL(1);
+            kp.pair_kernel_params.filter     = BS_REAL(0);
+            kp.pair_kernel_params.lmax       = BS_REAL(0);
+            kp.pair_kernel_params.mu         = BS_REAL(1);
+            kp.pair_kernel_params.mu_prime   = BS_REAL(1);
+            kp.pair_kernel_params.omega       = nu_row;
+            kp.pair_kernel_params.omega_prime = nu_col;
+            MyKernelOutput pair_1, pair_2;
+            PairKernels(&gop->eos_pars, &kp.pair_kernel_params, &pair_1, &pair_2);
+            for (int s = 0; s < total_num_species; ++s) {
+                em_rc[s] += pair_1.em[s];
+                ab_rc[s] += pair_1.abs[s];
+                if (row != col) { em_cr[s] += pair_2.em[s]; ab_cr[s] += pair_2.abs[s]; }
+            }
+        }
+
+        if (use_brem) {
+            kp.brem_kernel_params.omega       = nu_row;
+            kp.brem_kernel_params.omega_prime = nu_col;
+            MyKernelOutput brem_ker;
+            if (brem_impl == BREM_BRT06) {
+                brem_ker = BremKernelsBRT06(&kp.brem_kernel_params, &gop->eos_pars);
+            } else {
+                kp.brem_kernel_params.l = 0;
+                kp.brem_kernel_params.use_NN_medium_corr = gop->opacity_pars.use_NN_medium_corr;
+                brem_ker = BremKernelsLegCoeff(&kp.brem_kernel_params, &gop->eos_pars);
+            }
+            for (int s = 0; s < total_num_species; ++s) {
+                em_rc[s] += brem_ker.em[0]; ab_rc[s] += brem_ker.abs[0];
+                if (row != col) { em_cr[s] += brem_ker.em[0]; ab_cr[s] += brem_ker.abs[0]; }
+            }
+        }
+
+        BS_REAL g_row[total_num_species], g_col[total_num_species];
+        BS_REAL bf_row[total_num_species], bf_col[total_num_species];
+        for (int s = 0; s < total_num_species; ++s) {
+            g_row[s]  = TotalNuF(nu_row, &gop->distr_pars, s);
+            g_col[s]  = TotalNuF(nu_col, &gop->distr_pars, s);
+            bf_row[s] = neglect_blocking ? BS_REAL(1) : BS_REAL(1) - g_row[s];
+            bf_col[s] = neglect_blocking ? BS_REAL(1) : BS_REAL(1) - g_col[s];
+        }
+
+        if (row == col) {
+            for (int s = 0; s < total_num_species; ++s) {
+                const int pp = pair_partner[s];
+                const BS_REAL em_w = em_rc[s] * bf_row[pp];
+                const BS_REAL ab_w = ab_rc[s] * g_row[pp];
+                if (stim_abs == 1) {
+                    mat->m1_mat_em[s][row][row] = nu_fourth * em_w;
+                    mat->m1_mat_ab[s][row][row] = nu_fourth * g_row[s] * (em_w + ab_w);
+                } else {
+                    mat->m1_mat_em[s][row][row] = nu_fourth * (BS_REAL(1) - g_row[s]) * em_w;
+                    mat->m1_mat_ab[s][row][row] = nu_fourth * g_row[s] * ab_w;
+                }
+            }
+        } else {
+            for (int s = 0; s < total_num_species; ++s) {
+                const int pp = pair_partner[s];
+                const BS_REAL em_rc_w = em_rc[s] * bf_col[pp];
+                const BS_REAL ab_rc_w = ab_rc[s] * g_col[pp];
+                const BS_REAL em_cr_w = em_cr[s] * bf_row[pp];
+                const BS_REAL ab_cr_w = ab_cr[s] * g_row[pp];
+                if (stim_abs == 1) {
+                    mat->m1_mat_em[s][row][col] = nu_fourth * em_rc_w;
+                    mat->m1_mat_ab[s][row][col] = nu_fourth * g_row[s] * (em_rc_w + ab_rc_w);
+                    mat->m1_mat_em[s][col][row] = nu_fourth * em_cr_w;
+                    mat->m1_mat_ab[s][col][row] = nu_fourth * g_col[s] * (em_cr_w + ab_cr_w);
+                } else {
+                    mat->m1_mat_em[s][row][col] = nu_fourth * (BS_REAL(1)-g_row[s]) * em_rc_w;
+                    mat->m1_mat_ab[s][row][col] = nu_fourth * g_row[s] * ab_rc_w;
+                    mat->m1_mat_em[s][col][row] = nu_fourth * (BS_REAL(1)-g_col[s]) * em_cr_w;
+                    mat->m1_mat_ab[s][col][row] = nu_fourth * g_col[s] * ab_cr_w;
+                }
+            }
+        }
+    });
+    team.team_barrier();
+}
+
+// ---------------------------------------------------------------------------
+// ComputeNEPSIntegrandFillTeam
+// Team-parallel version of ComputeNEPSIntegrand().
+// For each (i,j) in [0,n)x[0,n) two (nu,nu_bar) variants are computed,
+// each writing to two unique matrix entries — all 4n^2 writes are race-free.
+// ---------------------------------------------------------------------------
+template <class MemberType>
+KOKKOS_INLINE_FUNCTION
+void ComputeNEPSIntegrandFillTeam(const MemberType &team,
+                                   const MyQuadrature *quad, BS_REAL t,
+                                   GreyOpacityParams *gop,
+                                   M1MatrixKokkos2D *mat,
+                                   const int stim_abs) {
+    const int n    = quad->nx;
+    const int N_sq = n * n;
+    constexpr BS_REAL half = BS_REAL(0.5);
+    constexpr BS_REAL one  = BS_REAL(1);
+
+    const int mat_n = static_cast<int>(sizeof(M1MatrixKokkos2D) / sizeof(BS_REAL));
+    Kokkos::parallel_for(Kokkos::TeamThreadRange(team, mat_n), [&](const int idx) {
+        reinterpret_cast<BS_REAL *>(mat)[idx] = BS_REAL(0);
+    });
+    team.team_barrier();
+
+    const bool neglect_blocking = gop->opacity_pars.neglect_blocking;
+
+    Kokkos::parallel_for(Kokkos::TeamThreadRange(team, N_sq), [&](const int flat) {
+        const int i    = flat / n;
+        const int j    = flat % n;
+        const BS_REAL x_i = quad->points[i];
+        const BS_REAL x_j = quad->points[j];
+        MyKernelParams kp = gop->kernel_pars;
+
+        // Variant 1: nu ~ x_i  → writes [i][j] and [i][n+j]
+        {
+            const BS_REAL nu     = half * t * x_i * (one - x_j);
+            const BS_REAL nu_bar = half * t * x_i * (one + x_j);
+            const BS_REAL nf     = (nu * nu) * (nu_bar * nu_bar);
+            BS_REAL g_nu[total_num_species], g_nb[total_num_species];
+            BS_REAL bf_nu[total_num_species], bf_nb[total_num_species];
+            for (int s = 0; s < total_num_species; ++s) {
+                g_nu[s]  = TotalNuF(nu,     &gop->distr_pars, s);
+                g_nb[s]  = TotalNuF(nu_bar, &gop->distr_pars, s);
+                bf_nu[s] = neglect_blocking ? one : one - g_nu[s];
+                bf_nb[s] = neglect_blocking ? one : one - g_nb[s];
+            }
+            kp.inelastic_kernel_params.omega       = nu;
+            kp.inelastic_kernel_params.omega_prime = nu_bar;
+            MyKernelOutput inel_1 = InelasticScattKernels(&kp.inelastic_kernel_params, &gop->eos_pars);
+            kp.inelastic_kernel_params.omega       = nu_bar;
+            kp.inelastic_kernel_params.omega_prime = nu;
+            MyKernelOutput inel_2 = InelasticScattKernels(&kp.inelastic_kernel_params, &gop->eos_pars);
+            for (int s = 0; s < total_num_species; ++s) {
+                const BS_REAL te1 = inel_1.em[s]  * g_nb[s];
+                const BS_REAL ta1 = inel_1.abs[s] * bf_nb[s];
+                const BS_REAL te2 = inel_2.em[s]  * g_nu[s];
+                const BS_REAL ta2 = inel_2.abs[s] * bf_nu[s];
+                if (stim_abs == 1) {
+                    mat->m1_mat_em[s][i][j]     = nf * te1;
+                    mat->m1_mat_ab[s][i][j]     = nf * g_nu[s] * (te1 + ta1);
+                    mat->m1_mat_em[s][i][n + j] = nf * te2;
+                    mat->m1_mat_ab[s][i][n + j] = nf * g_nb[s] * (te2 + ta2);
+                } else {
+                    mat->m1_mat_em[s][i][j]     = nf * (one - g_nu[s]) * te1;
+                    mat->m1_mat_ab[s][i][j]     = nf * g_nu[s] * ta1;
+                    mat->m1_mat_em[s][i][n + j] = nf * (one - g_nb[s]) * te2;
+                    mat->m1_mat_ab[s][i][n + j] = nf * g_nb[s] * ta2;
+                }
+            }
+        }
+
+        // Variant 2: nu ~ 1/x_i  → writes [n+i][j] and [n+i][n+j]
+        {
+            const BS_REAL nu     = half * t * (one - x_j) / x_i;
+            const BS_REAL nu_bar = half * t * (one + x_j) / x_i;
+            const BS_REAL nf     = (nu * nu) * (nu_bar * nu_bar);
+            BS_REAL g_nu[total_num_species], g_nb[total_num_species];
+            BS_REAL bf_nu[total_num_species], bf_nb[total_num_species];
+            for (int s = 0; s < total_num_species; ++s) {
+                g_nu[s]  = TotalNuF(nu,     &gop->distr_pars, s);
+                g_nb[s]  = TotalNuF(nu_bar, &gop->distr_pars, s);
+                bf_nu[s] = neglect_blocking ? one : one - g_nu[s];
+                bf_nb[s] = neglect_blocking ? one : one - g_nb[s];
+            }
+            kp.inelastic_kernel_params.omega       = nu;
+            kp.inelastic_kernel_params.omega_prime = nu_bar;
+            MyKernelOutput inel_1 = InelasticScattKernels(&kp.inelastic_kernel_params, &gop->eos_pars);
+            kp.inelastic_kernel_params.omega       = nu_bar;
+            kp.inelastic_kernel_params.omega_prime = nu;
+            MyKernelOutput inel_2 = InelasticScattKernels(&kp.inelastic_kernel_params, &gop->eos_pars);
+            for (int s = 0; s < total_num_species; ++s) {
+                const BS_REAL te1 = inel_1.em[s]  * g_nb[s];
+                const BS_REAL ta1 = inel_1.abs[s] * bf_nb[s];
+                const BS_REAL te2 = inel_2.em[s]  * g_nu[s];
+                const BS_REAL ta2 = inel_2.abs[s] * bf_nu[s];
+                if (stim_abs == 1) {
+                    mat->m1_mat_em[s][n + i][j]     = nf * te1;
+                    mat->m1_mat_ab[s][n + i][j]     = nf * g_nu[s] * (te1 + ta1);
+                    mat->m1_mat_em[s][n + i][n + j] = nf * te2;
+                    mat->m1_mat_ab[s][n + i][n + j] = nf * g_nb[s] * (te2 + ta2);
+                } else {
+                    mat->m1_mat_em[s][n + i][j]     = nf * (one - g_nu[s]) * te1;
+                    mat->m1_mat_ab[s][n + i][j]     = nf * g_nu[s] * ta1;
+                    mat->m1_mat_em[s][n + i][n + j] = nf * (one - g_nb[s]) * te2;
+                    mat->m1_mat_ab[s][n + i][n + j] = nf * g_nb[s] * ta2;
+                }
+            }
+        }
+    });
+    team.team_barrier();
+}
+
+// ---------------------------------------------------------------------------
+// ComputeM1OpacitiesTeam
+// Team-parallel equivalent of ComputeM1Opacities() (always stim_abs=1).
+// gop must already be filled in scratch (thread 0 + barrier before calling).
+// *result is written by team thread 0; caller should team_barrier() after.
+// ---------------------------------------------------------------------------
+template <class MemberType>
+KOKKOS_INLINE_FUNCTION
+void ComputeM1OpacitiesTeam(const MemberType &team,
+                             const MyQuadrature *quad_1d,
+                             const MyQuadrature *quad_2d,
+                             GreyOpacityParams *gop,
+                             M1MatrixKokkos2D *mat,
+                             M1Opacities *result) {
+    constexpr int stim_abs = 1;
+    constexpr BS_REAL c_light       = kBS_Clight;
+    constexpr BS_REAL three_halves  = BS_REAL(1.5);
+    constexpr BS_REAL five_sixths   = BS_REAL(5) / BS_REAL(6);
+    constexpr BS_REAL five          = BS_REAL(5);
+    constexpr BS_REAL temp_multiple = BS_REAL(0.5) * BS_REAL(4.364);
+
+    const BS_REAL temp   = gop->eos_pars.temp;
+    const BS_REAL eta_e  = gop->eos_pars.mu_e / temp;
+    const BS_REAL s_pair = temp_multiple * temp;
+    const BS_REAL s_nux  = three_halves * temp;
+    const BS_REAL s_neps4 = BS_REAL(4) * temp_multiple * temp;
+
+    // --- Phase 1: pair+brem fill (all threads) ---
+    MyQuadratureIntegrand n2d = {0}, e2d = {0};
+    if (gop->opacity_flags.use_pair || gop->opacity_flags.use_brem) {
+        ComputeDoubleIntegrandFillTeam(team, quad_2d, s_pair, gop, mat, stim_abs);
+        Kokkos::single(Kokkos::PerTeam(team), [&]() {
+            GaussLegendreIntegrate2DMatrixForM1Coeffs(quad_2d, mat, s_pair, &n2d, &e2d);
+        });
+    }
+    team.team_barrier();
+
+    // --- Phase 2: NEPS fill (all threads, mat reused) ---
+    MyQuadratureIntegrand nn = {0}, en = {0};
+    if (gop->opacity_flags.use_inelastic_scatt) {
+        ComputeNEPSIntegrandFillTeam(team, quad_2d, s_neps4, gop, mat, stim_abs);
+        Kokkos::single(Kokkos::PerTeam(team), [&]() {
+            GaussLegendreIntegrate2DMatrixForNEPS(quad_2d, mat, s_neps4, &nn, &en);
+        });
+    }
+    team.team_barrier();
+
+    // --- 1D integrals + assembly (thread 0) ---
+    Kokkos::single(Kokkos::PerTeam(team), [&]() {
+        const BS_REAL *n_m1 = gop->m1_pars.n;
+        const BS_REAL *J_m1 = gop->m1_pars.J;
+        BS_REAL s_beta[total_num_species] = {0};
+        BS_REAL s_iso[total_num_species]  = {0};
+
+        if (eta_e > BS_REAL(-30.) && eta_e < BS_REAL(30.)) {
+            s_beta[id_nue]  = temp * FDI_p5(eta_e)  / FDI_p4(eta_e);
+            s_beta[id_anue] = temp * FDI_p5(-eta_e) / FDI_p4(-eta_e);
+        } else if (eta_e > BS_REAL(30.)) {
+            s_beta[id_nue]  = temp * eta_e * five_sixths;
+            s_beta[id_anue] = temp * five;
+        } else {
+            s_beta[id_nue]  = temp * five;
+            s_beta[id_anue] = temp * eta_e * five_sixths;
+        }
+        for (int idx = 0; idx < total_num_species; ++idx)
+            s_iso[idx] = (n_m1[idx] > THRESHOLD_N) ? (J_m1[idx] / n_m1[idx]) : s_nux;
+
+        MyQuadratureIntegrand iso = {0};
+        if (gop->opacity_flags.use_iso) {
+            BS_REAL out_iso[total_num_species][BS_N_MAX];
+            Scattering1DIntegrand(quad_1d, gop, s_iso, out_iso);
+            iso = GaussLegendreIntegrate1DMatrix(quad_1d, total_num_species, out_iso, s_iso);
+        }
+        MyQuadratureIntegrand bne = {0}, bje = {0}, bna = {0}, bja = {0};
+        if (gop->opacity_flags.use_abs_em) {
+            BS_REAL obe[total_num_species][BS_N_MAX], oba[total_num_species][BS_N_MAX];
+            Beta1DIntegrand(quad_1d, gop, s_beta, obe, oba, stim_abs);
+            GaussLegendreIntegrate1DMatrixOnlyNumber(quad_1d, 2, obe, s_beta, &bne, &bje);
+            GaussLegendreIntegrate1DMatrixOnlyNumber(quad_1d, 2, oba, s_beta, &bna, &bja);
+        }
+
+        *result = {0};
+        constexpr BS_REAL z = BS_REAL(0);
+        for (int s = 0; s < total_num_species; ++s) {
+            result->kappa_0_a[s] = z; result->kappa_a[s] = z; result->kappa_s[s] = z;
+        }
+
+        // nue
+        result->eta_0[id_nue] = kBS_FourPi_hc3 *
+            (kBS_FourPi_hc3 * (n2d.integrand[0] + nn.integrand[0]) + bne.integrand[id_nue]);
+        result->eta[id_nue]   = kBS_FourPi_hc3 *
+            (kBS_FourPi_hc3 * (e2d.integrand[0] + en.integrand[0]) + bje.integrand[id_nue]);
+        if (n_m1[id_nue] > THRESHOLD_N)
+            result->kappa_0_a[id_nue] = kBS_FourPi_hc3 / (c_light * n_m1[id_nue]) *
+                (kBS_FourPi_hc3 * (n2d.integrand[4] + nn.integrand[4]) + bna.integrand[id_nue]);
+        if (J_m1[id_nue] > THRESHOLD_J) {
+            result->kappa_a[id_nue] = (n_m1[id_nue] == z) ? z :
+                kBS_FourPi_hc3 / (c_light * J_m1[id_nue]) *
+                (kBS_FourPi_hc3 * (e2d.integrand[4] + en.integrand[4]) + bja.integrand[id_nue]);
+            result->kappa_s[id_nue] = kBS_FourPi_hc3 / (c_light * J_m1[id_nue]) * iso.integrand[id_nue];
+        }
+
+        // anue
+        result->eta_0[id_anue] = kBS_FourPi_hc3 *
+            (kBS_FourPi_hc3 * (n2d.integrand[1] + nn.integrand[1]) + bne.integrand[id_anue]);
+        result->eta[id_anue]   = kBS_FourPi_hc3 *
+            (kBS_FourPi_hc3 * (e2d.integrand[1] + en.integrand[1]) + bje.integrand[id_anue]);
+        if (n_m1[id_anue] > THRESHOLD_N)
+            result->kappa_0_a[id_anue] = kBS_FourPi_hc3 / (c_light * n_m1[id_anue]) *
+                (kBS_FourPi_hc3 * (n2d.integrand[5] + nn.integrand[5]) + bna.integrand[id_anue]);
+        if (J_m1[id_anue] > THRESHOLD_J) {
+            result->kappa_a[id_anue] = kBS_FourPi_hc3 / (c_light * J_m1[id_anue]) *
+                (kBS_FourPi_hc3 * (e2d.integrand[5] + en.integrand[5]) + bja.integrand[id_anue]);
+            result->kappa_s[id_anue] = kBS_FourPi_hc3 / (c_light * J_m1[id_anue]) * iso.integrand[id_anue];
+        }
+
+        // nux
+        result->eta_0[id_nux] = kBS_FourPi_hc3_sqr * (n2d.integrand[2] + nn.integrand[2]);
+        result->eta[id_nux]   = kBS_FourPi_hc3_sqr * (e2d.integrand[2] + en.integrand[2]);
+        if (n_m1[id_nux] > THRESHOLD_N)
+            result->kappa_0_a[id_nux] = kBS_FourPi_hc3_sqr / (c_light * n_m1[id_nux]) *
+                (n2d.integrand[6] + nn.integrand[6]);
+        if (J_m1[id_nux] > THRESHOLD_J) {
+            result->kappa_a[id_nux] = kBS_FourPi_hc3_sqr / (c_light * J_m1[id_nux]) *
+                (e2d.integrand[6] + en.integrand[6]);
+            result->kappa_s[id_nux] = kBS_FourPi_hc3 / (c_light * J_m1[id_nux]) * iso.integrand[id_nux];
+        }
+
+        // anux
+        result->eta_0[id_anux] = kBS_FourPi_hc3_sqr * (n2d.integrand[3] + nn.integrand[3]);
+        result->eta[id_anux]   = kBS_FourPi_hc3_sqr * (e2d.integrand[3] + en.integrand[3]);
+        if (n_m1[id_anux] > THRESHOLD_N)
+            result->kappa_0_a[id_anux] = (n_m1[id_anux] == z) ? z :
+                kBS_FourPi_hc3_sqr / (c_light * n_m1[id_anux]) *
+                (n2d.integrand[7] + nn.integrand[7]);
+        if (J_m1[id_anux] > THRESHOLD_J) {
+            result->kappa_a[id_anux] = kBS_FourPi_hc3_sqr / (c_light * J_m1[id_anux]) *
+                (e2d.integrand[7] + en.integrand[7]);
+            result->kappa_s[id_anux] = kBS_FourPi_hc3 / (c_light * J_m1[id_anux]) * iso.integrand[id_anux];
+        }
+    });
+}
+
+// ---------------------------------------------------------------------------
+// ComputeM1OpacitiesNonThermalSeparatedTeam
+// Team-parallel version with NEPS contributions kept separate (non-thermal
+// separation formalism). Mirrors ComputeM1OpacitiesGenericFormalismNonThermalSeparated.
+// ---------------------------------------------------------------------------
+template <class MemberType>
+KOKKOS_INLINE_FUNCTION
+void ComputeM1OpacitiesNonThermalSeparatedTeam(
+        const MemberType &team,
+        const MyQuadrature *quad_1d,
+        const MyQuadrature *quad_2d,
+        GreyOpacityParams *gop,
+        M1MatrixKokkos2D *mat,
+        M1OpacitiesNonThermalSeparated *result) {
+    constexpr int stim_abs = 1;
+    constexpr BS_REAL c_light       = kBS_Clight;
+    constexpr BS_REAL three_halves  = BS_REAL(1.5);
+    constexpr BS_REAL five_sixths   = BS_REAL(5) / BS_REAL(6);
+    constexpr BS_REAL five          = BS_REAL(5);
+    constexpr BS_REAL temp_multiple = BS_REAL(0.5) * BS_REAL(4.364);
+
+    const BS_REAL temp   = gop->eos_pars.temp;
+    const BS_REAL eta_e  = gop->eos_pars.mu_e / temp;
+    const BS_REAL s_pair = temp_multiple * temp;
+    const BS_REAL s_nux  = three_halves * temp;
+    const BS_REAL s_neps4 = BS_REAL(4) * temp_multiple * temp;
+
+    MyQuadratureIntegrand n2d = {0}, e2d = {0};
+    if (gop->opacity_flags.use_pair || gop->opacity_flags.use_brem) {
+        ComputeDoubleIntegrandFillTeam(team, quad_2d, s_pair, gop, mat, stim_abs);
+        Kokkos::single(Kokkos::PerTeam(team), [&]() {
+            GaussLegendreIntegrate2DMatrixForM1Coeffs(quad_2d, mat, s_pair, &n2d, &e2d);
+        });
+    }
+    team.team_barrier();
+
+    MyQuadratureIntegrand nn = {0}, en = {0};
+    if (gop->opacity_flags.use_inelastic_scatt) {
+        ComputeNEPSIntegrandFillTeam(team, quad_2d, s_neps4, gop, mat, stim_abs);
+        Kokkos::single(Kokkos::PerTeam(team), [&]() {
+            GaussLegendreIntegrate2DMatrixForNEPS(quad_2d, mat, s_neps4, &nn, &en);
+        });
+    }
+    team.team_barrier();
+
+    Kokkos::single(Kokkos::PerTeam(team), [&]() {
+        const BS_REAL *n_m1 = gop->m1_pars.n;
+        const BS_REAL *J_m1 = gop->m1_pars.J;
+        BS_REAL s_beta[total_num_species] = {0};
+        BS_REAL s_iso[total_num_species]  = {0};
+
+        if (eta_e > BS_REAL(-30.) && eta_e < BS_REAL(30.)) {
+            s_beta[id_nue]  = temp * FDI_p5(eta_e)  / FDI_p4(eta_e);
+            s_beta[id_anue] = temp * FDI_p5(-eta_e) / FDI_p4(-eta_e);
+        } else if (eta_e > BS_REAL(30.)) {
+            s_beta[id_nue]  = temp * eta_e * five_sixths;
+            s_beta[id_anue] = temp * five;
+        } else {
+            s_beta[id_nue]  = temp * five;
+            s_beta[id_anue] = temp * eta_e * five_sixths;
+        }
+        for (int idx = 0; idx < total_num_species; ++idx)
+            s_iso[idx] = (n_m1[idx] > THRESHOLD_N) ? (J_m1[idx] / n_m1[idx]) : s_nux;
+
+        MyQuadratureIntegrand iso = {0};
+        if (gop->opacity_flags.use_iso) {
+            BS_REAL out_iso[total_num_species][BS_N_MAX];
+            Scattering1DIntegrand(quad_1d, gop, s_iso, out_iso);
+            iso = GaussLegendreIntegrate1DMatrix(quad_1d, total_num_species, out_iso, s_iso);
+        }
+        MyQuadratureIntegrand bne = {0}, bje = {0}, bna = {0}, bja = {0};
+        if (gop->opacity_flags.use_abs_em) {
+            BS_REAL obe[total_num_species][BS_N_MAX], oba[total_num_species][BS_N_MAX];
+            Beta1DIntegrand(quad_1d, gop, s_beta, obe, oba, stim_abs);
+            GaussLegendreIntegrate1DMatrixOnlyNumber(quad_1d, 2, obe, s_beta, &bne, &bje);
+            GaussLegendreIntegrate1DMatrixOnlyNumber(quad_1d, 2, oba, s_beta, &bna, &bja);
+        }
+
+        *result = {0};
+        constexpr BS_REAL z = BS_REAL(0);
+        for (int s = 0; s < total_num_species; ++s) {
+            result->kappa_0_a[s] = z; result->kappa_a_th[s] = z;
+            result->kappa_a_non_th[s] = z; result->kappa_s[s] = z;
+        }
+
+        // nue
+        result->eta_0[id_nue]      = kBS_FourPi_hc3 *
+            (kBS_FourPi_hc3 * n2d.integrand[0] + bne.integrand[id_nue]);
+        result->eta_th[id_nue]     = kBS_FourPi_hc3 *
+            (kBS_FourPi_hc3 * e2d.integrand[0] + bje.integrand[id_nue]);
+        result->eta_non_th[id_nue] = kBS_FourPi_hc3_sqr * en.integrand[0];
+        if (n_m1[id_nue] > THRESHOLD_N)
+            result->kappa_0_a[id_nue] = kBS_FourPi_hc3 / (c_light * n_m1[id_nue]) *
+                (kBS_FourPi_hc3 * n2d.integrand[4] + bna.integrand[id_nue]);
+        if (J_m1[id_nue] > THRESHOLD_J) {
+            result->kappa_a_th[id_nue]     = (n_m1[id_nue] == z) ? z :
+                kBS_FourPi_hc3 / (c_light * J_m1[id_nue]) *
+                (kBS_FourPi_hc3 * e2d.integrand[4] + bja.integrand[id_nue]);
+            result->kappa_a_non_th[id_nue] = (n_m1[id_nue] == z) ? z :
+                kBS_FourPi_hc3_sqr / (c_light * J_m1[id_nue]) * en.integrand[4];
+            result->kappa_s[id_nue] = kBS_FourPi_hc3 / (c_light * J_m1[id_nue]) * iso.integrand[id_nue];
+        }
+
+        // anue
+        result->eta_0[id_anue]      = kBS_FourPi_hc3 *
+            (kBS_FourPi_hc3 * n2d.integrand[1] + bne.integrand[id_anue]);
+        result->eta_th[id_anue]     = kBS_FourPi_hc3 *
+            (kBS_FourPi_hc3 * e2d.integrand[1] + bje.integrand[id_anue]);
+        result->eta_non_th[id_anue] = kBS_FourPi_hc3_sqr * en.integrand[1];
+        if (n_m1[id_anue] > THRESHOLD_N)
+            result->kappa_0_a[id_anue] = kBS_FourPi_hc3 / (c_light * n_m1[id_anue]) *
+                (kBS_FourPi_hc3 * n2d.integrand[5] + bna.integrand[id_anue]);
+        if (J_m1[id_anue] > THRESHOLD_J) {
+            result->kappa_a_th[id_anue]     = kBS_FourPi_hc3 / (c_light * J_m1[id_anue]) *
+                (kBS_FourPi_hc3 * e2d.integrand[5] + bja.integrand[id_anue]);
+            result->kappa_a_non_th[id_anue] = kBS_FourPi_hc3_sqr / (c_light * J_m1[id_anue]) * en.integrand[5];
+            result->kappa_s[id_anue] = kBS_FourPi_hc3 / (c_light * J_m1[id_anue]) * iso.integrand[id_anue];
+        }
+
+        // nux
+        result->eta_0[id_nux]      = kBS_FourPi_hc3_sqr * n2d.integrand[2];
+        result->eta_th[id_nux]     = kBS_FourPi_hc3_sqr * e2d.integrand[2];
+        result->eta_non_th[id_nux] = kBS_FourPi_hc3_sqr * en.integrand[2];
+        if (n_m1[id_nux] > THRESHOLD_N)
+            result->kappa_0_a[id_nux] = kBS_FourPi_hc3_sqr / (c_light * n_m1[id_nux]) * n2d.integrand[6];
+        if (J_m1[id_nux] > THRESHOLD_J) {
+            result->kappa_a_th[id_nux]     = kBS_FourPi_hc3_sqr / (c_light * J_m1[id_nux]) * e2d.integrand[6];
+            result->kappa_a_non_th[id_nux] = kBS_FourPi_hc3_sqr / (c_light * J_m1[id_nux]) * en.integrand[6];
+            result->kappa_s[id_nux] = kBS_FourPi_hc3 / (c_light * J_m1[id_nux]) * iso.integrand[id_nux];
+        }
+
+        // anux
+        result->eta_0[id_anux]      = kBS_FourPi_hc3_sqr * n2d.integrand[3];
+        result->eta_th[id_anux]     = kBS_FourPi_hc3_sqr * e2d.integrand[3];
+        result->eta_non_th[id_anux] = kBS_FourPi_hc3_sqr * en.integrand[3];
+        if (n_m1[id_anux] > THRESHOLD_N)
+            result->kappa_0_a[id_anux] = (n_m1[id_anux] == z) ? z :
+                kBS_FourPi_hc3_sqr / (c_light * n_m1[id_anux]) * n2d.integrand[7];
+        if (J_m1[id_anux] > THRESHOLD_J) {
+            result->kappa_a_th[id_anux]     = kBS_FourPi_hc3_sqr / (c_light * J_m1[id_anux]) * e2d.integrand[7];
+            result->kappa_a_non_th[id_anux] = kBS_FourPi_hc3_sqr / (c_light * J_m1[id_anux]) * en.integrand[7];
+            result->kappa_s[id_anux] = kBS_FourPi_hc3 / (c_light * J_m1[id_anux]) * iso.integrand[id_anux];
+        }
+    });
+}
+
+#endif // KOKKOS_CORE_HPP
+
 #endif // BNS_NURATES_SRC_OPACITIES_M1_OPACITIES_HPP_
+
