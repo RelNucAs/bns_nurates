@@ -489,11 +489,15 @@ typedef struct M1Opacities M1Opacities;
 struct M1OpacitiesNonThermalSeparated
 {
     /* Number coefficients */
-    BS_REAL eta_0[total_num_species];     // number emissivity coefficient
-    BS_REAL kappa_0_a[total_num_species]; // number absorption coefficient
+    BS_REAL eta_0_th[total_num_species];     // number emissivity coefficient, THERMAL processes only
+    BS_REAL kappa_0_a_th[total_num_species]; // number absorption coefficient, THERMAL processes only
+    BS_REAL eta_0_non_th[total_num_species];     // number emissivity coefficient,
+                                                 // non-thermal (NEPS / inelastic scatt) part only
+    BS_REAL kappa_0_a_non_th[total_num_species]; // number absorption coefficient,
+                                                 // non-thermal (NEPS / inelastic scatt) part only
 
     /* Energy coefficients */
-    BS_REAL eta_th[total_num_species];          // energy emissivity coefficient 
+    BS_REAL eta_th[total_num_species];          // energy emissivity coefficient
                                                 // for thermal processes
     BS_REAL eta_non_th[total_num_species];      // energy emissivity coefficient 
                                                 // for non-thermal processes
