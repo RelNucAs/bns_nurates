@@ -96,6 +96,7 @@ BS_REAL EtaNNAbs(const BS_REAL n_in, const BS_REAL n_out, const BS_REAL mu_hat,
     return etanp;
 }
 
+
 /* Perform phase space integration for:
  *    X + n -> X + p
  * Inputs:
@@ -109,6 +110,7 @@ BS_REAL EtaNP(const BS_REAL nn, const BS_REAL np, const BS_REAL mu_hat,
 {
     return EtaNNAbs(nn, np, mu_hat, T);
 }
+
 
 /* Perform phase space integration for:
  *    X + p -> X + n
@@ -124,6 +126,7 @@ BS_REAL EtaPN(const BS_REAL nn, const BS_REAL np, const BS_REAL mu_hat,
     return EtaNNAbs(np, nn, -mu_hat, T);
 }
 
+
 /* Compute opacities for:
  *
  * 1. Neutrino absorption on neutron (nu + n -> l- + p)
@@ -136,7 +139,7 @@ BS_REAL EtaPN(const BS_REAL nn, const BS_REAL np, const BS_REAL mu_hat,
  * [s^-1], out[3]: j_anu [s^-1]
  */
 KOKKOS_INLINE_FUNCTION
-void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
+void ElAbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
                          MyEOSParams* eos_pars, const BS_REAL mass_lepton,
                          const BS_REAL mu_lepton, BS_REAL* out)
 {
@@ -180,7 +183,7 @@ void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
     etapn = EtaPN(nn, np, mu_np, T);
 
     // Phase space, recoil and weak magnetism correction
-    if (opacity_pars->use_WM_ab)
+    if (opacity_pars->use_WM_el_ab)
         WMAbsEm(omega, &R, &Rbar);
 
     // Electron/muon-type neutrino
@@ -278,6 +281,162 @@ void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
     return;
 }
 
+
+/* Compute opacities for:
+ *
+ * 1. Neutrino absorption on neutron (nu + n -> l- + p)
+ * 2. Antineutrino absorption on neutron (anul + p -> l+ + n)
+ *
+ * Inputs:
+ *    omega [MeV], mLep [MeV], muLep [MeV]
+ * Outputs: j_x and 1/lambda_x for neutrino and antineutrino
+ *    out[0]: c/lambda_nu [s^-1], out[1]: j_nu [s^-1], out[2]: c/lambda_anu
+ * [s^-1], out[3]: j_anu [s^-1]
+ */
+KOKKOS_INLINE_FUNCTION
+void MuonAbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
+                         MyEOSParams* eos_pars, const BS_REAL mass_lepton,
+                         const BS_REAL mu_lepton, BS_REAL* out)
+{
+    constexpr BS_REAL zero = 0;
+    constexpr BS_REAL one  = 1;
+
+    const BS_REAL mass_lepton_squared = POW2(mass_lepton);
+
+    BS_REAL Qprime, mu_np;
+    BS_REAL etanp, etapn;
+    BS_REAL E_e, E_p;
+    BS_REAL E_e_squared, E_p_squared;
+    BS_REAL cap_term = 0., dec_term = 0.;
+    BS_REAL fd_e, fd_p;
+    BS_REAL R = 1., Rbar = 1.;
+    BS_REAL dU = 0., dQ = kBS_Q;
+
+    const BS_REAL nb   = eos_pars->nb;   // Number baryon density [nm-3]
+    const BS_REAL T    = eos_pars->temp; // Temperature [MeV]
+    const BS_REAL yp   = eos_pars->yp;   // Proton fraction
+    const BS_REAL yn   = eos_pars->yn;   // Neutron fraction
+    const BS_REAL mu_p = eos_pars->mu_p; // Proton chemical potential [MeV]
+    const BS_REAL mu_n = eos_pars->mu_n; // Neutron chemical potential [MeV]
+
+    const BS_REAL nn = nb * yn; // Neutron number density [nm-3]
+    const BS_REAL np = nb * yp; // Proton number density  [nm-3]
+
+    // Mean field corrections
+    if (opacity_pars->use_dU)
+        dU = eos_pars->dU; // [MeV]
+    if (opacity_pars->use_dm_eff)
+        dQ = eos_pars->dm_eff; // [MeV]
+
+    // Neutron minus proton chem. potentials (corrected for the mass difference)
+    const BS_REAL mu_hat = mu_n - mu_p - dQ; // [MeV]
+
+    Qprime = dQ + dU;     // [MeV], Eq.(79) in Hempel
+    mu_np  = mu_hat - dU; // [MeV], Eq.(80,86) in Hempel
+
+    etanp = EtaNP(nn, np, mu_np, T); // Eq. (C14)
+    etapn = EtaPN(nn, np, mu_np, T);
+
+    // Phase space, recoil and weak magnetism correction
+    if (opacity_pars->use_WM_muon_ab)
+        WMAbsEm(omega, &R, &Rbar);
+
+    // Electron/muon-type neutrino
+    E_e = omega + Qprime; // Electron energy [MeV]
+    E_p = -E_e;           // Positron energy [MeV]
+
+    E_e_squared = E_e * E_e;
+    E_p_squared = E_p * E_p;
+
+    fd_e = FermiDistr(E_e, T, +mu_lepton);
+    fd_p = FermiDistr(E_p, T, -mu_lepton);
+
+    // @TODO: HeavisideTanhApprox is 0.5 instead of 1 in E = m
+    if (E_e - mass_lepton >= zero)
+    {
+        cap_term = E_e_squared * Kokkos::sqrt(one - mass_lepton_squared / E_e_squared) *
+                   R; // * HeavisideTanhApprox(E_e - mass_lepton)
+    }
+
+    if (opacity_pars->use_decay)
+    {
+        if (E_p - mass_lepton >= zero)
+        {
+            dec_term = E_p_squared *
+                       Kokkos::sqrt(one - mass_lepton_squared /
+                                      E_p_squared); // * HeavisideTanhApprox(E_p
+                                                    // - mass_lepton)
+        }
+    }
+
+    // @TODO: eventually think about a specifically designed function for
+    // (1-FermiDistr)
+
+    // Neutrino emissivity [s^-1], Eq.(C15), remove c to get output in nm^-1
+    out[1] =
+        kBS_Beta_Const * etapn * (cap_term * fd_e + dec_term * (one - fd_p));
+    // Neutrino absorptivity [s^-1]
+    out[0] = out[1] * SafeExp((omega - (mu_p + mu_lepton - mu_n)) / T);
+
+    // without detailed balance
+    // out[0] = kAbsEmConst * etanp * (cap_term * (1. - fd_e) + dec_term *
+    // fd_p); // Neutrino absorptivity [s-1], Eq.(C13) BS_REAL mu_nue =
+    // (eos_pars->mu_e - eos_pars->mu_n + eos_pars->mu_p) / temp; out[0] =
+    // kAbsEmConst * etanp * cap_term / (1. + Kokkos::exp(eos_pars->mu_e / temp -
+    // FDI_p5(mu_nue)/FDI_p4(mu_nue)));
+
+    cap_term = zero;
+    dec_term = zero;
+
+    E_p = omega - Qprime; // Positron energy [MeV]
+    E_e = -E_p;           // Electron energy [MeV]
+
+    E_e_squared = E_e * E_e;
+    E_p_squared = E_p * E_p;
+
+    fd_e = FermiDistr(E_e, T, +mu_lepton);
+    fd_p = FermiDistr(E_p, T, -mu_lepton);
+
+    if (E_p - mass_lepton >= zero)
+    {
+        cap_term = E_p_squared * Kokkos::sqrt(one - mass_lepton_squared / E_p_squared) *
+                   Rbar; // * HeavisideTanhApprox(E_p - mass_lepton)
+    }
+
+    if (opacity_pars->use_decay)
+    {
+        if (E_e - mass_lepton >= zero)
+        {
+            dec_term = E_e_squared *
+                       Kokkos::sqrt(one - mass_lepton_squared /
+                                      E_e_squared); // * HeavisideTanhApprox(E_e
+                                                    // - mass_lepton)
+        }
+    }
+
+    // Antineutrino emissivity [s^-1], Eq.(C20), remove c to get output in nm^-1
+    out[3] =
+        kBS_Beta_Const * etanp * (cap_term * fd_p + dec_term * (one - fd_e));
+    // Antineutrino absorptivity [s^-1]
+    out[2] = out[3] * SafeExp((omega - (mu_n - mu_p - mu_lepton)) / T);
+
+    // without detailed balance
+    // out[2] = kAbsEmConst * etapn * (cap_term * (1 - fd_p) + dec_term * fd_e);
+    // // Antineutrino absorptivity [s-1], Eq.(C19)
+
+    BS_ASSERT(isfinite(out[1]) && out[1] >= zero,
+              "Invalid beta-process numu emissivity.");
+    BS_ASSERT(isfinite(out[3]) && out[3] >= zero,
+              "Invalid beta-process anumu emissivity.");
+    BS_ASSERT(isfinite(out[0]) && out[0] >= zero,
+              "Invalid beta-process numu absorptivity.");
+    BS_ASSERT(isfinite(out[2]) && out[2] >= zero,
+              "Invalid beta-process anumu absorptivity.");
+
+    return;
+}
+
+
 /* Compute the absortivity and inverse mean free path
  * (electron case)
  *
@@ -298,7 +457,7 @@ MyOpacity ElAbsOpacity(const BS_REAL omega, OpacityParams* opacity_pars,
 
     // Electron (anti)neutrino
     BS_REAL el_out[4] = {0.0};
-    AbsOpacitySingleLep(omega, opacity_pars, eos_pars, kBS_Me, eos_pars->mu_e,
+    ElAbsOpacitySingleLep(omega, opacity_pars, eos_pars, kBS_Me, eos_pars->mu_e,
                         el_out);
     MyOut.abs[id_nue]  = el_out[0];
     MyOut.em[id_nue]   = el_out[1];
@@ -329,7 +488,7 @@ MyOpacity MuonAbsOpacity(const BS_REAL omega, OpacityParams* opacity_pars,
 
     // Muon (anti)neutrino
     BS_REAL mu_out[4] = {0.0};
-    AbsOpacitySingleLep(omega, opacity_pars, eos_pars, kBS_Mmu,
+    MuonAbsOpacitySingleLep(omega, opacity_pars, eos_pars, kBS_Mmu,
                         eos_pars->mu_mu, mu_out);
     MyOut.abs[id_nux] = mu_out[0];
     MyOut.em[id_nux] = mu_out[1];

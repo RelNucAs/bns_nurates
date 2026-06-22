@@ -339,11 +339,12 @@ enum NMSImpl { NMS_KernelInterp = 0, NMS_SemiAnalytical = 1 };
  */
 struct OpacityParams
 {
-    bool use_dU;     // flag for dU correction
-    bool use_dm_eff; // flag for dm_eff correction
-    bool use_WM_ab;  // flag for WM correction (and related) on absorption rates
-    bool use_WM_sc;  // flag for WM correction (and related) on scattering rates
-    bool use_decay;  // flag for inclusion of nucleon decay rates
+    bool use_dU;         // flag for dU correction
+    bool use_dm_eff;     // flag for dm_eff correction
+    bool use_WM_el_ab;      // flag for WM correction (and related) on absorption rates
+    bool use_WM_muon_ab; // flag for WM correction (and related) on muonic absorption rates
+    bool use_WM_sc;      // flag for WM correction (and related) on scattering rates
+    bool use_decay;      // flag for inclusion of nucleon decay rates
     BremImpl brem_implementation; // choice of brem implementation: BREM_HR98,
                                   // BREM_BRT06 or BREM_GP19
     NMSImpl NMS_implementation; // choice of NMS implementation:
@@ -357,7 +358,8 @@ typedef struct OpacityParams OpacityParams;
 __attribute__((unused)) static OpacityParams opacity_params_default_all = {
     .use_dU              = true,
     .use_dm_eff          = true,
-    .use_WM_ab           = true,
+    .use_WM_el_ab        = true,
+    .use_WM_muon_ab      = true,
     .use_WM_sc           = true,
     .use_decay           = true,
     .brem_implementation = BREM_HR98,
@@ -367,7 +369,8 @@ __attribute__((unused)) static OpacityParams opacity_params_default_all = {
 __attribute__((unused)) static OpacityParams opacity_params_default_none = {
     .use_dU              = false,
     .use_dm_eff          = false,
-    .use_WM_ab           = false,
+    .use_WM_el_ab        = false,
+    .use_WM_muon_ab      = false,
     .use_WM_sc           = false,
     .use_decay           = false,
     .brem_implementation = BREM_HR98,
