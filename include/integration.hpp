@@ -945,7 +945,7 @@ GaussLegendreIntegrate1DMatrix(const MyQuadrature* quad,
 
 
 KOKKOS_INLINE_FUNCTION
-void GaussLegendreIntegrate1DMatrixOnlyNumber(const MyQuadrature* quad,
+void ElBetaGaussLegendreIntegrate1DMatrixOnlyNumber(const MyQuadrature* quad,
                                               const int num_integrands,
                                               const BS_REAL mat[][BS_N_MAX],
                                               BS_REAL* t,
@@ -984,6 +984,62 @@ void GaussLegendreIntegrate1DMatrixOnlyNumber(const MyQuadrature* quad,
 
     return;
 }
+
+
+KOKKOS_INLINE_FUNCTION
+void MuonicBetaGaussLegendreIntegrate1DMatrixOnlyNumber(const MyQuadrature* quad,
+                                              const BS_REAL mat[][BS_N_MAX],
+                                              BS_REAL* t,
+                                              MyQuadratureIntegrand* out_n,
+                                              MyQuadratureIntegrand* out_j)
+{
+    const int n = quad->nx;
+    BS_REAL x_i, w_i, x2_i;
+
+    for (int i = 0; i < n; ++i)
+    {
+
+        x_i  = quad->points[i];
+        w_i  = quad->w[i];
+        x2_i = POW2(x_i);
+
+        // nu_x
+        // Numerical quantities
+        out_n->integrand[id_nux] +=
+            w_i * (mat[id_nux][i] / x2_i);
+
+        BS_ASSERT(isfinite(out_n->integrand[id_nux]) &&
+                  out_n->integrand[id_nux] >= 0.);
+        // Energy quantities
+        out_j->integrand[id_nux] +=
+            w_i * (mat[id_nux][i] * (t[id_nux] / x_i) / x2_i);
+
+        BS_ASSERT(isfinite(out_j->integrand[id_nux]) &&
+                  out_j->integrand[id_nux] >= 0.);
+        
+        // anu_x
+        // Numerical quantities
+        out_n->integrand[id_anux] +=
+            w_i * (mat[id_anux][i] / x2_i);
+
+        BS_ASSERT(isfinite(out_n->integrand[id_anux]) &&
+                  out_n->integrand[id_anux] >= 0.);
+        // Energy quantities
+        out_j->integrand[id_anux] +=
+            w_i * (mat[id_anux][i] * (t[id_anux] / x_i) / x2_i);
+
+        BS_ASSERT(isfinite(out_j->integrand[id_anux]) &&
+                  out_j->integrand[id_anux] >= 0.);
+    }
+
+    out_n->integrand[id_nux] *= t[id_nux];
+    out_j->integrand[id_nux] *= t[id_nux];
+    out_n->integrand[id_anux] *= t[id_anux];
+    out_j->integrand[id_anux] *= t[id_anux];
+
+    return;
+}
+
 
 /* Perform 1d integration (finite interval) of multiple functions using a
  * Gauss-Legendre quadrature
