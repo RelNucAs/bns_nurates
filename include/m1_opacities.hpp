@@ -239,7 +239,7 @@ void ElBeta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
 
 KOKKOS_INLINE_FUNCTION
 void MuonicBeta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
-                     const BS_REAL* t, BS_REAL out_em[][BS_N_MAX],
+                     const BS_REAL* t, const BS_REAL Q, BS_REAL out_em[][BS_N_MAX],
                      BS_REAL out_ab[][BS_N_MAX], const int stim_abs)
 {
     const int n = quad->nx;
@@ -250,8 +250,8 @@ void MuonicBeta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_par
     {
         for (int i = 0; i < n; ++i)
         {
-            // nu_x
-            nu = t[id_nux] / quad->points[i];
+            // nu_mu_1
+            nu = (1 + quad->points[i]) * kBS_Mmu - Q;
             BS_ASSERT(nu >= 0,
                       "Neutrino energy is negative (nu=%e, t[id_nux]=%e, "
                       "quad->points[%d]=%e)",
@@ -264,12 +264,11 @@ void MuonicBeta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_par
                                          &grey_pars->eos_pars); // [s^-1]
 
             out_em[id_nux][i] = nu_sqr * abs_em_beta.em[id_nux];
-
             // ab = em + ab (stimulated absorption)
             out_ab[id_nux][i] = nu_sqr * g_nu * abs_em_beta.abs[id_nux];
 
-            // anu_x
-            nu = t[id_anux] / quad->points[i];
+            // anu_mu_1
+            nu = (1 + quad->points[i]) * kBS_Mmu + Q;
             BS_ASSERT(nu >= 0,
                       "Neutrino energy is negative (nu=%e, t[id_anux]=%e, "
                       "quad->points[%d]=%e)",
@@ -281,17 +280,49 @@ void MuonicBeta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_par
                                          &grey_pars->eos_pars); // [s^-1]
 
             out_em[id_anux][i] = nu_sqr * abs_em_beta.em[id_anux];
-
             // ab = em + ab (stimulated absorption)
             out_ab[id_anux][i] = nu_sqr * g_nu * abs_em_beta.abs[id_anux];
+
+            // nu_mu_2
+            nu = t[id_nux] / quad->points[i];
+            BS_ASSERT(nu >= 0,
+                      "Neutrino energy is negative (nu=%e, t[id_nux]=%e, "
+                      "quad->points[%d]=%e)",
+                      nu, t[id_nux], i, quad->points[i]);
+            nu_sqr = POW2(nu);
+            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_nux);
+
+            abs_em_beta = MuonStimAbsOpacity(nu, &grey_pars->opacity_pars,
+                                         &grey_pars->eos_pars); // [s^-1]
+
+            out_em[id_nux][n + i] = nu_sqr * abs_em_beta.em[id_nux];
+            // ab = em + ab (stimulated absorption)
+            out_ab[id_nux][n + i] = nu_sqr * g_nu * abs_em_beta.abs[id_nux];
+
+            // anu_mu_2
+            nu = t[id_anux] / quad->points[i];
+            BS_ASSERT(nu >= 0,
+                      "Neutrino energy is negative (nu=%e, t[id_anux]=%e, "
+                      "quad->points[%d]=%e)",
+                      nu, t[id_anux], i, quad->points[i]);
+            nu_sqr = POW2(nu);
+            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anux);
+
+            abs_em_beta = MuonStimAbsOpacity(nu, &grey_pars->opacity_pars,
+                                         &grey_pars->eos_pars); // [s^-1]
+
+            out_em[id_anux][n + i] = nu_sqr * abs_em_beta.em[id_anux];
+
+            // ab = em + ab (stimulated absorption)
+            out_ab[id_anux][n + i] = nu_sqr * g_nu * abs_em_beta.abs[id_anux];
         }
     }
     else
     {
         for (int i = 0; i < n; ++i)
         {
-            // nu_x
-            nu = t[id_nux] / quad->points[i];
+            // nu_mu_1
+            nu = (1 + quad->points[i]) * kBS_Mmu - Q;
             BS_ASSERT(nu >= 0,
                       "Neutrino energy is negative (nu=%e, t[id_nux]=%e, "
                       "quad->points[%d]=%e)",
@@ -305,8 +336,8 @@ void MuonicBeta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_par
             out_em[id_nux][i] = nu_sqr * abs_em_beta.em[id_nux];
             out_ab[id_nux][i] = nu_sqr * g_nu * abs_em_beta.abs[id_nux];
 
-            // anu_x
-            nu = t[id_anux] / quad->points[i];
+            // anu_mu_1
+            nu = (1 + quad->points[i]) * kBS_Mmu + Q;
             BS_ASSERT(nu >= 0,
                       "Neutrino energy is negative (nu=%e, t[id_anux]=%e, "
                       "quad->points[%d]=%e)",
@@ -319,6 +350,36 @@ void MuonicBeta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_par
 
             out_em[id_anux][i] = nu_sqr * abs_em_beta.em[id_anux];
             out_ab[id_anux][i] = nu_sqr * g_nu * abs_em_beta.abs[id_anux];
+
+            // nu_mu_2
+            nu = t[id_nux] / quad->points[i];
+            BS_ASSERT(nu >= 0,
+                      "Neutrino energy is negative (nu=%e, t[id_nux]=%e, "
+                      "quad->points[%d]=%e)",
+                      nu, t[id_nux], i, quad->points[i]);
+            nu_sqr = POW2(nu);
+            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_nux);
+
+            abs_em_beta = MuonAbsOpacity(nu, &grey_pars->opacity_pars,
+                                     &grey_pars->eos_pars); // [s^-1]
+
+            out_em[id_nux][n + i] = nu_sqr * abs_em_beta.em[id_nux];
+            out_ab[id_nux][n + i] = nu_sqr * g_nu * abs_em_beta.abs[id_nux];
+
+            // anu_mu_2
+            nu = t[id_anux] / quad->points[i];
+            BS_ASSERT(nu >= 0,
+                      "Neutrino energy is negative (nu=%e, t[id_anux]=%e, "
+                      "quad->points[%d]=%e)",
+                      nu, t[id_anux], i, quad->points[i]);
+            nu_sqr = POW2(nu);
+            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anux);
+
+            abs_em_beta = MuonAbsOpacity(nu, &grey_pars->opacity_pars,
+                                     &grey_pars->eos_pars); // [s^-1]
+
+            out_em[id_anux][n + i] = nu_sqr * abs_em_beta.em[id_anux];
+            out_ab[id_anux][n + i] = nu_sqr * g_nu * abs_em_beta.abs[id_anux];
         }
     }
 
@@ -1593,11 +1654,17 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     GreyOpacityParams* my_grey_opacity_params, const int stim_abs)
 {
     constexpr BS_REAL four    = 4;
+    constexpr BS_REAL two = 2;
     constexpr BS_REAL c_light = kBS_Clight;
-    constexpr BS_REAL five_over_six = 5. / 6.;
     BS_REAL umin, umax, vmax;
     BS_REAL dQ = kBS_Q;
     BS_REAL dU = 0.;
+    // Mean field corrections
+    if (my_grey_opacity_params->opacity_pars.use_dU)
+        dU = my_grey_opacity_params->eos_pars.dU; // [MeV]
+    if (my_grey_opacity_params->opacity_pars.use_dm_eff)
+        dQ = my_grey_opacity_params->eos_pars.dm_eff; // [MeV]
+    const BS_REAL Q = dU + dQ;
 
     // Extremals for NMS integration
     if (my_grey_opacity_params->opacity_pars.NMS_implementation == NMS_KernelInterp)
@@ -1627,13 +1694,6 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     const BS_REAL temp  = my_grey_opacity_params->eos_pars.temp;
     const BS_REAL eta_e = my_grey_opacity_params->eos_pars.mu_e / temp;
 
-    // Mean field corrections
-    if (my_grey_opacity_params->opacity_pars.use_dU)
-        dU = my_grey_opacity_params->eos_pars.dU; // [MeV]
-    if (my_grey_opacity_params->opacity_pars.use_dm_eff)
-        dQ = my_grey_opacity_params->eos_pars.dm_eff; // [MeV]
-    const BS_REAL Q = dU + dQ;
-
     constexpr BS_REAL three_halves  = 1.5;
     constexpr BS_REAL five_sixths   = 0.8333333333333333;
     constexpr BS_REAL five          = 5;
@@ -1644,7 +1704,7 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     const BS_REAL s_nux  = three_halves * temp;
     const BS_REAL s_neps = temp_multiple * temp;
     // s_nms depends on the grid boundaries:
-    const BS_REAL s_nms = std::max(2. * umin, std::min(4. * s_neps, five_over_six * umax));
+    const BS_REAL s_nms = std::max(two * umin, std::min(four * s_neps, five_sixths * umax));
 
     BS_REAL s_beta_el[total_num_species] = {0}, s_beta_muon[total_num_species] = {0};
     BS_REAL s_iso[total_num_species] = {0};
@@ -1665,8 +1725,8 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
         s_beta_el[id_anue] = temp * eta_e * five_sixths;
     }
 
-    s_beta_muon[id_nux] = kBS_Mmu - Q;
-    s_beta_muon[id_anux] = kBS_Mmu + Q;
+    s_beta_muon[id_nux] = two * kBS_Mmu - Q;
+    s_beta_muon[id_anux] = two * kBS_Mmu + Q;
 
     for (int idx = 0; idx < total_num_species; ++idx)
     {
@@ -1716,14 +1776,14 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
         BS_REAL out_muon_beta_em[total_num_species][BS_N_MAX];
         BS_REAL out_muon_beta_ab[total_num_species][BS_N_MAX];
 
-        MuonicBeta1DIntegrand(quad_1d, my_grey_opacity_params, s_beta_muon, out_muon_beta_em,
+        MuonicBeta1DIntegrand(quad_1d, my_grey_opacity_params, s_beta_muon, Q, out_muon_beta_em,
                             out_muon_beta_ab, stim_abs);
 
         MuonicBetaGaussLegendreIntegrate1DMatrixOnlyNumber(quad_1d, out_muon_beta_em,
-                                                 s_beta_muon, &muon_beta_n_em_integrals,
+                                                 s_beta_muon, Q, &muon_beta_n_em_integrals,
                                                  &muon_beta_j_em_integrals);
         MuonicBetaGaussLegendreIntegrate1DMatrixOnlyNumber(quad_1d, out_muon_beta_ab,
-                                                 s_beta_muon, &muon_beta_n_abs_integrals,
+                                                 s_beta_muon, Q, &muon_beta_n_abs_integrals,
                                                  &muon_beta_j_abs_integrals);
     }
 
@@ -1740,6 +1800,7 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
             quad_2d, &out_pair, s_pair, &n_integrals_2d, &e_integrals_2d);
     }
 
+
     MyQuadratureIntegrand n_neps_2d = {0};
     MyQuadratureIntegrand e_neps_2d = {0};
 
@@ -1750,6 +1811,7 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
         GaussLegendreIntegrate2DMatrixForNEPS(quad_2d, &out_inel, four * s_neps,
                                               &n_neps_2d, &e_neps_2d);
     }
+
 
     MyQuadratureIntegrand n_nms_2d = {0};
     MyQuadratureIntegrand e_nms_2d = {0};
@@ -1932,12 +1994,18 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
                 const MyQuadrature* quad_1d, const MyQuadrature* quad_2d,
                 GreyOpacityParams* my_grey_opacity_params, const int stim_abs)
 {
-    constexpr BS_REAL four    = 4;
+    constexpr BS_REAL four = 4;
+    constexpr BS_REAL two = 2;
     constexpr BS_REAL c_light = kBS_Clight;
-    constexpr BS_REAL five_over_six = 5. / 6.;
     BS_REAL umin, umax, vmax;
     BS_REAL dQ = kBS_Q;
     BS_REAL dU = 0.;
+    // Mean field corrections
+    if (my_grey_opacity_params->opacity_pars.use_dU)
+        dU = my_grey_opacity_params->eos_pars.dU; // [MeV]
+    if (my_grey_opacity_params->opacity_pars.use_dm_eff)
+        dQ = my_grey_opacity_params->eos_pars.dm_eff; // [MeV]
+    const BS_REAL Q = dU + dQ;
 
     // Extremals for NMS integration
     if (my_grey_opacity_params->opacity_pars.NMS_implementation == NMS_KernelInterp)
@@ -1967,13 +2035,6 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     const BS_REAL temp  = my_grey_opacity_params->eos_pars.temp;
     const BS_REAL eta_e = my_grey_opacity_params->eos_pars.mu_e / temp;
 
-    // Mean field corrections
-    if (my_grey_opacity_params->opacity_pars.use_dU)
-        dU = my_grey_opacity_params->eos_pars.dU; // [MeV]
-    if (my_grey_opacity_params->opacity_pars.use_dm_eff)
-        dQ = my_grey_opacity_params->eos_pars.dm_eff; // [MeV]
-    const BS_REAL Q = dU + dQ;
-
     constexpr BS_REAL three_halves  = 1.5;
     constexpr BS_REAL five_sixths   = 0.8333333333333333;
     constexpr BS_REAL five          = 5;
@@ -1984,7 +2045,7 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     const BS_REAL s_nux  = three_halves * temp;
     const BS_REAL s_neps = temp_multiple * temp;
     // s_nms depends on the grid boundaries:
-    const BS_REAL s_nms = std::max(2. * umin, std::min(4. * s_neps, five_over_six * umax));
+    const BS_REAL s_nms = std::max(two * umin, std::min(four * s_neps, five_sixths * umax));
 
     BS_REAL s_beta_el[total_num_species] = {0}, s_beta_muon[total_num_species];
     BS_REAL s_iso[total_num_species] = {0};
@@ -2010,8 +2071,8 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
         s_iso[idx] = (n[idx] > THRESHOLD_N) ? (J[idx] / n[idx]) : s_nux;
     }
 
-    s_beta_muon[id_nux] = kBS_Mmu - Q;
-    s_beta_muon[id_anux] = kBS_Mmu + Q;
+    s_beta_muon[id_nux] = two * kBS_Mmu - Q;
+    s_beta_muon[id_anux] = two * kBS_Mmu + Q;
 
     MyQuadratureIntegrand iso_integrals = {0};
     if (my_grey_opacity_params->opacity_flags.use_iso == 1)
@@ -2054,14 +2115,14 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
         BS_REAL out_muon_beta_em[total_num_species][BS_N_MAX];
         BS_REAL out_muon_beta_ab[total_num_species][BS_N_MAX];
 
-        MuonicBeta1DIntegrand(quad_1d, my_grey_opacity_params, s_beta_muon, out_muon_beta_em,
+        MuonicBeta1DIntegrand(quad_1d, my_grey_opacity_params, s_beta_muon, Q, out_muon_beta_em,
                             out_muon_beta_ab, stim_abs);
 
         MuonicBetaGaussLegendreIntegrate1DMatrixOnlyNumber(quad_1d, out_muon_beta_em,
-                                                 s_beta_muon, &muon_beta_n_em_integrals,
+                                                 s_beta_muon, Q, &muon_beta_n_em_integrals,
                                                  &muon_beta_j_em_integrals);
         MuonicBetaGaussLegendreIntegrate1DMatrixOnlyNumber(quad_1d, out_muon_beta_ab,
-                                                 s_beta_muon, &muon_beta_n_abs_integrals,
+                                                 s_beta_muon, Q, &muon_beta_n_abs_integrals,
                                                  &muon_beta_j_abs_integrals);
     }
 
