@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 
     // Select corrections to rates
     my_grey_opacity_params.opacity_pars.use_dm_eff =
-        0; // Do not use effective mass correction to beta processes
+        1; // Do not use effective mass correction to beta processes
     my_grey_opacity_params.opacity_pars.use_dU =
         1; // Use effective potential correction to beta processes
     my_grey_opacity_params.opacity_pars.use_decay =
