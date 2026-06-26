@@ -12,49 +12,26 @@
 int main(int argc, char* argv[])
 {
     // Fix the neutrino energy for computation of spectral rates
-    const double nu_energy = 20.; // [MeV]
-
-    const char TDpoint = 'E';
-    double nb, T, ye, mu_e, mu_mu, mu_p, mu_n;
+    const double nu_energy = 10.; // [MeV]
 
     // Input thermodynamic quantities (corresponding to point A in Chiesa+25
     // PRD) N.B.: chemical potentials include the rest mass contribution
-    if (TDpoint == 'A'){
-        nb   = 4.208366627847035e+38;  // Baryon number density [cm-3]
-        T    = 12.406403541564941;     // Temperature [MeV]
-        ye   = 0.07158458232879639;    // Electron fraction
-        mu_e = 1.871814489040245e+02;  // Electron chemical potential [MeV]
-        mu_mu = 1.871814489040245e+02; // Muon chemical potential [MeV]
-        mu_p = 1.011017977368873e+03;  // Proton chemical potential [MeV]
-        mu_n = 1.221590136808168e+03;  // Neutron chemical potential [MeV]
-    }
-    else if (TDpoint == 'C'){
-        nb   = (9.87e+12 / 1.66053906892e-24);  // Baryon number density [cm-3]
-        T    = 8.74;                            // Temperature [MeV]
-        ye   = 0.06;                            // Electron fraction
-        mu_e = 36.5;                            // Electron chemical potential [MeV]
-        mu_mu = 36.5;                           // Muon chemical potential [MeV]
-        mu_p = 1.011017977368873e+03;           // Proton chemical potential [MeV]
-        mu_n = mu_p + 41.4;                     // Neutron chemical potential [MeV]
-    }
-    else if (TDpoint == 'E'){
-        nb   = (1.00e+11 / 1.66053906892e-24);  // Baryon number density [cm-3]
-        T    = 3.60;                            // Temperature [MeV]
-        ye   = 0.14;                            // Electron fraction
-        mu_e = 9.05;                            // Electron chemical potential [MeV]
-        mu_mu = 9.05;                           // Muon chemical potential [MeV]
-        mu_p = 1.011017977368873e+03;           // Proton chemical potential [MeV]
-        mu_n = mu_p + 8.44;                     // Neutron chemical potential [MeV]
-    }
-    const double dU =
+    const double nb   = 4.208366627847035e+38;  // Baryon number density [cm-3]
+    const double T    = 12.406403541564941;     // Temperature [MeV]
+    const double ye   = 0.07158458232879639;    // Electron fraction
+    const double mu_e = 1.871814489040245e+02;  // Electron chemical potential [MeV]
+    const double mu_mu = mu_e;                  // Muon chemical potential [MeV]
+    const double mu_p = 1.011017977368873e+03;  // Proton chemical potential [MeV]
+    const double mu_n = 1.221590136808168e+03;  // Neutron chemical potential [MeV]
+    const double dU = 
         18.92714728; // Nucleon interaction potential difference (Un-Up) [MeV]
-    const double mp_eff = 278.87162217; // Proton effective mass [MeV]
-    const double mn_eff = 280.16495513; // Neutron effective mass [MeV]
-    const double dm =
-        mn_eff - mp_eff; // Nucleon effective mass difference [MeV]
+    const double mp_eff = 278.87162217;         // Proton effective mass [MeV]
+    const double mn_eff = 280.16495513;         // Neutron effective mass [MeV]
+    const double dm = 
+        mn_eff - mp_eff;          // Nucleon effective mass difference [MeV]
 
     // Input gray neutrino quantities (library supports 4 neutrino species)
-    // N.B.: These will be used in PART 2 for reconstructing the neutrino
+    // N.B.: These will be used only in PART 2 for reconstructing the neutrino
     // distribution functions
     //       and as normalization factors for energy-averaged opacities
     const double n_nue =
@@ -83,12 +60,20 @@ int main(int argc, char* argv[])
     // N.B.: only the 'nx' member can be modified, all the others should
     //       be always set as the following
     MyQuadrature my_quadrature;
-    my_quadrature.nx   = 6; // number of quadrature points
+    my_quadrature.nx   = 12; // number of quadrature points
     my_quadrature.dim  = 1;
     my_quadrature.type = kGauleg;
     my_quadrature.x1   = 0.;
     my_quadrature.x2   = 1.;
     GaussLegendre(&my_quadrature);
+
+    // Check: number of nodes has not to be larger than the maximum value
+    if (2 * my_quadrature.nx > BS_N_MAX) 
+    {
+        fprintf(stderr, "ERROR: The number of required nodes (2*%d) is larger than the set maximum value (BS_N_MAX=%d).\n", 
+                my_quadrature.nx, BS_N_MAX);
+        exit(EXIT_FAILURE); 
+    }
 
     // Create two structs that will hold the final result of the
     // computation of spectral and gray rates, respectively
@@ -104,36 +89,41 @@ int main(int argc, char* argv[])
 
     // Select active reactions
     my_grey_opacity_params.opacity_flags.use_abs_em =
-        0; // Activate beta processes
+        1; // Activate beta processes
+    my_grey_opacity_params.opacity_flags.use_muonic_beta =
+        0; // Activate beta processes with muons
     my_grey_opacity_params.opacity_flags.use_brem =
-        0; // Activate Bremsstrahlung
+        1; // Activate Bremsstrahlung
     my_grey_opacity_params.opacity_flags.use_pair =
-        0; // Activate pair processes
+        1; // Activate pair processes
     my_grey_opacity_params.opacity_flags.use_iso =
-        0; // Activate scattering on nucleons
+        1; // Activate scattering on nucleons
     my_grey_opacity_params.opacity_flags.use_inelastic_NEPS =
-        0; // Activate scattering on electrons/positrons
+        1; // Activate scattering on electrons/positrons
     my_grey_opacity_params.opacity_flags.use_inelastic_NMS =
-        1; // Activate scattering on muons
+        0; // Activate scattering on muons
+
 
     // Select corrections to rates
     my_grey_opacity_params.opacity_pars.use_dm_eff =
-        0; // Do not use effective mass correction to beta processes
+        1; // Do not use effective mass correction to beta processes
     my_grey_opacity_params.opacity_pars.use_dU =
-        0; // Use effective potential correction to beta processes
+        1; // Use effective potential correction to beta processes
     my_grey_opacity_params.opacity_pars.use_decay =
-        0; // Include (inverse) nucleon decays to beta processes
-    my_grey_opacity_params.opacity_pars.use_WM_ab =
-        0; // Activate beta-processes weak magnetism correction
+        1; // Include (inverse) nucleon decays to beta processes
+    my_grey_opacity_params.opacity_pars.use_WM_el_ab =
+        1; // Activate electron beta-processes weak magnetism correction
+    my_grey_opacity_params.opacity_pars.use_WM_muon_ab =
+        0; // Activate muon beta-processes weak magnetism correction
     my_grey_opacity_params.opacity_pars.use_WM_sc =
-        0; // Activate isoenergetic scattering weak magnetism correction
+        1; // Activate isoenergetic scattering weak magnetism correction
     my_grey_opacity_params.opacity_pars.brem_implementation =
         BREM_GP19; // Select bremsstrahlung implementation: Guo and Pinedo 2019
     my_grey_opacity_params.opacity_pars.NMS_implementation =
         NMS_KernelInterp; // Select NMS implementation: NMS_KernelInterp or 
                           // NMS_SemiAnalytical
     my_grey_opacity_params.opacity_pars.use_NN_medium_corr =
-        0; // Activate NN bremsstrahlung medium correction as in Fischer+16
+        1; // Activate NN bremsstrahlung medium correction as in Fischer+16
     my_grey_opacity_params.opacity_pars.neglect_blocking =
         true;   // Select 'true' to neglect neutrino blocking factors
 
@@ -275,7 +265,7 @@ int main(int argc, char* argv[])
     // paths for the
     //       sum of the active inelastic reactions, 'j_s' and 'kappa_s' are the
     //       equivalent for the elastic scattering off nucleons
-    printf("Spectral rates assuming equilibrium\n");
+    printf("Spectral rates assuming equilibrium, not in the stimulated absorption formalism\n");
     printf("------------------------------\n");
     printf("     j             j_s           kappa         kappa_s\n");
     printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_nue],
@@ -293,8 +283,8 @@ int main(int argc, char* argv[])
            spectral_rates.kappa_s[id_anux] * 1e7);
 
 
-    // Compute and output gray emissivities and opacities (Eqs. (19)-(23) in
-    // Chiesa+25 PRD)
+    // Compute and output gray emissivities and opacities in the stimulated absorption
+    // formalism (Eqs. (19)-(23) in Chiesa+25 PRD).
     // Thermal and non-thermal processes are all together.
     // NEPS is included in the total emissivities/absorsivities.
     // NEPS contribution is included in number quantities (eta0 and kappa0).
@@ -302,7 +292,7 @@ int main(int argc, char* argv[])
                                     &my_grey_opacity_params);
 
     // The numerical factors restore usual units (see output)
-    printf("Gray rates assuming equilibrium, NLS INCLUDED (also in eta0 and kappa0)\n");
+    printf("Gray rates assuming equilibrium, in the stimulated absorption formalism,\nNLS INCLUDED (also in eta0 and kappa0)\n");
     printf("------------------------------\n");
     printf(
         "     eta0          eta1          kappa0        kappa1        scat1\n");
@@ -326,8 +316,8 @@ int main(int argc, char* argv[])
            gray_rates.kappa_s[id_anux] * 1e7);
 
 
-    // Compute and output gray emissivities and opacities (Eqs. (19)-(23) in
-    // Chiesa+25 PRD)
+    // Compute and output gray emissivities and opacities in the stimulated absorption
+    // formalism (Eqs. (19)-(23) in Chiesa+25 PRD).
     // Thermal and non-thermal processes are separated.
     // NEPS emissivity and absorsivity are separated from ones related to 
     // other processes.
@@ -336,7 +326,7 @@ int main(int argc, char* argv[])
                         &my_quadrature, &my_quadrature, &my_grey_opacity_params);
 
     // The numerical factors restore usual units (see output)
-    printf("Gray rates assuming equilibrium, NLS SEPARATED, NLS NOT INCLUDED in eta0 and kappa0\n");
+    printf("Gray rates assuming equilibrium, in the stimulated absorption formalism,\nNLS SEPARATED, NLS NOT INCLUDED in eta0 and kappa0\n");
     printf("------------------------------\n");
     printf(
         "     eta0          eta1_th       eta1_non_th   kappa0        kappa1_th     kappa1_non_th scat1\n");
@@ -404,7 +394,7 @@ int main(int argc, char* argv[])
         nu_energy, &my_quadrature, &my_grey_opacity_params);
 
     // The numerical factors restore usual units (see output)
-    printf("Spectral rates reconstructing distribution function\n");
+    printf("Spectral rates reconstructing distribution function, not in the stimulated absorption formalism\n");
     printf("------------------------------\n");
     printf("     j             j_s           kappa         kappa_s\n");
     printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_nue],
@@ -422,8 +412,8 @@ int main(int argc, char* argv[])
            spectral_rates.kappa_s[id_anux] * 1e7);
 
 
-    // Compute and output gray emissivities and opacities (Eqs. (19)-(23) in
-    // Chiesa+25 PRD)
+    // Compute and output gray emissivities and opacities in the stimulated absorption
+    // formalism (Eqs. (19)-(23) in Chiesa+25 PRD).
     // Thermal and non-thermal processes are all together.
     // NEPS is included in the total emissivities/absorsivities.
     // NEPS contribution is included in number quantities (eta0 and kappa0).
@@ -431,7 +421,7 @@ int main(int argc, char* argv[])
                                     &my_grey_opacity_params);
 
     // The numerical factors restore usual units (see output)
-    printf("Gray rates reconstructing distribution function, NLS INCLUDED (also in eta0 and kappa0)\n");
+    printf("Gray rates reconstructing distribution function, in the stimulated absorption formalism,\nNLS INCLUDED (also in eta0 and kappa0)\n");
     printf("----------------------------------------------\n");
     printf(
         "     eta0          eta1          kappa0        kappa1        scat1\n");
@@ -455,8 +445,8 @@ int main(int argc, char* argv[])
            gray_rates.kappa_s[id_anux] * 1e7);
 
 
-    // Compute and output gray emissivities and opacities (Eqs. (19)-(23) in
-    // Chiesa+25 PRD)
+    // Compute and output gray emissivities and opacities in the stimulated absorption
+    // formalism (Eqs. (19)-(23) in Chiesa+25 PRD).
     // Thermal and non-thermal processes are separated.
     // NEPS emissivity and absorsivity are separated from ones related to 
     // other processes.
@@ -465,7 +455,7 @@ int main(int argc, char* argv[])
                             &my_quadrature, &my_quadrature, &my_grey_opacity_params);
 
     // The numerical factors restore usual units (see output)
-    printf("Gray rates reconstructing distribution function, NLS SEPARATED, NLS NOT INCLUDED in eta0 and kappa0\n");
+    printf("Gray rates reconstructing distribution function, in the stimulated absorption formalism,\nNLS SEPARATED, NLS NOT INCLUDED in eta0 and kappa0\n");
     printf("------------------------------\n");
     printf(
         "     eta0          eta1_th       eta1_non_th   kappa0        kappa1_th     kappa1_non_th scat1\n");

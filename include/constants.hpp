@@ -112,7 +112,7 @@ inline constexpr double kBS_Hpa = 0.5 * kBS_Ga;
 // BETA-PROCESSES CONSTANTS //
 //////////////////////////////
 
-// Constant in Eq.(C13,C15,C19,C20) of Bruenn
+// Constant in Eq.(C13,C15,C19,C20) of Bruenn (*V_ud^2)
 inline constexpr BS_REAL kBS_Beta_Const =
     (POW3(kBS_Clight) * POW2(kBS_Gf0 * kBS_Hbar)) * POW2(kBS_Vud) *
     (POW2(kBS_Gv) + 3. * POW2(kBS_Ga)) / kBS_Pi;
