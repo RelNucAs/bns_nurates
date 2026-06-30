@@ -490,10 +490,10 @@ MyOpacity MuonAbsOpacity(const BS_REAL omega, OpacityParams* opacity_pars,
     BS_REAL mu_out[4] = {0.0};
     MuonAbsOpacitySingleLep(omega, opacity_pars, eos_pars, kBS_Mmu,
                         eos_pars->mu_mu, mu_out);
-    MyOut.abs[id_nux] = mu_out[0];
-    MyOut.em[id_nux] = mu_out[1];
-    MyOut.abs[id_anux] = mu_out[2];
-    MyOut.em[id_anux] = mu_out[3];
+    MyOut.abs[id_num] = mu_out[0];
+    MyOut.em[id_num] = mu_out[1];
+    MyOut.abs[id_anum] = mu_out[2];
+    MyOut.em[id_anum] = mu_out[3];
 
     return MyOut;
 }
@@ -515,8 +515,8 @@ MyOpacity ElStimAbsOpacity(const BS_REAL omega, OpacityParams* opacity_pars,
 
     abs_opacity.abs[id_nue] = abs_opacity.abs[id_nue] + abs_opacity.em[id_nue];
     abs_opacity.abs[id_anue] = abs_opacity.abs[id_anue] + abs_opacity.em[id_anue];
-    abs_opacity.abs[id_nux] = abs_opacity.abs[id_nux] + abs_opacity.em[id_nux];
-    abs_opacity.abs[id_anux] = abs_opacity.abs[id_anux] + abs_opacity.em[id_anux];
+
+    // (a)nux quantities are identically zero
 
     return abs_opacity;
 }
@@ -536,10 +536,10 @@ MyOpacity MuonStimAbsOpacity(const BS_REAL omega, OpacityParams* opacity_pars,
 {
     MyOpacity abs_opacity = MuonAbsOpacity(omega, opacity_pars, eos_pars);
 
-    abs_opacity.abs[id_nue] = abs_opacity.abs[id_nue] + abs_opacity.em[id_nue];
-    abs_opacity.abs[id_anue] = abs_opacity.abs[id_anue] + abs_opacity.em[id_anue];
-    abs_opacity.abs[id_nux] = abs_opacity.abs[id_nux] + abs_opacity.em[id_nux];
-    abs_opacity.abs[id_anux] = abs_opacity.abs[id_anux] + abs_opacity.em[id_anux];
+    abs_opacity.abs[id_num] = abs_opacity.abs[id_num] + abs_opacity.em[id_num];
+    abs_opacity.abs[id_anum] = abs_opacity.abs[id_anum] + abs_opacity.em[id_anum];
+
+    // (a)nue and (a)nut quantities are identically zero
 
     return abs_opacity;
 }

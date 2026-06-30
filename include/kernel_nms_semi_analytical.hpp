@@ -270,19 +270,25 @@ MyKernelOutput InelasticNMSKernels_SemiAnalytical(InelasticScattKernelParams* ke
     const NMS_Parameters parameters_values = NMS_parameters_interpolator(T, mu_mu, w);
 
     // Neutrino-flavor dependent kernel
-    //nu_e, nu_t
+    // nu_e
     nms_kernel.abs[id_nue] = 0.0;
     
-    //anu_e, anu_t
+    // anu_e
     nms_kernel.abs[id_anue] = 0.0;
     
-    //nu_mu==nu_x
-    nms_kernel.abs[id_nux] = kBS_NMS_Conv_Const * NMS_SemiAnalyticalKernel(T, mu_mu, w, wp, 
+    // nu_m
+    nms_kernel.abs[id_num] = kBS_NMS_Conv_Const * NMS_SemiAnalyticalKernel(T, mu_mu, w, wp, 
                                 parameters_values.alpha, parameters_values.beta, parameters_values.gamma, 
                                 parameters_values.delta, parameters_values.wpbar, parameters_values.wpzero);
     
-    //anu_mu==anu_x
-    nms_kernel.abs[id_anux] = 0.0;
+    // anu_m
+    nms_kernel.abs[id_anum] = 0.0;
+
+    // nu_t
+    nms_kernel.abs[id_nut] = nms_kernel.abs[id_nue];
+
+    // anu_t
+    nms_kernel.abs[id_anut] = nms_kernel.abs[id_anue];
 
     // Absorption and Emission kernels [nm^3 s^-1]
     // nu_e(idx=0), nu_ae(idx=1), nu_x=nu_mu(idx=2), anu_x=anu_mu(idx=3)

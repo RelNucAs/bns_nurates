@@ -63,8 +63,12 @@ endif()
 
 add_definitions(-DSOURCE_DIR="${CMAKE_SOURCE_DIR}")
 
+# Set the number of neutrino species (4 by default) and pass it to the compiler
+set(NUM_SPECIES 4 CACHE STRING "Total number of neutrino species")
+add_compile_definitions(total_num_species=${NUM_SPECIES})
+
 include_directories(include)
-# include_directories(tests)
+
 
 ################################################################################
 macro(ADD_BNSNURATES_EXECUTABLE NAME PATH)
@@ -81,6 +85,8 @@ endif()
 if (${GSL_FOUND})
     target_link_libraries(${NAME} GSL::gsl GSL::gslcblas)
 endif()
+
+
 target_link_libraries(${NAME} m)
 endmacro()
 ################################################################################

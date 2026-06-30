@@ -202,28 +202,33 @@ MyKernelOutput InelasticNMSKernels_DirectInterp(InelasticScattKernelParams* kern
     const NMS_KernelResult R123_values = NMS_direct_interpolator(T, mu_mu, w, wp);
 
     // Neutrino-flavor dependent kernel
-    //nu_e, nu_t
+    // nu_e
     nms_kernel.abs[id_nue] = kBS_NMS_Conv_Const * (kBS_NMS_C1_nue * R123_values.R1 + 
              kBS_NMS_C2_nue * R123_values.R2 + 
              kBS_NMS_C3_nue * R123_values.R3);
     
-    //anu_e, anu_t
+    // anu_e
     nms_kernel.abs[id_anue] = kBS_NMS_Conv_Const * (kBS_NMS_C2_nue * R123_values.R1 + 
              kBS_NMS_C1_nue * R123_values.R2 + 
              kBS_NMS_C3_nue * R123_values.R3);
     
-    //nu_mu==nu_x
-    nms_kernel.abs[id_nux] = kBS_NMS_Conv_Const * (kBS_NMS_C1_numu * R123_values.R1 + 
+    // num
+    nms_kernel.abs[id_num] = kBS_NMS_Conv_Const * (kBS_NMS_C1_numu * R123_values.R1 + 
              kBS_NMS_C2_numu * R123_values.R2 + 
              kBS_NMS_C3_numu * R123_values.R3);
     
-    //anu_mu==anu_x
-    nms_kernel.abs[id_anux] = kBS_NMS_Conv_Const * (kBS_NMS_C2_numu * R123_values.R1 + 
+    // anum
+    nms_kernel.abs[id_anum] = kBS_NMS_Conv_Const * (kBS_NMS_C2_numu * R123_values.R1 + 
              kBS_NMS_C1_numu * R123_values.R2 + 
              kBS_NMS_C3_numu * R123_values.R3);
 
+    // nu_t
+    nms_kernel.abs[id_nut] = nms_kernel.abs[id_nue];
+    
+    // anu_t
+    nms_kernel.abs[id_anut] = nms_kernel.abs[id_anue];
+
     // Absorption and Emission kernels [nm^3 s^-1]
-    // nu_e(idx=0), nu_ae(idx=1), nu_x=nu_mu(idx=2), anu_x=anu_mu(idx=3)
     for (int idx = 0; idx < total_num_species; ++idx)
     {
         nms_kernel.em[idx]  = nms_kernel.abs[idx] * det_bal;

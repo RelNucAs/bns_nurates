@@ -2406,7 +2406,8 @@ MyQuadratureIntegrand SpectralIntegrand(BS_REAL* var, void* p)
 
     // compute the pair kernels
     MyKernelOutput pair_kernels_m1 = {
-        0}; //{.em_e = 0., .abs_e = 0., .em_x = 0., .abs_x = 0.};
+        0}; //{.em_e = 0., .abs_e = 0., .em_x = 0., .abs_x = 0.}
+            //{.em_e = 0., .abs_e = 0., .em_m = 0., .abs_m = 0., .em_t = 0., .abs_t = 0.}
     if (opacity_flags.use_pair)
     {
         my_grey_opacity_params->kernel_pars.pair_kernel_params.omega_prime =
@@ -2416,8 +2417,7 @@ MyQuadratureIntegrand SpectralIntegrand(BS_REAL* var, void* p)
         my_grey_opacity_params->kernel_pars.pair_kernel_params.lmax      = zero;
         my_grey_opacity_params->kernel_pars.pair_kernel_params.mu        = one;
         my_grey_opacity_params->kernel_pars.pair_kernel_params.mu_prime  = one;
-        // pair_kernels_m1 = PairKernels(&my_eos_params,
-        // &my_grey_opacity_params->kernel_pars.pair_kernel_params);
+
         pair_kernels_m1 = PairKernels(
             &my_eos_params,
             &my_grey_opacity_params->kernel_pars.pair_kernel_params);
@@ -2483,10 +2483,14 @@ MyQuadratureIntegrand SpectralIntegrand(BS_REAL* var, void* p)
         }
         else if (opacity_pars.NMS_implementation == NMS_SemiAnalytical)
         {
-
             inelastic_NMS_kernels_m1 = InelasticNMSKernels_SemiAnalytical(
                 &my_grey_opacity_params->kernel_pars.inelastic_kernel_params,
                 &my_grey_opacity_params->eos_pars);
+        }
+        else
+        {
+            BS_ASSERT(false, "Unknown NMS implementation: %d",
+                      (int)opacity_pars.NMS_implementation);
         }
     }
 
@@ -2515,17 +2519,41 @@ MyQuadratureIntegrand SpectralIntegrand(BS_REAL* var, void* p)
     pro_term[id_anue] =
         (pair_kernels_m1.em[id_anue] + brem_kernels_m1.em[id_anue]) *
         block_factor[id_nue];
-    pro_term[id_nux] =
-        (pair_kernels_m1.em[id_nux] + brem_kernels_m1.em[id_nux]) *
-        block_factor[id_anux];
-    pro_term[id_anux] =
-        (pair_kernels_m1.em[id_anux] + brem_kernels_m1.em[id_anux]) *
-        block_factor[id_nux];
 
-    for (int idx = 0; idx < total_num_species; ++idx)
-    {
-        pro_term[idx] += (inelastic_NEPS_kernels_m1.em[idx]
-                        + inelastic_NMS_kernels_m1.em[idx]) * g_nu_bar[idx];
+    if constexpr (total_num_species == 4){
+
+        pro_term[id_nux] =
+            (pair_kernels_m1.em[id_nux] + brem_kernels_m1.em[id_nux]) *
+            block_factor[id_anux];
+        pro_term[id_anux] =
+            (pair_kernels_m1.em[id_anux] + brem_kernels_m1.em[id_anux]) *
+            block_factor[id_nux];
+
+        for (int idx = 0; idx < total_num_species; ++idx)
+        {
+            pro_term[idx] += inelastic_NEPS_kernels_m1.em[idx] * g_nu_bar[idx];
+        }
+    }
+    else if constexpr (total_num_species == 6){
+
+        pro_term[id_num] =
+            (pair_kernels_m1.em[id_num] + brem_kernels_m1.em[id_num]) *
+            block_factor[id_anum];
+        pro_term[id_anum] =
+            (pair_kernels_m1.em[id_anum] + brem_kernels_m1.em[id_anum]) *
+            block_factor[id_num];
+        pro_term[id_nut] =
+            (pair_kernels_m1.em[id_nut] + brem_kernels_m1.em[id_nut]) *
+            block_factor[id_anut];
+        pro_term[id_anut] =
+            (pair_kernels_m1.em[id_anut] + brem_kernels_m1.em[id_anut]) *
+            block_factor[id_nut];
+
+        for (int idx = 0; idx < total_num_species; ++idx)
+        {
+            pro_term[idx] += (inelastic_NEPS_kernels_m1.em[idx]
+                            + inelastic_NMS_kernels_m1.em[idx]) * g_nu_bar[idx];
+        }
     }
 
     // Total annihilation term
@@ -2537,13 +2565,43 @@ MyQuadratureIntegrand SpectralIntegrand(BS_REAL* var, void* p)
     ann_term[id_anue] =
         (pair_kernels_m1.abs[id_anue] + brem_kernels_m1.abs[id_anue]) *
         g_nu_bar[id_nue];
-    ann_term[id_nux] =
-        (pair_kernels_m1.abs[id_nux] + brem_kernels_m1.abs[id_nux]) *
-        g_nu_bar[id_anux];
-    ann_term[id_anux] =
-        (pair_kernels_m1.abs[id_anux] + brem_kernels_m1.abs[id_anux]) *
-        g_nu_bar[id_nux];
 
+    if constexpr (total_num_species == 4)
+    {
+        ann_term[id_nux] =
+            (pair_kernels_m1.abs[id_nux] + brem_kernels_m1.abs[id_nux]) *
+            g_nu_bar[id_anux];
+        ann_term[id_anux] =
+            (pair_kernels_m1.abs[id_anux] + brem_kernels_m1.abs[id_anux]) *
+            g_nu_bar[id_nux];
+
+        for (int idx = 0; idx < total_num_species; ++idx)
+        {
+            ann_term[idx] += inelastic_NEPS_kernels_m1.abs[idx] * block_factor[idx];
+        }
+    }
+
+    else if constexpr (total_num_species == 6)
+    {
+        ann_term[id_num] =
+            (pair_kernels_m1.abs[id_num] + brem_kernels_m1.abs[id_num]) *
+            g_nu_bar[id_anum];
+        ann_term[id_anum] =
+            (pair_kernels_m1.abs[id_anum] + brem_kernels_m1.abs[id_anum]) *
+            g_nu_bar[id_num];
+        ann_term[id_nut] =
+            (pair_kernels_m1.abs[id_nut] + brem_kernels_m1.abs[id_nut]) *
+            g_nu_bar[id_anut];
+        ann_term[id_anut] =
+            (pair_kernels_m1.abs[id_anut] + brem_kernels_m1.abs[id_anut]) *
+            g_nu_bar[id_nut];
+
+        for (int idx = 0; idx < total_num_species; ++idx)
+        {
+            ann_term[idx] += (inelastic_NEPS_kernels_m1.abs[idx]
+                            + inelastic_NMS_kernels_m1.abs[idx]) * block_factor[idx];
+        }
+    }
     //////////////////////////////////////////////
     ////// ONLY FOR COMPARISON WITH NULIB ////////
     //////////////////////////////////////////////
@@ -2553,18 +2611,27 @@ MyQuadratureIntegrand SpectralIntegrand(BS_REAL* var, void* p)
             pair_kernels_m1.em[id_nue] * g_nu_bar[id_anue] / g_nu[id_nue];
         ann_term[id_anue] +=
             pair_kernels_m1.em[id_anue] * g_nu_bar[id_nue] / g_nu[id_anue];
-        ann_term[id_nux] +=
-            pair_kernels_m1.em[id_nux] * g_nu_bar[id_anux] / g_nu[id_nux];
-        ann_term[id_anux] +=
-            pair_kernels_m1.em[id_anux] * g_nu_bar[id_nux] / g_nu[id_anux];
+
+        if constexpr (total_num_species == 4)
+        {
+            ann_term[id_nux] +=
+                pair_kernels_m1.em[id_nux] * g_nu_bar[id_anux] / g_nu[id_nux];
+            ann_term[id_anux] +=
+                pair_kernels_m1.em[id_anux] * g_nu_bar[id_nux] / g_nu[id_anux];
+        }
+        else if constexpr (total_num_species == 6)
+        {
+            ann_term[id_num] +=
+                pair_kernels_m1.em[id_num] * g_nu_bar[id_anum] / g_nu[id_num];
+            ann_term[id_anum] +=
+                pair_kernels_m1.em[id_anum] * g_nu_bar[id_num] / g_nu[id_anum];
+                ann_term[id_nut] +=
+                pair_kernels_m1.em[id_nut] * g_nu_bar[id_anut] / g_nu[id_nut];
+            ann_term[id_anut] +=
+                pair_kernels_m1.em[id_anut] * g_nu_bar[id_nut] / g_nu[id_anut];
+        }
     }
     //////////////////////////////////////////////
-
-    for (int idx = 0; idx < total_num_species; ++idx)
-    {
-        ann_term[idx] += (inelastic_NEPS_kernels_m1.abs[idx]
-                        + inelastic_NMS_kernels_m1.abs[idx]) * block_factor[idx];
-    }
 
     BS_REAL integrand_1[total_num_species], integrand_2[total_num_species];
 
@@ -2574,34 +2641,41 @@ MyQuadratureIntegrand SpectralIntegrand(BS_REAL* var, void* p)
         integrand_2[idx] = POW2(nu_bar) * ann_term[idx];
     }
 
-    MyQuadratureIntegrand result = {.n = 8};
+    MyQuadratureIntegrand result = {.n = double_total_num_species};
 
-    result.integrand[0] = integrand_1[id_nue];
-    result.integrand[1] = integrand_1[id_anue];
-    result.integrand[2] = integrand_1[id_nux];
-    result.integrand[3] = integrand_1[id_anux];
-    result.integrand[4] = integrand_2[id_nue];
-    result.integrand[5] = integrand_2[id_anue];
-    result.integrand[6] = integrand_2[id_nux];
-    result.integrand[7] = integrand_2[id_anux];
+    for (int idx = 0; idx < total_num_species; ++idx)
+    {
+        result.integrand[idx] = integrand_1[idx];
+        result.integrand[total_num_species + idx] = integrand_2[idx];
+    }
 
     return result;
 }
 
-/* Computes the spectral emissivity and inverse mean free path */
 
+/* Computes the spectral emissivity and inverse mean free path */
 // Version without stimulated absorption
 KOKKOS_INLINE_FUNCTION
 SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
-    const BS_REAL nu, MyQuadrature* quad_1d,
-    GreyOpacityParams* my_grey_opacity_params)
+        const BS_REAL nu, MyQuadrature* quad_1d,
+        GreyOpacityParams* my_grey_opacity_params)
 {
     constexpr BS_REAL zero    = 0;
     constexpr BS_REAL one     = 1;
     constexpr BS_REAL two_over_three = 2. / 3.;
     constexpr BS_REAL four_pi = 4 * kBS_Pi;
     constexpr BS_REAL c_light = kBS_Clight;
+    //constexpr int double_total_num_species = 2 * total_num_species;
     BS_REAL wmin, wmax;
+
+    constexpr int id_nue_abs = total_num_species + id_nue;
+    constexpr int id_anue_abs = total_num_species + id_anue;
+    constexpr int id_nux_abs = total_num_species + id_nux;
+    constexpr int id_anux_abs = total_num_species + id_anux;
+    constexpr int id_num_abs = total_num_species + id_num;
+    constexpr int id_anum_abs = total_num_species + id_anum;
+    constexpr int id_nut_abs = total_num_species + id_nut;
+    constexpr int id_anut_abs = total_num_species + id_anut;
 
     // Extremals for NMS integration
     if (my_grey_opacity_params->opacity_pars.NMS_implementation == NMS_KernelInterp)
@@ -2625,7 +2699,7 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
 
     // set up 1d integration
     MyFunctionMultiD integrand_m1_1d;
-    MyQuadratureIntegrand integrand_m1_1d_info = {.n = 8};
+    MyQuadratureIntegrand integrand_m1_1d_info = {.n = double_total_num_species};
     integrand_m1_1d.function                   = &SpectralIntegrand;
     integrand_m1_1d.dim                        = 1;
     integrand_m1_1d.params                     = &local_grey_params;
@@ -2639,25 +2713,17 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
         g_nu[idx] = TotalNuF(nu, &my_grey_opacity_params->distr_pars, idx);
     }
 
-    // const BS_REAL eta_e = my_grey_opacity_params->eos_pars.mu_e /
-    //                       my_grey_opacity_params->eos_pars.temp;
-
     constexpr BS_REAL temp_multiple = 0.5 * 4.364;
 
-    BS_REAL s_pair[8], s_neps[8], s_nms[8];
+    // s can vary in terms of nu flavors and type of integrand (em or abs)
+    BS_REAL s_pair[double_total_num_species], s_neps[double_total_num_species], 
+            s_nms[double_total_num_species];
 
-    for (int i = 0; i < 8; ++i)
+    for (int i = 0; i < double_total_num_species; ++i)
     {
-        // s[i] = 1.5 * my_grey_opacity_params->eos_pars.temp;
         s_pair[i] = temp_multiple * my_grey_opacity_params->eos_pars.temp;
         s_neps[i] = nu;
         s_nms[i] = std::max(3. * wmin, std::min(nu, two_over_three * wmax));
-
-        // s[i] = my_grey_opacity_params->eos_pars.temp;
-        // s[i] = 2.425E-03 * my_grey_opacity_params->eos_pars.temp;
-        // s[i] =
-        // 0.5 * my_grey_opacity_params->eos_pars.temp *
-        // (FDI_p4(eta_e) / FDI_p3(eta_e) + FDI_p4(-eta_e) / FDI_p3(-eta_e));
     }
 
     MyQuadratureIntegrand integrals_pair_1d =
@@ -2706,62 +2772,141 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
 
     SpectralOpacities sp_opacities;
 
-    sp_opacities.j[id_nue]  = abs_em_beta.em[id_nue] +
-                              kBS_FourPi_hc3 * (integrals_pair_1d.integrand[0] +
-                                                integrals_neps_1d.integrand[0] +
-                                                integrals_nms_1d.integrand[0]);
-    sp_opacities.j[id_anue] = abs_em_beta.em[id_anue] +
-                              kBS_FourPi_hc3 * (integrals_pair_1d.integrand[1] +
-                                                integrals_neps_1d.integrand[1] +
-                                                integrals_nms_1d.integrand[1]);
-    sp_opacities.j[id_nux]  = abs_em_muonic_beta.em[id_nux] +
-                              kBS_FourPi_hc3 * (integrals_pair_1d.integrand[2] +
-                                                integrals_neps_1d.integrand[2] +
-                                                integrals_nms_1d.integrand[2]);
-    sp_opacities.j[id_anux] = abs_em_muonic_beta.em[id_anux] +
-                              kBS_FourPi_hc3 * (integrals_pair_1d.integrand[3] +
-                                                integrals_neps_1d.integrand[3] +
-                                                integrals_nms_1d.integrand[3]);
+    if constexpr (total_num_species == 4)
+    {
+        // Emissivities
+        sp_opacities.j[id_nue]  = abs_em_beta.em[id_nue] +
+                                  kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_nue] +
+                                                    integrals_neps_1d.integrand[id_nue]);
+        sp_opacities.j[id_anue] = abs_em_beta.em[id_anue] +
+                                  kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_anue] +
+                                                    integrals_neps_1d.integrand[id_anue]);
+        sp_opacities.j[id_nux]  = kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_nux] +
+                                                    integrals_neps_1d.integrand[id_nux]);
+        sp_opacities.j[id_anux] = kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_anux] +
+                                                    integrals_neps_1d.integrand[id_anux]);
 
-    sp_opacities.kappa[id_nue] =
-        (abs_em_beta.abs[id_nue] +
-         kBS_FourPi_hc3 * (integrals_pair_1d.integrand[4] +
-                           integrals_neps_1d.integrand[4] +
-                           integrals_nms_1d.integrand[4])) /
-        c_light;
-    sp_opacities.kappa[id_anue] =
-        (abs_em_beta.abs[id_anue] +
-         kBS_FourPi_hc3 * (integrals_pair_1d.integrand[5] +
-                           integrals_neps_1d.integrand[5] +
-                           integrals_nms_1d.integrand[5])) /
-        c_light;
-    sp_opacities.kappa[id_nux] =
-        (abs_em_muonic_beta.abs[id_nux] +
-         kBS_FourPi_hc3 * (integrals_pair_1d.integrand[6] +
-                           integrals_neps_1d.integrand[6] +
-                           integrals_nms_1d.integrand[6])) /
-        c_light;
-    sp_opacities.kappa[id_anux] =
-        (abs_em_muonic_beta.abs[id_anux] +
-         kBS_FourPi_hc3 * (integrals_pair_1d.integrand[7] +
-                           integrals_neps_1d.integrand[7] +
-                           integrals_nms_1d.integrand[7])) /
-        c_light;
+        // Absorsivities
+        sp_opacities.kappa[id_nue] =
+            (abs_em_beta.abs[id_nue] +
+             kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_nue_abs] +
+                               integrals_neps_1d.integrand[id_nue_abs])) /
+            c_light;
+        sp_opacities.kappa[id_anue] =
+            (abs_em_beta.abs[id_anue] +
+             kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_anue_abs] +
+                               integrals_neps_1d.integrand[id_anue_abs])) /
+            c_light;
+        sp_opacities.kappa[id_nux] =
+            kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_nux_abs] +
+                              integrals_neps_1d.integrand[id_nux_abs]) /
+            c_light;
+        sp_opacities.kappa[id_anux] =
+            kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_anux_abs] +
+                              integrals_neps_1d.integrand[id_anux_abs]) /
+            c_light;
 
-    sp_opacities.j_s[id_nue]  = four_pi * POW2(nu) * g_nu[id_nue] * iso_scatt;
-    sp_opacities.j_s[id_anue] = four_pi * POW2(nu) * g_nu[id_anue] * iso_scatt;
-    sp_opacities.j_s[id_nux]  = four_pi * POW2(nu) * g_nu[id_nux] * iso_scatt;
-    sp_opacities.j_s[id_anux] = four_pi * POW2(nu) * g_nu[id_anux] * iso_scatt;
+        
+        // Scattering quantities
+        sp_opacities.j_s[id_nue]  = four_pi * POW2(nu) * g_nu[id_nue] * iso_scatt;
+        sp_opacities.j_s[id_anue] = four_pi * POW2(nu) * g_nu[id_anue] * iso_scatt;
+        sp_opacities.j_s[id_nux]  = four_pi * POW2(nu) * g_nu[id_nux] * iso_scatt;
+        sp_opacities.j_s[id_anux] = four_pi * POW2(nu) * g_nu[id_anux] * iso_scatt;
 
-    sp_opacities.kappa_s[id_nue] =
-        four_pi * POW2(nu) * (one - g_nu[id_nue]) * iso_scatt / c_light;
-    sp_opacities.kappa_s[id_anue] =
-        four_pi * POW2(nu) * (one - g_nu[id_anue]) * iso_scatt / c_light;
-    sp_opacities.kappa_s[id_nux] =
-        four_pi * POW2(nu) * (one - g_nu[id_nux]) * iso_scatt / c_light;
-    sp_opacities.kappa_s[id_anux] =
-        four_pi * POW2(nu) * (one - g_nu[id_anux]) * iso_scatt / c_light;
+        sp_opacities.kappa_s[id_nue] =
+            four_pi * POW2(nu) * (one - g_nu[id_nue]) * iso_scatt / c_light;
+        sp_opacities.kappa_s[id_anue] =
+            four_pi * POW2(nu) * (one - g_nu[id_anue]) * iso_scatt / c_light;
+        sp_opacities.kappa_s[id_nux] =
+            four_pi * POW2(nu) * (one - g_nu[id_nux]) * iso_scatt / c_light;
+        sp_opacities.kappa_s[id_anux] =
+            four_pi * POW2(nu) * (one - g_nu[id_anux]) * iso_scatt / c_light;
+    }
+    
+    else if constexpr (total_num_species == 6)
+    {
+        // Emissivities
+        sp_opacities.j[id_nue]  = abs_em_beta.em[id_nue] +
+                                  kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_nue] +
+                                                    integrals_neps_1d.integrand[id_nue] +
+                                                    integrals_nms_1d.integrand[id_nue]);
+        sp_opacities.j[id_anue] = abs_em_beta.em[id_anue] +
+                                  kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_anue] +
+                                                    integrals_neps_1d.integrand[id_anue] +
+                                                    integrals_nms_1d.integrand[id_anue]);
+        sp_opacities.j[id_num]  = abs_em_muonic_beta.em[id_num] +
+                                  kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_num] +
+                                                    integrals_neps_1d.integrand[id_num] +
+                                                    integrals_nms_1d.integrand[id_num]);
+        sp_opacities.j[id_anum] = abs_em_muonic_beta.em[id_anum] +
+                                  kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_anum] +
+                                                    integrals_neps_1d.integrand[id_anum] +
+                                                    integrals_nms_1d.integrand[id_anum]);
+        sp_opacities.j[id_nut]  = kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_nut] +
+                                                    integrals_neps_1d.integrand[id_nut] +
+                                                    integrals_nms_1d.integrand[id_nut]);
+        sp_opacities.j[id_anut] = kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_anut] +
+                                                    integrals_neps_1d.integrand[id_anut] +
+                                                    integrals_nms_1d.integrand[id_anut]);
 
+        // Absorsivities
+        sp_opacities.kappa[id_nue] =
+            (abs_em_beta.abs[id_nue] +
+             kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_nue_abs] +
+                               integrals_neps_1d.integrand[id_nue_abs] +
+                               integrals_nms_1d.integrand[id_nue_abs])) /
+            c_light;
+        sp_opacities.kappa[id_anue] =
+            (abs_em_beta.abs[id_anue] +
+             kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_anue_abs] +
+                               integrals_neps_1d.integrand[id_anue_abs] +
+                               integrals_nms_1d.integrand[id_anue_abs])) /
+            c_light;
+        sp_opacities.kappa[id_num] =
+            (abs_em_muonic_beta.abs[id_num] +
+             kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_num_abs] +
+                               integrals_neps_1d.integrand[id_num_abs] +
+                               integrals_nms_1d.integrand[id_num_abs])) /
+            c_light;
+        sp_opacities.kappa[id_anum] =
+            (abs_em_muonic_beta.abs[id_anum] +
+             kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_anum_abs] +
+                               integrals_neps_1d.integrand[id_anum_abs] +
+                               integrals_nms_1d.integrand[id_anum_abs])) /
+            c_light;
+        sp_opacities.kappa[id_nut] =
+            kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_nut_abs] +
+                               integrals_neps_1d.integrand[id_nut_abs] +
+                               integrals_nms_1d.integrand[id_nut_abs]) /
+            c_light;
+        sp_opacities.kappa[id_anut] =
+            kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_anut_abs] +
+                               integrals_neps_1d.integrand[id_anut_abs] +
+                               integrals_nms_1d.integrand[id_anut_abs]) /
+            c_light;
+
+        // Scattering quantities
+        sp_opacities.j_s[id_nue]  = four_pi * POW2(nu) * g_nu[id_nue] * iso_scatt;
+        sp_opacities.j_s[id_anue] = four_pi * POW2(nu) * g_nu[id_anue] * iso_scatt;
+        sp_opacities.j_s[id_num]  = four_pi * POW2(nu) * g_nu[id_num] * iso_scatt;
+        sp_opacities.j_s[id_anum] = four_pi * POW2(nu) * g_nu[id_anum] * iso_scatt;
+        sp_opacities.j_s[id_nut]  = four_pi * POW2(nu) * g_nu[id_nut] * iso_scatt;
+        sp_opacities.j_s[id_anut] = four_pi * POW2(nu) * g_nu[id_anut] * iso_scatt;
+
+        sp_opacities.kappa_s[id_nue] =
+            four_pi * POW2(nu) * (one - g_nu[id_nue]) * iso_scatt / c_light;
+        sp_opacities.kappa_s[id_anue] =
+            four_pi * POW2(nu) * (one - g_nu[id_anue]) * iso_scatt / c_light;
+        sp_opacities.kappa_s[id_num] =
+            four_pi * POW2(nu) * (one - g_nu[id_num]) * iso_scatt / c_light;
+        sp_opacities.kappa_s[id_anum] =
+            four_pi * POW2(nu) * (one - g_nu[id_anum]) * iso_scatt / c_light;
+        sp_opacities.kappa_s[id_nut] =
+            four_pi * POW2(nu) * (one - g_nu[id_nut]) * iso_scatt / c_light;
+        sp_opacities.kappa_s[id_anut] =
+            four_pi * POW2(nu) * (one - g_nu[id_anut]) * iso_scatt / c_light;
+    }
+    
     return sp_opacities;
 }
 

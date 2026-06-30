@@ -185,9 +185,20 @@ MyKernelOutput PairKernels(const MyEOSParams* eos_pars,
 
     pair_kernel.em[id_nue]  = half * pair_phi[0];
     pair_kernel.em[id_anue] = half * pair_phi[1];
-    pair_kernel.em[id_nux]  = half * pair_phi[2];
-    pair_kernel.em[id_anux] = half * pair_phi[3];
 
+    if constexpr (total_num_species == 4)
+    {
+        pair_kernel.em[id_nux]  = half * pair_phi[2]; 
+        pair_kernel.em[id_anux] = half * pair_phi[3];  
+    }
+    else if constexpr (total_num_species == 6)
+    {
+        pair_kernel.em[id_num]  = half * pair_phi[2]; 
+        pair_kernel.em[id_anum] = half * pair_phi[3];
+        pair_kernel.em[id_nut] = pair_kernel.em[id_num];
+        pair_kernel.em[id_anut] = pair_kernel.em[id_anum];
+    }
+    
     for (int idx = 0; idx < total_num_species; ++idx)
     {
         pair_kernel.abs[idx] =
@@ -204,15 +215,35 @@ void PairKernels(const MyEOSParams* eos_pars,
 {
     *out_for = PairKernels(eos_pars, kernel_pars);
 
-    out_inv->em[id_nue]  = out_for->em[id_anue];
-    out_inv->em[id_anue] = out_for->em[id_nue];
-    out_inv->em[id_nux]  = out_for->em[id_anux];
-    out_inv->em[id_anux] = out_for->em[id_nux];
+    if constexpr (total_num_species == 4)
+    {
+        out_inv->em[id_nue]  = out_for->em[id_anue];
+        out_inv->em[id_anue] = out_for->em[id_nue];
+        out_inv->em[id_nux]  = out_for->em[id_anux];
+        out_inv->em[id_anux] = out_for->em[id_nux];
 
-    out_inv->abs[id_nue]  = out_for->abs[id_anue];
-    out_inv->abs[id_anue] = out_for->abs[id_nue];
-    out_inv->abs[id_nux]  = out_for->abs[id_anux];
-    out_inv->abs[id_anux] = out_for->abs[id_nux];
+        out_inv->abs[id_nue]  = out_for->abs[id_anue];
+        out_inv->abs[id_anue] = out_for->abs[id_nue];
+        out_inv->abs[id_nux]  = out_for->abs[id_anux];
+        out_inv->abs[id_anux] = out_for->abs[id_nux];
+    }
+    
+    else if constexpr (total_num_species == 6)
+    {
+        out_inv->em[id_nue]  = out_for->em[id_anue];
+        out_inv->em[id_anue] = out_for->em[id_nue];
+        out_inv->em[id_num]  = out_for->em[id_anum];
+        out_inv->em[id_anum] = out_for->em[id_num];
+        out_inv->em[id_nut]  = out_for->em[id_anut];
+        out_inv->em[id_anut] = out_for->em[id_nut];
+
+        out_inv->abs[id_nue]  = out_for->abs[id_anue];
+        out_inv->abs[id_anue] = out_for->abs[id_nue];
+        out_inv->abs[id_num]  = out_for->abs[id_anum];
+        out_inv->abs[id_anum] = out_for->abs[id_num];
+        out_inv->abs[id_nut]  = out_for->abs[id_anut];
+        out_inv->abs[id_anut] = out_for->abs[id_nut];
+    }
 }
 
 #endif // BNS_NURATES_INCLUDE_KERNEL_PAIR_HPP_

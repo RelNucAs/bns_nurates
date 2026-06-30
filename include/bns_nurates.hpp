@@ -58,8 +58,17 @@ namespace Kokkos {
 #define id_anue 1
 #define id_nux 2
 #define id_anux 3
+#define id_num 2
+#define id_anum 3
+#define id_nut 4
+#define id_anut 5
 
+//#define total_num_species 4
+#ifndef total_num_species
 #define total_num_species 4
+#endif
+
+#define double_total_num_species (2 * total_num_species)
 
 // Define dimension of tabulated PairT function
 #define dim_pair_t 100

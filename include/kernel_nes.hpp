@@ -344,15 +344,38 @@ KOKKOS_INLINE_FUNCTION
 MyKernelOutput InelasticNEPSKernels(InelasticScattKernelParams* kernel_params,
                                      MyEOSParams* eos_params)
 {
+
     MyKernelOutput nes_kernel = NESKernels(kernel_params, eos_params);
     MyKernelOutput nps_kernel = NPSKernels(kernel_params, eos_params);
 
     MyKernelOutput tot_kernel = {0};
 
-    for (int idx = 0; idx < total_num_species; ++idx)
+    // nu_e
+    tot_kernel.em[id_nue]  = nes_kernel.em[id_nue] + nps_kernel.em[id_nue];
+    tot_kernel.abs[id_nue] = nes_kernel.abs[id_nue] + nps_kernel.abs[id_nue];
+    // anu_e
+    tot_kernel.em[id_anue]  = nes_kernel.em[id_anue] + nps_kernel.em[id_anue];
+    tot_kernel.abs[id_anue] = nes_kernel.abs[id_anue] + nps_kernel.abs[id_anue];
+
+    // Heavy neutrinos
+    if constexpr (total_num_species == 4)
     {
-        tot_kernel.em[idx]  = nes_kernel.em[idx] + nps_kernel.em[idx];
-        tot_kernel.abs[idx] = nes_kernel.abs[idx] + nps_kernel.abs[idx];
+        tot_kernel.em[id_nux]  = nes_kernel.em[id_nux] + nps_kernel.em[id_nux];
+        tot_kernel.abs[id_nux] = nes_kernel.abs[id_nux] + nps_kernel.abs[id_nux];
+        tot_kernel.em[id_anux]  = nes_kernel.em[id_anux] + nps_kernel.em[id_anux];
+        tot_kernel.abs[id_anux] = nes_kernel.abs[id_anux] + nps_kernel.abs[id_anux];
+    }
+
+    else if constexpr (total_num_species == 6)
+    {
+        tot_kernel.em[id_num]  = nes_kernel.em[id_nux] + nps_kernel.em[id_nux];
+        tot_kernel.abs[id_num] = nes_kernel.abs[id_nux] + nps_kernel.abs[id_nux];
+        tot_kernel.em[id_anum]  = nes_kernel.em[id_anux] + nps_kernel.em[id_anux];
+        tot_kernel.abs[id_anum] = nes_kernel.abs[id_anux] + nps_kernel.abs[id_anux];
+        tot_kernel.em[id_nut] = tot_kernel.em[id_num];
+        tot_kernel.abs[id_nut] = tot_kernel.abs[id_num];
+        tot_kernel.em[id_anut] = tot_kernel.em[id_anum];
+        tot_kernel.abs[id_anut] = tot_kernel.abs[id_anum];
     }
 
     return tot_kernel;

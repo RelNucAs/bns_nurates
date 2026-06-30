@@ -30,37 +30,80 @@ int main(int argc, char* argv[])
     const double dm = 
         mn_eff - mp_eff;          // Nucleon effective mass difference [MeV]
 
-    // Input gray neutrino quantities (library supports 4 neutrino species)
+
+    // Input gray neutrino quantities from M1
     // N.B.: These will be used only in PART 2 for reconstructing the neutrino
-    // distribution functions
-    //       and as normalization factors for energy-averaged opacities
-    const double n_nue =
-        3.776741015683965e+33; // Electron neutrino number density [cm-3]
-    const double n_anue =
-        1.205553071624256e+35; // Electron antineutrino number density [cm-3]
-    const double n_nux =
-        2.271245089833032e+34; // Heavy-type neutrino number density [cm-3]
-    const double n_anux =
-        2.271245089833032e+34; // Heavy-type antineutrino number density [cm-3]
-    const double j_nue =
-        1.404570452828258e+35; // Electron neutrino energy density [MeV cm-3]
-    const double j_anue = 5.320827032977899e+36; // Electron antineutrino number
-                                                 // density [MeV cm-3]
-    const double j_nux =
-        8.885618224045794e+35; // Heavy-type neutrino energy density [MeV cm-3]
-    const double j_anux = 8.885618224045794e+35; // Heavy-type antineutrino
-                                                 // energy density [MeV cm-3]
-    const double chi_nue  = 1. / 3.; // Electron neutrino Eddington factor
-    const double chi_anue = 1. / 3.; // Electron antineutrino Eddington factor
-    const double chi_nux  = 1. / 3.; // Heavy-type neutrino Eddington factor
-    const double chi_anux = 1. / 3.; // Heavy-type antineutrino Eddington factor
+    //       distribution functions and as normalization factors for 
+    //       energy-averaged opacities
+    double n_nue, n_anue, j_nue, j_anue, chi_nue, chi_anue;
+    double n_nux, n_anux, j_nux, j_anux, chi_nux, chi_anux;
+    double n_num, n_anum, j_num, j_anum, chi_num, chi_anum;
+    double n_nut, n_anut, j_nut, j_anut, chi_nut, chi_anut;
+
+    if (total_num_species == 4)
+    {
+        n_nue =
+            3.776741015683965e+33; // Electron neutrino number density [cm-3]
+        n_anue =
+            1.205553071624256e+35; // Electron antineutrino number density [cm-3]
+        n_nux =
+            2.271245089833032e+34; // Heavy-type neutrino number density [cm-3]
+        n_anux =
+            2.271245089833032e+34; // Heavy-type antineutrino number density [cm-3]
+        j_nue =
+            1.404570452828258e+35; // Electron neutrino energy density [MeV cm-3]
+        j_anue = 
+            5.320827032977899e+36; // Electron antineutrino number density [MeV cm-3]
+        j_nux =
+            8.885618224045794e+35; // Heavy-type neutrino energy density [MeV cm-3]
+        j_anux = 
+            8.885618224045794e+35; // Heavy-type antineutrino energy density [MeV cm-3]
+        chi_nue  = 1. / 3.; // Electron neutrino Eddington factor
+        chi_anue = 1. / 3.; // Electron antineutrino Eddington factor
+        chi_nux  = 1. / 3.; // Heavy-type neutrino Eddington factor
+        chi_anux = 1. / 3.; // Heavy-type antineutrino Eddington factor
+    }
+
+    else if (total_num_species == 6)
+    {
+        n_nue =
+            3.776741015683965e+33; // Electron neutrino number density [cm-3]
+        n_anue =
+            1.205553071624256e+35; // Electron antineutrino number density [cm-3]
+        n_num =
+            0.5 * 2.271245089833032e+34; // Muon neutrino number density [cm-3]
+        n_anum =
+            0.5 * 2.271245089833032e+34; // Muon antineutrino number density [cm-3]
+        n_nut =
+            0.5 * 2.271245089833032e+34; // Tau neutrino number density [cm-3]
+        n_anut =
+            0.5 * 2.271245089833032e+34; // Tau antineutrino number density [cm-3]
+        j_nue = 
+            1.404570452828258e+35; // Electron neutrino energy density [MeV cm-3]
+        j_anue = 
+            5.320827032977899e+36; // Electron antineutrino number density [MeV cm-3]
+        j_num = 
+            0.5 * 8.885618224045794e+35; // Muon neutrino energy density [MeV cm-3]
+        j_anum = 
+            0.5 * 8.885618224045794e+35; // Muon antineutrino energy density [MeV cm-3]
+        j_nut = 
+            0.5 * 8.885618224045794e+35; // Tau neutrino energy density [MeV cm-3]
+        j_anut = 
+            0.5 * 8.885618224045794e+35; // Tau antineutrino energy density [MeV cm-3]
+        chi_nue  = 1. / 3.; // Electron neutrino Eddington factor
+        chi_anue = 1. / 3.; // Electron antineutrino Eddington factor
+        chi_num  = 1. / 3.; // Muon neutrino Eddington factor
+        chi_anum = 1. / 3.; // Muon antineutrino Eddington factor
+        chi_nut  = 1. / 3.; // Tau neutrino Eddington factor
+        chi_anut = 1. / 3.; // Tau antineutrino Eddington factor
+    }
 
     // Create a quadrature struct and populate it with data relative to
     // Gauss-Legendre quadrature
     // N.B.: only the 'nx' member can be modified, all the others should
     //       be always set as the following
     MyQuadrature my_quadrature;
-    my_quadrature.nx   = 12; // number of quadrature points
+    my_quadrature.nx   = 6; // number of quadrature points
     my_quadrature.dim  = 1;
     my_quadrature.type = kGauleg;
     my_quadrature.x1   = 0.;
@@ -90,8 +133,6 @@ int main(int argc, char* argv[])
     // Select active reactions
     my_grey_opacity_params.opacity_flags.use_abs_em =
         1; // Activate beta processes
-    my_grey_opacity_params.opacity_flags.use_muonic_beta =
-        0; // Activate beta processes with muons
     my_grey_opacity_params.opacity_flags.use_brem =
         1; // Activate Bremsstrahlung
     my_grey_opacity_params.opacity_flags.use_pair =
@@ -100,10 +141,21 @@ int main(int argc, char* argv[])
         1; // Activate scattering on nucleons
     my_grey_opacity_params.opacity_flags.use_inelastic_NEPS =
         1; // Activate scattering on electrons/positrons
-    my_grey_opacity_params.opacity_flags.use_inelastic_NMS =
-        0; // Activate scattering on muons
 
-
+    // Select active muonic reactions
+    if (total_num_species == 6)
+    {
+        my_grey_opacity_params.opacity_flags.use_muonic_beta =
+            0; // Activate beta processes with muons
+        my_grey_opacity_params.opacity_flags.use_inelastic_NMS =
+            0; // Activate scattering on muons
+    }
+    else  // no muonic reactions if num=nut=nux
+    {
+        my_grey_opacity_params.opacity_flags.use_muonic_beta = 0;
+        my_grey_opacity_params.opacity_flags.use_inelastic_NMS = 0;
+    }
+    
     // Select corrections to rates
     my_grey_opacity_params.opacity_pars.use_dm_eff =
         1; // Do not use effective mass correction to beta processes
@@ -125,7 +177,7 @@ int main(int argc, char* argv[])
     my_grey_opacity_params.opacity_pars.use_NN_medium_corr =
         1; // Activate NN bremsstrahlung medium correction as in Fischer+16
     my_grey_opacity_params.opacity_pars.neglect_blocking =
-        true;   // Select 'true' to neglect neutrino blocking factors
+        false;   // Select 'true' to neglect neutrino blocking factors
 
     // Pass thermodynamic conditions
     my_grey_opacity_params.eos_pars.nb =
@@ -183,32 +235,83 @@ int main(int argc, char* argv[])
     printf(
         "Electron antineutrinos number density 'n'          : %13.6e (cm^-3)\n",
         n_anue);
-    printf(
-        "Heavy-type neutrinos number density 'n'            : %13.6e (cm^-3)\n",
-        n_nux);
-    printf(
-        "Heavy-type antineutrinos number density 'n'        : %13.6e (cm^-3)\n",
-        n_anux);
-    printf("Electron neutrinos energy density 'J'              : %13.6e (MeV "
+    if (total_num_species == 4)
+    {
+        printf(
+            "Heavy-type neutrinos number density 'n'            : %13.6e (cm^-3)\n",
+            n_nux);
+        printf(
+            "Heavy-type antineutrinos number density 'n'        : %13.6e (cm^-3)\n",
+            n_anux);
+    }
+    else if (total_num_species == 6)
+    {
+        printf(
+            "Muon neutrinos number density 'n'                  : %13.6e (cm^-3)\n",
+            n_num);
+        printf(
+            "Muon antineutrinos number density 'n'              : %13.6e (cm^-3)\n",
+            n_anum);
+        printf(
+            "Tau neutrinos number density 'n'                   : %13.6e (cm^-3)\n",
+            n_nut);
+        printf(
+            "Tau antineutrinos number density 'n'               : %13.6e (cm^-3)\n",
+            n_anut);
+    }
+    printf("Electron neutrinos energy density 'J'             : %13.6e (MeV "
            "cm^-3)\n",
            j_nue);
-    printf("Electron antineutrinos energy density 'J'          : %13.6e (MeV "
+    printf("Electron antineutrinos energy density 'J'         : %13.6e (MeV "
            "cm^-3)\n",
            j_anue);
-    printf("Heavy-type neutrinos energy density 'J'            : %13.6e (MeV "
-           "cm^-3)\n",
-           j_nux);
-    printf("Heavy-type antineutrinos energy density 'J'        : %13.6e (MeV "
-           "cm^-3)\n",
-           j_anux);
-    printf("Electron neutrinos Eddington parameter 'chi'       : %13.11f\n",
+    if (total_num_species == 4)
+    {
+        printf("Heavy-type neutrinos energy density 'J'         : %13.6e (MeV "
+            "cm^-3)\n",
+            j_nux);
+        printf("Heavy-type antineutrinos energy density 'J'     : %13.6e (MeV "
+            "cm^-3)\n",
+            j_anux);
+    }
+    else if (total_num_species == 6)
+    {
+        printf("Muon neutrinos energy density 'J'               : %13.6e (MeV "
+            "cm^-3)\n",
+            j_num);
+        printf("Muon antineutrinos energy density 'J'           : %13.6e (MeV "
+            "cm^-3)\n",
+            j_anum);
+        printf("Tau neutrinos energy density 'J'                : %13.6e (MeV "
+            "cm^-3)\n",
+            j_nut);
+        printf("Tau antineutrinos energy density 'J'            : %13.6e (MeV "
+            "cm^-3)\n",
+            j_anut);
+    }
+    printf("Electron neutrinos Eddington parameter 'chi'      : %13.11f\n",
            chi_nue);
-    printf("Electron antineutrinos Eddington parameter 'chi'   : %13.11f\n",
+    printf("Electron antineutrinos Eddington parameter 'chi'  : %13.11f\n",
            chi_anue);
-    printf("Heavy-type neutrinos Eddington parameter 'chi'     : %13.11f\n",
-           chi_nux);
-    printf("Heavy-type antineutrinos Eddington parameter 'chi' : %13.11f\n\n",
-           chi_anux);
+    if (total_num_species == 4)
+    {
+        printf("Heavy-type neutrinos Eddington parameter 'chi'     : %13.11f\n",
+            chi_nux);
+        printf("Heavy-type antineutrinos Eddington parameter 'chi'    : %13.11f\n\n",
+            chi_anux);
+    }
+    else if (total_num_species == 6)
+    {
+        printf("Muon neutrinos Eddington parameter 'chi'        : %13.11f\n",
+            chi_num);
+        printf("Muon antineutrinos Eddington parameter 'chi'    : %13.11f\n",
+            chi_anum);
+        printf("Tau neutrinos Eddington parameter 'chi'         : %13.11f\n",
+            chi_nut);
+        printf("Tau antineutrinos Eddington parameter 'chi'     : %13.11f\n\n",
+            chi_anut);
+    }
+
 
     ////////////////////////////////////////////////////////////
     // PART 1: compute rates assuming equilibrium with matter //
@@ -225,35 +328,77 @@ int main(int argc, char* argv[])
     ComputeM1DensitiesEq(&my_grey_opacity_params.eos_pars,
                          &my_grey_opacity_params.distr_pars,
                          &my_grey_opacity_params.m1_pars);
-    my_grey_opacity_params.m1_pars.chi[id_nue]  = 0.333333333333333333333333333;
-    my_grey_opacity_params.m1_pars.chi[id_anue] = 0.333333333333333333333333333;
-    my_grey_opacity_params.m1_pars.chi[id_nux]  = 0.333333333333333333333333333;
-    my_grey_opacity_params.m1_pars.chi[id_anux] = 0.333333333333333333333333333;
 
-    // Restore units of cm^-3 and MeV cm^-3 for printing
-    const double n_nue_eq  = my_grey_opacity_params.m1_pars.n[id_nue] * 1e21;
-    const double n_anue_eq = my_grey_opacity_params.m1_pars.n[id_anue] * 1e21;
-    const double n_nux_eq  = my_grey_opacity_params.m1_pars.n[id_nux] * 1e21;
-    const double n_anux_eq = my_grey_opacity_params.m1_pars.n[id_anux] * 1e21;
+    if (total_num_species == 4)
+    {
+        my_grey_opacity_params.m1_pars.chi[id_nue]  = 0.333333333333333333333333333;
+        my_grey_opacity_params.m1_pars.chi[id_anue] = 0.333333333333333333333333333;
+        my_grey_opacity_params.m1_pars.chi[id_nux]  = 0.333333333333333333333333333;
+        my_grey_opacity_params.m1_pars.chi[id_anux] = 0.333333333333333333333333333;
 
-    const double J_nue_eq  = my_grey_opacity_params.m1_pars.J[id_nue] * 1e21;
-    const double J_anue_eq = my_grey_opacity_params.m1_pars.J[id_anue] * 1e21;
-    const double J_nux_eq  = my_grey_opacity_params.m1_pars.J[id_nux] * 1e21;
-    const double J_anux_eq = my_grey_opacity_params.m1_pars.J[id_anux] * 1e21;
+        // Restore units of cm^-3 and MeV cm^-3 for printing
+        const double n_nue_eq  = my_grey_opacity_params.m1_pars.n[id_nue] * 1e21;
+        const double n_anue_eq = my_grey_opacity_params.m1_pars.n[id_anue] * 1e21;
+        const double n_nux_eq  = my_grey_opacity_params.m1_pars.n[id_nux] * 1e21;
+        const double n_anux_eq = my_grey_opacity_params.m1_pars.n[id_anux] * 1e21;
 
-    printf("Reconstructed neutrino densities assuming equilibrium\n");
-    printf("-----------------------------------------------------\n");
-    printf("    nue            anue            nux            anux\n");
-    printf("n  %13.6e  %13.6e   %13.6e  %13.6e     (cm^-3)\n", n_nue_eq,
-           n_anue_eq, n_nux_eq, n_anux_eq);
-    printf("J  %13.6e  %13.6e   %13.6e  %13.6e (MeV cm^-3)\n", J_nue_eq,
-           J_anue_eq, J_nux_eq, J_anux_eq);
-    printf("chi %12.10f   %12.10f    %12.10f   %12.10f\n\n",
-           my_grey_opacity_params.m1_pars.chi[id_nue],
-           my_grey_opacity_params.m1_pars.chi[id_anue],
-           my_grey_opacity_params.m1_pars.chi[id_nux],
-           my_grey_opacity_params.m1_pars.chi[id_anux]);
+        const double J_nue_eq  = my_grey_opacity_params.m1_pars.J[id_nue] * 1e21;
+        const double J_anue_eq = my_grey_opacity_params.m1_pars.J[id_anue] * 1e21;
+        const double J_nux_eq  = my_grey_opacity_params.m1_pars.J[id_nux] * 1e21;
+        const double J_anux_eq = my_grey_opacity_params.m1_pars.J[id_anux] * 1e21;
 
+        printf("Reconstructed neutrino densities assuming equilibrium\n");
+        printf("-----------------------------------------------------\n");
+        printf("    nue            anue            nux            anux\n");
+        printf("n  %13.6e  %13.6e   %13.6e  %13.6e     (cm^-3)\n", n_nue_eq,
+            n_anue_eq, n_nux_eq, n_anux_eq);
+        printf("J  %13.6e  %13.6e   %13.6e  %13.6e (MeV cm^-3)\n", J_nue_eq,
+            J_anue_eq, J_nux_eq, J_anux_eq);
+        printf("chi %12.10f   %12.10f    %12.10f   %12.10f\n\n",
+            my_grey_opacity_params.m1_pars.chi[id_nue],
+            my_grey_opacity_params.m1_pars.chi[id_anue],
+            my_grey_opacity_params.m1_pars.chi[id_nux],
+            my_grey_opacity_params.m1_pars.chi[id_anux]);
+    }
+    else if (total_num_species == 6)
+    {
+        my_grey_opacity_params.m1_pars.chi[id_nue]  = 0.333333333333333333333333333;
+        my_grey_opacity_params.m1_pars.chi[id_anue] = 0.333333333333333333333333333;
+        my_grey_opacity_params.m1_pars.chi[id_num]  = 0.333333333333333333333333333;
+        my_grey_opacity_params.m1_pars.chi[id_anum] = 0.333333333333333333333333333;
+        my_grey_opacity_params.m1_pars.chi[id_nut]  = 0.333333333333333333333333333;
+        my_grey_opacity_params.m1_pars.chi[id_anut] = 0.333333333333333333333333333;
+
+        // Restore units of cm^-3 and MeV cm^-3 for printing
+        const double n_nue_eq  = my_grey_opacity_params.m1_pars.n[id_nue] * 1e21;
+        const double n_anue_eq = my_grey_opacity_params.m1_pars.n[id_anue] * 1e21;
+        const double n_num_eq  = my_grey_opacity_params.m1_pars.n[id_num] * 1e21;
+        const double n_anum_eq = my_grey_opacity_params.m1_pars.n[id_anum] * 1e21;
+        const double n_nut_eq  = my_grey_opacity_params.m1_pars.n[id_nut] * 1e21;
+        const double n_anut_eq = my_grey_opacity_params.m1_pars.n[id_anut] * 1e21;
+
+        const double J_nue_eq  = my_grey_opacity_params.m1_pars.J[id_nue] * 1e21;
+        const double J_anue_eq = my_grey_opacity_params.m1_pars.J[id_anue] * 1e21;
+        const double J_num_eq  = my_grey_opacity_params.m1_pars.J[id_num] * 1e21;
+        const double J_anum_eq = my_grey_opacity_params.m1_pars.J[id_anum] * 1e21;
+        const double J_nut_eq  = my_grey_opacity_params.m1_pars.J[id_nut] * 1e21;
+        const double J_anut_eq = my_grey_opacity_params.m1_pars.J[id_anut] * 1e21;
+
+        printf("Reconstructed neutrino densities assuming equilibrium\n");
+        printf("-----------------------------------------------------\n");
+        printf("    nue            anue            num            anum            nut            anut\n");
+        printf("n  %13.6e  %13.6e   %13.6e  %13.6e   %13.6e  %13.6e     (cm^-3)\n", n_nue_eq,
+            n_anue_eq, n_num_eq, n_anum_eq, n_nut_eq, n_anut_eq);
+        printf("J  %13.6e  %13.6e   %13.6e  %13.6e   %13.6e  %13.6e (MeV cm^-3)\n", J_nue_eq,
+            J_anue_eq, J_num_eq, J_anum_eq, J_nut_eq, J_anut_eq);
+        printf("chi %12.10f   %12.10f    %12.10f   %12.10f    %12.10f   %12.10f\n\n",
+            my_grey_opacity_params.m1_pars.chi[id_nue],
+            my_grey_opacity_params.m1_pars.chi[id_anue],
+            my_grey_opacity_params.m1_pars.chi[id_num],
+            my_grey_opacity_params.m1_pars.chi[id_anum],
+            my_grey_opacity_params.m1_pars.chi[id_nut],
+            my_grey_opacity_params.m1_pars.chi[id_anut]);
+    }
 
     // Compute and output spectral emissivities and inverse mean free paths (not
     // in the stimulated absorption formalism)
@@ -265,24 +410,54 @@ int main(int argc, char* argv[])
     // paths for the
     //       sum of the active inelastic reactions, 'j_s' and 'kappa_s' are the
     //       equivalent for the elastic scattering off nucleons
-    printf("Spectral rates assuming equilibrium, not in the stimulated absorption formalism\n");
-    printf("------------------------------\n");
-    printf("     j             j_s           kappa         kappa_s\n");
-    printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_nue],
-           spectral_rates.j_s[id_nue], spectral_rates.kappa[id_nue] * 1e7,
-           spectral_rates.kappa_s[id_nue] * 1e7);
-    printf("anue %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_anue],
-           spectral_rates.j_s[id_anue], spectral_rates.kappa[id_anue] * 1e7,
-           spectral_rates.kappa_s[id_anue] * 1e7);
-    printf(" nux %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_nux],
-           spectral_rates.j_s[id_nux], spectral_rates.kappa[id_nux] * 1e7,
-           spectral_rates.kappa_s[id_nux] * 1e7);
-    printf("anux %-13.6e %-13.6e %-13.6e %-13.6e\n\n",
-           spectral_rates.j[id_anux], spectral_rates.j_s[id_anux],
-           spectral_rates.kappa[id_anux] * 1e7,
-           spectral_rates.kappa_s[id_anux] * 1e7);
+    if (total_num_species == 4)
+    {
+        printf("Spectral rates assuming equilibrium, not in the stimulated absorption formalism\n");
+        printf("------------------------------\n");
+        printf("     j             j_s           kappa         kappa_s\n");
+        printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_nue],
+            spectral_rates.j_s[id_nue], spectral_rates.kappa[id_nue] * 1e7,
+            spectral_rates.kappa_s[id_nue] * 1e7);
+        printf("anue %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_anue],
+            spectral_rates.j_s[id_anue], spectral_rates.kappa[id_anue] * 1e7,
+            spectral_rates.kappa_s[id_anue] * 1e7);
+        printf(" nux %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_nux],
+            spectral_rates.j_s[id_nux], spectral_rates.kappa[id_nux] * 1e7,
+            spectral_rates.kappa_s[id_nux] * 1e7);
+        printf("anux %-13.6e %-13.6e %-13.6e %-13.6e\n\n",
+            spectral_rates.j[id_anux], spectral_rates.j_s[id_anux],
+            spectral_rates.kappa[id_anux] * 1e7,
+            spectral_rates.kappa_s[id_anux] * 1e7);
+    }
 
-
+    else if (total_num_species == 6)
+    {
+        printf("Spectral rates assuming equilibrium, not in the stimulated absorption formalism\n");
+        printf("------------------------------\n");
+        printf("     j             j_s           kappa         kappa_s\n");
+        printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_nue],
+            spectral_rates.j_s[id_nue], spectral_rates.kappa[id_nue] * 1e7,
+            spectral_rates.kappa_s[id_nue] * 1e7);
+        printf("anue %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_anue],
+            spectral_rates.j_s[id_anue], spectral_rates.kappa[id_anue] * 1e7,
+            spectral_rates.kappa_s[id_anue] * 1e7);
+        printf(" num %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_num],
+            spectral_rates.j_s[id_num], spectral_rates.kappa[id_num] * 1e7,
+            spectral_rates.kappa_s[id_num] * 1e7);
+        printf("anum %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            spectral_rates.j[id_anum], spectral_rates.j_s[id_anum],
+            spectral_rates.kappa[id_anum] * 1e7,
+            spectral_rates.kappa_s[id_anum] * 1e7);
+        printf(" nut %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_nut],
+            spectral_rates.j_s[id_nut], spectral_rates.kappa[id_nut] * 1e7,
+            spectral_rates.kappa_s[id_nut] * 1e7);
+        printf("anut %-13.6e %-13.6e %-13.6e %-13.6e\n\n",
+            spectral_rates.j[id_anut], spectral_rates.j_s[id_anut],
+            spectral_rates.kappa[id_anut] * 1e7,
+            spectral_rates.kappa_s[id_anut] * 1e7);
+    }
+    
+    
     // Compute and output gray emissivities and opacities in the stimulated absorption
     // formalism (Eqs. (19)-(23) in Chiesa+25 PRD).
     // Thermal and non-thermal processes are all together.
@@ -363,7 +538,7 @@ int main(int argc, char* argv[])
            gray_rates_non_th_separated.kappa_a_non_th[id_anux] * 1e7,
            gray_rates_non_th_separated.kappa_s[id_anux] * 1e7);
 
-
+    /*
     ////////////////////////////////////////////////////////////////////
     // PART 2: compute rates reconstructing the neutrino distribution //
     //         function from neutrino number and energy densities     //
@@ -501,6 +676,6 @@ int main(int argc, char* argv[])
            "Gray number opacity 'kappa0'                  :          cm^-1\n"
            "Gray energy opacity 'kappa1'(th and non-th)   :          cm^-1\n"
            "Gray scattering opacity 'scat1'               :          cm^-1\n");
-
+    */
     return 0;
 }
