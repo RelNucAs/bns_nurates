@@ -234,7 +234,7 @@ int main(int argc, char* argv[])
     printf(
         "Electron antineutrinos number density 'n'          : %13.6e (cm^-3)\n",
         n_anue);
-    if (total_num_species == 4)
+    if constexpr (total_num_species == 4)
     {
         printf(
             "Heavy-type neutrinos number density 'n'            : %13.6e (cm^-3)\n",
@@ -243,7 +243,7 @@ int main(int argc, char* argv[])
             "Heavy-type antineutrinos number density 'n'        : %13.6e (cm^-3)\n",
             n_anux);
     }
-    else if (total_num_species == 6)
+    else if constexpr (total_num_species == 6)
     {
         printf(
             "Muon neutrinos number density 'n'                  : %13.6e (cm^-3)\n",
@@ -264,7 +264,7 @@ int main(int argc, char* argv[])
     printf("Electron antineutrinos energy density 'J'         : %13.6e (MeV "
            "cm^-3)\n",
            j_anue);
-    if (total_num_species == 4)
+    if constexpr (total_num_species == 4)
     {
         printf("Heavy-type neutrinos energy density 'J'         : %13.6e (MeV "
             "cm^-3)\n",
@@ -273,7 +273,7 @@ int main(int argc, char* argv[])
             "cm^-3)\n",
             j_anux);
     }
-    else if (total_num_species == 6)
+    else if constexpr (total_num_species == 6)
     {
         printf("Muon neutrinos energy density 'J'               : %13.6e (MeV "
             "cm^-3)\n",
@@ -292,14 +292,14 @@ int main(int argc, char* argv[])
            chi_nue);
     printf("Electron antineutrinos Eddington parameter 'chi'  : %13.11f\n",
            chi_anue);
-    if (total_num_species == 4)
+    if constexpr (total_num_species == 4)
     {
         printf("Heavy-type neutrinos Eddington parameter 'chi'     : %13.11f\n",
             chi_nux);
         printf("Heavy-type antineutrinos Eddington parameter 'chi'    : %13.11f\n\n",
             chi_anux);
     }
-    else if (total_num_species == 6)
+    else if constexpr (total_num_species == 6)
     {
         printf("Muon neutrinos Eddington parameter 'chi'        : %13.11f\n",
             chi_num);
@@ -328,7 +328,7 @@ int main(int argc, char* argv[])
                          &my_grey_opacity_params.distr_pars,
                          &my_grey_opacity_params.m1_pars);
 
-    if (total_num_species == 4)
+    if constexpr (total_num_species == 4)
     {
         my_grey_opacity_params.m1_pars.chi[id_nue]  = 0.333333333333333333333333333;
         my_grey_opacity_params.m1_pars.chi[id_anue] = 0.333333333333333333333333333;
@@ -359,7 +359,7 @@ int main(int argc, char* argv[])
             my_grey_opacity_params.m1_pars.chi[id_nux],
             my_grey_opacity_params.m1_pars.chi[id_anux]);
     }
-    else if (total_num_species == 6)
+    else if constexpr (total_num_species == 6)
     {
         my_grey_opacity_params.m1_pars.chi[id_nue]  = 0.333333333333333333333333333;
         my_grey_opacity_params.m1_pars.chi[id_anue] = 0.333333333333333333333333333;
