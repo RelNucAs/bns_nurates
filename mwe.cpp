@@ -12,9 +12,8 @@
 int main(int argc, char* argv[])
 {
     // Fix the neutrino energy for computation of spectral rates
-    const double nu_energy = 100.; // [MeV]
+    const double nu_energy = 10.; // [MeV]
 
-    /*
     // Input thermodynamic quantities (corresponding to point A in Chiesa+25
     // PRD) N.B.: chemical potentials include the rest mass contribution
     const double nb   = 4.208366627847035e+38;  // Baryon number density [cm-3]
@@ -30,48 +29,6 @@ int main(int argc, char* argv[])
     const double mn_eff = 280.16495513;         // Neutron effective mass [MeV]
     const double dm = 
         mn_eff - mp_eff;          // Nucleon effective mass difference [MeV]
-    */
-
-    const char TDpoint = 'C';
-    double nb, T, ye, mu_e, mu_mu, mu_p, mu_n, dU, mp_eff, mn_eff, dm;
-
-    // Input thermodynamic quantities (corresponding to point A in Chiesa+25
-    // PRD) N.B.: chemical potentials include the rest mass contribution
-    if (TDpoint == 'A'){
-        nb   = 4.208366627847035e+38;  // Baryon number density [cm-3]
-        T    = 12.406403541564941;     // Temperature [MeV]
-        ye   = 0.07158458232879639;    // Electron fraction
-        mu_e = 1.871814489040245e+02;  // Electron chemical potential [MeV]
-        mu_mu = 1.871814489040245e+02; // Muon chemical potential [MeV]
-        mu_p = 1.011017977368873e+03;  // Proton chemical potential [MeV]
-        mu_n = 1.221590136808168e+03;  // Neutron chemical potential [MeV]
-        dU = 18.92714728; // Nucleon interaction potential difference (Un-Up) [MeV]
-        mp_eff = 278.87162217; // Proton effective mass [MeV]
-        mn_eff = 280.16495513; // Neutron effective mass [MeV]
-        dm = mn_eff - mp_eff;  // Nucleon effective mass difference [MeV]
-    }
-    else if (TDpoint == 'C'){
-        nb   = (9.87e+12 / kBS_Mb);  // Baryon number density [cm-3]
-        T    = 8.74;                            // Temperature [MeV]
-        ye   = 0.06;                            // Electron fraction
-        mu_e = 36.5;                            // Electron chemical potential [MeV]
-        mu_mu = 36.5;                           // Muon chemical potential [MeV]
-        mu_p = 1.011017977368873e+03;           // Proton chemical potential [MeV]
-        mu_n = mu_p + 41.4;                     // Neutron chemical potential [MeV]
-        dU = 4.98; // Nucleon interaction potential difference (Un-Up) [MeV]
-        dm = 1.293333251;
-    }
-    else if (TDpoint == 'E'){
-        nb   = (1.00e+11 / kBS_Mb);  // Baryon number density [cm-3]
-        T    = 3.60;                            // Temperature [MeV]
-        ye   = 0.14;                            // Electron fraction
-        mu_e = 9.05;                            // Electron chemical potential [MeV]
-        mu_mu = 9.05;                           // Muon chemical potential [MeV]
-        mu_p = 1.011017977368873e+03;           // Proton chemical potential [MeV]
-        mu_n = mu_p + 8.44;                     // Neutron chemical potential [MeV]
-        dU = 0.045; // Nucleon interaction potential difference (Un-Up) [MeV]
-        dm = 1.293333251;
-    }
 
     // Input gray neutrino quantities from M1
     // N.B.: These will be used only in PART 2 for reconstructing the neutrino
@@ -82,7 +39,7 @@ int main(int argc, char* argv[])
     double n_num, n_anum, j_num, j_anum, chi_num, chi_anum;
     double n_nut, n_anut, j_nut, j_anut, chi_nut, chi_anut;
 
-    if (total_num_species == 4)
+    if constexpr (total_num_species == 4)
     {
         n_nue =
             3.776741015683965e+33; // Electron neutrino number density [cm-3]
@@ -106,7 +63,7 @@ int main(int argc, char* argv[])
         chi_anux = 1. / 3.; // Heavy-type antineutrino Eddington factor
     }
 
-    else if (total_num_species == 6)
+    else if constexpr (total_num_species == 6)
     {
         n_nue =
             3.776741015683965e+33; // Electron neutrino number density [cm-3]
