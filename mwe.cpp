@@ -12,8 +12,9 @@
 int main(int argc, char* argv[])
 {
     // Fix the neutrino energy for computation of spectral rates
-    const double nu_energy = 10.; // [MeV]
+    const double nu_energy = 100.; // [MeV]
 
+    /*
     // Input thermodynamic quantities (corresponding to point A in Chiesa+25
     // PRD) N.B.: chemical potentials include the rest mass contribution
     const double nb   = 4.208366627847035e+38;  // Baryon number density [cm-3]
@@ -29,7 +30,48 @@ int main(int argc, char* argv[])
     const double mn_eff = 280.16495513;         // Neutron effective mass [MeV]
     const double dm = 
         mn_eff - mp_eff;          // Nucleon effective mass difference [MeV]
+    */
 
+    const char TDpoint = 'C';
+    double nb, T, ye, mu_e, mu_mu, mu_p, mu_n, dU, mp_eff, mn_eff, dm;
+
+    // Input thermodynamic quantities (corresponding to point A in Chiesa+25
+    // PRD) N.B.: chemical potentials include the rest mass contribution
+    if (TDpoint == 'A'){
+        nb   = 4.208366627847035e+38;  // Baryon number density [cm-3]
+        T    = 12.406403541564941;     // Temperature [MeV]
+        ye   = 0.07158458232879639;    // Electron fraction
+        mu_e = 1.871814489040245e+02;  // Electron chemical potential [MeV]
+        mu_mu = 1.871814489040245e+02; // Muon chemical potential [MeV]
+        mu_p = 1.011017977368873e+03;  // Proton chemical potential [MeV]
+        mu_n = 1.221590136808168e+03;  // Neutron chemical potential [MeV]
+        dU = 18.92714728; // Nucleon interaction potential difference (Un-Up) [MeV]
+        mp_eff = 278.87162217; // Proton effective mass [MeV]
+        mn_eff = 280.16495513; // Neutron effective mass [MeV]
+        dm = mn_eff - mp_eff;  // Nucleon effective mass difference [MeV]
+    }
+    else if (TDpoint == 'C'){
+        nb   = (9.87e+12 / kBS_Mb);  // Baryon number density [cm-3]
+        T    = 8.74;                            // Temperature [MeV]
+        ye   = 0.06;                            // Electron fraction
+        mu_e = 36.5;                            // Electron chemical potential [MeV]
+        mu_mu = 36.5;                           // Muon chemical potential [MeV]
+        mu_p = 1.011017977368873e+03;           // Proton chemical potential [MeV]
+        mu_n = mu_p + 41.4;                     // Neutron chemical potential [MeV]
+        dU = 4.98; // Nucleon interaction potential difference (Un-Up) [MeV]
+        dm = 1.293333251;
+    }
+    else if (TDpoint == 'E'){
+        nb   = (1.00e+11 / kBS_Mb);  // Baryon number density [cm-3]
+        T    = 3.60;                            // Temperature [MeV]
+        ye   = 0.14;                            // Electron fraction
+        mu_e = 9.05;                            // Electron chemical potential [MeV]
+        mu_mu = 9.05;                           // Muon chemical potential [MeV]
+        mu_p = 1.011017977368873e+03;           // Proton chemical potential [MeV]
+        mu_n = mu_p + 8.44;                     // Neutron chemical potential [MeV]
+        dU = 0.045; // Nucleon interaction potential difference (Un-Up) [MeV]
+        dm = 1.293333251;
+    }
 
     // Input gray neutrino quantities from M1
     // N.B.: These will be used only in PART 2 for reconstructing the neutrino
@@ -71,25 +113,25 @@ int main(int argc, char* argv[])
         n_anue =
             1.205553071624256e+35; // Electron antineutrino number density [cm-3]
         n_num =
-            0.5 * 2.271245089833032e+34; // Muon neutrino number density [cm-3]
+            2.271245089833032e+34; // Muon neutrino number density [cm-3]
         n_anum =
-            0.5 * 2.271245089833032e+34; // Muon antineutrino number density [cm-3]
+            2.271245089833032e+34; // Muon antineutrino number density [cm-3]
         n_nut =
-            0.5 * 2.271245089833032e+34; // Tau neutrino number density [cm-3]
+            2.271245089833032e+34; // Tau neutrino number density [cm-3]
         n_anut =
-            0.5 * 2.271245089833032e+34; // Tau antineutrino number density [cm-3]
+            2.271245089833032e+34; // Tau antineutrino number density [cm-3]
         j_nue = 
             1.404570452828258e+35; // Electron neutrino energy density [MeV cm-3]
         j_anue = 
             5.320827032977899e+36; // Electron antineutrino number density [MeV cm-3]
         j_num = 
-            0.5 * 8.885618224045794e+35; // Muon neutrino energy density [MeV cm-3]
+            8.885618224045794e+35; // Muon neutrino energy density [MeV cm-3]
         j_anum = 
-            0.5 * 8.885618224045794e+35; // Muon antineutrino energy density [MeV cm-3]
+            8.885618224045794e+35; // Muon antineutrino energy density [MeV cm-3]
         j_nut = 
-            0.5 * 8.885618224045794e+35; // Tau neutrino energy density [MeV cm-3]
+            8.885618224045794e+35; // Tau neutrino energy density [MeV cm-3]
         j_anut = 
-            0.5 * 8.885618224045794e+35; // Tau antineutrino energy density [MeV cm-3]
+            8.885618224045794e+35; // Tau antineutrino energy density [MeV cm-3]
         chi_nue  = 1. / 3.; // Electron neutrino Eddington factor
         chi_anue = 1. / 3.; // Electron antineutrino Eddington factor
         chi_num  = 1. / 3.; // Muon neutrino Eddington factor
@@ -143,12 +185,12 @@ int main(int argc, char* argv[])
         1; // Activate scattering on electrons/positrons
 
     // Select active muonic reactions
-    if (total_num_species == 6)
+    if constexpr (total_num_species == 6)
     {
         my_grey_opacity_params.opacity_flags.use_muonic_beta =
-            0; // Activate beta processes with muons
+            1; // Activate beta processes with muons
         my_grey_opacity_params.opacity_flags.use_inelastic_NMS =
-            0; // Activate scattering on muons
+            1; // Activate scattering on muons
     }
     else  // no muonic reactions if num=nut=nux
     {
@@ -410,7 +452,7 @@ int main(int argc, char* argv[])
     // paths for the
     //       sum of the active inelastic reactions, 'j_s' and 'kappa_s' are the
     //       equivalent for the elastic scattering off nucleons
-    if (total_num_species == 4)
+    if constexpr (total_num_species == 4)
     {
         printf("Spectral rates assuming equilibrium, not in the stimulated absorption formalism\n");
         printf("------------------------------\n");
@@ -430,7 +472,7 @@ int main(int argc, char* argv[])
             spectral_rates.kappa_s[id_anux] * 1e7);
     }
 
-    else if (total_num_species == 6)
+    else if constexpr (total_num_species == 6)
     {
         printf("Spectral rates assuming equilibrium, not in the stimulated absorption formalism\n");
         printf("------------------------------\n");
@@ -461,103 +503,229 @@ int main(int argc, char* argv[])
     // Compute and output gray emissivities and opacities in the stimulated absorption
     // formalism (Eqs. (19)-(23) in Chiesa+25 PRD).
     // Thermal and non-thermal processes are all together.
-    // NEPS is included in the total emissivities/absorsivities.
-    // NEPS contribution is included in number quantities (eta0 and kappa0).
+    // NLS is included in the total emissivities/absorsivities.
+    // NLS contribution is included in number quantities (eta0 and kappa0).
     gray_rates = ComputeM1Opacities(&my_quadrature, &my_quadrature,
                                     &my_grey_opacity_params);
 
-    // The numerical factors restore usual units (see output)
-    printf("Gray rates assuming equilibrium, in the stimulated absorption formalism,\nNLS INCLUDED (also in eta0 and kappa0)\n");
-    printf("------------------------------\n");
-    printf(
-        "     eta0          eta1          kappa0        kappa1        scat1\n");
-    printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
-           gray_rates.eta_0[id_nue] * 1e21, gray_rates.eta[id_nue] * 1e21,
-           gray_rates.kappa_0_a[id_nue] * 1e7, gray_rates.kappa_a[id_nue] * 1e7,
-           gray_rates.kappa_s[id_nue] * 1e7);
-    printf("anue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
-           gray_rates.eta_0[id_anue] * 1e21, gray_rates.eta[id_anue] * 1e21,
-           gray_rates.kappa_0_a[id_anue] * 1e7,
-           gray_rates.kappa_a[id_anue] * 1e7,
-           gray_rates.kappa_s[id_anue] * 1e7);
-    printf(" nux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
-           gray_rates.eta_0[id_nux] * 1e21, gray_rates.eta[id_nux] * 1e21,
-           gray_rates.kappa_0_a[id_nux] * 1e7, gray_rates.kappa_a[id_nux] * 1e7,
-           gray_rates.kappa_s[id_nux] * 1e7);
-    printf("anux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n\n",
-           gray_rates.eta_0[id_anux] * 1e21, gray_rates.eta[id_anux] * 1e21,
-           gray_rates.kappa_0_a[id_anux] * 1e7,
-           gray_rates.kappa_a[id_anux] * 1e7,
-           gray_rates.kappa_s[id_anux] * 1e7);
+    if constexpr (total_num_species == 4)
+    {
+        // The numerical factors restore usual units (see output)
+        printf("Gray rates assuming equilibrium, in the stimulated absorption formalism,\nNLS INCLUDED (also in eta0 and kappa0)\n");
+        printf("------------------------------\n");
+        printf(
+            "     eta0          eta1          kappa0        kappa1        scat1\n");
+        printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates.eta_0[id_nue] * 1e21, gray_rates.eta[id_nue] * 1e21,
+            gray_rates.kappa_0_a[id_nue] * 1e7, gray_rates.kappa_a[id_nue] * 1e7,
+            gray_rates.kappa_s[id_nue] * 1e7);
+        printf("anue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates.eta_0[id_anue] * 1e21, gray_rates.eta[id_anue] * 1e21,
+            gray_rates.kappa_0_a[id_anue] * 1e7,
+            gray_rates.kappa_a[id_anue] * 1e7,
+            gray_rates.kappa_s[id_anue] * 1e7);
+        printf(" nux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates.eta_0[id_nux] * 1e21, gray_rates.eta[id_nux] * 1e21,
+            gray_rates.kappa_0_a[id_nux] * 1e7, gray_rates.kappa_a[id_nux] * 1e7,
+            gray_rates.kappa_s[id_nux] * 1e7);
+        printf("anux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n\n",
+            gray_rates.eta_0[id_anux] * 1e21, gray_rates.eta[id_anux] * 1e21,
+            gray_rates.kappa_0_a[id_anux] * 1e7,
+            gray_rates.kappa_a[id_anux] * 1e7,
+            gray_rates.kappa_s[id_anux] * 1e7);
+    }
+
+    if constexpr (total_num_species == 6)
+    {
+        // The numerical factors restore usual units (see output)
+        printf("Gray rates assuming equilibrium, in the stimulated absorption formalism,\nNLS INCLUDED (also in eta0 and kappa0)\n");
+        printf("------------------------------\n");
+        printf(
+            "     eta0          eta1          kappa0        kappa1        scat1\n");
+        printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates.eta_0[id_nue] * 1e21, gray_rates.eta[id_nue] * 1e21,
+            gray_rates.kappa_0_a[id_nue] * 1e7, gray_rates.kappa_a[id_nue] * 1e7,
+            gray_rates.kappa_s[id_nue] * 1e7);
+        printf("anue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates.eta_0[id_anue] * 1e21, gray_rates.eta[id_anue] * 1e21,
+            gray_rates.kappa_0_a[id_anue] * 1e7,
+            gray_rates.kappa_a[id_anue] * 1e7,
+            gray_rates.kappa_s[id_anue] * 1e7);
+        printf(" num %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates.eta_0[id_num] * 1e21, gray_rates.eta[id_num] * 1e21,
+            gray_rates.kappa_0_a[id_num] * 1e7, gray_rates.kappa_a[id_num] * 1e7,
+            gray_rates.kappa_s[id_num] * 1e7);
+        printf("anum %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates.eta_0[id_anum] * 1e21, gray_rates.eta[id_anum] * 1e21,
+            gray_rates.kappa_0_a[id_anum] * 1e7,
+            gray_rates.kappa_a[id_anum] * 1e7,
+            gray_rates.kappa_s[id_anum] * 1e7);
+        printf(" nut %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates.eta_0[id_nut] * 1e21, gray_rates.eta[id_nut] * 1e21,
+            gray_rates.kappa_0_a[id_nut] * 1e7, gray_rates.kappa_a[id_nut] * 1e7,
+            gray_rates.kappa_s[id_nut] * 1e7);
+        printf("anut %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n\n",
+            gray_rates.eta_0[id_anut] * 1e21, gray_rates.eta[id_anut] * 1e21,
+            gray_rates.kappa_0_a[id_anut] * 1e7,
+            gray_rates.kappa_a[id_anut] * 1e7,
+            gray_rates.kappa_s[id_anut] * 1e7);
+    }
 
 
+    
     // Compute and output gray emissivities and opacities in the stimulated absorption
     // formalism (Eqs. (19)-(23) in Chiesa+25 PRD).
     // Thermal and non-thermal processes are separated.
-    // NEPS emissivity and absorsivity are separated from ones related to 
+    // NLS emissivity and absorsivity are separated from ones related to 
     // other processes.
-    // NEPS contribution is NOT included in number quantities (eta0 and kappa0).
+    // NLS contribution is NOT included in number quantities (eta0 and kappa0).
     gray_rates_non_th_separated = ComputeM1OpacitiesNonThermalSeparated(
                         &my_quadrature, &my_quadrature, &my_grey_opacity_params);
 
-    // The numerical factors restore usual units (see output)
-    printf("Gray rates assuming equilibrium, in the stimulated absorption formalism,\nNLS SEPARATED, NLS NOT INCLUDED in eta0 and kappa0\n");
-    printf("------------------------------\n");
-    printf(
-        "     eta0          eta1_th       eta1_non_th   kappa0        kappa1_th     kappa1_non_th scat1\n");
-    printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
-           gray_rates_non_th_separated.eta_0[id_nue] * 1e21, 
-           gray_rates_non_th_separated.eta_th[id_nue] * 1e21,
-           gray_rates_non_th_separated.eta_non_th[id_nue] * 1e21,
-           gray_rates_non_th_separated.kappa_0_a[id_nue] * 1e7, 
-           gray_rates_non_th_separated.kappa_a_th[id_nue] * 1e7,
-           gray_rates_non_th_separated.kappa_a_non_th[id_nue] * 1e7,
-           gray_rates_non_th_separated.kappa_s[id_nue] * 1e7);
-    printf("anue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
-           gray_rates_non_th_separated.eta_0[id_anue] * 1e21, 
-           gray_rates_non_th_separated.eta_th[id_anue] * 1e21,
-           gray_rates_non_th_separated.eta_non_th[id_anue] * 1e21,
-           gray_rates_non_th_separated.kappa_0_a[id_anue] * 1e7,
-           gray_rates_non_th_separated.kappa_a_th[id_anue] * 1e7,
-           gray_rates_non_th_separated.kappa_a_non_th[id_anue] * 1e7,
-           gray_rates_non_th_separated.kappa_s[id_anue] * 1e7);
-    printf(" nux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
-           gray_rates_non_th_separated.eta_0[id_nux] * 1e21, 
-           gray_rates_non_th_separated.eta_th[id_nux] * 1e21,
-           gray_rates_non_th_separated.eta_non_th[id_nux] * 1e21,
-           gray_rates_non_th_separated.kappa_0_a[id_nux] * 1e7, 
-           gray_rates_non_th_separated.kappa_a_th[id_nux] * 1e7,
-           gray_rates_non_th_separated.kappa_a_non_th[id_nux] * 1e7,
-           gray_rates_non_th_separated.kappa_s[id_nux] * 1e7);
-    printf("anux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n\n",
-           gray_rates_non_th_separated.eta_0[id_anux] * 1e21, 
-           gray_rates_non_th_separated.eta_th[id_anux] * 1e21,
-           gray_rates_non_th_separated.eta_non_th[id_anux] * 1e21,
-           gray_rates_non_th_separated.kappa_0_a[id_anux] * 1e7,
-           gray_rates_non_th_separated.kappa_a_th[id_anux] * 1e7,
-           gray_rates_non_th_separated.kappa_a_non_th[id_anux] * 1e7,
-           gray_rates_non_th_separated.kappa_s[id_anux] * 1e7);
+    if constexpr (total_num_species == 4)
+    {
+        // The numerical factors restore usual units (see output)
+        printf("Gray rates assuming equilibrium, in the stimulated absorption formalism,\nNLS SEPARATED, NLS NOT INCLUDED in eta0 and kappa0\n");
+        printf("------------------------------\n");
+        printf(
+            "     eta0          eta1_th       eta1_non_th   kappa0        kappa1_th     kappa1_non_th scat1\n");
+        printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates_non_th_separated.eta_0[id_nue] * 1e21, 
+            gray_rates_non_th_separated.eta_th[id_nue] * 1e21,
+            gray_rates_non_th_separated.eta_non_th[id_nue] * 1e21,
+            gray_rates_non_th_separated.kappa_0_a[id_nue] * 1e7, 
+            gray_rates_non_th_separated.kappa_a_th[id_nue] * 1e7,
+            gray_rates_non_th_separated.kappa_a_non_th[id_nue] * 1e7,
+            gray_rates_non_th_separated.kappa_s[id_nue] * 1e7);
+        printf("anue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates_non_th_separated.eta_0[id_anue] * 1e21, 
+            gray_rates_non_th_separated.eta_th[id_anue] * 1e21,
+            gray_rates_non_th_separated.eta_non_th[id_anue] * 1e21,
+            gray_rates_non_th_separated.kappa_0_a[id_anue] * 1e7,
+            gray_rates_non_th_separated.kappa_a_th[id_anue] * 1e7,
+            gray_rates_non_th_separated.kappa_a_non_th[id_anue] * 1e7,
+            gray_rates_non_th_separated.kappa_s[id_anue] * 1e7);
+        printf(" nux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates_non_th_separated.eta_0[id_nux] * 1e21, 
+            gray_rates_non_th_separated.eta_th[id_nux] * 1e21,
+            gray_rates_non_th_separated.eta_non_th[id_nux] * 1e21,
+            gray_rates_non_th_separated.kappa_0_a[id_nux] * 1e7, 
+            gray_rates_non_th_separated.kappa_a_th[id_nux] * 1e7,
+            gray_rates_non_th_separated.kappa_a_non_th[id_nux] * 1e7,
+            gray_rates_non_th_separated.kappa_s[id_nux] * 1e7);
+        printf("anux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n\n",
+            gray_rates_non_th_separated.eta_0[id_anux] * 1e21, 
+            gray_rates_non_th_separated.eta_th[id_anux] * 1e21,
+            gray_rates_non_th_separated.eta_non_th[id_anux] * 1e21,
+            gray_rates_non_th_separated.kappa_0_a[id_anux] * 1e7,
+            gray_rates_non_th_separated.kappa_a_th[id_anux] * 1e7,
+            gray_rates_non_th_separated.kappa_a_non_th[id_anux] * 1e7,
+            gray_rates_non_th_separated.kappa_s[id_anux] * 1e7);
+    }
+    
+    else if constexpr (total_num_species == 6)
+    {
+        // The numerical factors restore usual units (see output)
+        printf("Gray rates assuming equilibrium, in the stimulated absorption formalism,\nNLS SEPARATED, NLS NOT INCLUDED in eta0 and kappa0\n");
+        printf("------------------------------\n");
+        printf(
+            "     eta0          eta1_th       eta1_non_th   kappa0        kappa1_th     kappa1_non_th scat1\n");
+        printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates_non_th_separated.eta_0[id_nue] * 1e21, 
+            gray_rates_non_th_separated.eta_th[id_nue] * 1e21,
+            gray_rates_non_th_separated.eta_non_th[id_nue] * 1e21,
+            gray_rates_non_th_separated.kappa_0_a[id_nue] * 1e7, 
+            gray_rates_non_th_separated.kappa_a_th[id_nue] * 1e7,
+            gray_rates_non_th_separated.kappa_a_non_th[id_nue] * 1e7,
+            gray_rates_non_th_separated.kappa_s[id_nue] * 1e7);
+        printf("anue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates_non_th_separated.eta_0[id_anue] * 1e21, 
+            gray_rates_non_th_separated.eta_th[id_anue] * 1e21,
+            gray_rates_non_th_separated.eta_non_th[id_anue] * 1e21,
+            gray_rates_non_th_separated.kappa_0_a[id_anue] * 1e7,
+            gray_rates_non_th_separated.kappa_a_th[id_anue] * 1e7,
+            gray_rates_non_th_separated.kappa_a_non_th[id_anue] * 1e7,
+            gray_rates_non_th_separated.kappa_s[id_anue] * 1e7);
+        printf(" num %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates_non_th_separated.eta_0[id_num] * 1e21, 
+            gray_rates_non_th_separated.eta_th[id_num] * 1e21,
+            gray_rates_non_th_separated.eta_non_th[id_num] * 1e21,
+            gray_rates_non_th_separated.kappa_0_a[id_num] * 1e7, 
+            gray_rates_non_th_separated.kappa_a_th[id_num] * 1e7,
+            gray_rates_non_th_separated.kappa_a_non_th[id_num] * 1e7,
+            gray_rates_non_th_separated.kappa_s[id_num] * 1e7);
+        printf("anum %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates_non_th_separated.eta_0[id_anum] * 1e21, 
+            gray_rates_non_th_separated.eta_th[id_anum] * 1e21,
+            gray_rates_non_th_separated.eta_non_th[id_anum] * 1e21,
+            gray_rates_non_th_separated.kappa_0_a[id_anum] * 1e7,
+            gray_rates_non_th_separated.kappa_a_th[id_anum] * 1e7,
+            gray_rates_non_th_separated.kappa_a_non_th[id_anum] * 1e7,
+            gray_rates_non_th_separated.kappa_s[id_anum] * 1e7);
+        printf(" nut %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates_non_th_separated.eta_0[id_nut] * 1e21, 
+            gray_rates_non_th_separated.eta_th[id_nut] * 1e21,
+            gray_rates_non_th_separated.eta_non_th[id_nut] * 1e21,
+            gray_rates_non_th_separated.kappa_0_a[id_nut] * 1e7, 
+            gray_rates_non_th_separated.kappa_a_th[id_nut] * 1e7,
+            gray_rates_non_th_separated.kappa_a_non_th[id_nut] * 1e7,
+            gray_rates_non_th_separated.kappa_s[id_nut] * 1e7);
+        printf("anut %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n\n",
+            gray_rates_non_th_separated.eta_0[id_anut] * 1e21, 
+            gray_rates_non_th_separated.eta_th[id_anut] * 1e21,
+            gray_rates_non_th_separated.eta_non_th[id_anut] * 1e21,
+            gray_rates_non_th_separated.kappa_0_a[id_anut] * 1e7,
+            gray_rates_non_th_separated.kappa_a_th[id_anut] * 1e7,
+            gray_rates_non_th_separated.kappa_a_non_th[id_anut] * 1e7,
+            gray_rates_non_th_separated.kappa_s[id_anut] * 1e7);
+    }
 
-    /*
+    
     ////////////////////////////////////////////////////////////////////
     // PART 2: compute rates reconstructing the neutrino distribution //
     //         function from neutrino number and energy densities     //
     ////////////////////////////////////////////////////////////////////
 
     // Set neutrino number and energy densities
-    my_grey_opacity_params.m1_pars.n[id_nue]    = n_nue * 1e-21; // nm^-3
-    my_grey_opacity_params.m1_pars.J[id_nue]    = j_nue * 1e-21; // MeV nm^-3
-    my_grey_opacity_params.m1_pars.chi[id_nue]  = chi_nue;
-    my_grey_opacity_params.m1_pars.n[id_anue]   = n_anue * 1e-21; // nm^-3
-    my_grey_opacity_params.m1_pars.J[id_anue]   = j_anue * 1e-21; // MeV nm^-3
-    my_grey_opacity_params.m1_pars.chi[id_anue] = chi_anue;
-    my_grey_opacity_params.m1_pars.n[id_nux]    = n_nux * 1e-21; // nm^-3
-    my_grey_opacity_params.m1_pars.J[id_nux]    = j_nux * 1e-21; // MeV nm^-3
-    my_grey_opacity_params.m1_pars.chi[id_nux]  = chi_nux;
-    my_grey_opacity_params.m1_pars.n[id_anux]   = n_nux * 1e-21; // nm^-3
-    my_grey_opacity_params.m1_pars.J[id_anux]   = j_nux * 1e-21; // MeV nm^-3
-    my_grey_opacity_params.m1_pars.chi[id_anux] = chi_nux;
+    if constexpr (total_num_species == 4)
+    {
+        my_grey_opacity_params.m1_pars.n[id_nue]    = n_nue * 1e-21; // nm^-3
+        my_grey_opacity_params.m1_pars.J[id_nue]    = j_nue * 1e-21; // MeV nm^-3
+        my_grey_opacity_params.m1_pars.chi[id_nue]  = chi_nue;
+        my_grey_opacity_params.m1_pars.n[id_anue]   = n_anue * 1e-21; // nm^-3
+        my_grey_opacity_params.m1_pars.J[id_anue]   = j_anue * 1e-21; // MeV nm^-3
+        my_grey_opacity_params.m1_pars.chi[id_anue] = chi_anue;
 
+        my_grey_opacity_params.m1_pars.n[id_nux]    = n_nux * 1e-21; // nm^-3
+        my_grey_opacity_params.m1_pars.J[id_nux]    = j_nux * 1e-21; // MeV nm^-3
+        my_grey_opacity_params.m1_pars.chi[id_nux]  = chi_nux;
+        my_grey_opacity_params.m1_pars.n[id_anux]   = n_nux * 1e-21; // nm^-3
+        my_grey_opacity_params.m1_pars.J[id_anux]   = j_nux * 1e-21; // MeV nm^-3
+        my_grey_opacity_params.m1_pars.chi[id_anux] = chi_nux;
+    }
+    else if constexpr (total_num_species == 6)
+    {
+        my_grey_opacity_params.m1_pars.n[id_nue]    = n_nue * 1e-21; // nm^-3
+        my_grey_opacity_params.m1_pars.J[id_nue]    = j_nue * 1e-21; // MeV nm^-3
+        my_grey_opacity_params.m1_pars.chi[id_nue]  = chi_nue;
+        my_grey_opacity_params.m1_pars.n[id_anue]   = n_anue * 1e-21; // nm^-3
+        my_grey_opacity_params.m1_pars.J[id_anue]   = j_anue * 1e-21; // MeV nm^-3
+        my_grey_opacity_params.m1_pars.chi[id_anue] = chi_anue;
+
+        my_grey_opacity_params.m1_pars.n[id_num]    = n_num * 1e-21; // nm^-3
+        my_grey_opacity_params.m1_pars.J[id_num]    = j_num * 1e-21; // MeV nm^-3
+        my_grey_opacity_params.m1_pars.chi[id_num]  = chi_num;
+        my_grey_opacity_params.m1_pars.n[id_anum]   = n_num * 1e-21; // nm^-3
+        my_grey_opacity_params.m1_pars.J[id_anum]   = j_num * 1e-21; // MeV nm^-3
+        my_grey_opacity_params.m1_pars.chi[id_anum] = chi_num;
+
+        my_grey_opacity_params.m1_pars.n[id_nut]    = n_nut * 1e-21; // nm^-3
+        my_grey_opacity_params.m1_pars.J[id_nut]    = j_nut * 1e-21; // MeV nm^-3
+        my_grey_opacity_params.m1_pars.chi[id_nut]  = chi_nut;
+        my_grey_opacity_params.m1_pars.n[id_anut]   = n_nut * 1e-21; // nm^-3
+        my_grey_opacity_params.m1_pars.J[id_anut]   = j_nut * 1e-21; // MeV nm^-3
+        my_grey_opacity_params.m1_pars.chi[id_anut] = chi_nut;
+    }
     // Compute neutrino distribution parameters from neutrino number/energy
     // densities
     my_grey_opacity_params.distr_pars = CalculateDistrParamsFromM1(
@@ -568,104 +736,229 @@ int main(int argc, char* argv[])
     spectral_rates = ComputeSpectralOpacitiesNotStimulatedAbs(
         nu_energy, &my_quadrature, &my_grey_opacity_params);
 
-    // The numerical factors restore usual units (see output)
-    printf("Spectral rates reconstructing distribution function, not in the stimulated absorption formalism\n");
-    printf("------------------------------\n");
-    printf("     j             j_s           kappa         kappa_s\n");
-    printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_nue],
-           spectral_rates.j_s[id_nue], spectral_rates.kappa[id_nue] * 1e7,
-           spectral_rates.kappa_s[id_nue] * 1e7);
-    printf("anue %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_anue],
-           spectral_rates.j_s[id_anue], spectral_rates.kappa[id_anue] * 1e7,
-           spectral_rates.kappa_s[id_anue] * 1e7);
-    printf(" nux %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_nux],
-           spectral_rates.j_s[id_nux], spectral_rates.kappa[id_nux] * 1e7,
-           spectral_rates.kappa_s[id_nux] * 1e7);
-    printf("anux %-13.6e %-13.6e %-13.6e %-13.6e\n\n",
-           spectral_rates.j[id_anux], spectral_rates.j_s[id_anux],
-           spectral_rates.kappa[id_anux] * 1e7,
-           spectral_rates.kappa_s[id_anux] * 1e7);
-
+    if constexpr (total_num_species == 4)
+    {
+        // The numerical factors restore usual units (see output)
+        printf("Spectral rates reconstructing distribution function, not in the stimulated absorption formalism\n");
+        printf("------------------------------\n");
+        printf("     j             j_s           kappa         kappa_s\n");
+        printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_nue],
+            spectral_rates.j_s[id_nue], spectral_rates.kappa[id_nue] * 1e7,
+            spectral_rates.kappa_s[id_nue] * 1e7);
+        printf("anue %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_anue],
+            spectral_rates.j_s[id_anue], spectral_rates.kappa[id_anue] * 1e7,
+            spectral_rates.kappa_s[id_anue] * 1e7);
+        printf(" nux %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_nux],
+            spectral_rates.j_s[id_nux], spectral_rates.kappa[id_nux] * 1e7,
+            spectral_rates.kappa_s[id_nux] * 1e7);
+        printf("anux %-13.6e %-13.6e %-13.6e %-13.6e\n\n",
+            spectral_rates.j[id_anux], spectral_rates.j_s[id_anux],
+            spectral_rates.kappa[id_anux] * 1e7,
+            spectral_rates.kappa_s[id_anux] * 1e7);
+    }
+    else if constexpr (total_num_species == 6)
+    {
+        // The numerical factors restore usual units (see output)
+        printf("Spectral rates reconstructing distribution function, not in the stimulated absorption formalism\n");
+        printf("------------------------------\n");
+        printf("     j             j_s           kappa         kappa_s\n");
+        printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_nue],
+            spectral_rates.j_s[id_nue], spectral_rates.kappa[id_nue] * 1e7,
+            spectral_rates.kappa_s[id_nue] * 1e7);
+        printf("anue %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_anue],
+            spectral_rates.j_s[id_anue], spectral_rates.kappa[id_anue] * 1e7,
+            spectral_rates.kappa_s[id_anue] * 1e7);
+        printf(" num %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_num],
+            spectral_rates.j_s[id_num], spectral_rates.kappa[id_num] * 1e7,
+            spectral_rates.kappa_s[id_num] * 1e7);
+        printf("anum %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            spectral_rates.j[id_anum], spectral_rates.j_s[id_anum],
+            spectral_rates.kappa[id_anum] * 1e7,
+            spectral_rates.kappa_s[id_anum] * 1e7);
+        printf(" nut %-13.6e %-13.6e %-13.6e %-13.6e\n", spectral_rates.j[id_nut],
+            spectral_rates.j_s[id_nut], spectral_rates.kappa[id_nut] * 1e7,
+            spectral_rates.kappa_s[id_nut] * 1e7);
+        printf("anut %-13.6e %-13.6e %-13.6e %-13.6e\n\n",
+            spectral_rates.j[id_anut], spectral_rates.j_s[id_anut],
+            spectral_rates.kappa[id_anut] * 1e7,
+            spectral_rates.kappa_s[id_anut] * 1e7);
+    }
 
     // Compute and output gray emissivities and opacities in the stimulated absorption
     // formalism (Eqs. (19)-(23) in Chiesa+25 PRD).
     // Thermal and non-thermal processes are all together.
-    // NEPS is included in the total emissivities/absorsivities.
-    // NEPS contribution is included in number quantities (eta0 and kappa0).
+    // NLS is included in the total emissivities/absorsivities.
+    // NLS contribution is included in number quantities (eta0 and kappa0).
     gray_rates = ComputeM1Opacities(&my_quadrature, &my_quadrature,
                                     &my_grey_opacity_params);
 
-    // The numerical factors restore usual units (see output)
-    printf("Gray rates reconstructing distribution function, in the stimulated absorption formalism,\nNLS INCLUDED (also in eta0 and kappa0)\n");
-    printf("----------------------------------------------\n");
-    printf(
-        "     eta0          eta1          kappa0        kappa1        scat1\n");
-    printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
-           gray_rates.eta_0[id_nue] * 1e21, gray_rates.eta[id_nue] * 1e21,
-           gray_rates.kappa_0_a[id_nue] * 1e7, gray_rates.kappa_a[id_nue] * 1e7,
-           gray_rates.kappa_s[id_nue] * 1e7);
-    printf("anue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
-           gray_rates.eta_0[id_anue] * 1e21, gray_rates.eta[id_anue] * 1e21,
-           gray_rates.kappa_0_a[id_anue] * 1e7,
-           gray_rates.kappa_a[id_anue] * 1e7,
-           gray_rates.kappa_s[id_anue] * 1e7);
-    printf(" nux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
-           gray_rates.eta_0[id_nux] * 1e21, gray_rates.eta[id_nux] * 1e21,
-           gray_rates.kappa_0_a[id_nux] * 1e7, gray_rates.kappa_a[id_nux] * 1e7,
-           gray_rates.kappa_s[id_nux] * 1e7);
-    printf("anux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n\n\n",
-           gray_rates.eta_0[id_anux] * 1e21, gray_rates.eta[id_anux] * 1e21,
-           gray_rates.kappa_0_a[id_anux] * 1e7,
-           gray_rates.kappa_a[id_anux] * 1e7,
-           gray_rates.kappa_s[id_anux] * 1e7);
-
+    if constexpr (total_num_species == 4)
+    {
+        // The numerical factors restore usual units (see output)
+        printf("Gray rates reconstructing distribution function, in the stimulated absorption formalism,\nNLS INCLUDED (also in eta0 and kappa0)\n");
+        printf("----------------------------------------------\n");
+        printf(
+            "     eta0          eta1          kappa0        kappa1        scat1\n");
+        printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates.eta_0[id_nue] * 1e21, gray_rates.eta[id_nue] * 1e21,
+            gray_rates.kappa_0_a[id_nue] * 1e7, gray_rates.kappa_a[id_nue] * 1e7,
+            gray_rates.kappa_s[id_nue] * 1e7);
+        printf("anue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates.eta_0[id_anue] * 1e21, gray_rates.eta[id_anue] * 1e21,
+            gray_rates.kappa_0_a[id_anue] * 1e7,
+            gray_rates.kappa_a[id_anue] * 1e7,
+            gray_rates.kappa_s[id_anue] * 1e7);
+        printf(" nux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates.eta_0[id_nux] * 1e21, gray_rates.eta[id_nux] * 1e21,
+            gray_rates.kappa_0_a[id_nux] * 1e7, gray_rates.kappa_a[id_nux] * 1e7,
+            gray_rates.kappa_s[id_nux] * 1e7);
+        printf("anux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n\n\n",
+            gray_rates.eta_0[id_anux] * 1e21, gray_rates.eta[id_anux] * 1e21,
+            gray_rates.kappa_0_a[id_anux] * 1e7,
+            gray_rates.kappa_a[id_anux] * 1e7,
+            gray_rates.kappa_s[id_anux] * 1e7);
+    }
+    else if constexpr (total_num_species == 6)
+    {
+        // The numerical factors restore usual units (see output)
+        printf("Gray rates reconstructing distribution function, in the stimulated absorption formalism,\nNLS INCLUDED (also in eta0 and kappa0)\n");
+        printf("----------------------------------------------\n");
+        printf(
+            "     eta0          eta1          kappa0        kappa1        scat1\n");
+        printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates.eta_0[id_nue] * 1e21, gray_rates.eta[id_nue] * 1e21,
+            gray_rates.kappa_0_a[id_nue] * 1e7, gray_rates.kappa_a[id_nue] * 1e7,
+            gray_rates.kappa_s[id_nue] * 1e7);
+        printf("anue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates.eta_0[id_anue] * 1e21, gray_rates.eta[id_anue] * 1e21,
+            gray_rates.kappa_0_a[id_anue] * 1e7,
+            gray_rates.kappa_a[id_anue] * 1e7,
+            gray_rates.kappa_s[id_anue] * 1e7);
+        printf(" num %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates.eta_0[id_num] * 1e21, gray_rates.eta[id_num] * 1e21,
+            gray_rates.kappa_0_a[id_num] * 1e7, gray_rates.kappa_a[id_num] * 1e7,
+            gray_rates.kappa_s[id_num] * 1e7);
+        printf("anum %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates.eta_0[id_anum] * 1e21, gray_rates.eta[id_anum] * 1e21,
+            gray_rates.kappa_0_a[id_anum] * 1e7,
+            gray_rates.kappa_a[id_anum] * 1e7,
+            gray_rates.kappa_s[id_anum] * 1e7);
+        printf(" nut %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates.eta_0[id_nut] * 1e21, gray_rates.eta[id_nut] * 1e21,
+            gray_rates.kappa_0_a[id_nut] * 1e7, gray_rates.kappa_a[id_nut] * 1e7,
+            gray_rates.kappa_s[id_nut] * 1e7);
+        printf("anut %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n\n\n",
+            gray_rates.eta_0[id_anut] * 1e21, gray_rates.eta[id_anut] * 1e21,
+            gray_rates.kappa_0_a[id_anut] * 1e7,
+            gray_rates.kappa_a[id_anut] * 1e7,
+            gray_rates.kappa_s[id_anut] * 1e7);
+    }
 
     // Compute and output gray emissivities and opacities in the stimulated absorption
     // formalism (Eqs. (19)-(23) in Chiesa+25 PRD).
     // Thermal and non-thermal processes are separated.
-    // NEPS emissivity and absorsivity are separated from ones related to 
+    // NLS emissivity and absorsivity are separated from ones related to 
     // other processes.
-    // NEPS contribution is NOT included in number quantities (eta0 and kappa0).
+    // NLS contribution is NOT included in number quantities (eta0 and kappa0).
     gray_rates_non_th_separated = ComputeM1OpacitiesNonThermalSeparated(
                             &my_quadrature, &my_quadrature, &my_grey_opacity_params);
 
-    // The numerical factors restore usual units (see output)
-    printf("Gray rates reconstructing distribution function, in the stimulated absorption formalism,\nNLS SEPARATED, NLS NOT INCLUDED in eta0 and kappa0\n");
-    printf("------------------------------\n");
-    printf(
-        "     eta0          eta1_th       eta1_non_th   kappa0        kappa1_th     kappa1_non_th scat1\n");
-    printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
-           gray_rates_non_th_separated.eta_0[id_nue] * 1e21, 
-           gray_rates_non_th_separated.eta_th[id_nue] * 1e21,
-           gray_rates_non_th_separated.eta_non_th[id_nue] * 1e21,
-           gray_rates_non_th_separated.kappa_0_a[id_nue] * 1e7, 
-           gray_rates_non_th_separated.kappa_a_th[id_nue] * 1e7,
-           gray_rates_non_th_separated.kappa_a_non_th[id_nue] * 1e7,
-           gray_rates_non_th_separated.kappa_s[id_nue] * 1e7);
-    printf("anue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
-           gray_rates_non_th_separated.eta_0[id_anue] * 1e21, 
-           gray_rates_non_th_separated.eta_th[id_anue] * 1e21,
-           gray_rates_non_th_separated.eta_non_th[id_anue] * 1e21,
-           gray_rates_non_th_separated.kappa_0_a[id_anue] * 1e7,
-           gray_rates_non_th_separated.kappa_a_th[id_anue] * 1e7,
-           gray_rates_non_th_separated.kappa_a_non_th[id_anue] * 1e7,
-           gray_rates_non_th_separated.kappa_s[id_anue] * 1e7);
-    printf(" nux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
-           gray_rates_non_th_separated.eta_0[id_nux] * 1e21, 
-           gray_rates_non_th_separated.eta_th[id_nux] * 1e21,
-           gray_rates_non_th_separated.eta_non_th[id_nux] * 1e21,
-           gray_rates_non_th_separated.kappa_0_a[id_nux] * 1e7, 
-           gray_rates_non_th_separated.kappa_a_th[id_nux] * 1e7,
-           gray_rates_non_th_separated.kappa_a_non_th[id_nux] * 1e7,
-           gray_rates_non_th_separated.kappa_s[id_nux] * 1e7);
-    printf("anux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n\n",
-           gray_rates_non_th_separated.eta_0[id_anux] * 1e21, 
-           gray_rates_non_th_separated.eta_th[id_anux] * 1e21,
-           gray_rates_non_th_separated.eta_non_th[id_anux] * 1e21,
-           gray_rates_non_th_separated.kappa_0_a[id_anux] * 1e7,
-           gray_rates_non_th_separated.kappa_a_th[id_anux] * 1e7,
-           gray_rates_non_th_separated.kappa_a_non_th[id_anux] * 1e7,
-           gray_rates_non_th_separated.kappa_s[id_anux] * 1e7);
+    if constexpr (total_num_species == 4)
+    {
+        // The numerical factors restore usual units (see output)
+        printf("Gray rates reconstructing distribution function, in the stimulated absorption formalism,\nNLS SEPARATED, NLS NOT INCLUDED in eta0 and kappa0\n");
+        printf("------------------------------\n");
+        printf(
+            "     eta0          eta1_th       eta1_non_th   kappa0        kappa1_th     kappa1_non_th scat1\n");
+        printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates_non_th_separated.eta_0[id_nue] * 1e21, 
+            gray_rates_non_th_separated.eta_th[id_nue] * 1e21,
+            gray_rates_non_th_separated.eta_non_th[id_nue] * 1e21,
+            gray_rates_non_th_separated.kappa_0_a[id_nue] * 1e7, 
+            gray_rates_non_th_separated.kappa_a_th[id_nue] * 1e7,
+            gray_rates_non_th_separated.kappa_a_non_th[id_nue] * 1e7,
+            gray_rates_non_th_separated.kappa_s[id_nue] * 1e7);
+        printf("anue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates_non_th_separated.eta_0[id_anue] * 1e21, 
+            gray_rates_non_th_separated.eta_th[id_anue] * 1e21,
+            gray_rates_non_th_separated.eta_non_th[id_anue] * 1e21,
+            gray_rates_non_th_separated.kappa_0_a[id_anue] * 1e7,
+            gray_rates_non_th_separated.kappa_a_th[id_anue] * 1e7,
+            gray_rates_non_th_separated.kappa_a_non_th[id_anue] * 1e7,
+            gray_rates_non_th_separated.kappa_s[id_anue] * 1e7);
+        printf(" nux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates_non_th_separated.eta_0[id_nux] * 1e21, 
+            gray_rates_non_th_separated.eta_th[id_nux] * 1e21,
+            gray_rates_non_th_separated.eta_non_th[id_nux] * 1e21,
+            gray_rates_non_th_separated.kappa_0_a[id_nux] * 1e7, 
+            gray_rates_non_th_separated.kappa_a_th[id_nux] * 1e7,
+            gray_rates_non_th_separated.kappa_a_non_th[id_nux] * 1e7,
+            gray_rates_non_th_separated.kappa_s[id_nux] * 1e7);
+        printf("anux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n\n",
+            gray_rates_non_th_separated.eta_0[id_anux] * 1e21, 
+            gray_rates_non_th_separated.eta_th[id_anux] * 1e21,
+            gray_rates_non_th_separated.eta_non_th[id_anux] * 1e21,
+            gray_rates_non_th_separated.kappa_0_a[id_anux] * 1e7,
+            gray_rates_non_th_separated.kappa_a_th[id_anux] * 1e7,
+            gray_rates_non_th_separated.kappa_a_non_th[id_anux] * 1e7,
+            gray_rates_non_th_separated.kappa_s[id_anux] * 1e7);
+    }
+    else if constexpr (total_num_species == 6)
+    {
+        // The numerical factors restore usual units (see output)
+        printf("Gray rates reconstructing distribution function, in the stimulated absorption formalism,\nNLS SEPARATED, NLS NOT INCLUDED in eta0 and kappa0\n");
+        printf("------------------------------\n");
+        printf(
+            "     eta0          eta1_th       eta1_non_th   kappa0        kappa1_th     kappa1_non_th scat1\n");
+        printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates_non_th_separated.eta_0[id_nue] * 1e21, 
+            gray_rates_non_th_separated.eta_th[id_nue] * 1e21,
+            gray_rates_non_th_separated.eta_non_th[id_nue] * 1e21,
+            gray_rates_non_th_separated.kappa_0_a[id_nue] * 1e7, 
+            gray_rates_non_th_separated.kappa_a_th[id_nue] * 1e7,
+            gray_rates_non_th_separated.kappa_a_non_th[id_nue] * 1e7,
+            gray_rates_non_th_separated.kappa_s[id_nue] * 1e7);
+        printf("anue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates_non_th_separated.eta_0[id_anue] * 1e21, 
+            gray_rates_non_th_separated.eta_th[id_anue] * 1e21,
+            gray_rates_non_th_separated.eta_non_th[id_anue] * 1e21,
+            gray_rates_non_th_separated.kappa_0_a[id_anue] * 1e7,
+            gray_rates_non_th_separated.kappa_a_th[id_anue] * 1e7,
+            gray_rates_non_th_separated.kappa_a_non_th[id_anue] * 1e7,
+            gray_rates_non_th_separated.kappa_s[id_anue] * 1e7);
+        printf(" num %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates_non_th_separated.eta_0[id_num] * 1e21, 
+            gray_rates_non_th_separated.eta_th[id_num] * 1e21,
+            gray_rates_non_th_separated.eta_non_th[id_num] * 1e21,
+            gray_rates_non_th_separated.kappa_0_a[id_num] * 1e7, 
+            gray_rates_non_th_separated.kappa_a_th[id_num] * 1e7,
+            gray_rates_non_th_separated.kappa_a_non_th[id_num] * 1e7,
+            gray_rates_non_th_separated.kappa_s[id_num] * 1e7);
+        printf("anum %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates_non_th_separated.eta_0[id_anum] * 1e21, 
+            gray_rates_non_th_separated.eta_th[id_anum] * 1e21,
+            gray_rates_non_th_separated.eta_non_th[id_anum] * 1e21,
+            gray_rates_non_th_separated.kappa_0_a[id_anum] * 1e7,
+            gray_rates_non_th_separated.kappa_a_th[id_anum] * 1e7,
+            gray_rates_non_th_separated.kappa_a_non_th[id_anum] * 1e7,
+            gray_rates_non_th_separated.kappa_s[id_anum] * 1e7);
+        printf(" nut %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
+            gray_rates_non_th_separated.eta_0[id_nut] * 1e21, 
+            gray_rates_non_th_separated.eta_th[id_nut] * 1e21,
+            gray_rates_non_th_separated.eta_non_th[id_nut] * 1e21,
+            gray_rates_non_th_separated.kappa_0_a[id_nut] * 1e7, 
+            gray_rates_non_th_separated.kappa_a_th[id_nut] * 1e7,
+            gray_rates_non_th_separated.kappa_a_non_th[id_nut] * 1e7,
+            gray_rates_non_th_separated.kappa_s[id_nut] * 1e7);
+        printf("anut %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n\n",
+            gray_rates_non_th_separated.eta_0[id_anut] * 1e21, 
+            gray_rates_non_th_separated.eta_th[id_anut] * 1e21,
+            gray_rates_non_th_separated.eta_non_th[id_anut] * 1e21,
+            gray_rates_non_th_separated.kappa_0_a[id_anut] * 1e7,
+            gray_rates_non_th_separated.kappa_a_th[id_anut] * 1e7,
+            gray_rates_non_th_separated.kappa_a_non_th[id_anut] * 1e7,
+            gray_rates_non_th_separated.kappa_s[id_anut] * 1e7);
+    }
 
     printf("Units\n"
            "-----\n"
@@ -676,6 +969,6 @@ int main(int argc, char* argv[])
            "Gray number opacity 'kappa0'                  :          cm^-1\n"
            "Gray energy opacity 'kappa1'(th and non-th)   :          cm^-1\n"
            "Gray scattering opacity 'scat1'               :          cm^-1\n");
-    */
+    
     return 0;
 }

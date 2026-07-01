@@ -1003,35 +1003,35 @@ void MuonicBetaGaussLegendreIntegrate1DMatrixOnlyNumber(const MyQuadrature* quad
 
         // nu_x
         // Numerical quantities
-        out_n->integrand[id_nux] +=
-            w_i * (kBS_Mmu * mat[id_nux][i] +                
-                   (t[id_nux] / x2_i) * mat[id_nux][n + i]);
+        out_n->integrand[id_num] +=
+            w_i * (kBS_Mmu * mat[id_num][i] +                
+                   (t[id_num] / x2_i) * mat[id_num][n + i]);
 
-        BS_ASSERT(isfinite(out_n->integrand[id_nux]) &&
-                  out_n->integrand[id_nux] >= 0.);
+        BS_ASSERT(isfinite(out_n->integrand[id_num]) &&
+                  out_n->integrand[id_num] >= 0.);
         // Energy quantities
-        out_j->integrand[id_nux] +=
-            w_i * (kBS_Mmu * ((1 + x_i) * kBS_Mmu - Q) * mat[id_nux][i] +                
-                   (t[id_nux] / x2_i) * (t[id_nux] / x_i) * mat[id_nux][n + i]);
+        out_j->integrand[id_num] +=
+            w_i * (kBS_Mmu * ((1 + x_i) * kBS_Mmu - Q) * mat[id_num][i] +                
+                   (t[id_num] / x2_i) * (t[id_num] / x_i) * mat[id_num][n + i]);
 
-        BS_ASSERT(isfinite(out_j->integrand[id_nux]) &&
-                  out_j->integrand[id_nux] >= 0.);
+        BS_ASSERT(isfinite(out_j->integrand[id_num]) &&
+                  out_j->integrand[id_num] >= 0.);
         
         // anu_x
         // Numerical quantities
-        out_n->integrand[id_anux] +=
-            w_i * (kBS_Mmu * mat[id_anux][i] +                
-                   (t[id_anux] / x2_i) * mat[id_anux][n + i]);
+        out_n->integrand[id_anum] +=
+            w_i * (kBS_Mmu * mat[id_anum][i] +                
+                   (t[id_anum] / x2_i) * mat[id_anum][n + i]);
 
-        BS_ASSERT(isfinite(out_n->integrand[id_anux]) &&
-                  out_n->integrand[id_anux] >= 0.);
+        BS_ASSERT(isfinite(out_n->integrand[id_anum]) &&
+                  out_n->integrand[id_anum] >= 0.);
         // Energy quantities
-        out_j->integrand[id_anux] +=
-            w_i * (kBS_Mmu * ((1 + x_i) * kBS_Mmu + Q) * mat[id_anux][i] +                
-                   (t[id_anux] / x2_i) * (t[id_anux] / x_i) * mat[id_anux][n + i]);
+        out_j->integrand[id_anum] +=
+            w_i * (kBS_Mmu * ((1 + x_i) * kBS_Mmu + Q) * mat[id_anum][i] +                
+                   (t[id_anum] / x2_i) * (t[id_anum] / x_i) * mat[id_anum][n + i]);
 
-        BS_ASSERT(isfinite(out_j->integrand[id_anux]) &&
-                  out_j->integrand[id_anux] >= 0.);
+        BS_ASSERT(isfinite(out_j->integrand[id_anum]) &&
+                  out_j->integrand[id_anum] >= 0.);
     }
 
     return;

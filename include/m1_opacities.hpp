@@ -253,68 +253,68 @@ void MuonicBeta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_par
             // nu_mu_1
             nu = (1 + quad->points[i]) * kBS_Mmu - Q;
             BS_ASSERT(nu >= 0,
-                      "Neutrino energy is negative (nu=%e, t[id_nux]=%e, "
+                      "Neutrino energy is negative (nu=%e, t[id_num]=%e, "
                       "quad->points[%d]=%e)",
-                      nu, t[id_nux], i, quad->points[i]);
+                      nu, t[id_num], i, quad->points[i]);
             nu_sqr = POW2(nu);
 
-            g_nu = TotalNuF(nu, &grey_pars->distr_pars, id_nux);
+            g_nu = TotalNuF(nu, &grey_pars->distr_pars, id_num);
 
             abs_em_beta = MuonStimAbsOpacity(nu, &grey_pars->opacity_pars,
                                          &grey_pars->eos_pars); // [s^-1]
 
-            out_em[id_nux][i] = nu_sqr * abs_em_beta.em[id_nux];
+            out_em[id_num][i] = nu_sqr * abs_em_beta.em[id_num];
             // ab = em + ab (stimulated absorption)
-            out_ab[id_nux][i] = nu_sqr * g_nu * abs_em_beta.abs[id_nux];
+            out_ab[id_num][i] = nu_sqr * g_nu * abs_em_beta.abs[id_num];
 
             // anu_mu_1
             nu = (1 + quad->points[i]) * kBS_Mmu + Q;
             BS_ASSERT(nu >= 0,
-                      "Neutrino energy is negative (nu=%e, t[id_anux]=%e, "
+                      "Neutrino energy is negative (nu=%e, t[id_anum]=%e, "
                       "quad->points[%d]=%e)",
-                      nu, t[id_anux], i, quad->points[i]);
+                      nu, t[id_anum], i, quad->points[i]);
             nu_sqr = POW2(nu);
-            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anux);
+            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anum);
 
             abs_em_beta = MuonStimAbsOpacity(nu, &grey_pars->opacity_pars,
                                          &grey_pars->eos_pars); // [s^-1]
 
-            out_em[id_anux][i] = nu_sqr * abs_em_beta.em[id_anux];
+            out_em[id_anum][i] = nu_sqr * abs_em_beta.em[id_anum];
             // ab = em + ab (stimulated absorption)
-            out_ab[id_anux][i] = nu_sqr * g_nu * abs_em_beta.abs[id_anux];
+            out_ab[id_anum][i] = nu_sqr * g_nu * abs_em_beta.abs[id_anum];
 
             // nu_mu_2
-            nu = t[id_nux] / quad->points[i];
+            nu = t[id_num] / quad->points[i];
             BS_ASSERT(nu >= 0,
-                      "Neutrino energy is negative (nu=%e, t[id_nux]=%e, "
+                      "Neutrino energy is negative (nu=%e, t[id_num]=%e, "
                       "quad->points[%d]=%e)",
-                      nu, t[id_nux], i, quad->points[i]);
+                      nu, t[id_num], i, quad->points[i]);
             nu_sqr = POW2(nu);
-            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_nux);
+            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_num);
 
             abs_em_beta = MuonStimAbsOpacity(nu, &grey_pars->opacity_pars,
                                          &grey_pars->eos_pars); // [s^-1]
 
-            out_em[id_nux][n + i] = nu_sqr * abs_em_beta.em[id_nux];
+            out_em[id_num][n + i] = nu_sqr * abs_em_beta.em[id_num];
             // ab = em + ab (stimulated absorption)
-            out_ab[id_nux][n + i] = nu_sqr * g_nu * abs_em_beta.abs[id_nux];
+            out_ab[id_num][n + i] = nu_sqr * g_nu * abs_em_beta.abs[id_num];
 
             // anu_mu_2
-            nu = t[id_anux] / quad->points[i];
+            nu = t[id_anum] / quad->points[i];
             BS_ASSERT(nu >= 0,
-                      "Neutrino energy is negative (nu=%e, t[id_anux]=%e, "
+                      "Neutrino energy is negative (nu=%e, t[id_anum]=%e, "
                       "quad->points[%d]=%e)",
-                      nu, t[id_anux], i, quad->points[i]);
+                      nu, t[id_anum], i, quad->points[i]);
             nu_sqr = POW2(nu);
-            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anux);
+            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anum);
 
             abs_em_beta = MuonStimAbsOpacity(nu, &grey_pars->opacity_pars,
                                          &grey_pars->eos_pars); // [s^-1]
 
-            out_em[id_anux][n + i] = nu_sqr * abs_em_beta.em[id_anux];
+            out_em[id_anum][n + i] = nu_sqr * abs_em_beta.em[id_anum];
 
             // ab = em + ab (stimulated absorption)
-            out_ab[id_anux][n + i] = nu_sqr * g_nu * abs_em_beta.abs[id_anux];
+            out_ab[id_anum][n + i] = nu_sqr * g_nu * abs_em_beta.abs[id_anum];
         }
     }
     else
@@ -324,62 +324,62 @@ void MuonicBeta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_par
             // nu_mu_1
             nu = (1 + quad->points[i]) * kBS_Mmu - Q;
             BS_ASSERT(nu >= 0,
-                      "Neutrino energy is negative (nu=%e, t[id_nux]=%e, "
+                      "Neutrino energy is negative (nu=%e, t[id_num]=%e, "
                       "quad->points[%d]=%e)",
-                      nu, t[id_nux], i, quad->points[i]);
+                      nu, t[id_num], i, quad->points[i]);
             nu_sqr = POW2(nu);
-            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_nux);
+            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_num);
 
             abs_em_beta = MuonAbsOpacity(nu, &grey_pars->opacity_pars,
                                      &grey_pars->eos_pars); // [s^-1]
 
-            out_em[id_nux][i] = nu_sqr * abs_em_beta.em[id_nux];
-            out_ab[id_nux][i] = nu_sqr * g_nu * abs_em_beta.abs[id_nux];
+            out_em[id_num][i] = nu_sqr * abs_em_beta.em[id_num];
+            out_ab[id_num][i] = nu_sqr * g_nu * abs_em_beta.abs[id_num];
 
             // anu_mu_1
             nu = (1 + quad->points[i]) * kBS_Mmu + Q;
             BS_ASSERT(nu >= 0,
-                      "Neutrino energy is negative (nu=%e, t[id_anux]=%e, "
+                      "Neutrino energy is negative (nu=%e, t[id_anum]=%e, "
                       "quad->points[%d]=%e)",
-                      nu, t[id_anux], i, quad->points[i]);
+                      nu, t[id_anum], i, quad->points[i]);
             nu_sqr = POW2(nu);
-            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anux);
+            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anum);
 
             abs_em_beta = MuonAbsOpacity(nu, &grey_pars->opacity_pars,
                                      &grey_pars->eos_pars); // [s^-1]
 
-            out_em[id_anux][i] = nu_sqr * abs_em_beta.em[id_anux];
-            out_ab[id_anux][i] = nu_sqr * g_nu * abs_em_beta.abs[id_anux];
+            out_em[id_anum][i] = nu_sqr * abs_em_beta.em[id_anum];
+            out_ab[id_anum][i] = nu_sqr * g_nu * abs_em_beta.abs[id_anum];
 
             // nu_mu_2
-            nu = t[id_nux] / quad->points[i];
+            nu = t[id_num] / quad->points[i];
             BS_ASSERT(nu >= 0,
-                      "Neutrino energy is negative (nu=%e, t[id_nux]=%e, "
+                      "Neutrino energy is negative (nu=%e, t[id_num]=%e, "
                       "quad->points[%d]=%e)",
-                      nu, t[id_nux], i, quad->points[i]);
+                      nu, t[id_num], i, quad->points[i]);
             nu_sqr = POW2(nu);
-            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_nux);
+            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_num);
 
             abs_em_beta = MuonAbsOpacity(nu, &grey_pars->opacity_pars,
                                      &grey_pars->eos_pars); // [s^-1]
 
-            out_em[id_nux][n + i] = nu_sqr * abs_em_beta.em[id_nux];
-            out_ab[id_nux][n + i] = nu_sqr * g_nu * abs_em_beta.abs[id_nux];
+            out_em[id_num][n + i] = nu_sqr * abs_em_beta.em[id_num];
+            out_ab[id_num][n + i] = nu_sqr * g_nu * abs_em_beta.abs[id_num];
 
             // anu_mu_2
-            nu = t[id_anux] / quad->points[i];
+            nu = t[id_anum] / quad->points[i];
             BS_ASSERT(nu >= 0,
-                      "Neutrino energy is negative (nu=%e, t[id_anux]=%e, "
+                      "Neutrino energy is negative (nu=%e, t[id_anum]=%e, "
                       "quad->points[%d]=%e)",
-                      nu, t[id_anux], i, quad->points[i]);
+                      nu, t[id_anum], i, quad->points[i]);
             nu_sqr = POW2(nu);
-            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anux);
+            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anum);
 
             abs_em_beta = MuonAbsOpacity(nu, &grey_pars->opacity_pars,
                                      &grey_pars->eos_pars); // [s^-1]
 
-            out_em[id_anux][n + i] = nu_sqr * abs_em_beta.em[id_anux];
-            out_ab[id_anux][n + i] = nu_sqr * g_nu * abs_em_beta.abs[id_anux];
+            out_em[id_anum][n + i] = nu_sqr * abs_em_beta.em[id_anum];
+            out_ab[id_anum][n + i] = nu_sqr * g_nu * abs_em_beta.abs[id_anum];
         }
     }
 
@@ -387,6 +387,7 @@ void MuonicBeta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_par
 }
 
 
+/*
 KOKKOS_INLINE_FUNCTION
 void AddElBetaReactionToIntegrand(int n, BS_REAL* nu_array,
                                 GreyOpacityParams* grey_pars,
@@ -437,8 +438,10 @@ void AddElBetaReactionToIntegrand(int n, BS_REAL* nu_array,
     }
     return;
 }
+*/
 
 
+/*
 KOKKOS_INLINE_FUNCTION
 void AddMuonicBetaReactionToIntegrand(int n, BS_REAL* nu_array,
                                 GreyOpacityParams* grey_pars,
@@ -490,6 +493,7 @@ void AddMuonicBetaReactionToIntegrand(int n, BS_REAL* nu_array,
     }
     return;
 }
+*/
 
 
 KOKKOS_INLINE_FUNCTION
@@ -593,6 +597,7 @@ void AddBremKernelsToIntegrand(int n, BS_REAL* nu_array,
             }
         }
     }
+
     else if (grey_pars->opacity_pars.brem_implementation == BREM_HR98)
     {
         grey_pars->kernel_pars.brem_kernel_params.l = 0;
@@ -636,6 +641,7 @@ void AddBremKernelsToIntegrand(int n, BS_REAL* nu_array,
             }
         }
     }
+
     else if (grey_pars->opacity_pars.brem_implementation == BREM_GP19)
     {
         for (int i = 0; i < 2 * n; ++i)
@@ -675,6 +681,7 @@ void AddBremKernelsToIntegrand(int n, BS_REAL* nu_array,
             }
         }
     }
+
     else
     {
         BS_ASSERT(false, "Unknown bremsstrahlung implementation: %d",
@@ -683,6 +690,8 @@ void AddBremKernelsToIntegrand(int n, BS_REAL* nu_array,
     return;
 }
 
+
+/*
 KOKKOS_INLINE_FUNCTION
 void AddInelNEPSKernelsToIntegrand(int n, BS_REAL* nu_array,
                                GreyOpacityParams* grey_pars,
@@ -779,6 +788,8 @@ void AddInelNEPSKernelsToIntegrand(int n, BS_REAL* nu_array,
     }
     return;
 }
+*/
+
 
 KOKKOS_INLINE_FUNCTION
 void WeightNuNuBarReactionsWithDistr(int n, BS_REAL* nu_array,
@@ -790,7 +801,7 @@ void WeightNuNuBarReactionsWithDistr(int n, BS_REAL* nu_array,
     BS_REAL nu, nu_bar;
     BS_REAL g_nu[total_num_species], g_nu_bar[total_num_species];
     BS_REAL block_factor_nu[total_num_species],
-        block_factor_nu_bar[total_num_species];
+            block_factor_nu_bar[total_num_species];
 
     for (int i = 0; i < 2 * n; ++i)
     {
@@ -811,15 +822,34 @@ void WeightNuNuBarReactionsWithDistr(int n, BS_REAL* nu_array,
             }
         }
 
-        out->m1_mat_em[id_nue][i][i] *= block_factor_nu[id_anue];
-        out->m1_mat_em[id_anue][i][i] *= block_factor_nu[id_nue];
-        out->m1_mat_em[id_nux][i][i] *= block_factor_nu[id_anux];
-        out->m1_mat_em[id_anux][i][i] *= block_factor_nu[id_nux];
+        if constexpr (total_num_species == 4)
+        {
+            out->m1_mat_em[id_nue][i][i] *= block_factor_nu[id_anue];
+            out->m1_mat_em[id_anue][i][i] *= block_factor_nu[id_nue];
+            out->m1_mat_em[id_nux][i][i] *= block_factor_nu[id_anux];
+            out->m1_mat_em[id_anux][i][i] *= block_factor_nu[id_nux];
 
-        out->m1_mat_ab[id_nue][i][i] *= g_nu[id_anue];
-        out->m1_mat_ab[id_anue][i][i] *= g_nu[id_nue];
-        out->m1_mat_ab[id_nux][i][i] *= g_nu[id_anux];
-        out->m1_mat_ab[id_anux][i][i] *= g_nu[id_nux];
+            out->m1_mat_ab[id_nue][i][i] *= g_nu[id_anue];
+            out->m1_mat_ab[id_anue][i][i] *= g_nu[id_nue];
+            out->m1_mat_ab[id_nux][i][i] *= g_nu[id_anux];
+            out->m1_mat_ab[id_anux][i][i] *= g_nu[id_nux];
+        }
+        else if constexpr (total_num_species == 6)
+        {
+            out->m1_mat_em[id_nue][i][i] *= block_factor_nu[id_anue];
+            out->m1_mat_em[id_anue][i][i] *= block_factor_nu[id_nue];
+            out->m1_mat_em[id_num][i][i] *= block_factor_nu[id_anum];
+            out->m1_mat_em[id_anum][i][i] *= block_factor_nu[id_num];
+            out->m1_mat_em[id_nut][i][i] *= block_factor_nu[id_anut];
+            out->m1_mat_em[id_anut][i][i] *= block_factor_nu[id_nut];
+
+            out->m1_mat_ab[id_nue][i][i] *= g_nu[id_anue];
+            out->m1_mat_ab[id_anue][i][i] *= g_nu[id_nue];
+            out->m1_mat_ab[id_num][i][i] *= g_nu[id_anum];
+            out->m1_mat_ab[id_anum][i][i] *= g_nu[id_num];
+            out->m1_mat_ab[id_nut][i][i] *= g_nu[id_anut];
+            out->m1_mat_ab[id_anut][i][i] *= g_nu[id_nut];
+        }
 
         for (int j = i + 1; j < 2 * n; ++j)
         {
@@ -841,29 +871,63 @@ void WeightNuNuBarReactionsWithDistr(int n, BS_REAL* nu_array,
                 }
             }
 
-            out->m1_mat_em[id_nue][i][j] *= block_factor_nu_bar[id_anue];
-            out->m1_mat_em[id_anue][i][j] *= block_factor_nu_bar[id_nue];
-            out->m1_mat_em[id_nux][i][j] *= block_factor_nu_bar[id_anux];
-            out->m1_mat_em[id_anux][i][j] *= block_factor_nu_bar[id_nux];
+            if constexpr (total_num_species == 4)
+            {
+                out->m1_mat_em[id_nue][i][j] *= block_factor_nu_bar[id_anue];
+                out->m1_mat_em[id_anue][i][j] *= block_factor_nu_bar[id_nue];
+                out->m1_mat_em[id_nux][i][j] *= block_factor_nu_bar[id_anux];
+                out->m1_mat_em[id_anux][i][j] *= block_factor_nu_bar[id_nux];
 
-            out->m1_mat_em[id_nue][j][i] *= block_factor_nu[id_anue];
-            out->m1_mat_em[id_anue][j][i] *= block_factor_nu[id_nue];
-            out->m1_mat_em[id_nux][j][i] *= block_factor_nu[id_anux];
-            out->m1_mat_em[id_anux][j][i] *= block_factor_nu[id_nux];
+                out->m1_mat_em[id_nue][j][i] *= block_factor_nu[id_anue];
+                out->m1_mat_em[id_anue][j][i] *= block_factor_nu[id_nue];
+                out->m1_mat_em[id_nux][j][i] *= block_factor_nu[id_anux];
+                out->m1_mat_em[id_anux][j][i] *= block_factor_nu[id_nux];
 
-            out->m1_mat_ab[id_nue][i][j] *= g_nu_bar[id_anue];
-            out->m1_mat_ab[id_anue][i][j] *= g_nu_bar[id_nue];
-            out->m1_mat_ab[id_nux][i][j] *= g_nu_bar[id_anux];
-            out->m1_mat_ab[id_anux][i][j] *= g_nu_bar[id_nux];
+                out->m1_mat_ab[id_nue][i][j] *= g_nu_bar[id_anue];
+                out->m1_mat_ab[id_anue][i][j] *= g_nu_bar[id_nue];
+                out->m1_mat_ab[id_nux][i][j] *= g_nu_bar[id_anux];
+                out->m1_mat_ab[id_anux][i][j] *= g_nu_bar[id_nux];
 
-            out->m1_mat_ab[id_nue][j][i] *= g_nu[id_anue];
-            out->m1_mat_ab[id_anue][j][i] *= g_nu[id_nue];
-            out->m1_mat_ab[id_nux][j][i] *= g_nu[id_anux];
-            out->m1_mat_ab[id_anux][j][i] *= g_nu[id_nux];
+                out->m1_mat_ab[id_nue][j][i] *= g_nu[id_anue];
+                out->m1_mat_ab[id_anue][j][i] *= g_nu[id_nue];
+                out->m1_mat_ab[id_nux][j][i] *= g_nu[id_anux];
+                out->m1_mat_ab[id_anux][j][i] *= g_nu[id_nux];
+            }
+            else if constexpr (total_num_species == 6)
+            {
+                out->m1_mat_em[id_nue][i][j] *= block_factor_nu_bar[id_anue];
+                out->m1_mat_em[id_anue][i][j] *= block_factor_nu_bar[id_nue];
+                out->m1_mat_em[id_num][i][j] *= block_factor_nu_bar[id_anum];
+                out->m1_mat_em[id_anum][i][j] *= block_factor_nu_bar[id_num];
+                out->m1_mat_em[id_nut][i][j] *= block_factor_nu_bar[id_anut];
+                out->m1_mat_em[id_anut][i][j] *= block_factor_nu_bar[id_nut];
+
+                out->m1_mat_em[id_nue][j][i] *= block_factor_nu[id_anue];
+                out->m1_mat_em[id_anue][j][i] *= block_factor_nu[id_nue];
+                out->m1_mat_em[id_num][j][i] *= block_factor_nu[id_anum];
+                out->m1_mat_em[id_anum][j][i] *= block_factor_nu[id_num];
+                out->m1_mat_em[id_nut][j][i] *= block_factor_nu[id_anut];
+                out->m1_mat_em[id_anut][j][i] *= block_factor_nu[id_nut];
+
+                out->m1_mat_ab[id_nue][i][j] *= g_nu_bar[id_anue];
+                out->m1_mat_ab[id_anue][i][j] *= g_nu_bar[id_nue];
+                out->m1_mat_ab[id_num][i][j] *= g_nu_bar[id_anum];
+                out->m1_mat_ab[id_anum][i][j] *= g_nu_bar[id_num];
+                out->m1_mat_ab[id_nut][i][j] *= g_nu_bar[id_anut];
+                out->m1_mat_ab[id_anut][i][j] *= g_nu_bar[id_nut];
+
+                out->m1_mat_ab[id_nue][j][i] *= g_nu[id_anue];
+                out->m1_mat_ab[id_anue][j][i] *= g_nu[id_nue];
+                out->m1_mat_ab[id_num][j][i] *= g_nu[id_anum];
+                out->m1_mat_ab[id_anum][j][i] *= g_nu[id_num];
+                out->m1_mat_ab[id_nut][j][i] *= g_nu[id_anut];
+                out->m1_mat_ab[id_anut][j][i] *= g_nu[id_nut];
+            }
         }
     }
     return;
 }
+
 
 KOKKOS_INLINE_FUNCTION
 void AddCommonWeightsToIntegrand(int n, BS_REAL* nu_array,
@@ -962,6 +1026,7 @@ void AddCommonWeightsToIntegrand(int n, BS_REAL* nu_array,
     }
     return;
 }
+
 
 /* Compute the 2d integrands for all reactions from Leonardo's notes [Eqns. (51)
  * & (52)] There are a total of two expressions for 'e' and 'x' neutrinos, so 4
@@ -1089,21 +1154,11 @@ M1MatrixKokkos2D ComputeNEPSIntegrand(const MyQuadrature* quad, BS_REAL t,
     // compute the neutrino & anti-neutrino distribution function
     BS_REAL g_nu[total_num_species], g_nu_bar[total_num_species];
     BS_REAL block_factor_nu[total_num_species],
-        block_factor_nu_bar[total_num_species];
+            block_factor_nu_bar[total_num_species];
 
     MyKernelOutput inel_1, inel_2;
 
     M1MatrixKokkos2D out = {0};
-
-    // for (int i = 0; i < n; ++i)
-    // {
-    //     x = quad->points[i];
-
-    //     nu_array_1[i]     = t * x;
-    //     nu_array_1[n + i] = t / x;
-
-    //     nu_array_2[i] = x / (1. - x) - (1. - x) / x;
-    // }
 
     for (int i = 0; i < n; ++i)
     {
@@ -1288,7 +1343,7 @@ M1MatrixKokkos2D ComputeNMSIntegrand(const MyQuadrature* quad, BS_REAL t,
     // compute the neutrino & anti-neutrino distribution function
     BS_REAL g_nu[total_num_species], g_nu_bar[total_num_species];
     BS_REAL block_factor_nu[total_num_species],
-        block_factor_nu_bar[total_num_species];
+            block_factor_nu_bar[total_num_species];
 
     MyKernelOutput inel_1, inel_2;
 
@@ -1632,9 +1687,10 @@ M1MatrixKokkos2D ComputeNMSIntegrand(const MyQuadrature* quad, BS_REAL t,
         }
     }
 
-    //Fallback
-    else{
-        printf("ERROR: NMS implementation is not well specified.");
+    else  //fallback
+    {
+        BS_ASSERT(false, "Unknown NMS implementation: %d",
+                  (int)grey_pars->opacity_pars.NMS_implementation);
     }
 
     return out;
@@ -1653,6 +1709,16 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     const MyQuadrature* quad_1d, const MyQuadrature* quad_2d,
     GreyOpacityParams* my_grey_opacity_params, const int stim_abs)
 {
+
+    constexpr int id_nue_kappa = total_num_species + id_nue;
+    constexpr int id_anue_kappa = total_num_species + id_anue;
+    constexpr int id_nux_kappa = total_num_species + id_nux;
+    constexpr int id_anux_kappa = total_num_species + id_anux;
+    constexpr int id_num_kappa = total_num_species + id_num;
+    constexpr int id_anum_kappa = total_num_species + id_anum;
+    constexpr int id_nut_kappa = total_num_species + id_nut;
+    constexpr int id_anut_kappa = total_num_species + id_anut;
+
     constexpr BS_REAL four    = 4;
     constexpr BS_REAL two = 2;
     constexpr BS_REAL c_light = kBS_Clight;
@@ -1699,15 +1765,13 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     constexpr BS_REAL five          = 5;
     constexpr BS_REAL temp_multiple = 0.5 * 4.364;
     const BS_REAL s_pair            = temp_multiple * temp;
-    // const BS_REAL s_pair              = temp * (FDI_p4(eta_e) / FDI_p3(eta_e)
-    // + FDI_p4(-eta_e) / FDI_p3(-eta_e));
     const BS_REAL s_nux  = three_halves * temp;
     const BS_REAL s_neps = temp_multiple * temp;
     // s_nms depends on the grid boundaries:
     const BS_REAL s_nms = std::max(two * umin, std::min(four * s_neps, five_sixths * umax));
 
-    BS_REAL s_beta_el[total_num_species] = {0}, s_beta_muon[total_num_species] = {0};
-    BS_REAL s_iso[total_num_species] = {0};
+    BS_REAL s_beta_el[total_num_species] = {0}, s_beta_muon[total_num_species] = {0},
+            s_iso[total_num_species] = {0};
 
     if (eta_e > -30. and eta_e < 30.)
     {
@@ -1725,8 +1789,8 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
         s_beta_el[id_anue] = temp * eta_e * five_sixths;
     }
 
-    s_beta_muon[id_nux] = two * kBS_Mmu - Q;
-    s_beta_muon[id_anux] = two * kBS_Mmu + Q;
+    s_beta_muon[id_num] = two * kBS_Mmu - Q;
+    s_beta_muon[id_anum] = two * kBS_Mmu + Q;
 
     for (int idx = 0; idx < total_num_species; ++idx)
     {
@@ -1840,142 +1904,328 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
         m1_opacities.kappa_s[idx]   = zero;
     }
 
-    /* Electron neutrinos */
-    m1_opacities.eta_0[id_nue] =
-        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * (n_integrals_2d.integrand[0] +
-                                            n_neps_2d.integrand[0] +
-                                            n_nms_2d.integrand[0]) +
-                          el_beta_n_em_integrals.integrand[id_nue]);
-    m1_opacities.eta[id_nue] =
-        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * (e_integrals_2d.integrand[0] +
-                                            e_neps_2d.integrand[0] +
-                                            e_nms_2d.integrand[0]) +
-                          el_beta_j_em_integrals.integrand[id_nue]);
-    if (n[id_nue] > THRESHOLD_N)
+    if constexpr (total_num_species == 4)
     {
-        m1_opacities.kappa_0_a[id_nue] =
-            kBS_FourPi_hc3 / (c_light * n[id_nue]) *
-            (kBS_FourPi_hc3 *
-                 (n_integrals_2d.integrand[4] + 
-                  n_neps_2d.integrand[4] + 
-                  n_nms_2d.integrand[4]) +
-             el_beta_n_abs_integrals.integrand[id_nue]);
-    }
-    if (J[id_nue] > THRESHOLD_J)
-    {
-        m1_opacities.kappa_a[id_nue] =
-            n[id_nue] == zero ?
-                zero :
-                kBS_FourPi_hc3 / (c_light * J[id_nue]) *
-                    (kBS_FourPi_hc3 * (e_integrals_2d.integrand[4] +
-                                       e_neps_2d.integrand[4] + 
-                                       e_nms_2d.integrand[4]) +
-                     el_beta_j_abs_integrals.integrand[id_nue]);
-        m1_opacities.kappa_s[id_nue] = kBS_FourPi_hc3 / (c_light * J[id_nue]) *
-                                       iso_integrals.integrand[id_nue];
+
+        /* Electron neutrinos */
+        m1_opacities.eta_0[id_nue] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * (n_integrals_2d.integrand[id_nue] +
+                                                n_neps_2d.integrand[id_nue]) +
+                            el_beta_n_em_integrals.integrand[id_nue]);
+        m1_opacities.eta[id_nue] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * (e_integrals_2d.integrand[id_nue] +
+                                                e_neps_2d.integrand[id_nue]) +
+                            el_beta_j_em_integrals.integrand[id_nue]);
+        if (n[id_nue] > THRESHOLD_N)
+        {
+            m1_opacities.kappa_0_a[id_nue] =
+                kBS_FourPi_hc3 / (c_light * n[id_nue]) *
+                (kBS_FourPi_hc3 *
+                    (n_integrals_2d.integrand[id_nue_kappa] + 
+                     n_neps_2d.integrand[id_nue_kappa]) +
+                el_beta_n_abs_integrals.integrand[id_nue]);
+        }
+        if (J[id_nue] > THRESHOLD_J)
+        {
+            m1_opacities.kappa_a[id_nue] =
+                n[id_nue] == zero ?
+                    zero :
+                    kBS_FourPi_hc3 / (c_light * J[id_nue]) *
+                        (kBS_FourPi_hc3 * (e_integrals_2d.integrand[id_nue_kappa] +
+                                           e_neps_2d.integrand[id_nue_kappa]) +
+                        el_beta_j_abs_integrals.integrand[id_nue]);
+            m1_opacities.kappa_s[id_nue] = kBS_FourPi_hc3 / (c_light * J[id_nue]) *
+                                        iso_integrals.integrand[id_nue];
+        }
+
+        /* Electron anti-neutrinos */
+        m1_opacities.eta_0[id_anue] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * (n_integrals_2d.integrand[id_anue] +
+                                                n_neps_2d.integrand[id_anue]) +
+                            el_beta_n_em_integrals.integrand[id_anue]);
+        m1_opacities.eta[id_anue] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * (e_integrals_2d.integrand[id_anue] +
+                                                e_neps_2d.integrand[id_anue]) +
+                            el_beta_j_em_integrals.integrand[id_anue]);
+        if (n[id_anue] > THRESHOLD_N)
+        {
+            m1_opacities.kappa_0_a[id_anue] =
+                kBS_FourPi_hc3 / (c_light * n[id_anue]) *
+                (kBS_FourPi_hc3 *
+                    (n_integrals_2d.integrand[id_anue_kappa] + 
+                     n_neps_2d.integrand[id_anue_kappa]) +
+                el_beta_n_abs_integrals.integrand[id_anue]);
+        }
+        if (J[id_anue] > THRESHOLD_J)
+        {
+            m1_opacities.kappa_a[id_anue] =
+                kBS_FourPi_hc3 / (c_light * J[id_anue]) *
+                (kBS_FourPi_hc3 *
+                    (e_integrals_2d.integrand[id_anue_kappa] + 
+                     e_neps_2d.integrand[id_anue_kappa]) +
+                el_beta_j_abs_integrals.integrand[id_anue]);
+            m1_opacities.kappa_s[id_anue] = kBS_FourPi_hc3 /
+                                            (c_light * J[id_anue]) *
+                                            iso_integrals.integrand[id_anue];
+        }
+
+        /* Heavy neutrinos */
+        m1_opacities.eta_0[id_nux] =
+            kBS_FourPi_hc3_sqr * (n_integrals_2d.integrand[id_nux] + 
+                                  n_neps_2d.integrand[id_nux]);
+        m1_opacities.eta[id_nux] =
+            kBS_FourPi_hc3_sqr * (e_integrals_2d.integrand[id_nux] + 
+                                  e_neps_2d.integrand[id_nux]);
+        if (n[id_nux] > THRESHOLD_N)
+        {
+            m1_opacities.kappa_0_a[id_nux] =
+                kBS_FourPi_hc3_sqr / (c_light * n[id_nux]) *
+                (n_integrals_2d.integrand[id_nux_kappa] + 
+                 n_neps_2d.integrand[id_nux_kappa]);
+        }
+        if (J[id_nux] > THRESHOLD_J)
+        {
+            m1_opacities.kappa_a[id_nux] =
+                kBS_FourPi_hc3_sqr / (c_light * J[id_nux]) *
+                (e_integrals_2d.integrand[id_nux_kappa] + 
+                 e_neps_2d.integrand[id_nux_kappa]);
+            m1_opacities.kappa_s[id_nux] = kBS_FourPi_hc3 / (c_light * J[id_nux]) *
+                                        iso_integrals.integrand[id_nux];
+        }
+
+        /* Heavy anti-neutrinos */
+        m1_opacities.eta_0[id_anux] =
+            kBS_FourPi_hc3_sqr * (n_integrals_2d.integrand[id_anux] + 
+                                  n_neps_2d.integrand[id_anux]);
+        m1_opacities.eta[id_anux] =
+            kBS_FourPi_hc3_sqr * (e_integrals_2d.integrand[id_anux] + 
+                                  e_neps_2d.integrand[id_anux]);
+        if (n[id_anux] > THRESHOLD_N)
+        {
+            m1_opacities.kappa_0_a[id_anux] =
+                n[id_anux] == zero ?
+                    zero :
+                    kBS_FourPi_hc3_sqr / (c_light * n[id_anux]) *
+                    (n_integrals_2d.integrand[id_anux_kappa] + 
+                     n_neps_2d.integrand[id_anux_kappa]);
+        }
+        if (J[id_anux] > THRESHOLD_J)
+        {
+            m1_opacities.kappa_a[id_anux] =
+                kBS_FourPi_hc3_sqr / (c_light * J[id_anux]) *
+                (e_integrals_2d.integrand[id_anux_kappa] + 
+                 e_neps_2d.integrand[id_anux_kappa]);
+            m1_opacities.kappa_s[id_anux] = kBS_FourPi_hc3 /
+                                            (c_light * J[id_anux]) *
+                                            iso_integrals.integrand[id_anux];
+        }
     }
 
-    /* Electron anti-neutrinos */
-    m1_opacities.eta_0[id_anue] =
-        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * (n_integrals_2d.integrand[1] +
-                                            n_neps_2d.integrand[1] +
-                                            n_nms_2d.integrand[1]) +
-                          el_beta_n_em_integrals.integrand[id_anue]);
-    m1_opacities.eta[id_anue] =
-        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * (e_integrals_2d.integrand[1] +
-                                            e_neps_2d.integrand[1] +
-                                            e_nms_2d.integrand[1]) +
-                          el_beta_j_em_integrals.integrand[id_anue]);
-    if (n[id_anue] > THRESHOLD_N)
+    else if constexpr (total_num_species == 6)
     {
-        m1_opacities.kappa_0_a[id_anue] =
-            kBS_FourPi_hc3 / (c_light * n[id_anue]) *
-            (kBS_FourPi_hc3 *
-                 (n_integrals_2d.integrand[5] + 
-                  n_neps_2d.integrand[5] +
-                  n_nms_2d.integrand[5]) +
-             el_beta_n_abs_integrals.integrand[id_anue]);
-    }
-    if (J[id_anue] > THRESHOLD_J)
-    {
-        m1_opacities.kappa_a[id_anue] =
-            kBS_FourPi_hc3 / (c_light * J[id_anue]) *
-            (kBS_FourPi_hc3 *
-                 (e_integrals_2d.integrand[5] + 
-                  e_neps_2d.integrand[5] +
-                  e_nms_2d.integrand[5]) +
-             el_beta_j_abs_integrals.integrand[id_anue]);
-        m1_opacities.kappa_s[id_anue] = kBS_FourPi_hc3 /
-                                        (c_light * J[id_anue]) *
-                                        iso_integrals.integrand[id_anue];
+
+        /* Electron neutrinos */
+        m1_opacities.eta_0[id_nue] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * (n_integrals_2d.integrand[id_nue] +
+                                                n_neps_2d.integrand[id_nue] +
+                                                n_nms_2d.integrand[id_nue]) +
+                              el_beta_n_em_integrals.integrand[id_nue]);
+        m1_opacities.eta[id_nue] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * (e_integrals_2d.integrand[id_nue] +
+                                                e_neps_2d.integrand[id_nue] +
+                                                e_nms_2d.integrand[id_nue]) +
+                              el_beta_j_em_integrals.integrand[id_nue]);
+        if (n[id_nue] > THRESHOLD_N)
+        {
+            m1_opacities.kappa_0_a[id_nue] =
+                kBS_FourPi_hc3 / (c_light * n[id_nue]) *
+                (kBS_FourPi_hc3 *
+                    (n_integrals_2d.integrand[id_nue_kappa] + 
+                    n_neps_2d.integrand[id_nue_kappa] + 
+                    n_nms_2d.integrand[id_nue_kappa]) +
+                 el_beta_n_abs_integrals.integrand[id_nue]);
+        }
+        if (J[id_nue] > THRESHOLD_J)
+        {
+            m1_opacities.kappa_a[id_nue] =
+                n[id_nue] == zero ?
+                    zero :
+                    kBS_FourPi_hc3 / (c_light * J[id_nue]) *
+                        (kBS_FourPi_hc3 * (e_integrals_2d.integrand[id_nue_kappa] +
+                                        e_neps_2d.integrand[id_nue_kappa] + 
+                                        e_nms_2d.integrand[id_nue_kappa]) +
+                         el_beta_j_abs_integrals.integrand[id_nue]);
+            m1_opacities.kappa_s[id_nue] = kBS_FourPi_hc3 / (c_light * J[id_nue]) *
+                                        iso_integrals.integrand[id_nue];
+        }
+
+        /* Electron anti-neutrinos */
+        m1_opacities.eta_0[id_anue] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * (n_integrals_2d.integrand[id_anue] +
+                                                n_neps_2d.integrand[id_anue] +
+                                                n_nms_2d.integrand[id_anue]) +
+                              el_beta_n_em_integrals.integrand[id_anue]);
+        m1_opacities.eta[id_anue] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * (e_integrals_2d.integrand[id_anue] +
+                                                e_neps_2d.integrand[id_anue] +
+                                                e_nms_2d.integrand[id_anue]) +
+                              el_beta_j_em_integrals.integrand[id_anue]);
+        if (n[id_anue] > THRESHOLD_N)
+        {
+            m1_opacities.kappa_0_a[id_anue] =
+                kBS_FourPi_hc3 / (c_light * n[id_anue]) *
+                (kBS_FourPi_hc3 *
+                    (n_integrals_2d.integrand[id_anue_kappa] + 
+                    n_neps_2d.integrand[id_anue_kappa] +
+                    n_nms_2d.integrand[id_anue_kappa]) +
+                 el_beta_n_abs_integrals.integrand[id_anue]);
+        }
+        if (J[id_anue] > THRESHOLD_J)
+        {
+            m1_opacities.kappa_a[id_anue] =
+                kBS_FourPi_hc3 / (c_light * J[id_anue]) *
+                (kBS_FourPi_hc3 *
+                    (e_integrals_2d.integrand[id_anue_kappa] + 
+                    e_neps_2d.integrand[id_anue_kappa] +
+                    e_nms_2d.integrand[id_anue_kappa]) +
+                 el_beta_j_abs_integrals.integrand[id_anue]);
+            m1_opacities.kappa_s[id_anue] = kBS_FourPi_hc3 /
+                                            (c_light * J[id_anue]) *
+                                            iso_integrals.integrand[id_anue];
+        }
+
+        /* Muon neutrinos */
+        m1_opacities.eta_0[id_num] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * (n_integrals_2d.integrand[id_num] + 
+                                                n_neps_2d.integrand[id_num] +
+                                                n_nms_2d.integrand[id_num]) +
+                              muon_beta_n_em_integrals.integrand[id_num]);
+        m1_opacities.eta[id_num] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * (e_integrals_2d.integrand[id_num] + 
+                                                e_neps_2d.integrand[id_num] +
+                                                e_nms_2d.integrand[id_num]) +
+                              muon_beta_j_em_integrals.integrand[id_num]);
+        if (n[id_num] > THRESHOLD_N)
+        {
+            m1_opacities.kappa_0_a[id_num] =
+                kBS_FourPi_hc3 / (c_light * n[id_num]) *
+                (kBS_FourPi_hc3 * (n_integrals_2d.integrand[id_num_kappa] + 
+                                n_neps_2d.integrand[id_num_kappa] +
+                                n_nms_2d.integrand[id_num_kappa]) +
+                 muon_beta_n_abs_integrals.integrand[id_num]);
+        }
+        if (J[id_num] > THRESHOLD_J)
+        {
+            m1_opacities.kappa_a[id_num] =
+                kBS_FourPi_hc3 / (c_light * J[id_num]) *
+                (kBS_FourPi_hc3 * (e_integrals_2d.integrand[id_num_kappa] + 
+                                e_neps_2d.integrand[id_num_kappa] +
+                                e_nms_2d.integrand[id_num_kappa]) +
+                 muon_beta_j_abs_integrals.integrand[id_num]);
+            m1_opacities.kappa_s[id_num] = kBS_FourPi_hc3 / (c_light * J[id_num]) *
+                                        iso_integrals.integrand[id_num];
+        }
+
+        /* Muon anti-neutrinos */
+        m1_opacities.eta_0[id_anum] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * (n_integrals_2d.integrand[id_anum] + 
+                                                n_neps_2d.integrand[id_anum] +
+                                                n_nms_2d.integrand[id_anum]) + 
+                              muon_beta_n_em_integrals.integrand[id_anum]);
+        m1_opacities.eta[id_anum] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * (e_integrals_2d.integrand[id_anum] + 
+                                                e_neps_2d.integrand[id_anum] +
+                                                e_nms_2d.integrand[id_anum]) + 
+                              muon_beta_j_em_integrals.integrand[id_anum]);
+        if (n[id_anum] > THRESHOLD_N)
+        {
+            m1_opacities.kappa_0_a[id_anum] =
+                n[id_anum] == zero ?
+                    zero :
+                    kBS_FourPi_hc3 / (c_light * n[id_anum]) *
+                        (kBS_FourPi_hc3 * (n_integrals_2d.integrand[id_anum_kappa] + 
+                                        n_neps_2d.integrand[id_anum_kappa] +
+                                        n_nms_2d.integrand[id_anum_kappa]) +
+                         muon_beta_n_abs_integrals.integrand[id_anum]);
+        }
+        if (J[id_anum] > THRESHOLD_J)
+        {
+            m1_opacities.kappa_a[id_anum] =
+                kBS_FourPi_hc3 / (c_light * J[id_anum]) *
+                (kBS_FourPi_hc3 * (e_integrals_2d.integrand[id_anum_kappa] + 
+                                e_neps_2d.integrand[id_anum_kappa] +
+                                e_nms_2d.integrand[id_anum_kappa]) +
+                 muon_beta_j_abs_integrals.integrand[id_anum]);
+
+            m1_opacities.kappa_s[id_anum] = kBS_FourPi_hc3 /
+                                            (c_light * J[id_anum]) *
+                                            iso_integrals.integrand[id_anum];
+        }
+
+        /* Tau neutrinos */
+        m1_opacities.eta_0[id_nut] =
+            kBS_FourPi_hc3_sqr * (n_integrals_2d.integrand[id_nut] + 
+                                  n_neps_2d.integrand[id_nut] +
+                                  n_nms_2d.integrand[id_nut]);
+        m1_opacities.eta[id_nut] =
+            kBS_FourPi_hc3_sqr * (e_integrals_2d.integrand[id_nut] + 
+                                  e_neps_2d.integrand[id_nut] +
+                                  e_nms_2d.integrand[id_nut]);
+        if (n[id_nut] > THRESHOLD_N)
+        {
+            m1_opacities.kappa_0_a[id_nut] =
+                kBS_FourPi_hc3_sqr / (c_light * n[id_nut]) *
+                (n_integrals_2d.integrand[id_nut_kappa] + 
+                 n_neps_2d.integrand[id_nut_kappa] +
+                 n_nms_2d.integrand[id_nut_kappa]);
+        }
+        if (J[id_nut] > THRESHOLD_J)
+        {
+            m1_opacities.kappa_a[id_nut] =
+                kBS_FourPi_hc3_sqr / (c_light * J[id_nut]) *
+                (e_integrals_2d.integrand[id_nut_kappa] + 
+                 e_neps_2d.integrand[id_nut_kappa] +
+                 e_nms_2d.integrand[id_nut_kappa]);
+            m1_opacities.kappa_s[id_nut] = kBS_FourPi_hc3 / (c_light * J[id_nut]) *
+                                        iso_integrals.integrand[id_nut];
+        }
+
+        /* Tau anti-neutrinos */
+        m1_opacities.eta_0[id_anut] =
+            kBS_FourPi_hc3_sqr * (n_integrals_2d.integrand[id_anut] + 
+                                  n_neps_2d.integrand[id_anut] +
+                                  n_nms_2d.integrand[id_anut]);
+        m1_opacities.eta[id_anut] =
+            kBS_FourPi_hc3_sqr * (e_integrals_2d.integrand[id_anut] + 
+                                  e_neps_2d.integrand[id_anut] +
+                                  e_nms_2d.integrand[id_anut]);
+        if (n[id_anut] > THRESHOLD_N)
+        {
+            m1_opacities.kappa_0_a[id_anut] =
+                n[id_anut] == zero ?
+                    zero :
+                    kBS_FourPi_hc3_sqr / (c_light * n[id_anut]) *
+                        (n_integrals_2d.integrand[id_anut_kappa] + 
+                         n_neps_2d.integrand[id_anut_kappa] +
+                         n_nms_2d.integrand[id_anut_kappa]);
+        }
+        if (J[id_anut] > THRESHOLD_J)
+        {
+            m1_opacities.kappa_a[id_anut] =
+                kBS_FourPi_hc3_sqr / (c_light * J[id_anut]) *
+                (e_integrals_2d.integrand[id_anut_kappa] + 
+                 e_neps_2d.integrand[id_anut_kappa] +
+                 e_nms_2d.integrand[id_anut_kappa]);
+
+            m1_opacities.kappa_s[id_anut] = kBS_FourPi_hc3 /
+                                            (c_light * J[id_anut]) *
+                                            iso_integrals.integrand[id_anut];
+        }
     }
 
-    /* Heavy neutrinos */
-    m1_opacities.eta_0[id_nux] =
-        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * (n_integrals_2d.integrand[2] + 
-                                            n_neps_2d.integrand[2] +
-                                            n_nms_2d.integrand[2]) +
-                          muon_beta_n_em_integrals.integrand[id_nux]);
-    m1_opacities.eta[id_nux] =
-        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * (e_integrals_2d.integrand[2] + 
-                                            e_neps_2d.integrand[2] +
-                                            e_nms_2d.integrand[2]) +
-                          muon_beta_j_em_integrals.integrand[id_nux]);
-    if (n[id_nux] > THRESHOLD_N)
+    else  //fallback
     {
-        m1_opacities.kappa_0_a[id_nux] =
-            kBS_FourPi_hc3 / (c_light * n[id_nux]) *
-            (kBS_FourPi_hc3 * (n_integrals_2d.integrand[6] + 
-                               n_neps_2d.integrand[6] +
-                               n_nms_2d.integrand[6]) +
-             muon_beta_n_abs_integrals.integrand[id_nux]);
-    }
-    if (J[id_nux] > THRESHOLD_J)
-    {
-        m1_opacities.kappa_a[id_nux] =
-            kBS_FourPi_hc3 / (c_light * J[id_nux]) *
-            (kBS_FourPi_hc3 * (e_integrals_2d.integrand[6] + 
-                               e_neps_2d.integrand[6] +
-                               e_nms_2d.integrand[6]) +
-             muon_beta_j_abs_integrals.integrand[id_nux]);
-        m1_opacities.kappa_s[id_nux] = kBS_FourPi_hc3 / (c_light * J[id_nux]) *
-                                       iso_integrals.integrand[id_nux];
-    }
-
-    /* Heavy anti-neutrinos */
-    m1_opacities.eta_0[id_anux] =
-        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * (n_integrals_2d.integrand[3] + 
-                                            n_neps_2d.integrand[3] +
-                                            n_nms_2d.integrand[3]) + 
-                          muon_beta_n_em_integrals.integrand[id_anux]);
-    m1_opacities.eta[id_anux] =
-        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * (e_integrals_2d.integrand[3] + 
-                                            e_neps_2d.integrand[3] +
-                                            e_nms_2d.integrand[3]) + 
-                          muon_beta_j_em_integrals.integrand[id_anux]);
-    if (n[id_anux] > THRESHOLD_N)
-    {
-        m1_opacities.kappa_0_a[id_anux] =
-            n[id_anux] == zero ?
-                zero :
-                kBS_FourPi_hc3 / (c_light * n[id_anux]) *
-                    (kBS_FourPi_hc3 * (n_integrals_2d.integrand[7] + 
-                                       n_neps_2d.integrand[7] +
-                                       n_nms_2d.integrand[7]) +
-                     muon_beta_n_abs_integrals.integrand[id_anux]);
-    }
-    if (J[id_anux] > THRESHOLD_J)
-    {
-        m1_opacities.kappa_a[id_anux] =
-            kBS_FourPi_hc3 / (c_light * J[id_anux]) *
-            (kBS_FourPi_hc3 * (e_integrals_2d.integrand[7] + 
-                               e_neps_2d.integrand[7] +
-                               e_nms_2d.integrand[7]) +
-             muon_beta_j_abs_integrals.integrand[id_anux]);
-
-        m1_opacities.kappa_s[id_anux] = kBS_FourPi_hc3 /
-                                        (c_light * J[id_anux]) *
-                                        iso_integrals.integrand[id_anux];
+        BS_ASSERT(false, "Wrong number of nu species: %d", total_num_species);
     }
 
     return m1_opacities;
@@ -1994,6 +2244,16 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
                 const MyQuadrature* quad_1d, const MyQuadrature* quad_2d,
                 GreyOpacityParams* my_grey_opacity_params, const int stim_abs)
 {
+
+    constexpr int id_nue_kappa = total_num_species + id_nue;
+    constexpr int id_anue_kappa = total_num_species + id_anue;
+    constexpr int id_nux_kappa = total_num_species + id_nux;
+    constexpr int id_anux_kappa = total_num_species + id_anux;
+    constexpr int id_num_kappa = total_num_species + id_num;
+    constexpr int id_anum_kappa = total_num_species + id_anum;
+    constexpr int id_nut_kappa = total_num_species + id_nut;
+    constexpr int id_anut_kappa = total_num_species + id_anut;
+
     constexpr BS_REAL four = 4;
     constexpr BS_REAL two = 2;
     constexpr BS_REAL c_light = kBS_Clight;
@@ -2040,8 +2300,6 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     constexpr BS_REAL five          = 5;
     constexpr BS_REAL temp_multiple = 0.5 * 4.364;
     const BS_REAL s_pair            = temp_multiple * temp;
-    // const BS_REAL s_pair              = temp * (FDI_p4(eta_e) / FDI_p3(eta_e)
-    // + FDI_p4(-eta_e) / FDI_p3(-eta_e));
     const BS_REAL s_nux  = three_halves * temp;
     const BS_REAL s_neps = temp_multiple * temp;
     // s_nms depends on the grid boundaries:
@@ -2071,8 +2329,8 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
         s_iso[idx] = (n[idx] > THRESHOLD_N) ? (J[idx] / n[idx]) : s_nux;
     }
 
-    s_beta_muon[id_nux] = two * kBS_Mmu - Q;
-    s_beta_muon[id_anux] = two * kBS_Mmu + Q;
+    s_beta_muon[id_num] = two * kBS_Mmu - Q;
+    s_beta_muon[id_anum] = two * kBS_Mmu + Q;
 
     MyQuadratureIntegrand iso_integrals = {0};
     if (my_grey_opacity_params->opacity_flags.use_iso == 1)
@@ -2178,154 +2436,367 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
         m1_opacities_non_th_separated.kappa_s[idx]        = zero;
     }
 
-    /* Electron neutrinos */
-    m1_opacities_non_th_separated.eta_0[id_nue] =
-        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * n_integrals_2d.integrand[0] +
-                          el_beta_n_em_integrals.integrand[id_nue]);
 
-    m1_opacities_non_th_separated.eta_th[id_nue] =
-        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * e_integrals_2d.integrand[0] +
-                          el_beta_j_em_integrals.integrand[id_nue]);
-
-    m1_opacities_non_th_separated.eta_non_th[id_nue] =
-        kBS_FourPi_hc3_sqr * (e_neps_2d.integrand[0] +
-                              e_nms_2d.integrand[0]);
-
-    if (n[id_nue] > THRESHOLD_N)
+    if constexpr (total_num_species == 4)
     {
-        m1_opacities_non_th_separated.kappa_0_a[id_nue] =
-            kBS_FourPi_hc3 / (c_light * n[id_nue]) *
-            (kBS_FourPi_hc3 * n_integrals_2d.integrand[4] +
-             el_beta_n_abs_integrals.integrand[id_nue]);
+        /* Electron neutrinos */
+        m1_opacities_non_th_separated.eta_0[id_nue] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * n_integrals_2d.integrand[id_nue] +
+                              el_beta_n_em_integrals.integrand[id_nue]);
+
+        m1_opacities_non_th_separated.eta_th[id_nue] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * e_integrals_2d.integrand[id_nue] +
+                              el_beta_j_em_integrals.integrand[id_nue]);
+
+        m1_opacities_non_th_separated.eta_non_th[id_nue] =
+            kBS_FourPi_hc3_sqr * e_neps_2d.integrand[id_nue];
+
+        if (n[id_nue] > THRESHOLD_N)
+        {
+            m1_opacities_non_th_separated.kappa_0_a[id_nue] =
+                kBS_FourPi_hc3 / (c_light * n[id_nue]) *
+                (kBS_FourPi_hc3 * n_integrals_2d.integrand[id_nue_kappa] +
+                 el_beta_n_abs_integrals.integrand[id_nue]);
+        }
+        if (J[id_nue] > THRESHOLD_J)
+        {
+            m1_opacities_non_th_separated.kappa_a_th[id_nue] =
+                n[id_nue] == zero ?
+                    zero :
+                    kBS_FourPi_hc3 / (c_light * J[id_nue]) *
+                        (kBS_FourPi_hc3 * e_integrals_2d.integrand[id_nue_kappa] +
+                         el_beta_j_abs_integrals.integrand[id_nue]);
+
+            m1_opacities_non_th_separated.kappa_a_non_th[id_nue] =
+                n[id_nue] == zero ?
+                    zero :
+                    kBS_FourPi_hc3_sqr / (c_light * J[id_nue]) * e_neps_2d.integrand[id_nue_kappa];
+
+            m1_opacities_non_th_separated.kappa_s[id_nue] = kBS_FourPi_hc3 / (c_light * J[id_nue]) *
+                                        iso_integrals.integrand[id_nue];
+        }
+
+        /* Electron anti-neutrinos */
+        m1_opacities_non_th_separated.eta_0[id_anue] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * n_integrals_2d.integrand[id_anue] +
+                              el_beta_n_em_integrals.integrand[id_anue]);
+
+        m1_opacities_non_th_separated.eta_th[id_anue] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * e_integrals_2d.integrand[id_anue] +
+                              el_beta_j_em_integrals.integrand[id_anue]);
+
+        m1_opacities_non_th_separated.eta_non_th[id_anue] =
+            kBS_FourPi_hc3_sqr * e_neps_2d.integrand[id_anue];
+
+        if (n[id_anue] > THRESHOLD_N)
+        {
+            m1_opacities_non_th_separated.kappa_0_a[id_anue] =
+                kBS_FourPi_hc3 / (c_light * n[id_anue]) *
+                (kBS_FourPi_hc3 * n_integrals_2d.integrand[id_anue_kappa] +
+                 el_beta_n_abs_integrals.integrand[id_anue]);
+        }
+        if (J[id_anue] > THRESHOLD_J)
+        {
+            m1_opacities_non_th_separated.kappa_a_th[id_anue] =
+                kBS_FourPi_hc3 / (c_light * J[id_anue]) *
+                (kBS_FourPi_hc3 * e_integrals_2d.integrand[id_anue_kappa] +
+                 el_beta_j_abs_integrals.integrand[id_anue]);
+
+            m1_opacities_non_th_separated.kappa_a_non_th[id_anue] =
+                kBS_FourPi_hc3_sqr / (c_light * J[id_anue]) * e_neps_2d.integrand[id_anue_kappa];
+
+            m1_opacities_non_th_separated.kappa_s[id_anue] = kBS_FourPi_hc3 /
+                                            (c_light * J[id_anue]) *
+                                            iso_integrals.integrand[id_anue];
+        }
+
+        /* Heavy neutrinos */
+        m1_opacities_non_th_separated.eta_0[id_nux] =
+            kBS_FourPi_hc3_sqr * n_integrals_2d.integrand[id_nux];
+
+        m1_opacities_non_th_separated.eta_th[id_nux] =
+            kBS_FourPi_hc3_sqr * e_integrals_2d.integrand[id_nux];
+
+        m1_opacities_non_th_separated.eta_non_th[id_nux] =
+            kBS_FourPi_hc3_sqr * e_neps_2d.integrand[id_nux];
+
+        if (n[id_nux] > THRESHOLD_N)
+        {
+            m1_opacities_non_th_separated.kappa_0_a[id_nux] =
+                kBS_FourPi_hc3_sqr / (c_light * n[id_nux]) *
+                n_integrals_2d.integrand[id_nux_kappa];
+        }
+        if (J[id_nux] > THRESHOLD_J)
+        {
+            m1_opacities_non_th_separated.kappa_a_th[id_nux] =
+                kBS_FourPi_hc3_sqr / (c_light * J[id_nux]) *
+                e_integrals_2d.integrand[id_nux_kappa];
+
+            m1_opacities_non_th_separated.kappa_a_non_th[id_nux] =
+                kBS_FourPi_hc3_sqr / (c_light * J[id_nux]) *
+                e_neps_2d.integrand[6];
+
+            m1_opacities_non_th_separated.kappa_s[id_nux] = kBS_FourPi_hc3 / (c_light * J[id_nux]) *
+                                        iso_integrals.integrand[id_nux];
+        }
+
+        /* Heavy anti-neutrinos */
+        m1_opacities_non_th_separated.eta_0[id_anux] =
+            kBS_FourPi_hc3_sqr * n_integrals_2d.integrand[id_anux];
+
+        m1_opacities_non_th_separated.eta_th[id_anux] =
+            kBS_FourPi_hc3_sqr * e_integrals_2d.integrand[id_anux];
+
+        m1_opacities_non_th_separated.eta_non_th[id_anux] =
+            kBS_FourPi_hc3_sqr * e_neps_2d.integrand[id_anux];
+
+        if (n[id_anux] > THRESHOLD_N)
+        {
+            m1_opacities_non_th_separated.kappa_0_a[id_anux] =
+                n[id_anux] == zero ?
+                    zero :
+                    kBS_FourPi_hc3_sqr / (c_light * n[id_anux]) *
+                    n_integrals_2d.integrand[id_anux_kappa];
+        }
+        if (J[id_anux] > THRESHOLD_J)
+        {
+            m1_opacities_non_th_separated.kappa_a_th[id_anux] =
+                kBS_FourPi_hc3_sqr / (c_light * J[id_anux]) *
+                e_integrals_2d.integrand[id_anux_kappa];
+
+            m1_opacities_non_th_separated.kappa_a_non_th[id_anux] =
+                kBS_FourPi_hc3_sqr / (c_light * J[id_anux]) *
+                e_neps_2d.integrand[id_anux_kappa];
+
+            m1_opacities_non_th_separated.kappa_s[id_anux] = kBS_FourPi_hc3 /
+                                            (c_light * J[id_anux]) *
+                                            iso_integrals.integrand[id_anux];
+        }
+
     }
-    if (J[id_nue] > THRESHOLD_J)
+
+    else if constexpr (total_num_species == 6)
     {
-        m1_opacities_non_th_separated.kappa_a_th[id_nue] =
-            n[id_nue] == zero ?
-                zero :
-                kBS_FourPi_hc3 / (c_light * J[id_nue]) *
-                    (kBS_FourPi_hc3 * e_integrals_2d.integrand[4] +
-                     el_beta_j_abs_integrals.integrand[id_nue]);
+        /* Electron neutrinos */
+        m1_opacities_non_th_separated.eta_0[id_nue] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * n_integrals_2d.integrand[id_nue] +
+                              el_beta_n_em_integrals.integrand[id_nue]);
 
-        m1_opacities_non_th_separated.kappa_a_non_th[id_nue] =
-            n[id_nue] == zero ?
-                zero :
-                kBS_FourPi_hc3 / (c_light * J[id_nue]) *
-                    (kBS_FourPi_hc3 * (e_neps_2d.integrand[4] +
-                                       e_nms_2d.integrand[4]));
+        m1_opacities_non_th_separated.eta_th[id_nue] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * e_integrals_2d.integrand[id_nue] +
+                              el_beta_j_em_integrals.integrand[id_nue]);
 
-        m1_opacities_non_th_separated.kappa_s[id_nue] = kBS_FourPi_hc3 / (c_light * J[id_nue]) *
-                                       iso_integrals.integrand[id_nue];
+        m1_opacities_non_th_separated.eta_non_th[id_nue] =
+            kBS_FourPi_hc3_sqr * (e_neps_2d.integrand[id_nue] +
+                                  e_nms_2d.integrand[id_nue]);
+
+        if (n[id_nue] > THRESHOLD_N)
+        {
+            m1_opacities_non_th_separated.kappa_0_a[id_nue] =
+                kBS_FourPi_hc3 / (c_light * n[id_nue]) *
+                (kBS_FourPi_hc3 * n_integrals_2d.integrand[id_nue_kappa] +
+                 el_beta_n_abs_integrals.integrand[id_nue]);
+        }
+        if (J[id_nue] > THRESHOLD_J)
+        {
+            m1_opacities_non_th_separated.kappa_a_th[id_nue] =
+                n[id_nue] == zero ?
+                    zero :
+                    kBS_FourPi_hc3 / (c_light * J[id_nue]) *
+                        (kBS_FourPi_hc3 * e_integrals_2d.integrand[id_nue_kappa] +
+                         el_beta_j_abs_integrals.integrand[id_nue]);
+
+            m1_opacities_non_th_separated.kappa_a_non_th[id_nue] =
+                n[id_nue] == zero ?
+                    zero :
+                    kBS_FourPi_hc3 / (c_light * J[id_nue]) *
+                        (kBS_FourPi_hc3 * (e_neps_2d.integrand[id_nue_kappa] +
+                                           e_nms_2d.integrand[id_nue_kappa]));
+
+            m1_opacities_non_th_separated.kappa_s[id_nue] = kBS_FourPi_hc3 / (c_light * J[id_nue]) *
+                                        iso_integrals.integrand[id_nue];
+        }
+
+        /* Electron anti-neutrinos */
+        m1_opacities_non_th_separated.eta_0[id_anue] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * n_integrals_2d.integrand[id_anue] +
+                              el_beta_n_em_integrals.integrand[id_anue]);
+
+        m1_opacities_non_th_separated.eta_th[id_anue] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * e_integrals_2d.integrand[id_anue] +
+                              el_beta_j_em_integrals.integrand[id_anue]);
+
+        m1_opacities_non_th_separated.eta_non_th[id_anue] =
+            kBS_FourPi_hc3_sqr * (e_neps_2d.integrand[id_anue] +
+                                  e_nms_2d.integrand[id_anue]);
+
+        if (n[id_anue] > THRESHOLD_N)
+        {
+            m1_opacities_non_th_separated.kappa_0_a[id_anue] =
+                kBS_FourPi_hc3 / (c_light * n[id_anue]) *
+                (kBS_FourPi_hc3 * n_integrals_2d.integrand[id_anue_kappa] +
+                 el_beta_n_abs_integrals.integrand[id_anue]);
+        }
+        if (J[id_anue] > THRESHOLD_J)
+        {
+            m1_opacities_non_th_separated.kappa_a_th[id_anue] =
+                kBS_FourPi_hc3 / (c_light * J[id_anue]) *
+                (kBS_FourPi_hc3 * e_integrals_2d.integrand[id_anue_kappa] +
+                 el_beta_j_abs_integrals.integrand[id_anue]);
+
+            m1_opacities_non_th_separated.kappa_a_non_th[id_anue] =
+                kBS_FourPi_hc3 / (c_light * J[id_anue]) *
+                (kBS_FourPi_hc3 * (e_neps_2d.integrand[id_anue_kappa] +
+                                   e_nms_2d.integrand[id_anue_kappa]));
+
+            m1_opacities_non_th_separated.kappa_s[id_anue] = kBS_FourPi_hc3 /
+                                            (c_light * J[id_anue]) *
+                                            iso_integrals.integrand[id_anue];
+        }
+
+        /* Muon neutrinos */
+        m1_opacities_non_th_separated.eta_0[id_num] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * n_integrals_2d.integrand[id_num] +
+                              muon_beta_n_em_integrals.integrand[id_num]);
+
+        m1_opacities_non_th_separated.eta_th[id_num] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * e_integrals_2d.integrand[id_num] +
+                              muon_beta_j_em_integrals.integrand[id_num]);
+
+        m1_opacities_non_th_separated.eta_non_th[id_num] =
+            kBS_FourPi_hc3_sqr * (e_neps_2d.integrand[id_num] +
+                                  e_nms_2d.integrand[id_num]);
+
+        if (n[id_num] > THRESHOLD_N)
+        {
+            m1_opacities_non_th_separated.kappa_0_a[id_num] =
+                kBS_FourPi_hc3 / (c_light * n[id_num]) *
+                (kBS_FourPi_hc3 * n_integrals_2d.integrand[id_num_kappa] +
+                 muon_beta_n_abs_integrals.integrand[id_num]);
+        }
+        if (J[id_num] > THRESHOLD_J)
+        {
+            m1_opacities_non_th_separated.kappa_a_th[id_num] =
+                kBS_FourPi_hc3 / (c_light * J[id_num]) *
+                (kBS_FourPi_hc3 * e_integrals_2d.integrand[id_num_kappa] +
+                 muon_beta_j_abs_integrals.integrand[id_num]);
+
+            m1_opacities_non_th_separated.kappa_a_non_th[id_num] =
+                kBS_FourPi_hc3_sqr / (c_light * J[id_num]) *
+                (e_neps_2d.integrand[id_num_kappa] + e_nms_2d.integrand[id_num_kappa]);
+
+            m1_opacities_non_th_separated.kappa_s[id_num] = kBS_FourPi_hc3 / (c_light * J[id_num]) *
+                                        iso_integrals.integrand[id_num];
+        }
+
+        /* Muon anti-neutrinos */
+        m1_opacities_non_th_separated.eta_0[id_anum] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * n_integrals_2d.integrand[id_anum] +
+                              muon_beta_n_em_integrals.integrand[id_anum]);
+
+        m1_opacities_non_th_separated.eta_th[id_anum] =
+            kBS_FourPi_hc3 * (kBS_FourPi_hc3 * e_integrals_2d.integrand[id_anum] +
+                              muon_beta_j_em_integrals.integrand[id_anum]);
+
+        m1_opacities_non_th_separated.eta_non_th[id_anum] =
+            kBS_FourPi_hc3_sqr * (e_neps_2d.integrand[id_anum] +
+                                  e_nms_2d.integrand[id_anum]);
+
+        if (n[id_anum] > THRESHOLD_N)
+        {
+            m1_opacities_non_th_separated.kappa_0_a[id_anum] =
+                n[id_anum] == zero ?
+                    zero :
+                    kBS_FourPi_hc3 / (c_light * n[id_anum]) *
+                        (kBS_FourPi_hc3 * n_integrals_2d.integrand[id_anum_kappa] +
+                         muon_beta_n_abs_integrals.integrand[id_anum]);
+        }
+        if (J[id_anum] > THRESHOLD_J)
+        {
+            m1_opacities_non_th_separated.kappa_a_th[id_anum] =
+                kBS_FourPi_hc3 / (c_light * J[id_anum]) *
+                (kBS_FourPi_hc3 * e_integrals_2d.integrand[id_anum_kappa] +
+                 muon_beta_j_abs_integrals.integrand[id_anum]);
+
+            m1_opacities_non_th_separated.kappa_a_non_th[id_anum] =
+                kBS_FourPi_hc3_sqr / (c_light * J[id_anum]) *
+                (e_neps_2d.integrand[id_anum_kappa] + e_nms_2d.integrand[id_anum_kappa]);
+
+            m1_opacities_non_th_separated.kappa_s[id_anum] = kBS_FourPi_hc3 /
+                                            (c_light * J[id_anum]) *
+                                            iso_integrals.integrand[id_anum];
+        }
+
+        /* Tau neutrinos */
+        m1_opacities_non_th_separated.eta_0[id_nut] =
+            kBS_FourPi_hc3_sqr * n_integrals_2d.integrand[id_nut];
+
+        m1_opacities_non_th_separated.eta_th[id_nut] =
+            kBS_FourPi_hc3_sqr * e_integrals_2d.integrand[id_nut];
+
+        m1_opacities_non_th_separated.eta_non_th[id_nut] =
+            kBS_FourPi_hc3_sqr * (e_neps_2d.integrand[id_nut] +
+                                  e_nms_2d.integrand[id_nut]);
+
+        if (n[id_nut] > THRESHOLD_N)
+        {
+            m1_opacities_non_th_separated.kappa_0_a[id_nut] =
+                kBS_FourPi_hc3_sqr / (c_light * n[id_nut]) *
+                    n_integrals_2d.integrand[id_nut_kappa];
+        }
+        if (J[id_nut] > THRESHOLD_J)
+        {
+            m1_opacities_non_th_separated.kappa_a_th[id_nut] =
+                kBS_FourPi_hc3_sqr / (c_light * J[id_nut]) *
+                    e_integrals_2d.integrand[id_nut_kappa];
+
+            m1_opacities_non_th_separated.kappa_a_non_th[id_nut] =
+                kBS_FourPi_hc3_sqr / (c_light * J[id_nut]) *
+                (e_neps_2d.integrand[id_nut_kappa] + e_nms_2d.integrand[id_nut_kappa]);
+
+            m1_opacities_non_th_separated.kappa_s[id_nut] = kBS_FourPi_hc3 / (c_light * J[id_nut]) *
+                                        iso_integrals.integrand[id_nut];
+        }
+
+        /* Tau anti-neutrinos */
+        m1_opacities_non_th_separated.eta_0[id_anut] =
+            kBS_FourPi_hc3_sqr * n_integrals_2d.integrand[id_anut];
+
+        m1_opacities_non_th_separated.eta_th[id_anut] =
+            kBS_FourPi_hc3_sqr * e_integrals_2d.integrand[id_anut];
+
+        m1_opacities_non_th_separated.eta_non_th[id_anut] =
+            kBS_FourPi_hc3_sqr * (e_neps_2d.integrand[id_anut] +
+                                  e_nms_2d.integrand[id_anut]);
+
+        if (n[id_anut] > THRESHOLD_N)
+        {
+            m1_opacities_non_th_separated.kappa_0_a[id_anut] =
+                n[id_anut] == zero ?
+                    zero :
+                    kBS_FourPi_hc3_sqr / (c_light * n[id_anut]) *
+                        n_integrals_2d.integrand[id_anut_kappa];
+        }
+        if (J[id_anut] > THRESHOLD_J)
+        {
+            m1_opacities_non_th_separated.kappa_a_th[id_anut] =
+                kBS_FourPi_hc3_sqr / (c_light * J[id_anut]) *
+                    e_integrals_2d.integrand[id_anut_kappa];
+
+            m1_opacities_non_th_separated.kappa_a_non_th[id_anut] =
+                kBS_FourPi_hc3_sqr / (c_light * J[id_anut]) *
+                (e_neps_2d.integrand[id_anut_kappa] + e_nms_2d.integrand[id_anut_kappa]);
+
+            m1_opacities_non_th_separated.kappa_s[id_anut] = kBS_FourPi_hc3 /
+                                            (c_light * J[id_anut]) *
+                                            iso_integrals.integrand[id_anut];
+        }
+
     }
 
-    /* Electron anti-neutrinos */
-    m1_opacities_non_th_separated.eta_0[id_anue] =
-        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * n_integrals_2d.integrand[1] +
-                          el_beta_n_em_integrals.integrand[id_anue]);
-
-    m1_opacities_non_th_separated.eta_th[id_anue] =
-        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * e_integrals_2d.integrand[1] +
-                          el_beta_j_em_integrals.integrand[id_anue]);
-
-    m1_opacities_non_th_separated.eta_non_th[id_anue] =
-        kBS_FourPi_hc3_sqr * (e_neps_2d.integrand[1] +
-                              e_nms_2d.integrand[1]);
-
-    if (n[id_anue] > THRESHOLD_N)
+    else  //fallback
     {
-        m1_opacities_non_th_separated.kappa_0_a[id_anue] =
-            kBS_FourPi_hc3 / (c_light * n[id_anue]) *
-            (kBS_FourPi_hc3 * n_integrals_2d.integrand[5] +
-             el_beta_n_abs_integrals.integrand[id_anue]);
-    }
-    if (J[id_anue] > THRESHOLD_J)
-    {
-        m1_opacities_non_th_separated.kappa_a_th[id_anue] =
-            kBS_FourPi_hc3 / (c_light * J[id_anue]) *
-            (kBS_FourPi_hc3 * e_integrals_2d.integrand[5] +
-             el_beta_j_abs_integrals.integrand[id_anue]);
-
-        m1_opacities_non_th_separated.kappa_a_non_th[id_anue] =
-            kBS_FourPi_hc3 / (c_light * J[id_anue]) *
-            (kBS_FourPi_hc3 * (e_neps_2d.integrand[5] +
-                               e_nms_2d.integrand[5]));
-
-        m1_opacities_non_th_separated.kappa_s[id_anue] = kBS_FourPi_hc3 /
-                                        (c_light * J[id_anue]) *
-                                        iso_integrals.integrand[id_anue];
-    }
-
-    /* Heavy neutrinos */
-    m1_opacities_non_th_separated.eta_0[id_nux] =
-        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * n_integrals_2d.integrand[2] +
-                          muon_beta_n_em_integrals.integrand[id_nux]);
-
-    m1_opacities_non_th_separated.eta_th[id_nux] =
-        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * e_integrals_2d.integrand[2] +
-                          muon_beta_j_em_integrals.integrand[id_nux]);
-
-    m1_opacities_non_th_separated.eta_non_th[id_nux] =
-        kBS_FourPi_hc3_sqr * (e_neps_2d.integrand[2] +
-                              e_nms_2d.integrand[2]);
-
-    if (n[id_nux] > THRESHOLD_N)
-    {
-        m1_opacities_non_th_separated.kappa_0_a[id_nux] =
-            kBS_FourPi_hc3 / (c_light * n[id_nux]) *
-            (kBS_FourPi_hc3 * n_integrals_2d.integrand[6] +
-             muon_beta_n_abs_integrals.integrand[id_nux]);
-    }
-    if (J[id_nux] > THRESHOLD_J)
-    {
-        m1_opacities_non_th_separated.kappa_a_th[id_nux] =
-            kBS_FourPi_hc3 / (c_light * J[id_nux]) *
-            (kBS_FourPi_hc3 * e_integrals_2d.integrand[6] +
-             muon_beta_j_abs_integrals.integrand[id_nux]);
-
-        m1_opacities_non_th_separated.kappa_a_non_th[id_nux] =
-            kBS_FourPi_hc3_sqr / (c_light * J[id_nux]) *
-            (e_neps_2d.integrand[6] + e_nms_2d.integrand[6]);
-
-        m1_opacities_non_th_separated.kappa_s[id_nux] = kBS_FourPi_hc3 / (c_light * J[id_nux]) *
-                                       iso_integrals.integrand[id_nux];
-    }
-
-    /* Heavy anti-neutrinos */
-    m1_opacities_non_th_separated.eta_0[id_anux] =
-        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * n_integrals_2d.integrand[3] +
-                          muon_beta_n_em_integrals.integrand[id_anux]);
-
-    m1_opacities_non_th_separated.eta_th[id_anux] =
-        kBS_FourPi_hc3 * (kBS_FourPi_hc3 * e_integrals_2d.integrand[3] +
-                          muon_beta_j_em_integrals.integrand[id_anux]);
-
-    m1_opacities_non_th_separated.eta_non_th[id_anux] =
-        kBS_FourPi_hc3_sqr * (e_neps_2d.integrand[3] +
-                              e_nms_2d.integrand[3]);
-
-    if (n[id_anux] > THRESHOLD_N)
-    {
-        m1_opacities_non_th_separated.kappa_0_a[id_anux] =
-            n[id_anux] == zero ?
-                zero :
-                kBS_FourPi_hc3 / (c_light * n[id_anux]) *
-                    (kBS_FourPi_hc3 * n_integrals_2d.integrand[7] +
-                     muon_beta_n_abs_integrals.integrand[id_anux]);
-    }
-    if (J[id_anux] > THRESHOLD_J)
-    {
-        m1_opacities_non_th_separated.kappa_a_th[id_anux] =
-            kBS_FourPi_hc3 / (c_light * J[id_anux]) *
-            (kBS_FourPi_hc3 * e_integrals_2d.integrand[7] +
-             muon_beta_j_abs_integrals.integrand[id_anux]);
-
-        m1_opacities_non_th_separated.kappa_a_non_th[id_anux] =
-            kBS_FourPi_hc3_sqr / (c_light * J[id_anux]) *
-            (e_neps_2d.integrand[7] + e_nms_2d.integrand[7]);
-
-        m1_opacities_non_th_separated.kappa_s[id_anux] = kBS_FourPi_hc3 /
-                                        (c_light * J[id_anux]) *
-                                        iso_integrals.integrand[id_anux];
+        BS_ASSERT(false, "Wrong number of nu species: %d", total_num_species);
     }
 
     return m1_opacities_non_th_separated;

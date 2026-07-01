@@ -294,7 +294,7 @@ NuDistributionParams NuEquilibriumParams(const MyEOSParams* eos_pars)
     {
         out.eta_t[id_nue]  = (mu_e - mu_n + mu_p) / T;
         out.eta_t[id_anue] = -out.eta_t[id_nue];
-        out.eta_t[id_num]  = (mu_mu - mu_n + mu_p) / T;
+        out.eta_t[id_num]  = zero; //(mu_mu - mu_n + mu_p) / T;
         out.eta_t[id_anum] = -out.eta_t[id_num];
         out.eta_t[id_nut]  = zero;
         out.eta_t[id_anut] = zero;
