@@ -222,6 +222,15 @@ inline constexpr BS_REAL kBS_NMS_C3_nue = 2. * POW2(kBS_Gf0) * POW2(kBS_Mmu) *
 // Conversion constant, from [MeV^-2] to [nm^3 s^-1]
 inline constexpr BS_REAL kBS_NMS_Conv_Const = kBS_Clight * POW2(kBS_Hbar * kBS_Clight);
 
+
+/////////////////////////////////////////////////////
+//               MUON DECAY CONSTANTS              //
+/////////////////////////////////////////////////////
+inline constexpr BS_REAL kBS_MuonDecay_C = 4. * POW2(kBS_Gf0) / kBS_Pi;
+inline constexpr BS_REAL kBS_MuonDecay_Conv_Const = kBS_Clight * POW2(kBS_Hbar * kBS_Clight);
+inline constexpr BS_REAL kBS_squared_mass_diff = 0.5 * (POW2(kBS_Mmu) - POW2(kBS_Me));
+
+
 /*
 // Constants for Gauss-Legendre integration, coming from table boundaries
 // We HAVE TO consider w and w' axis with same extremals

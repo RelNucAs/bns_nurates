@@ -2965,6 +2965,17 @@ MyQuadratureIntegrand SpectralIntegrand(BS_REAL* var, void* p)
         }
     }
 
+    // Compute the muon decay kernels
+    MyKernelOutput muon_decay_kernels_m1 = {0};
+    if (opacity_flags.use_muon_decay)
+    {
+        my_grey_opacity_params->kernel_pars.muon_decay_kernel_params
+            .omega_anue = nu_bar;
+        muon_decay_kernels_m1 = MuonDecayKernels(
+            &my_grey_opacity_params->kernel_pars.muon_decay_kernel_params,
+            &my_grey_opacity_params->eos_pars);
+    }
+
     // Block factor
     if (opacity_pars.neglect_blocking == false)
     {
@@ -3020,6 +3031,13 @@ MyQuadratureIntegrand SpectralIntegrand(BS_REAL* var, void* p)
             (pair_kernels_m1.em[id_anut] + brem_kernels_m1.em[id_anut]) *
             block_factor[id_nut];
 
+        //muon decay contribution
+        pro_term[id_num] += muon_decay_kernels_m1.em[id_num] * 
+                            block_factor[id_anue];
+        pro_term[id_anue] += muon_decay_kernels_m1.em[id_anue] * 
+                            block_factor[id_num];
+
+        //inelastic scattering contribution
         for (int idx = 0; idx < total_num_species; ++idx)
         {
             pro_term[idx] += (inelastic_NEPS_kernels_m1.em[idx]
@@ -3067,6 +3085,13 @@ MyQuadratureIntegrand SpectralIntegrand(BS_REAL* var, void* p)
             (pair_kernels_m1.abs[id_anut] + brem_kernels_m1.abs[id_anut]) *
             g_nu_bar[id_nut];
 
+        //muon decay contribution
+        ann_term[id_num] += muon_decay_kernels_m1.abs[id_num] * 
+                            g_nu_bar[id_anue];
+        ann_term[id_anue] += muon_decay_kernels_m1.abs[id_anue] * 
+                            g_nu_bar[id_num];
+
+        //inelastic scattering contribution
         for (int idx = 0; idx < total_num_species; ++idx)
         {
             ann_term[idx] += (inelastic_NEPS_kernels_m1.abs[idx]
@@ -3136,7 +3161,7 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
     constexpr BS_REAL two_over_three = 2. / 3.;
     constexpr BS_REAL four_pi = 4 * kBS_Pi;
     constexpr BS_REAL c_light = kBS_Clight;
-    //constexpr int double_total_num_species = 2 * total_num_species;
+    constexpr BS_REAL Mmu_over_three = kBS_Mmu / 3.;
     BS_REAL wmin, wmax;
 
     constexpr int id_nue_abs = total_num_species + id_nue;
@@ -3163,10 +3188,12 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
     my_grey_opacity_params->kernel_pars.pair_kernel_params.omega      = nu;
     my_grey_opacity_params->kernel_pars.brem_kernel_params.omega      = nu;
     my_grey_opacity_params->kernel_pars.inelastic_kernel_params.omega = nu;
+    my_grey_opacity_params->kernel_pars.muon_decay_kernel_params.omega_numu = nu;
 
     GreyOpacityParams local_grey_params = *my_grey_opacity_params;
     local_grey_params.opacity_flags.use_inelastic_NEPS = 0;
     local_grey_params.opacity_flags.use_inelastic_NMS = 0;
+    local_grey_params.opacity_flags.use_muon_decay = 0;
 
     // set up 1d integration
     MyFunctionMultiD integrand_m1_1d;
@@ -3187,14 +3214,15 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
     constexpr BS_REAL temp_multiple = 0.5 * 4.364;
 
     // s can vary in terms of nu flavors and type of integrand (em or abs)
-    BS_REAL s_pair[double_total_num_species], s_neps[double_total_num_species], 
-            s_nms[double_total_num_species];
+    BS_REAL s_pair[double_total_num_species], s_neps[double_total_num_species];
+    BS_REAL s_mudec[double_total_num_species], s_nms[double_total_num_species];
 
     for (int i = 0; i < double_total_num_species; ++i)
     {
         s_pair[i] = temp_multiple * my_grey_opacity_params->eos_pars.temp;
         s_neps[i] = nu;
         s_nms[i] = std::max(3. * wmin, std::min(nu, two_over_three * wmax));
+        s_mudec[i] = Mmu_over_three;
     }
 
     MyQuadratureIntegrand integrals_pair_1d =
@@ -3218,6 +3246,17 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
         integrand_m1_1d.params = &local_grey_params;
         integrals_nms_1d =
             MuonReactionsGaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s_nms, wmin, wmax);
+    }
+
+    MyQuadratureIntegrand integrals_muon_decay_1d = {0};
+    if (my_grey_opacity_params->opacity_flags.use_muon_decay == 1)
+    {
+        local_grey_params.opacity_flags                     = {0};
+        local_grey_params.opacity_flags.use_muon_decay = 1;
+        integrand_m1_1d.params = &local_grey_params;
+        integrals_muon_decay_1d =
+            MuonReactionsGaussLegendreIntegrate1D(quad_1d, &integrand_m1_1d, s_mudec, 
+                                                    MuonDecay_wanue_min, MuonDecay_wanue_max);
     }
 
     MyOpacity abs_em_beta = {0};
@@ -3304,11 +3343,13 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
         sp_opacities.j[id_anue] = abs_em_beta.em[id_anue] +
                                   kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_anue] +
                                                     integrals_neps_1d.integrand[id_anue] +
-                                                    integrals_nms_1d.integrand[id_anue]);
+                                                    integrals_nms_1d.integrand[id_anue]  +
+                                                    integrals_muon_decay_1d.integrand[id_anue]);
         sp_opacities.j[id_num]  = abs_em_muonic_beta.em[id_num] +
                                   kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_num] +
                                                     integrals_neps_1d.integrand[id_num] +
-                                                    integrals_nms_1d.integrand[id_num]);
+                                                    integrals_nms_1d.integrand[id_num]  +
+                                                    integrals_muon_decay_1d.integrand[id_num]);
         sp_opacities.j[id_anum] = abs_em_muonic_beta.em[id_anum] +
                                   kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_anum] +
                                                     integrals_neps_1d.integrand[id_anum] +
@@ -3331,13 +3372,15 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
             (abs_em_beta.abs[id_anue] +
              kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_anue_abs] +
                                integrals_neps_1d.integrand[id_anue_abs] +
-                               integrals_nms_1d.integrand[id_anue_abs])) /
+                               integrals_nms_1d.integrand[id_anue_abs]  +
+                               integrals_muon_decay_1d.integrand[id_anue_abs])) /
             c_light;
         sp_opacities.kappa[id_num] =
             (abs_em_muonic_beta.abs[id_num] +
              kBS_FourPi_hc3 * (integrals_pair_1d.integrand[id_num_abs] +
                                integrals_neps_1d.integrand[id_num_abs] +
-                               integrals_nms_1d.integrand[id_num_abs])) /
+                               integrals_nms_1d.integrand[id_num_abs]  +
+                               integrals_muon_decay_1d.integrand[id_num_abs])) /
             c_light;
         sp_opacities.kappa[id_anum] =
             (abs_em_muonic_beta.abs[id_anum] +

@@ -239,11 +239,22 @@ typedef struct PairKernelParams PairKernelParams;
  */
 struct InelasticScattKernelParams
 {
-    BS_REAL omega;       // neutrino energy
-    BS_REAL omega_prime; // anti-neutrino energy
+    BS_REAL omega;       // incoming (anti)neutrino energy
+    BS_REAL omega_prime; // outgoing (anti)neutrino energy
                          // @TODO: complete here
 };
 typedef struct InelasticScattKernelParams InelasticScattKernelParams;
+
+/* MuonDecayParams struct
+ *
+ * Parameters for muon decay
+ */
+struct MuonDecayKernelParams
+{
+    BS_REAL omega_numu;       // muon neutrino energy
+    BS_REAL omega_anue;       // electron anti-neutrino energy
+};
+typedef struct MuonDecayKernelParams MuonDecayKernelParams;
 
 /* MyKernelParams struct
  *
@@ -255,6 +266,8 @@ struct MyKernelParams
     BremKernelParams brem_kernel_params; // Bremsstrahlung kernel
     InelasticScattKernelParams
         inelastic_kernel_params; // inelastic scattering kernel parameters
+    MuonDecayKernelParams
+        muon_decay_kernel_params;  // muon decay kernel parameters
 };
 typedef struct MyKernelParams MyKernelParams;
 
@@ -442,6 +455,7 @@ struct OpacityFlags
     int use_inelastic_NMS;
     int use_iso;
     int use_muonic_beta;
+    int use_muon_decay;
 };
 typedef struct OpacityFlags OpacityFlags;
 __attribute__((unused)) static OpacityFlags opacity_flags_default_all = {
@@ -451,7 +465,8 @@ __attribute__((unused)) static OpacityFlags opacity_flags_default_all = {
     .use_inelastic_NEPS  = 1,
     .use_inelastic_NMS   = 1,
     .use_iso             = 1,
-    .use_muonic_beta     = 1};
+    .use_muonic_beta     = 1,
+    .use_muon_decay      = 1};
 __attribute__((unused)) static OpacityFlags opacity_flags_default_none = {
     .use_abs_em          = 0,
     .use_pair            = 0,
@@ -459,7 +474,8 @@ __attribute__((unused)) static OpacityFlags opacity_flags_default_none = {
     .use_inelastic_NEPS  = 0,
     .use_inelastic_NMS   = 0,
     .use_iso             = 0,
-    .use_muonic_beta     = 0};
+    .use_muonic_beta     = 0,
+    .use_muon_decay      = 0};
 
 /* GreyOpacityParams struct
  *

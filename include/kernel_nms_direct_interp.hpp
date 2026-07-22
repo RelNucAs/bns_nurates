@@ -52,10 +52,10 @@ NMS_KernelResult NMS_direct_interpolator(const BS_REAL T, const BS_REAL mu, cons
     int i0, i1, j0, j1, k0, k1, l0, l1;
     BS_REAL tx, ty, tz, tw;
 
-    if (NMSLinear_find_bracketing_indices(T, NMS_T_axis, NMS_T_dims, &i0, &i1, &tx) < 0 or
-        NMSLinear_find_bracketing_indices(mu, NMS_mu_axis, NMS_mu_dims, &j0, &j1, &ty) < 0 or
-        NMSLinear_find_bracketing_indices(w, NMS_w_axis, NMS_w_dims, &k0, &k1, &tz) < 0 or
-        NMSLinear_find_bracketing_indices(wp, NMS_wp_axis, NMS_wp_dims, &l0, &l1, &tw) < 0)
+    if (MuonLinear_find_bracketing_indices(T, NMS_T_axis, NMS_T_dims, &i0, &i1, &tx) < 0 or
+        MuonLinear_find_bracketing_indices(mu, NMS_mu_axis, NMS_mu_dims, &j0, &j1, &ty) < 0 or
+        MuonLinear_find_bracketing_indices(w, NMS_w_axis, NMS_w_dims, &k0, &k1, &tz) < 0 or
+        MuonLinear_find_bracketing_indices(wp, NMS_wp_axis, NMS_wp_dims, &l0, &l1, &tw) < 0)
     {
         return res;
     }

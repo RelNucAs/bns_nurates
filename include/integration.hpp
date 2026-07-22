@@ -557,7 +557,6 @@ MyQuadratureIntegrand
 MuonReactionsGaussLegendreIntegrate1D(MyQuadrature* quad, 
                         MyFunctionMultiD* func, BS_REAL* t, BS_REAL wmin, BS_REAL wmax)
 {
-
     int num_integrands = func->my_quadrature_integrand.n;
     BS_ASSERT(num_integrands <= num_max_integrands);
     BS_REAL f1_x[num_max_integrands][BS_N_MAX],
@@ -585,7 +584,7 @@ MuonReactionsGaussLegendreIntegrate1D(MyQuadrature* quad,
         result.integrand[k] =
             (t[k] - wmin) * DoIntegration(quad->nx, quad->w, f1_x[k]) +
                 (wmax - t[k]) * DoIntegration(quad->nx, quad->w, f2_x[k]);  
-        //(t-1) * G(1+(t-1)x) + (300-t) * G(t+(300-t)x) 
+        //(t - 1) * sum_x[G(1 + (t-1)x)] + (300 - t) * sum_x[G(t + (300-t)x)] 
     }
 
     return result;

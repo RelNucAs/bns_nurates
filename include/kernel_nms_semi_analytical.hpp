@@ -98,15 +98,15 @@ BS_REAL NMS_analytical_kernel_nu_mu(const BS_REAL T, const BS_REAL mu,
     const BS_REAL x6 = x4 + x5;
     const BS_REAL x7 = POW2(kBS_Mmu);
     const BS_REAL x8 = 2. * kBS_SinThW2 + 1.;
-    const BS_REAL x9 = std::abs(w - wp);
-    const BS_REAL x10 = std::abs(x2);
+    const BS_REAL x9 = Kokkos::fabs(w - wp);
+    const BS_REAL x10 = Kokkos::fabs(x2);
     const BS_REAL x11 = w * wp;
     const BS_REAL x12 = x10 * x11;
     const BS_REAL x13 = x0 * x9;
     const BS_REAL x14 = -x0 * x10 - x1 * x10 + x1 * x9 + x13;
     
     const BS_REAL E_ = 0.5 * (
-                            wp - w + std::sqrt( 
+                            wp - w + Kokkos::sqrt( 
                                 (x5 - 2. * x11 * u) * ( 1. + ((2. * POW2(kBS_Mmu)) / (x11 * (1. - u))) )
                             )
                         );
@@ -149,7 +149,7 @@ BS_REAL NMS_analytical_kernel_nu_mu(const BS_REAL T, const BS_REAL mu,
     const BS_REAL x40 = POW5(wp);
     const BS_REAL x41 = POW5(w);
     const BS_REAL x42 = x1 * x21;
-    const BS_REAL x43 = std::abs( (w - wp) * POW2((w + wp)) );
+    const BS_REAL x43 = Kokkos::fabs( (w - wp) * POW2((w + wp)) );
     const BS_REAL x44 = 45. * x43;
     const BS_REAL x45 = 15. * x43;
     const BS_REAL x46 = x10 * x38;
@@ -157,7 +157,7 @@ BS_REAL NMS_analytical_kernel_nu_mu(const BS_REAL T, const BS_REAL mu,
     const BS_REAL x48 = x0 * x20;
     const BS_REAL x49 = w * x29;
     const BS_REAL x50 = x28 * x41;
-    const BS_REAL x51 = std::abs(x0 - x1);
+    const BS_REAL x51 = Kokkos::fabs(x0 - x1);
     const BS_REAL x52 = 15. * x51;
     const BS_REAL x53 = w * x40;
     const BS_REAL x54 = x10 * x53;
@@ -235,14 +235,14 @@ BS_REAL NMS_SemiAnalyticalKernel(const BS_REAL T, const BS_REAL mu, const BS_REA
     else if (wp > min_val && wp <= max_val){
         BS_REAL inv_min = 1. / min_val;
         BS_REAL prefactor1 = NMS_analytical_kernel_nu_mu(T, mu, w, min_val, 0.0);
-        return prefactor1 * std::pow(wp * inv_min, gamma) * SafeExp(delta * (min_val - wp));
+        return prefactor1 * Kokkos::pow(wp * inv_min, gamma) * SafeExp(delta * (min_val - wp));
     }
     else if (wp > max_val){
         BS_REAL inv_min = 1. / min_val;
         BS_REAL inv_max = 1. / max_val;
         BS_REAL prefactor2 = NMS_analytical_kernel_nu_mu(T, mu, w, min_val, 0.0) 
-                            * std::pow(max_val * inv_min, gamma) * SafeExp(delta * (min_val - max_val));
-        return prefactor2 * std::pow(wp * inv_max, alpha) * SafeExp(beta * (max_val - wp));
+                            * Kokkos::pow(max_val * inv_min, gamma) * SafeExp(delta * (min_val - max_val));
+        return prefactor2 * Kokkos::pow(wp * inv_max, alpha) * SafeExp(beta * (max_val - wp));
     }
     else{  //fallback
         return 0.0;

@@ -4834,7 +4834,7 @@ void FreeM1Matrix(M1Matrix* mat, const int n)
 // If a point is ouside the grid, we clamp it to stay within the borders
 
 KOKKOS_INLINE_FUNCTION
-int NMSLinear_find_bracketing_indices(const BS_REAL value, const BS_REAL* axis,
+int MuonLinear_find_bracketing_indices(const BS_REAL value, const BS_REAL* axis,
                                  const int size, int* i0, int* i1, BS_REAL* t)
 {
     // Points under the minimum limit of the grid
