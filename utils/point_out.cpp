@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 
     double nb;
 
-    MyQuadrature my_quadrature;
+    MyQuadrature my_quadrature = quadrature_default;
 
     M1Opacities opacities;
 
