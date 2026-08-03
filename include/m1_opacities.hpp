@@ -938,6 +938,8 @@ void AddCommonWeightsToIntegrand(int n, BS_REAL* nu_array,
 
     BS_REAL nu, nu_bar, nu_squared, nu_fourth;
     BS_REAL g_nu[total_num_species], g_nu_bar[total_num_species];
+    BS_REAL block_factor_nu[total_num_species], 
+            block_factor_nu_bar[total_num_species];
 
     BS_ASSERT((stim_abs == 0) || (stim_abs == 1));
 
@@ -997,9 +999,14 @@ void AddCommonWeightsToIntegrand(int n, BS_REAL* nu_array,
             for (int idx = 0; idx < total_num_species; ++idx)
             {
                 g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, idx);
+                if (grey_pars->opacity_pars.neglect_blocking == false){
+                    block_factor_nu[idx] = one - g_nu[idx];
+                } else{
+                    block_factor_nu[idx] = one;
+                }
 
                 out->m1_mat_ab[idx][i][i] *= nu_fourth * g_nu[idx];
-                out->m1_mat_em[idx][i][i] *= nu_fourth * (one - g_nu[idx]);
+                out->m1_mat_em[idx][i][i] *= nu_fourth * block_factor_nu[idx];
             }
 
             for (int j = i + 1; j < 2 * n; ++j)
@@ -1013,13 +1020,18 @@ void AddCommonWeightsToIntegrand(int n, BS_REAL* nu_array,
                 {
                     g_nu_bar[idx] =
                         TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
+                    if (grey_pars->opacity_pars.neglect_blocking == false){
+                        block_factor_nu_bar[idx] = one - g_nu_bar[idx];
+                    } else{
+                        block_factor_nu_bar[idx] = one;
+                    }
 
                     out->m1_mat_ab[idx][i][j] *= nu_fourth * g_nu[idx];
                     out->m1_mat_ab[idx][j][i] *= nu_fourth * g_nu_bar[idx];
 
-                    out->m1_mat_em[idx][i][j] *= nu_fourth * (one - g_nu[idx]);
+                    out->m1_mat_em[idx][i][j] *= nu_fourth * block_factor_nu[idx];
                     out->m1_mat_em[idx][j][i] *=
-                        nu_fourth * (one - g_nu_bar[idx]);
+                        nu_fourth * block_factor_nu_bar[idx];
                 }
             }
         }
