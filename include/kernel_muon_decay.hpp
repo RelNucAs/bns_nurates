@@ -187,9 +187,14 @@ MyKernelOutput MuonDecayKernels(MuonDecayKernelParams* kernel_params,
 
     MyKernelOutput mudec_kernel = {0.};
 
-    // Considering that the integral is performed along anue (anue is the varying energy), 
-    // to compute the quantities related to anue, we need to exchange numu<-->anue, so that numu
-    // becomes the varying quantity along which we integrate.
+    // Spectral integrals related to numu are performed along anue 
+    // (anue is the varying energy). But this is wrong when computing 
+    // spectral quantities related to anue. Thus, we need to exchange 
+    // numu<-->anue in the calculation of the kernel, 
+    // so that numu becomes the varying quantity along which we integrate.
+
+    // Instead, when computing gray quantities this change is not needed,
+    // and we consider only the id_num term.
 
     // numu
     BS_REAL ubar_numu = scale_factor * muon_decay_ubar_int16_interpolator(T, mu_el, w_numu, w_anue);

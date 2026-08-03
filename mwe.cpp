@@ -131,35 +131,38 @@ int main(int argc, char* argv[])
 
     // Select active reactions
     my_grey_opacity_params.opacity_flags.use_abs_em =
-        1; // Activate beta processes
+        0; // Activate beta processes
     my_grey_opacity_params.opacity_flags.use_brem =
-        1; // Activate Bremsstrahlung
+        0; // Activate Bremsstrahlung
     my_grey_opacity_params.opacity_flags.use_pair =
-        1; // Activate pair processes
+        0; // Activate pair processes
     my_grey_opacity_params.opacity_flags.use_iso =
-        1; // Activate scattering on nucleons
+        0; // Activate scattering on nucleons
     my_grey_opacity_params.opacity_flags.use_inelastic_NEPS =
-        1; // Activate scattering on electrons/positrons
+        0; // Activate scattering on electrons/positrons
 
     // Select active muonic reactions
     if constexpr (total_num_species == 6)
     {
         my_grey_opacity_params.opacity_flags.use_muonic_beta =
-            1; // Activate beta processes with muons
+            0; // Activate beta processes with muons
         my_grey_opacity_params.opacity_flags.use_inelastic_NMS =
-            1; // Activate scattering on muons
+            0; // Activate scattering on muons
+        my_grey_opacity_params.opacity_flags.use_muon_decay =
+            1; // Activate muon decay
     }
-    else  // no muonic reactions if num=nut=nux
+    else  // no muonic reactions in the four-flavors case
     {
-        my_grey_opacity_params.opacity_flags.use_muonic_beta = 0;
-        my_grey_opacity_params.opacity_flags.use_inelastic_NMS = 0;
+        my_grey_opacity_params.opacity_flags.use_muonic_beta = 0; //do not change this
+        my_grey_opacity_params.opacity_flags.use_inelastic_NMS = 0; //do not change this
+        my_grey_opacity_params.opacity_flags.use_muon_decay = 0; //do not change this
     }
     
     // Select corrections to rates
     my_grey_opacity_params.opacity_pars.use_dm_eff =
-        1; // Do not use effective mass correction to beta processes
+        0; // Do not use effective mass correction to beta processes
     my_grey_opacity_params.opacity_pars.use_dU =
-        1; // Use effective potential correction to beta processes
+        0; // Use effective potential correction to beta processes
     my_grey_opacity_params.opacity_pars.use_decay =
         1; // Include (inverse) nucleon decays to beta processes
     my_grey_opacity_params.opacity_pars.use_WM_el_ab =

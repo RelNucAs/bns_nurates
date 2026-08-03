@@ -907,6 +907,108 @@ void GaussLegendreIntegrate2DMatrixForNMS(const MyQuadrature* quad,
 
 
 KOKKOS_INLINE_FUNCTION
+void GaussLegendreIntegrate2DMatrixForMuonDecay(const MyQuadrature* quad,
+                                                const M1MatrixKokkos2D* mat,
+                                                MyQuadratureIntegrand* result_1,
+                                                MyQuadratureIntegrand* result_2)
+{
+    
+    constexpr BS_REAL max = MuonDecay_wnumu_max;
+    constexpr BS_REAL min = MuonDecay_wnumu_min;
+    constexpr BS_REAL t = kBS_Mmu / 3.;
+    constexpr BS_REAL prefactor_1 = POW2(t - min);
+    constexpr BS_REAL prefactor_2 = (t - min) * (max - t);
+    constexpr BS_REAL prefactor_3 = POW2(max - t);
+    const int n = quad->nx;
+
+    BS_REAL w_i, w_j, w_ij;
+    BS_REAL x_i, x_j;
+    BS_REAL w_numu_0, w_numu_1, w_anue_0, w_anue_1;
+
+
+    for (int i = 0; i < n; ++i)
+    {
+
+        x_i  = quad->points[i];
+        w_i  = quad->w[i];
+
+        w_numu_0 = min + (t - min) * x_i;
+        w_numu_1 = t + (max - t) * x_i;
+
+        for (int j = 0; j < n; ++j)
+        {
+
+            x_j = quad->points[j];
+            w_j = quad->w[j];
+
+            w_ij = w_i * w_j;
+
+            w_anue_0 = min + (t - min) * x_j;
+            w_anue_1 = t + (max - t) * x_j;
+
+            // Number, numu
+            result_1->integrand[id_num] +=
+                w_ij * (prefactor_1 * mat->m1_mat_em[id_num][i][j] +
+                        prefactor_2 * (mat->m1_mat_em[id_num][i][n + j] +
+                                       mat->m1_mat_em[id_num][n + i][j]) +
+                        prefactor_3 * mat->m1_mat_em[id_num][n + i][n + j]
+                    );
+            result_1->integrand[total_num_species + id_num] +=
+                w_ij * (prefactor_1 * mat->m1_mat_ab[id_num][i][j] +
+                        prefactor_2 * (mat->m1_mat_ab[id_num][i][n + j] +
+                                       mat->m1_mat_ab[id_num][n + i][j]) +
+                        prefactor_3 * mat->m1_mat_ab[id_num][n + i][n + j]
+                    );
+
+            // Number, anue
+            result_1->integrand[id_anue] +=
+                w_ij * (prefactor_1 * mat->m1_mat_em[id_anue][i][j] +
+                        prefactor_2 * (mat->m1_mat_em[id_anue][i][n + j] +
+                                       mat->m1_mat_em[id_anue][n + i][j]) +
+                        prefactor_3 * mat->m1_mat_em[id_anue][n + i][n + j]
+                    );
+            result_1->integrand[total_num_species + id_anue] +=
+                w_ij * (prefactor_1 * mat->m1_mat_ab[id_anue][i][j] +
+                        prefactor_2 * (mat->m1_mat_ab[id_anue][i][n + j] +
+                                       mat->m1_mat_ab[id_anue][n + i][j]) +
+                        prefactor_3 * mat->m1_mat_ab[id_anue][n + i][n + j]
+                    );
+
+            // Energy, numu
+            result_2->integrand[id_num] +=
+                w_ij * (prefactor_1 * w_numu_0 * mat->m1_mat_em[id_num][i][j] +
+                        prefactor_2 * (w_numu_0 * mat->m1_mat_em[id_num][i][n + j] +
+                                       w_numu_1 * mat->m1_mat_em[id_num][n + i][j]) +
+                        prefactor_3 * w_numu_1 * mat->m1_mat_em[id_num][n + i][n + j]
+                    );
+            result_2->integrand[total_num_species + id_num] +=
+                w_ij * (prefactor_1 * w_numu_0 * mat->m1_mat_ab[id_num][i][j] +
+                        prefactor_2 * (w_numu_0 * mat->m1_mat_ab[id_num][i][n + j] +
+                                       w_numu_1 * mat->m1_mat_ab[id_num][n + i][j]) +
+                        prefactor_3 * w_numu_1 * mat->m1_mat_ab[id_num][n + i][n + j]
+                    );
+
+            // Energy, anue
+            result_2->integrand[id_anue] +=
+                w_ij * (prefactor_1 * w_anue_0 * mat->m1_mat_em[id_anue][i][j] +
+                        prefactor_2 * (w_anue_1 * mat->m1_mat_em[id_anue][i][n + j] +
+                                       w_anue_0 * mat->m1_mat_em[id_anue][n + i][j]) +
+                        prefactor_3 * w_anue_1 * mat->m1_mat_em[id_anue][n + i][n + j]
+                    );
+            result_2->integrand[total_num_species + id_anue] +=
+                w_ij * (prefactor_1 * w_anue_0 * mat->m1_mat_ab[id_anue][i][j] +
+                        prefactor_2 * (w_anue_1 * mat->m1_mat_ab[id_anue][i][n + j] +
+                                       w_anue_0 * mat->m1_mat_ab[id_anue][n + i][j]) +
+                        prefactor_3 * w_anue_1 * mat->m1_mat_ab[id_anue][n + i][n + j]
+                    );
+        }
+    }
+
+    return;
+}
+
+
+KOKKOS_INLINE_FUNCTION
 MyQuadratureIntegrand
 GaussLegendreIntegrate1DMatrix(const MyQuadrature* quad,
                                const int num_integrands,

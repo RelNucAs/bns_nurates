@@ -231,17 +231,6 @@ inline constexpr BS_REAL kBS_MuonDecay_Conv_Const = kBS_Clight * POW2(kBS_Hbar *
 inline constexpr BS_REAL kBS_squared_mass_diff = 0.5 * (POW2(kBS_Mmu) - POW2(kBS_Me));
 
 
-/*
-// Constants for Gauss-Legendre integration, coming from table boundaries
-// We HAVE TO consider w and w' axis with same extremals
-inline constexpr BS_REAL DirectInterp_min_const = NMS_w_max - NMS_wp_min;
-inline constexpr BS_REAL SemiAnalytical_min_const = NMSParams_w_max - NMSParams_wp_min;
-inline constexpr BS_REAL DirectInterp_lower_bound = NMS_w_min + NMS_wp_min;
-inline constexpr BS_REAL DirectInterp_larger_bound = NMS_w_max + NMS_wp_max;
-inline constexpr BS_REAL SemiAnalytical_lower_bound = NMSParams_w_min + NMSParams_wp_min;
-inline constexpr BS_REAL SemiAnalytical_larger_bound = NMSParams_w_max + NMSParams_wp_max;
-*/
-
 /////////////////////////////
 // MISCELLANEOUS CONSTANTS //
 /////////////////////////////
