@@ -1233,12 +1233,12 @@ M1MatrixKokkos2D ComputeNEPSIntegrand(const MyQuadrature* quad, BS_REAL t,
                     out.m1_mat_ab[idx][i][j] =
                         nu_fourth * g_nu[idx] * tmp_abs_1;
                     out.m1_mat_em[idx][i][j] =
-                        nu_fourth * (one - g_nu[idx]) * tmp_em_1;
+                        nu_fourth * block_factor_nu[idx] * tmp_em_1;
 
                     out.m1_mat_ab[idx][i][n + j] =
                         nu_fourth * g_nu_bar[idx] * tmp_abs_2;
                     out.m1_mat_em[idx][i][n + j] =
-                        nu_fourth * (one - g_nu_bar[idx]) * tmp_em_2;
+                        nu_fourth * block_factor_nu_bar[idx] * tmp_em_2;
                 }
             }
 
@@ -1305,12 +1305,12 @@ M1MatrixKokkos2D ComputeNEPSIntegrand(const MyQuadrature* quad, BS_REAL t,
                     out.m1_mat_ab[idx][n + i][j] =
                         nu_fourth * g_nu[idx] * tmp_abs_1;
                     out.m1_mat_em[idx][n + i][j] =
-                        nu_fourth * (one - g_nu[idx]) * tmp_em_1;
+                        nu_fourth * block_factor_nu[idx] * tmp_em_1;
 
                     out.m1_mat_ab[idx][n + i][n + j] =
                         nu_fourth * g_nu_bar[idx] * tmp_abs_2;
                     out.m1_mat_em[idx][n + i][n + j] =
-                        nu_fourth * (one - g_nu_bar[idx]) * tmp_em_2;
+                        nu_fourth * block_factor_nu_bar[idx] * tmp_em_2;
                 }
             }
         }
@@ -1434,12 +1434,12 @@ M1MatrixKokkos2D ComputeNMSIntegrand(const MyQuadrature* quad, BS_REAL t,
                         out.m1_mat_ab[idx][i][j] =
                             nu_fourth * g_nu[idx] * tmp_abs_1;
                         out.m1_mat_em[idx][i][j] =
-                            nu_fourth * (one - g_nu[idx]) * tmp_em_1;
+                            nu_fourth * block_factor_nu[idx] * tmp_em_1;
 
                         out.m1_mat_ab[idx][i][n + j] =
                             nu_fourth * g_nu_bar[idx] * tmp_abs_2;
                         out.m1_mat_em[idx][i][n + j] =
-                            nu_fourth * (one - g_nu_bar[idx]) * tmp_em_2;
+                            nu_fourth * block_factor_nu_bar[idx] * tmp_em_2;
                     }
                 }
 
@@ -1506,12 +1506,12 @@ M1MatrixKokkos2D ComputeNMSIntegrand(const MyQuadrature* quad, BS_REAL t,
                         out.m1_mat_ab[idx][n + i][j] =
                             nu_fourth * g_nu[idx] * tmp_abs_1;
                         out.m1_mat_em[idx][n + i][j] =
-                            nu_fourth * (one - g_nu[idx]) * tmp_em_1;
+                            nu_fourth * block_factor_nu[idx] * tmp_em_1;
 
                         out.m1_mat_ab[idx][n + i][n + j] =
                             nu_fourth * g_nu_bar[idx] * tmp_abs_2;
                         out.m1_mat_em[idx][n + i][n + j] =
-                            nu_fourth * (one - g_nu_bar[idx]) * tmp_em_2;
+                            nu_fourth * block_factor_nu_bar[idx] * tmp_em_2;
                     }
                 }
             }
@@ -1603,12 +1603,12 @@ M1MatrixKokkos2D ComputeNMSIntegrand(const MyQuadrature* quad, BS_REAL t,
                         out.m1_mat_ab[idx][i][j] =
                             nu_fourth * g_nu[idx] * tmp_abs_1;
                         out.m1_mat_em[idx][i][j] =
-                            nu_fourth * (one - g_nu[idx]) * tmp_em_1;
+                            nu_fourth * block_factor_nu[idx] * tmp_em_1;
 
                         out.m1_mat_ab[idx][i][n + j] =
                             nu_fourth * g_nu_bar[idx] * tmp_abs_2;
                         out.m1_mat_em[idx][i][n + j] =
-                            nu_fourth * (one - g_nu_bar[idx]) * tmp_em_2;
+                            nu_fourth * block_factor_nu_bar[idx] * tmp_em_2;
                     }
                 }
 
@@ -1675,12 +1675,12 @@ M1MatrixKokkos2D ComputeNMSIntegrand(const MyQuadrature* quad, BS_REAL t,
                         out.m1_mat_ab[idx][n + i][j] =
                             nu_fourth * g_nu[idx] * tmp_abs_1;
                         out.m1_mat_em[idx][n + i][j] =
-                            nu_fourth * (one - g_nu[idx]) * tmp_em_1;
+                            nu_fourth * block_factor_nu[idx] * tmp_em_1;
 
                         out.m1_mat_ab[idx][n + i][n + j] =
                             nu_fourth * g_nu_bar[idx] * tmp_abs_2;
                         out.m1_mat_em[idx][n + i][n + j] =
-                            nu_fourth * (one - g_nu_bar[idx]) * tmp_em_2;
+                            nu_fourth * block_factor_nu_bar[idx] * tmp_em_2;
                     }
                 }
             }
