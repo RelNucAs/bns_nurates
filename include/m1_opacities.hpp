@@ -441,61 +441,6 @@ void AddElBetaReactionToIntegrand(int n, BS_REAL* nu_array,
 */
 
 
-/*
-KOKKOS_INLINE_FUNCTION
-void AddMuonicBetaReactionToIntegrand(int n, BS_REAL* nu_array,
-                                GreyOpacityParams* grey_pars,
-                                M1MatrixKokkos2D* out, const int stim_abs)
-{
-    BS_REAL nu;
-    MyOpacity abs_em_beta;
-
-    if (stim_abs == 1)
-    {
-        // We consider only i<n, since we don't split the integral
-        // and we have less points to be computed
-        for (int i = 0; i < n; ++i)
-        {
-            nu = nu_array[i];
-
-            abs_em_beta = MuonStimAbsOpacity(nu, &grey_pars->opacity_pars,
-                                         &grey_pars->eos_pars); // [s^-1]
-
-            for (int j = 0; i < n; ++j)
-            {
-                out->m1_mat_em[id_nux][i][j] += abs_em_beta.em[id_nux];
-                out->m1_mat_em[id_anux][i][j] += abs_em_beta.em[id_anux];
-
-                // ab = em + ab (stimulated absorption)
-                out->m1_mat_ab[id_nux][i][j] += abs_em_beta.abs[id_nux];
-                out->m1_mat_ab[id_anux][i][j] += abs_em_beta.abs[id_anux];
-            }
-        }
-    }
-    else
-    {
-        for (int i = 0; i < n; ++i)
-        {
-            nu = nu_array[i];
-
-            abs_em_beta = MuonAbsOpacity(nu, &grey_pars->opacity_pars,
-                                     &grey_pars->eos_pars); // [s^-1]
-
-            for (int j = 0; i < n; ++j)
-            {
-                out->m1_mat_em[id_nux][i][j] += abs_em_beta.em[id_nux];
-                out->m1_mat_em[id_anux][i][j] += abs_em_beta.em[id_anux];
-
-                out->m1_mat_ab[id_nux][i][j] += abs_em_beta.abs[id_nux];
-                out->m1_mat_ab[id_anux][i][j] += abs_em_beta.abs[id_anux];
-            }
-        }
-    }
-    return;
-}
-*/
-
-
 KOKKOS_INLINE_FUNCTION
 void AddPairKernelsToIntegrand(int n, BS_REAL* nu_array,
                                GreyOpacityParams* grey_pars,
@@ -1146,10 +1091,10 @@ M1MatrixKokkos2D ComputeDoubleIntegrand(const MyQuadrature* quad, BS_REAL t,
 
 
 // Compute NEPS Integrand for double GL integration
+template <int stim_abs>  //template to speed-up the "stim_abs" if-statement
 KOKKOS_INLINE_FUNCTION
 M1MatrixKokkos2D ComputeNEPSIntegrand(const MyQuadrature* quad, BS_REAL t,
-                                      GreyOpacityParams* grey_pars,
-                                      const int stim_abs)
+                                      GreyOpacityParams* grey_pars)
 {
     constexpr BS_REAL half = 0.5;
     constexpr BS_REAL one  = 1;
@@ -1230,7 +1175,7 @@ M1MatrixKokkos2D ComputeNEPSIntegrand(const MyQuadrature* quad, BS_REAL t,
                 tmp_em_2  = inel_2.em[idx] * g_nu[idx];
                 tmp_abs_2 = inel_2.abs[idx] * block_factor_nu[idx];
 
-                if (stim_abs == 1)
+                if constexpr (stim_abs == 1)
                 {
                     out.m1_mat_ab[idx][i][j] =
                         nu_fourth * g_nu[idx] * (tmp_em_1 + tmp_abs_1);
@@ -1302,7 +1247,7 @@ M1MatrixKokkos2D ComputeNEPSIntegrand(const MyQuadrature* quad, BS_REAL t,
                 tmp_em_2  = inel_2.em[idx] * g_nu[idx];
                 tmp_abs_2 = inel_2.abs[idx] * block_factor_nu[idx];
 
-                if (stim_abs == 1)
+                if constexpr (stim_abs == 1)
                 {
                     out.m1_mat_ab[idx][n + i][j] =
                         nu_fourth * g_nu[idx] * (tmp_em_1 + tmp_abs_1);
@@ -1333,10 +1278,10 @@ M1MatrixKokkos2D ComputeNEPSIntegrand(const MyQuadrature* quad, BS_REAL t,
 
 
 // Compute NMS Integrand for double GL integration
+template <int stim_abs>  //template to speed-up the "stim_abs" if-statement
 KOKKOS_INLINE_FUNCTION
 M1MatrixKokkos2D ComputeNMSIntegrand(const MyQuadrature* quad, BS_REAL t,
-                                      GreyOpacityParams* grey_pars,
-                                      const int stim_abs)
+                                      GreyOpacityParams* grey_pars)
 {
     constexpr BS_REAL half = 0.5;
     constexpr BS_REAL one  = 1;
@@ -1431,7 +1376,7 @@ M1MatrixKokkos2D ComputeNMSIntegrand(const MyQuadrature* quad, BS_REAL t,
                     tmp_em_2  = inel_2.em[idx] * g_nu[idx];
                     tmp_abs_2 = inel_2.abs[idx] * block_factor_nu[idx];
 
-                    if (stim_abs == 1)
+                    if constexpr (stim_abs == 1)
                     {
                         out.m1_mat_ab[idx][i][j] =
                             nu_fourth * g_nu[idx] * (tmp_em_1 + tmp_abs_1);
@@ -1503,7 +1448,7 @@ M1MatrixKokkos2D ComputeNMSIntegrand(const MyQuadrature* quad, BS_REAL t,
                     tmp_em_2  = inel_2.em[idx] * g_nu[idx];
                     tmp_abs_2 = inel_2.abs[idx] * block_factor_nu[idx];
 
-                    if (stim_abs == 1)
+                    if constexpr (stim_abs == 1)
                     {
                         out.m1_mat_ab[idx][n + i][j] =
                             nu_fourth * g_nu[idx] * (tmp_em_1 + tmp_abs_1);
@@ -1600,7 +1545,7 @@ M1MatrixKokkos2D ComputeNMSIntegrand(const MyQuadrature* quad, BS_REAL t,
                     tmp_em_2  = inel_2.em[idx] * g_nu[idx];
                     tmp_abs_2 = inel_2.abs[idx] * block_factor_nu[idx];
 
-                    if (stim_abs == 1)
+                    if constexpr (stim_abs == 1)
                     {
                         out.m1_mat_ab[idx][i][j] =
                             nu_fourth * g_nu[idx] * (tmp_em_1 + tmp_abs_1);
@@ -1672,7 +1617,7 @@ M1MatrixKokkos2D ComputeNMSIntegrand(const MyQuadrature* quad, BS_REAL t,
                     tmp_em_2  = inel_2.em[idx] * g_nu[idx];
                     tmp_abs_2 = inel_2.abs[idx] * block_factor_nu[idx];
 
-                    if (stim_abs == 1)
+                    if constexpr (stim_abs == 1)
                     {
                         out.m1_mat_ab[idx][n + i][j] =
                             nu_fourth * g_nu[idx] * (tmp_em_1 + tmp_abs_1);
@@ -2007,9 +1952,18 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
 
     if (my_grey_opacity_params->opacity_flags.use_inelastic_NEPS == 1)
     {
-        M1MatrixKokkos2D out_inel = ComputeNEPSIntegrand(
-            quad_2d, four * s_neps, my_grey_opacity_params, stim_abs);
-        GaussLegendreIntegrate2DMatrixForNEPS(quad_2d, &out_inel, four * s_neps,
+        M1MatrixKokkos2D out_inel_NEPS;
+
+        // use templates to speed-up the "stim_abs" if-statement
+        if (stim_abs == 1){
+            out_inel_NEPS = ComputeNEPSIntegrand<1>(
+                            quad_2d, four * s_neps, my_grey_opacity_params);
+        } else {
+            out_inel_NEPS = ComputeNEPSIntegrand<0>(
+                            quad_2d, four * s_neps, my_grey_opacity_params);
+        }
+
+        GaussLegendreIntegrate2DMatrixForNEPS(quad_2d, &out_inel_NEPS, four * s_neps,
                                               &n_neps_2d, &e_neps_2d);
     }
 
@@ -2019,9 +1973,18 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
 
     if (my_grey_opacity_params->opacity_flags.use_inelastic_NMS == 1)
     {
-        M1MatrixKokkos2D out_inel = ComputeNMSIntegrand(
-            quad_2d, s_nms, my_grey_opacity_params, stim_abs);
-        GaussLegendreIntegrate2DMatrixForNMS(quad_2d, &out_inel, s_nms,
+        M1MatrixKokkos2D out_inel_NMS;
+
+        // use templates to speed-up the "stim_abs" if-statement
+        if (stim_abs == 1){
+            out_inel_NMS = ComputeNMSIntegrand<1>(
+                            quad_2d, s_nms, my_grey_opacity_params);
+        } else {
+            out_inel_NMS = ComputeNMSIntegrand<0>(
+                            quad_2d, s_nms, my_grey_opacity_params);
+        }
+
+        GaussLegendreIntegrate2DMatrixForNMS(quad_2d, &out_inel_NMS, s_nms,
                                               umin, umax, vmax,
                                               &n_nms_2d, &e_nms_2d);
     }
@@ -2570,20 +2533,39 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
 
     if (my_grey_opacity_params->opacity_flags.use_inelastic_NEPS == 1)
     {
-        M1MatrixKokkos2D out_inel = ComputeNEPSIntegrand(
-            quad_2d, four * s_neps, my_grey_opacity_params, stim_abs);
-        GaussLegendreIntegrate2DMatrixForNEPS(quad_2d, &out_inel, four * s_neps,
+        M1MatrixKokkos2D out_inel_NEPS;
+
+        // use templates to speed-up the "stim_abs" if-statement
+        if (stim_abs == 1){
+            out_inel_NEPS = ComputeNEPSIntegrand<1>(
+                            quad_2d, four * s_neps, my_grey_opacity_params);
+        } else {
+            out_inel_NEPS = ComputeNEPSIntegrand<0>(
+                            quad_2d, four * s_neps, my_grey_opacity_params);
+        }
+
+        GaussLegendreIntegrate2DMatrixForNEPS(quad_2d, &out_inel_NEPS, four * s_neps,
                                               &n_neps_2d, &e_neps_2d);
     }
+
 
     MyQuadratureIntegrand n_nms_2d = {0};
     MyQuadratureIntegrand e_nms_2d = {0};
 
     if (my_grey_opacity_params->opacity_flags.use_inelastic_NMS == 1)
     {
-        M1MatrixKokkos2D out_inel = ComputeNMSIntegrand(
-            quad_2d, s_nms, my_grey_opacity_params, stim_abs);
-        GaussLegendreIntegrate2DMatrixForNMS(quad_2d, &out_inel, s_nms,
+        M1MatrixKokkos2D out_inel_NMS;
+
+        // use templates to speed-up the "stim_abs" if-statement
+        if (stim_abs == 1){
+            out_inel_NMS = ComputeNMSIntegrand<1>(
+                            quad_2d, s_nms, my_grey_opacity_params);
+        } else {
+            out_inel_NMS = ComputeNMSIntegrand<0>(
+                            quad_2d, s_nms, my_grey_opacity_params);
+        }
+
+        GaussLegendreIntegrate2DMatrixForNMS(quad_2d, &out_inel_NMS, s_nms,
                                               umin, umax, vmax,
                                               &n_nms_2d, &e_nms_2d);
     }
