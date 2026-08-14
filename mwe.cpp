@@ -294,7 +294,7 @@ int main(int argc, char* argv[])
     // Compute and output gray emissivities and opacities (Eqs. (19)-(23) in
     // Chiesa+25 PRD)
     // Thermal and non-thermal processes are separated.
-    // NEPS emissivity and absorsivity are separated from ones related to 
+    // NEPS emissivity and absorsivity are separated from ones related to
     // other processes.
     // NEPS contribution is NOT included in number quantities (eta0 and kappa0).
     gray_rates_non_th_separated = ComputeM1OpacitiesNonThermalSeparated(
@@ -306,34 +306,34 @@ int main(int argc, char* argv[])
     printf(
         "     eta0          eta1_th       eta1_non_th   kappa0        kappa1_th     kappa1_non_th scat1\n");
     printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
-           gray_rates_non_th_separated.eta_0[id_nue] * 1e21, 
+           gray_rates_non_th_separated.eta_0_th[id_nue] * 1e21,
            gray_rates_non_th_separated.eta_th[id_nue] * 1e21,
            gray_rates_non_th_separated.eta_non_th[id_nue] * 1e21,
-           gray_rates_non_th_separated.kappa_0_a[id_nue] * 1e7, 
+           gray_rates_non_th_separated.kappa_0_a_th[id_nue] * 1e7,
            gray_rates_non_th_separated.kappa_a_th[id_nue] * 1e7,
            gray_rates_non_th_separated.kappa_a_non_th[id_nue] * 1e7,
            gray_rates_non_th_separated.kappa_s[id_nue] * 1e7);
     printf("anue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
-           gray_rates_non_th_separated.eta_0[id_anue] * 1e21, 
+           gray_rates_non_th_separated.eta_0_th[id_anue] * 1e21,
            gray_rates_non_th_separated.eta_th[id_anue] * 1e21,
            gray_rates_non_th_separated.eta_non_th[id_anue] * 1e21,
-           gray_rates_non_th_separated.kappa_0_a[id_anue] * 1e7,
+           gray_rates_non_th_separated.kappa_0_a_th[id_anue] * 1e7,
            gray_rates_non_th_separated.kappa_a_th[id_anue] * 1e7,
            gray_rates_non_th_separated.kappa_a_non_th[id_anue] * 1e7,
            gray_rates_non_th_separated.kappa_s[id_anue] * 1e7);
     printf(" nux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
-           gray_rates_non_th_separated.eta_0[id_nux] * 1e21, 
+           gray_rates_non_th_separated.eta_0_th[id_nux] * 1e21,
            gray_rates_non_th_separated.eta_th[id_nux] * 1e21,
            gray_rates_non_th_separated.eta_non_th[id_nux] * 1e21,
-           gray_rates_non_th_separated.kappa_0_a[id_nux] * 1e7, 
+           gray_rates_non_th_separated.kappa_0_a_th[id_nux] * 1e7,
            gray_rates_non_th_separated.kappa_a_th[id_nux] * 1e7,
            gray_rates_non_th_separated.kappa_a_non_th[id_nux] * 1e7,
            gray_rates_non_th_separated.kappa_s[id_nux] * 1e7);
     printf("anux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n\n",
-           gray_rates_non_th_separated.eta_0[id_anux] * 1e21, 
+           gray_rates_non_th_separated.eta_0_th[id_anux] * 1e21,
            gray_rates_non_th_separated.eta_th[id_anux] * 1e21,
            gray_rates_non_th_separated.eta_non_th[id_anux] * 1e21,
-           gray_rates_non_th_separated.kappa_0_a[id_anux] * 1e7,
+           gray_rates_non_th_separated.kappa_0_a_th[id_anux] * 1e7,
            gray_rates_non_th_separated.kappa_a_th[id_anux] * 1e7,
            gray_rates_non_th_separated.kappa_a_non_th[id_anux] * 1e7,
            gray_rates_non_th_separated.kappa_s[id_anux] * 1e7);
@@ -423,7 +423,7 @@ int main(int argc, char* argv[])
     // Compute and output gray emissivities and opacities (Eqs. (19)-(23) in
     // Chiesa+25 PRD)
     // Thermal and non-thermal processes are separated.
-    // NEPS emissivity and absorsivity are separated from ones related to 
+    // NEPS emissivity and absorsivity are separated from ones related to
     // other processes.
     // NEPS contribution is NOT included in number quantities (eta0 and kappa0).
     gray_rates_non_th_separated = ComputeM1OpacitiesNonThermalSeparated(
@@ -435,34 +435,34 @@ int main(int argc, char* argv[])
     printf(
         "     eta0          eta1_th       eta1_non_th   kappa0        kappa1_th     kappa1_non_th scat1\n");
     printf(" nue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
-           gray_rates_non_th_separated.eta_0[id_nue] * 1e21, 
+           gray_rates_non_th_separated.eta_0_th[id_nue] * 1e21,
            gray_rates_non_th_separated.eta_th[id_nue] * 1e21,
            gray_rates_non_th_separated.eta_non_th[id_nue] * 1e21,
-           gray_rates_non_th_separated.kappa_0_a[id_nue] * 1e7, 
+           gray_rates_non_th_separated.kappa_0_a_th[id_nue] * 1e7,
            gray_rates_non_th_separated.kappa_a_th[id_nue] * 1e7,
            gray_rates_non_th_separated.kappa_a_non_th[id_nue] * 1e7,
            gray_rates_non_th_separated.kappa_s[id_nue] * 1e7);
     printf("anue %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
-           gray_rates_non_th_separated.eta_0[id_anue] * 1e21, 
+           gray_rates_non_th_separated.eta_0_th[id_anue] * 1e21,
            gray_rates_non_th_separated.eta_th[id_anue] * 1e21,
            gray_rates_non_th_separated.eta_non_th[id_anue] * 1e21,
-           gray_rates_non_th_separated.kappa_0_a[id_anue] * 1e7,
+           gray_rates_non_th_separated.kappa_0_a_th[id_anue] * 1e7,
            gray_rates_non_th_separated.kappa_a_th[id_anue] * 1e7,
            gray_rates_non_th_separated.kappa_a_non_th[id_anue] * 1e7,
            gray_rates_non_th_separated.kappa_s[id_anue] * 1e7);
     printf(" nux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n",
-           gray_rates_non_th_separated.eta_0[id_nux] * 1e21, 
+           gray_rates_non_th_separated.eta_0_th[id_nux] * 1e21,
            gray_rates_non_th_separated.eta_th[id_nux] * 1e21,
            gray_rates_non_th_separated.eta_non_th[id_nux] * 1e21,
-           gray_rates_non_th_separated.kappa_0_a[id_nux] * 1e7, 
+           gray_rates_non_th_separated.kappa_0_a_th[id_nux] * 1e7,
            gray_rates_non_th_separated.kappa_a_th[id_nux] * 1e7,
            gray_rates_non_th_separated.kappa_a_non_th[id_nux] * 1e7,
            gray_rates_non_th_separated.kappa_s[id_nux] * 1e7);
     printf("anux %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e %-13.6e\n\n",
-           gray_rates_non_th_separated.eta_0[id_anux] * 1e21, 
+           gray_rates_non_th_separated.eta_0_th[id_anux] * 1e21,
            gray_rates_non_th_separated.eta_th[id_anux] * 1e21,
            gray_rates_non_th_separated.eta_non_th[id_anux] * 1e21,
-           gray_rates_non_th_separated.kappa_0_a[id_anux] * 1e7,
+           gray_rates_non_th_separated.kappa_0_a_th[id_anux] * 1e7,
            gray_rates_non_th_separated.kappa_a_th[id_anux] * 1e7,
            gray_rates_non_th_separated.kappa_a_non_th[id_anux] * 1e7,
            gray_rates_non_th_separated.kappa_s[id_anux] * 1e7);

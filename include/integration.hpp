@@ -124,8 +124,8 @@ inline BS_REAL GaussLegendreIntegrateZeroInf(MyQuadrature* quad,
                                              MyFunction* func, BS_REAL t)
 {
 
-    BS_REAL f1_x[quad->nx], f2_x[quad->nx], f_y[quad->ny], f_z[quad->nz];
-    BS_REAL w_y[quad->ny], w_z[quad->nz];
+    BS_REAL f1_x[BS_N_MAX], f2_x[BS_N_MAX], f_y[BS_N_MAX], f_z[BS_N_MAX];
+    BS_REAL w_y[BS_N_MAX], w_z[BS_N_MAX];
     // var3d var = var3d_default;
     BS_REAL var[3];
 
@@ -175,23 +175,23 @@ GaussLegendreIntegrateZeroInfSpecial(MyQuadrature* quad,
                                      MyFunctionSpecial* func, BS_REAL t)
 {
 
-    BS_REAL f1_em_e[quad->nx], f2_em_e[quad->nx];   // emissivity e neutrino
-    BS_REAL f1_abs_e[quad->nx], f2_abs_e[quad->nx]; // absoptivity e neutrino
-    BS_REAL f1_em_x[quad->nx], f2_em_x[quad->nx]; // emissivity mu/tau neutrino
-    BS_REAL f1_abs_x[quad->nx],
-        f2_abs_x[quad->nx]; // absorptivity mu/tau neutrino
+    BS_REAL f1_em_e[BS_N_MAX], f2_em_e[BS_N_MAX];   // emissivity e neutrino
+    BS_REAL f1_abs_e[BS_N_MAX], f2_abs_e[BS_N_MAX]; // absoptivity e neutrino
+    BS_REAL f1_em_x[BS_N_MAX], f2_em_x[BS_N_MAX]; // emissivity mu/tau neutrino
+    BS_REAL f1_abs_x[BS_N_MAX],
+        f2_abs_x[BS_N_MAX]; // absorptivity mu/tau neutrino
 
-    BS_REAL f_em_e_y[quad->ny];  // emissivity e neutrino
-    BS_REAL f_abs_e_y[quad->ny]; // absoptivity e neutrino
-    BS_REAL f_em_x_y[quad->ny];  // emissivity mu/tau neutrino
-    BS_REAL f_abs_x_y[quad->ny]; // absorptivity mu/tau neutrino
+    BS_REAL f_em_e_y[BS_N_MAX];  // emissivity e neutrino
+    BS_REAL f_abs_e_y[BS_N_MAX]; // absoptivity e neutrino
+    BS_REAL f_em_x_y[BS_N_MAX];  // emissivity mu/tau neutrino
+    BS_REAL f_abs_x_y[BS_N_MAX]; // absorptivity mu/tau neutrino
 
-    BS_REAL f_em_e_z[quad->ny];  // emissivity e neutrino
-    BS_REAL f_abs_e_z[quad->ny]; // absoptivity e neutrino
-    BS_REAL f_em_x_z[quad->ny];  // emissivity mu/tau neutrino
-    BS_REAL f_abs_x_z[quad->ny]; // absorptivity mu/tau neutrino
+    BS_REAL f_em_e_z[BS_N_MAX];  // emissivity e neutrino
+    BS_REAL f_abs_e_z[BS_N_MAX]; // absoptivity e neutrino
+    BS_REAL f_em_x_z[BS_N_MAX];  // emissivity mu/tau neutrino
+    BS_REAL f_abs_x_z[BS_N_MAX]; // absorptivity mu/tau neutrino
 
-    BS_REAL w_y[quad->ny], w_z[quad->nz];
+    BS_REAL w_y[BS_N_MAX], w_z[BS_N_MAX];
     BS_REAL var[3];
 
     for (int k = 0; k < quad->nz; ++k)
@@ -259,7 +259,7 @@ inline BS_REAL GaussLaguerreIntegrateZeroInf(MyQuadrature* quad,
 
     constexpr BS_REAL zero = 0;
 
-    BS_REAL f[quad->nx];
+    BS_REAL f[BS_N_MAX];
 
     if (quad->alpha == zero)
     {
@@ -295,11 +295,14 @@ GaussLegendreIntegrateFixedSplit2D(MyQuadrature* quad, MyFunctionMultiD* func,
 {
 
     int num_integrands = func->my_quadrature_integrand.n;
+    BS_ASSERT(num_integrands <= num_max_integrands);
 
-    BS_REAL f1_x[num_integrands][quad->nx], f2_x[num_integrands][quad->nx];
-    BS_REAL f1_y[num_integrands][quad->ny], f2_y[num_integrands][quad->ny];
+    BS_REAL f1_x[num_max_integrands][BS_N_MAX],
+        f2_x[num_max_integrands][BS_N_MAX];
+    BS_REAL f1_y[num_max_integrands][BS_N_MAX],
+        f2_y[num_max_integrands][BS_N_MAX];
 
-    BS_REAL w_y[quad->ny];
+    BS_REAL w_y[BS_N_MAX];
     BS_REAL var[2];
 
     MyQuadratureIntegrand f1_vals, f2_vals;
@@ -387,7 +390,9 @@ GaussLegendreIntegrateFixedSplit1D(MyQuadrature* quad, MyFunctionMultiD* func,
 {
 
     int num_integrands = func->my_quadrature_integrand.n;
-    BS_REAL f1_x[num_integrands][quad->nx], f2_x[num_integrands][quad->nx];
+    BS_ASSERT(num_integrands <= num_max_integrands);
+    BS_REAL f1_x[num_max_integrands][BS_N_MAX],
+        f2_x[num_max_integrands][BS_N_MAX];
     BS_REAL var[2];
 
     MyQuadratureIntegrand f1_vals, f2_vals;
@@ -435,11 +440,14 @@ inline MyQuadratureIntegrand GaussLegendreIntegrate2D(MyQuadrature* quad,
 {
 
     int num_integrands = func->my_quadrature_integrand.n;
+    BS_ASSERT(num_integrands <= num_max_integrands);
 
-    BS_REAL f1_x[num_integrands][quad->nx], f2_x[num_integrands][quad->nx];
-    BS_REAL f1_y[num_integrands][quad->ny], f2_y[num_integrands][quad->ny];
+    BS_REAL f1_x[num_max_integrands][BS_N_MAX],
+        f2_x[num_max_integrands][BS_N_MAX];
+    BS_REAL f1_y[num_max_integrands][BS_N_MAX],
+        f2_y[num_max_integrands][BS_N_MAX];
 
-    BS_REAL w_y[quad->ny];
+    BS_REAL w_y[BS_N_MAX];
     BS_REAL var[2];
 
     MyQuadratureIntegrand result;
@@ -856,7 +864,8 @@ GaussLegendreIntegrate1DFiniteInterval(MyQuadrature* quad,
     (void)t;
 
     int num_integrands = func->my_quadrature_integrand.n;
-    BS_REAL f_x[num_integrands][quad->nx];
+    BS_ASSERT(num_integrands <= num_max_integrands);
+    BS_REAL f_x[num_max_integrands][BS_N_MAX];
     BS_REAL var[2];
     MyQuadratureIntegrand result;
 
@@ -892,11 +901,13 @@ inline MyQuadratureIntegrand GaussLegendreIntegrate2DFiniteInterval(
     (void)tx;
 
     int num_integrands = func->my_quadrature_integrand.n;
+    BS_ASSERT(num_integrands <= num_max_integrands);
 
-    BS_REAL f1_x[num_integrands][quad->nx];
-    BS_REAL f1_y[num_integrands][quad->ny], f2_y[num_integrands][quad->ny];
+    BS_REAL f1_x[num_max_integrands][BS_N_MAX];
+    BS_REAL f1_y[num_max_integrands][BS_N_MAX],
+        f2_y[num_max_integrands][BS_N_MAX];
 
-    BS_REAL w_y[quad->ny];
+    BS_REAL w_y[BS_N_MAX];
     BS_REAL var[2];
 
     MyQuadratureIntegrand result;
