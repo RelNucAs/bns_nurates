@@ -174,6 +174,7 @@ void ElAbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
         dQ = eos_pars->dm_eff; // [MeV]
 
     // Neutron minus proton chem. potentials (corrected for the mass difference)
+    // mu_hat is the difference of non-relativistic chemical potentials
     const BS_REAL mu_hat = mu_n - mu_p - dQ; // [MeV]
 
     Qprime = dQ + dU;     // [MeV], Eq.(79) in Hempel
