@@ -106,9 +106,13 @@ utils/point_out.cpp)
 if(BUILD_TESTING)
 include(CTest)
 
-ADD_BNSNURATES_TEST(
+# test_opacities_benchmarks is a parametric harness: main() requires
+# <n_quad> <mesh_size> and rejects n_quad*2 > BS_N_MAX.
+ADD_BNSNURATES_EXECUTABLE(
 test_opacities_benchmarks
 tests/tests_opacities_m1/test_opacities_benchmarks.cpp)
+add_test(NAME test_opacities_benchmarks
+COMMAND test_opacities_benchmarks 10 4)
 
 ADD_BNSNURATES_TEST(
 test_beta
