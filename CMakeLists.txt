@@ -154,6 +154,11 @@ ADD_BNSNURATES_TEST(
 test_opacities_all_reactions
 tests/tests_opacities_m1/test_opacities_all_reactions.cpp)
 
+# Driver (not a ctest: takes a profile path as argv[1]).
+ADD_BNSNURATES_EXECUTABLE(
+test_opacities_bns_eq_vs_recon
+tests/tests_opacities_m1/test_opacities_bns_eq_vs_recon.cpp)
+
 ADD_BNSNURATES_TEST(
 test_spectral_opacities_all_reactions
 tests/tests_opacities_spectral/test_opacities_spectral.cpp)
