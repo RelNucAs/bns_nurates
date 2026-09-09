@@ -302,8 +302,26 @@ NuDistributionParams NuEquilibriumParams(const MyEOSParams* eos_pars)
  */
 KOKKOS_INLINE_FUNCTION
 BS_REAL TotalNuF(const BS_REAL omega, const NuDistributionParams* distr_pars,
-                 const int nuid)
+                 MyEOSParams* eos_pars, const int nuid)
 {
+
+    // Fallback to equilibrium if T_trapped is larger than 200 MeV
+    if (distr_pars->temp_t[nuid] > 200){
+        const BS_REAL T    = eos_pars->temp; // [MeV]
+        const BS_REAL mu_e = eos_pars->mu_e; // [MeV]
+        const BS_REAL mu_p = eos_pars->mu_p; // [MeV]
+        const BS_REAL mu_n = eos_pars->mu_n; // [MeV]
+        BS_REAL mu_nu;
+        if (nuid == id_nue){
+            mu_nu = mu_e - mu_n + mu_p;
+        } else if (nuid == id_anue){
+            mu_nu = - (mu_e - mu_n + mu_p);
+        }else{
+            mu_nu = 0;
+        }
+        return FermiDistr(omega, T, mu_nu);
+    }
+
     [[maybe_unused]] constexpr BS_REAL zero = 0;
 
     BS_ASSERT(omega >= zero, "Neutrino energy is negative.");
@@ -341,6 +359,7 @@ NuDistributionParams CalculateDistrParamsFromM1(const M1Quantities* M1_pars,
  *
  * Computes this for three neutrino species
  */
+/*
 KOKKOS_INLINE_FUNCTION
 MyQuadratureIntegrand NuNumberIntegrand(BS_REAL* x, void* p)
 {
@@ -356,7 +375,7 @@ MyQuadratureIntegrand NuNumberIntegrand(BS_REAL* x, void* p)
 
     return result;
 }
-
+*/
 /* Compute neutrino number density
  *
  * Computes this for three neutrino species
@@ -399,6 +418,7 @@ inline MyQuadratureIntegrand NuNumber(NuDistributionParams* distr_pars)
  *
  * Computes this for three neutrino species
  */
+/*
 inline MyQuadratureIntegrand NuEnergyIntegrand(BS_REAL* x, void* p)
 {
     MyQuadratureIntegrand result = NuNumberIntegrand(x, p);
@@ -410,7 +430,7 @@ inline MyQuadratureIntegrand NuEnergyIntegrand(BS_REAL* x, void* p)
 
     return result;
 }
-
+*/
 /* Compute neutrino energy density
  *
  * Computes this for three neutrino species

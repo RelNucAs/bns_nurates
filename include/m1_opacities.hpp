@@ -60,7 +60,8 @@ void Scattering1DIntegrand(const MyQuadrature* quad,
                       nu, idx, t[idx], i, quad->points[i]);
 
             // compute the neutrino distribution function
-            g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, idx);
+            g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars,
+                                &grey_pars->eos_pars, idx);
 
             iso_scatt = IsoScattTotal(nu, &grey_pars->opacity_pars,
                                       &grey_pars->eos_pars);
@@ -76,7 +77,8 @@ void Scattering1DIntegrand(const MyQuadrature* quad,
                       nu, idx, t[idx], i, quad->points[i]);
 
             // compute the neutrino distribution function
-            g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, idx);
+            g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars,
+                                &grey_pars->eos_pars, idx);
 
             iso_scatt = IsoScattTotal(nu, &grey_pars->opacity_pars,
                                       &grey_pars->eos_pars);
@@ -110,7 +112,8 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
                       nu, t[id_nue], i, quad->points[i]);
             nu_sqr = POW2(nu);
 
-            g_nu = TotalNuF(nu, &grey_pars->distr_pars, id_nue);
+            g_nu = TotalNuF(nu, &grey_pars->distr_pars, 
+                            &grey_pars->eos_pars, id_nue);
 
             abs_em_beta = StimAbsOpacity(nu, &grey_pars->opacity_pars,
                                          &grey_pars->eos_pars); // [s^-1]
@@ -127,7 +130,8 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
                       "quad->points[%d]=%e)",
                       nu, t[id_anue], i, quad->points[i]);
             nu_sqr = POW2(nu);
-            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anue);
+            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, 
+                            &grey_pars->eos_pars, id_anue);
 
             abs_em_beta = StimAbsOpacity(nu, &grey_pars->opacity_pars,
                                          &grey_pars->eos_pars); // [s^-1]
@@ -143,7 +147,8 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
                       "quad->points[%d]=%e)",
                       nu, t[id_nue], i, quad->points[i]);
             nu_sqr = POW2(nu);
-            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_nue);
+            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, 
+                            &grey_pars->eos_pars, id_nue);
 
             abs_em_beta = StimAbsOpacity(nu, &grey_pars->opacity_pars,
                                          &grey_pars->eos_pars); // [s^-1]
@@ -159,7 +164,8 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
                       "quad->points[%d]=%e)",
                       nu, t[id_anue], i, quad->points[i]);
             nu_sqr = POW2(nu);
-            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anue);
+            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, 
+                            &grey_pars->eos_pars, id_anue);
 
             abs_em_beta = StimAbsOpacity(nu, &grey_pars->opacity_pars,
                                          &grey_pars->eos_pars); // [s^-1]
@@ -180,7 +186,8 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
                       "quad->points[%d]=%e)",
                       nu, t[id_nue], i, quad->points[i]);
             nu_sqr = POW2(nu);
-            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_nue);
+            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, 
+                            &grey_pars->eos_pars, id_nue);
 
             abs_em_beta = AbsOpacity(nu, &grey_pars->opacity_pars,
                                      &grey_pars->eos_pars); // [s^-1]
@@ -195,7 +202,8 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
                       "quad->points[%d]=%e)",
                       nu, t[id_anue], i, quad->points[i]);
             nu_sqr = POW2(nu);
-            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anue);
+            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, 
+                            &grey_pars->eos_pars, id_anue);
 
             abs_em_beta = AbsOpacity(nu, &grey_pars->opacity_pars,
                                      &grey_pars->eos_pars); // [s^-1]
@@ -209,7 +217,8 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
                       "quad->points[%d]=%e)",
                       nu, t[id_nue], i, quad->points[i]);
             nu_sqr = POW2(nu);
-            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_nue);
+            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, 
+                            &grey_pars->eos_pars, id_nue);
 
             abs_em_beta = AbsOpacity(nu, &grey_pars->opacity_pars,
                                      &grey_pars->eos_pars); // [s^-1]
@@ -223,7 +232,8 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
                       "quad->points[%d]=%e)",
                       nu, t[id_anue], i, quad->points[i]);
             nu_sqr = POW2(nu);
-            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, id_anue);
+            g_nu   = TotalNuF(nu, &grey_pars->distr_pars, 
+                            &grey_pars->eos_pars, id_anue);
 
             abs_em_beta = AbsOpacity(nu, &grey_pars->opacity_pars,
                                      &grey_pars->eos_pars); // [s^-1]
@@ -497,7 +507,8 @@ void AddInelKernelsToIntegrand(int n, BS_REAL* nu_array,
 
         for (int idx = 0; idx < total_num_species; ++idx)
         {
-            g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, idx);
+            g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, 
+                                &grey_pars->eos_pars, idx);
 
             if (grey_pars->opacity_pars.neglect_blocking == false)
             {
@@ -532,7 +543,8 @@ void AddInelKernelsToIntegrand(int n, BS_REAL* nu_array,
 
             for (int idx = 0; idx < total_num_species; ++idx)
             {
-                g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
+                g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, 
+                                        &grey_pars->eos_pars, idx);
 
                 if (grey_pars->opacity_pars.neglect_blocking == false)
                 {
@@ -593,7 +605,8 @@ void WeightNuNuBarReactionsWithDistr(int n, BS_REAL* nu_array,
 
         for (int idx = 0; idx < total_num_species; ++idx)
         {
-            g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, idx);
+            g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, 
+                                &grey_pars->eos_pars, idx);
 
             if (grey_pars->opacity_pars.neglect_blocking == false)
             {
@@ -623,7 +636,8 @@ void WeightNuNuBarReactionsWithDistr(int n, BS_REAL* nu_array,
 
             for (int idx = 0; idx < total_num_species; ++idx)
             {
-                g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
+                g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, 
+                                        &grey_pars->eos_pars, idx);
 
                 if (grey_pars->opacity_pars.neglect_blocking == false)
                 {
@@ -682,7 +696,8 @@ void AddCommonWeightsToIntegrand(int n, BS_REAL* nu_array,
 
             for (int idx = 0; idx < total_num_species; ++idx)
             {
-                g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, idx);
+                g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, 
+                                    &grey_pars->eos_pars, idx);
 
                 out->m1_mat_ab[idx][i][i] =
                     nu_fourth * g_nu[idx] *
@@ -700,7 +715,8 @@ void AddCommonWeightsToIntegrand(int n, BS_REAL* nu_array,
                 for (int idx = 0; idx < total_num_species; ++idx)
                 {
                     g_nu_bar[idx] =
-                        TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
+                        TotalNuF(nu_bar, &grey_pars->distr_pars, 
+                                &grey_pars->eos_pars, idx);
 
                     out->m1_mat_ab[idx][i][j] =
                         nu_fourth * g_nu[idx] *
@@ -726,7 +742,8 @@ void AddCommonWeightsToIntegrand(int n, BS_REAL* nu_array,
 
             for (int idx = 0; idx < total_num_species; ++idx)
             {
-                g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, idx);
+                g_nu[idx] = TotalNuF(nu, &grey_pars->distr_pars, 
+                                    &grey_pars->eos_pars, idx);
 
                 out->m1_mat_ab[idx][i][i] *= nu_fourth * g_nu[idx];
                 out->m1_mat_em[idx][i][i] *= nu_fourth * (one - g_nu[idx]);
@@ -742,7 +759,8 @@ void AddCommonWeightsToIntegrand(int n, BS_REAL* nu_array,
                 for (int idx = 0; idx < total_num_species; ++idx)
                 {
                     g_nu_bar[idx] =
-                        TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
+                        TotalNuF(nu_bar, &grey_pars->distr_pars, 
+                                &grey_pars->eos_pars, idx);
 
                     out->m1_mat_ab[idx][i][j] *= nu_fourth * g_nu[idx];
                     out->m1_mat_ab[idx][j][i] *= nu_fourth * g_nu_bar[idx];
@@ -917,8 +935,10 @@ M1MatrixKokkos2D ComputeNEPSIntegrand(const MyQuadrature* quad, BS_REAL t,
 
             for (int idx = 0; idx < total_num_species; ++idx)
             {
-                g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, idx);
-                g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
+                g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, 
+                                        &grey_pars->eos_pars, idx);
+                g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, 
+                                        &grey_pars->eos_pars, idx);
 
                 if (grey_pars->opacity_pars.neglect_blocking == false)
                 {
@@ -989,8 +1009,10 @@ M1MatrixKokkos2D ComputeNEPSIntegrand(const MyQuadrature* quad, BS_REAL t,
 
             for (int idx = 0; idx < total_num_species; ++idx)
             {
-                g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, idx);
-                g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, idx);
+                g_nu[idx]     = TotalNuF(nu, &grey_pars->distr_pars, 
+                                        &grey_pars->eos_pars, idx);
+                g_nu_bar[idx] = TotalNuF(nu_bar, &grey_pars->distr_pars, 
+                                        &grey_pars->eos_pars, idx);
 
                 if (grey_pars->opacity_pars.neglect_blocking == false)
                 {
@@ -1110,7 +1132,8 @@ void AddPairBremDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
         BS_REAL g_a[total_num_species], bf_a[total_num_species];
         for (int s = 0; s < total_num_species; ++s)
         {
-            g_a[s]  = TotalNuF(nu_a, &gop->distr_pars, s);
+            g_a[s]  = TotalNuF(nu_a, &gop->distr_pars, 
+                                &gop->eos_pars, s);
             bf_a[s] = neglect_blocking ? one : (one - g_a[s]);
         }
 
@@ -1128,7 +1151,8 @@ void AddPairBremDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
             BS_REAL g_b[total_num_species], bf_b[total_num_species];
             for (int s = 0; s < total_num_species; ++s)
             {
-                g_b[s]  = TotalNuF(nu_b, &gop->distr_pars, s);
+                g_b[s]  = TotalNuF(nu_b, &gop->distr_pars, 
+                                    &gop->eos_pars, s);
                 bf_b[s] = neglect_blocking ? one : (one - g_b[s]);
             }
 
@@ -1244,8 +1268,10 @@ void NEPSCellFused(GreyOpacityParams* gop, BS_REAL nu, BS_REAL nu_bar,
     BS_REAL g_nu[total_num_species], g_nb[total_num_species];
     for (int s = 0; s < total_num_species; ++s)
     {
-        g_nu[s] = TotalNuF(nu,     &gop->distr_pars, s);
-        g_nb[s] = TotalNuF(nu_bar, &gop->distr_pars, s);
+        g_nu[s] = TotalNuF(nu, &gop->distr_pars, 
+                            &gop->eos_pars, s);
+        g_nb[s] = TotalNuF(nu_bar, &gop->distr_pars, 
+                            &gop->eos_pars, s);
     }
 
     gop->kernel_pars.inelastic_kernel_params.omega       = nu;
@@ -1963,9 +1989,11 @@ MyQuadratureIntegrand SpectralIntegrand(BS_REAL* var, void* p)
 
     for (int idx = 0; idx < total_num_species; ++idx)
     {
-        g_nu[idx] = TotalNuF(nu, &my_grey_opacity_params->distr_pars, idx);
+        g_nu[idx] = TotalNuF(nu, &my_grey_opacity_params->distr_pars, 
+                            &my_grey_opacity_params->eos_pars, idx);
         g_nu_bar[idx] =
-            TotalNuF(nu_bar, &my_grey_opacity_params->distr_pars, idx);
+            TotalNuF(nu_bar, &my_grey_opacity_params->distr_pars, 
+                    &my_grey_opacity_params->eos_pars, idx);
     }
 
     // compute the pair kernels
@@ -2159,7 +2187,8 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
 
     for (int idx = 0; idx < total_num_species; ++idx)
     {
-        g_nu[idx] = TotalNuF(nu, &my_grey_opacity_params->distr_pars, idx);
+        g_nu[idx] = TotalNuF(nu, &my_grey_opacity_params->distr_pars, 
+                            &my_grey_opacity_params->eos_pars, idx);
     }
 
     // const BS_REAL eta_e = my_grey_opacity_params->eos_pars.mu_e /
@@ -2393,8 +2422,10 @@ void ComputeDoubleIntegrandFillTeam(const MemberType &team,
         BS_REAL g_row[total_num_species], g_col[total_num_species];
         BS_REAL bf_row[total_num_species], bf_col[total_num_species];
         for (int s = 0; s < total_num_species; ++s) {
-            g_row[s]  = TotalNuF(nu_row, &gop->distr_pars, s);
-            g_col[s]  = TotalNuF(nu_col, &gop->distr_pars, s);
+            g_row[s]  = TotalNuF(nu_row, &gop->distr_pars, 
+                                &gop->eos_pars, s);
+            g_col[s]  = TotalNuF(nu_col, &gop->distr_pars, 
+                                &gop->eos_pars, s);
             bf_row[s] = neglect_blocking ? BS_REAL(1) : BS_REAL(1) - g_row[s];
             bf_col[s] = neglect_blocking ? BS_REAL(1) : BS_REAL(1) - g_col[s];
         }
@@ -2477,8 +2508,10 @@ void ComputeNEPSIntegrandFillTeam(const MemberType &team,
             BS_REAL g_nu[total_num_species], g_nb[total_num_species];
             BS_REAL bf_nu[total_num_species], bf_nb[total_num_species];
             for (int s = 0; s < total_num_species; ++s) {
-                g_nu[s]  = TotalNuF(nu,     &gop->distr_pars, s);
-                g_nb[s]  = TotalNuF(nu_bar, &gop->distr_pars, s);
+                g_nu[s]  = TotalNuF(nu,&gop->distr_pars, 
+                                    &gop->eos_pars, s);
+                g_nb[s]  = TotalNuF(nu_bar, &gop->distr_pars, 
+                                    &gop->eos_pars, s);
                 bf_nu[s] = neglect_blocking ? one : one - g_nu[s];
                 bf_nb[s] = neglect_blocking ? one : one - g_nb[s];
             }
@@ -2515,8 +2548,10 @@ void ComputeNEPSIntegrandFillTeam(const MemberType &team,
             BS_REAL g_nu[total_num_species], g_nb[total_num_species];
             BS_REAL bf_nu[total_num_species], bf_nb[total_num_species];
             for (int s = 0; s < total_num_species; ++s) {
-                g_nu[s]  = TotalNuF(nu,     &gop->distr_pars, s);
-                g_nb[s]  = TotalNuF(nu_bar, &gop->distr_pars, s);
+                g_nu[s]  = TotalNuF(nu,     &gop->distr_pars, 
+                                    &gop->eos_pars, s);
+                g_nb[s]  = TotalNuF(nu_bar, &gop->distr_pars, 
+                                    &gop->eos_pars, s);
                 bf_nu[s] = neglect_blocking ? one : one - g_nu[s];
                 bf_nb[s] = neglect_blocking ? one : one - g_nb[s];
             }

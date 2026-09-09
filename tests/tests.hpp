@@ -337,7 +337,8 @@ inline void TestM1Opacities(char filename[200], OpacityFlags* opacity_flags,
                                my_grey_opacity_params.eos_pars.mu_n +
                                my_grey_opacity_params.eos_pars.mu_p);
             BS_REAL distr_nuftot =
-                TotalNuF(123.4, &my_grey_opacity_params.distr_pars, 0);
+                TotalNuF(123.4, &my_grey_opacity_params.distr_pars, 
+                        &my_grey_opacity_params.eos_pars, 0);
             BS_REAL diff_distr = Kokkos::fabs(distr_fermi - distr_nuftot);
 
             printf("# Computing M1 coefficients\n");
@@ -749,7 +750,8 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200], const int nx,
                                my_grey_opacity_params.eos_pars.mu_n +
                                my_grey_opacity_params.eos_pars.mu_p);
             BS_REAL distr_nuftot =
-                TotalNuF(123.4, &my_grey_opacity_params.distr_pars, 0);
+                TotalNuF(123.4, &my_grey_opacity_params.distr_pars, 
+                        &my_grey_opacity_params.eos_pars, 0);
 
             BS_REAL diff_distr = Kokkos::fabs(distr_fermi - distr_nuftot);
 
