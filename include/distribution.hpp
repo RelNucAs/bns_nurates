@@ -266,6 +266,8 @@ NuDistributionParams NuEquilibriumParams(const MyEOSParams* eos_pars)
 
     NuDistributionParams out;
 
+    out.use_equilibrium_bns = true; // Set equilibrium flag (equilibrium case)
+
     const BS_REAL T    = eos_pars->temp; // [MeV]
     const BS_REAL mu_e = eos_pars->mu_e; // [MeV]
     const BS_REAL mu_p = eos_pars->mu_p; // [MeV]
@@ -305,23 +307,25 @@ BS_REAL TotalNuF(const BS_REAL omega, const NuDistributionParams* distr_pars,
                  MyEOSParams* eos_pars, const int nuid)
 {
 
-    // Fallback to equilibrium if T_trapped is larger than 200 MeV
-    if (distr_pars->temp_t[nuid] > 200){
-        const BS_REAL T    = eos_pars->temp; // [MeV]
-        const BS_REAL mu_e = eos_pars->mu_e; // [MeV]
-        const BS_REAL mu_p = eos_pars->mu_p; // [MeV]
-        const BS_REAL mu_n = eos_pars->mu_n; // [MeV]
-        BS_REAL mu_nu;
-        if (nuid == id_nue){
-            mu_nu = mu_e - mu_n + mu_p;
-        } else if (nuid == id_anue){
-            mu_nu = - (mu_e - mu_n + mu_p);
-        }else{
-            mu_nu = 0;
+    if (distr_pars->use_equilibrium_bns == false){
+        // Fallback to equilibrium if T_trapped is larger than 200 MeV
+        if (distr_pars->temp_t[nuid] > 200){
+            const BS_REAL T    = eos_pars->temp; // [MeV]
+            const BS_REAL mu_e = eos_pars->mu_e; // [MeV]
+            const BS_REAL mu_p = eos_pars->mu_p; // [MeV]
+            const BS_REAL mu_n = eos_pars->mu_n; // [MeV]
+            BS_REAL mu_nu;
+            if (nuid == id_nue){
+                mu_nu = mu_e - mu_n + mu_p;
+            } else if (nuid == id_anue){
+                mu_nu = - (mu_e - mu_n + mu_p);
+            }else{
+                mu_nu = 0;
+            }
+            return FermiDistr(omega, T, mu_nu);
         }
-        return FermiDistr(omega, T, mu_nu);
     }
-
+    
     [[maybe_unused]] constexpr BS_REAL zero = 0;
 
     BS_ASSERT(omega >= zero, "Neutrino energy is negative.");
@@ -348,6 +352,8 @@ NuDistributionParams CalculateDistrParamsFromM1(const M1Quantities* M1_pars,
                                                 const MyEOSParams* eos_pars)
 {
     NuDistributionParams out;
+
+    out.use_equilibrium_bns = false;  // Set equilibrium flag (reconstructed case)
 
     CalculateThickParamsFromM1(M1_pars, &out);
     CalculateThinParamsFromM1(M1_pars, &out);
