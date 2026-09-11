@@ -386,9 +386,10 @@ __attribute__((unused)) static OpacityParams opacity_params_default_none = {
  */
 struct NuDistributionParams
 {
-    // This is used to skip the fallback-to-equilibrium procedure of the reconstructed case.
-    bool use_equilibrium_bns;   // True: we are using equilibrium distribution
-                                // False: we are using reconstructed distribution
+
+    // Set to true if a fallback to equilibrium is needed.
+    bool switch_to_equilibrium_bns[total_num_species] = {false};  
+
     // parameters for optically thick distribution function
     BS_REAL w_t[total_num_species];    // contribution factor
     BS_REAL temp_t[total_num_species]; // temperature
