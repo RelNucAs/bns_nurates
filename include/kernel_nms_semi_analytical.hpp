@@ -82,6 +82,7 @@ NMS_Parameters NMS_parameters_interpolator(const BS_REAL T, const BS_REAL mu, co
 
 
 // Analytical approximation of numu-muon scattering kernel   [MeV^-2]
+KOKKOS_INLINE_FUNCTION
 BS_REAL NMS_analytical_kernel_nu_mu(const BS_REAL T, const BS_REAL mu,
                                         const BS_REAL w, const BS_REAL wp_in, const BS_REAL u)
 {
@@ -205,6 +206,7 @@ BS_REAL NMS_analytical_kernel_nu_mu(const BS_REAL T, const BS_REAL mu,
     return numerator / denominator;
 }
 
+KOKKOS_INLINE_FUNCTION
 BS_REAL smoothstep(const BS_REAL wp, const BS_REAL wpzero, const BS_REAL epsilon){
 
     return (3. * POW2( (wp - (wpzero - epsilon)) / (2. * epsilon) ) 
@@ -214,6 +216,7 @@ BS_REAL smoothstep(const BS_REAL wp, const BS_REAL wpzero, const BS_REAL epsilon
 
 
 // Semi-Analytical expression of the NMS kernel  [MeV^-2]
+KOKKOS_INLINE_FUNCTION
 BS_REAL NMS_SemiAnalyticalKernel(const BS_REAL T, const BS_REAL mu, const BS_REAL w, const BS_REAL wp,
                         const BS_REAL alpha, const BS_REAL beta, const BS_REAL gamma, const BS_REAL delta,
                         const BS_REAL wpbar, const BS_REAL wpzero)

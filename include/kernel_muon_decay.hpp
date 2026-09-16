@@ -21,6 +21,7 @@
 
 
 // Analytical Expression of Inverse Muon Decay kernel [MeV^-2]
+KOKKOS_INLINE_FUNCTION
 BS_REAL InverseMuonDecayKernel_Analytical(const BS_REAL T, const BS_REAL mu_el, 
                                           const BS_REAL u_bar, const BS_REAL wnu, const BS_REAL wanu)
 {
