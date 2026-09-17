@@ -20,6 +20,8 @@
 #include "muon_decay_ubar_table.hpp"
 
 
+#if !defined(__CUDA_ARCH__) && !defined(__SYCL_DEVICE_ONLY__)  // muon decay table data lives in CPU memory only
+
 // Analytical Expression of Inverse Muon Decay kernel [MeV^-2]
 KOKKOS_INLINE_FUNCTION
 BS_REAL InverseMuonDecayKernel_Analytical(const BS_REAL T, const BS_REAL mu_el, 
@@ -82,7 +84,8 @@ BS_REAL InverseMuonDecayKernel_Analytical(const BS_REAL T, const BS_REAL mu_el,
 
 
 // Analytical Expression of Inverse Anti-Muon Decay kernel [MeV^-2]
-BS_REAL InverseAntiMuonDecayKernel_Analytical(const BS_REAL T, const BS_REAL mu_pos, 
+KOKKOS_INLINE_FUNCTION
+BS_REAL InverseAntiMuonDecayKernel_Analytical(const BS_REAL T, const BS_REAL mu_pos,
                                           const BS_REAL u_bar, const BS_REAL w_anumu, const BS_REAL w_nue)
 {
 
@@ -361,6 +364,18 @@ MyKernelOutput MuonDecayKernels(MuonDecayKernelParams* kernel_params,
 
     return mudec_kernel;
 }
+
+#else  // __CUDA_ARCH__ || __SYCL_DEVICE_ONLY__ — muon decay is host-only; provide a stub so device code links
+
+KOKKOS_INLINE_FUNCTION
+MyKernelOutput MuonDecayKernels(MuonDecayKernelParams* /*kernel_params*/,
+                                MyEOSParams* /*eos_params*/)
+{
+    MyKernelOutput mudec_kernel = {0};
+    return mudec_kernel;
+}
+
+#endif  // !__CUDA_ARCH__ && !__SYCL_DEVICE_ONLY__
 
 
 #endif // BNS_NURATES_INCLUDE_KERNEL_MUON_DECAY_HPP_

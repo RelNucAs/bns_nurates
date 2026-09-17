@@ -40,6 +40,8 @@
  *          wp_zero: [MeV]
  */
 
+#if !defined(__CUDA_ARCH__) && !defined(__SYCL_DEVICE_ONLY__)  // NMS semi-analytical table data lives in CPU memory only
+
 // Struct to store the different parameters
 struct NMS_Parameters{
     BS_REAL alpha;
@@ -302,6 +304,18 @@ MyKernelOutput InelasticNMSKernels_SemiAnalytical(InelasticScattKernelParams* ke
 
     return nms_kernel;
 }
+
+#else  // __CUDA_ARCH__ || __SYCL_DEVICE_ONLY__ — NMS semi-analytical is host-only; provide a stub so device code links
+
+KOKKOS_INLINE_FUNCTION
+MyKernelOutput InelasticNMSKernels_SemiAnalytical(InelasticScattKernelParams* /*kernel_params*/,
+                                        MyEOSParams* /*eos_params*/)
+{
+    MyKernelOutput nms_kernel = {0};
+    return nms_kernel;
+}
+
+#endif  // !__CUDA_ARCH__ && !__SYCL_DEVICE_ONLY__
 
 
 #endif // BNS_NURATES_INCLUDE_KERNEL_NMS_SEMI_ANALYTICAL_HPP_

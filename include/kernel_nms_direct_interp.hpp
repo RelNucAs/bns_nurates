@@ -34,6 +34,8 @@
  *          R1, R2, R3:   Interpolated values        []
  */
 
+#if !defined(__CUDA_ARCH__) && !defined(__SYCL_DEVICE_ONLY__)  // NMS direct-interp table data lives in CPU memory only
+
 // Struct to store the three terms of the kernel
 struct NMS_KernelResult{
     BS_REAL R1;
@@ -236,6 +238,18 @@ MyKernelOutput InelasticNMSKernels_DirectInterp(InelasticScattKernelParams* kern
 
     return nms_kernel;
 }
+
+#else  // __CUDA_ARCH__ || __SYCL_DEVICE_ONLY__ — NMS direct-interp is host-only; provide a stub so device code links
+
+KOKKOS_INLINE_FUNCTION
+MyKernelOutput InelasticNMSKernels_DirectInterp(InelasticScattKernelParams* /*kernel_params*/,
+                                        MyEOSParams* /*eos_params*/)
+{
+    MyKernelOutput nms_kernel = {0};
+    return nms_kernel;
+}
+
+#endif  // !__CUDA_ARCH__ && !__SYCL_DEVICE_ONLY__
 
 
 #endif // BNS_NURATES_INCLUDE_KERNEL_NMS_DIRECT_INTERP_HPP_
