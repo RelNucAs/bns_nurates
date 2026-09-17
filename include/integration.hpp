@@ -572,13 +572,13 @@ MuonReactionsGaussLegendreIntegrate1D(MyQuadrature* quad,
         for (int i = 0; i < quad->nx; ++i)
         {
 
-            var[0]                        = wmin + (t[k] - wmin) * quad->points[i];      // 1 + (t-1)x 
+            var[0]                        = wmin + (t[k] - wmin) * quad->points[i];    // 1 + (t-1)x 
             MyQuadratureIntegrand f1_vals = func->function(var, func->params);
-            f1_x[k][i]                    = f1_vals.integrand[k];                    // G(1 + (t-1)x)
+            f1_x[k][i]                    = f1_vals.integrand[k];                      // G(1 + (t-1)x)
 
-            var[0]                        = t[k] + (wmax - t[k]) * quad->points[i];  // t + (300-t)x
+            var[0]                        = t[k] + (wmax - t[k]) * quad->points[i];    // t + (300-t)x
             MyQuadratureIntegrand f2_vals = func->function(var, func->params);
-            f2_x[k][i] = f2_vals.integrand[k];                                       // G(t + (300-t)x)
+            f2_x[k][i] = f2_vals.integrand[k];                                         // G(t + (300-t)x)
         }
 
         result.integrand[k] =
@@ -847,8 +847,8 @@ void GaussLegendreIntegrate2DMatrixForNMS(const MyQuadrature* quad,
 
             u1 = umin + (t - umin) * x_i;
             u2 = t + (umax - t) * x_i;
-            min1 = std::min(u1, vmax);
-            min2 = std::min(u2, vmax);
+            min1 = Kokkos::min(u1, vmax);
+            min2 = Kokkos::min(u2, vmax);
             prefactor1 = (t - umin) * min1;
             prefactor2 = (umax - t) * min2;
 
@@ -913,8 +913,8 @@ void GaussLegendreIntegrate2DMatrixForMuonDecay(const MyQuadrature* quad,
                                                 MyQuadratureIntegrand* result_2)
 {
     
-    constexpr BS_REAL max = MuonDecay_wnumu_max;
-    constexpr BS_REAL min = MuonDecay_wnumu_min;
+    constexpr BS_REAL max = MuonDecay_w_mu_max;
+    constexpr BS_REAL min = MuonDecay_w_mu_min;
     constexpr BS_REAL t = kBS_Mmu / 3.;
     constexpr BS_REAL prefactor_1 = POW2(t - min);
     constexpr BS_REAL prefactor_2 = (t - min) * (max - t);
@@ -923,7 +923,7 @@ void GaussLegendreIntegrate2DMatrixForMuonDecay(const MyQuadrature* quad,
 
     BS_REAL w_i, w_j, w_ij;
     BS_REAL x_i, x_j;
-    BS_REAL w_numu_0, w_numu_1, w_anue_0, w_anue_1;
+    BS_REAL w_mu_0, w_mu_1, w_e_0, w_e_1;
 
 
     for (int i = 0; i < n; ++i)
@@ -932,8 +932,8 @@ void GaussLegendreIntegrate2DMatrixForMuonDecay(const MyQuadrature* quad,
         x_i  = quad->points[i];
         w_i  = quad->w[i];
 
-        w_numu_0 = min + (t - min) * x_i;
-        w_numu_1 = t + (max - t) * x_i;
+        w_mu_0 = min + (t - min) * x_i;
+        w_mu_1 = t + (max - t) * x_i;
 
         for (int j = 0; j < n; ++j)
         {
@@ -943,8 +943,8 @@ void GaussLegendreIntegrate2DMatrixForMuonDecay(const MyQuadrature* quad,
 
             w_ij = w_i * w_j;
 
-            w_anue_0 = min + (t - min) * x_j;
-            w_anue_1 = t + (max - t) * x_j;
+            w_e_0 = min + (t - min) * x_j;
+            w_e_1 = t + (max - t) * x_j;
 
             // Number, numu
             result_1->integrand[id_num] +=
@@ -958,6 +958,20 @@ void GaussLegendreIntegrate2DMatrixForMuonDecay(const MyQuadrature* quad,
                         prefactor_2 * (mat->m1_mat_ab[id_num][i][n + j] +
                                        mat->m1_mat_ab[id_num][n + i][j]) +
                         prefactor_3 * mat->m1_mat_ab[id_num][n + i][n + j]
+                    );
+
+            // Number, anumu
+            result_1->integrand[id_anum] +=
+                w_ij * (prefactor_1 * mat->m1_mat_em[id_anum][i][j] +
+                        prefactor_2 * (mat->m1_mat_em[id_anum][i][n + j] +
+                                       mat->m1_mat_em[id_anum][n + i][j]) +
+                        prefactor_3 * mat->m1_mat_em[id_anum][n + i][n + j]
+                    );
+            result_1->integrand[total_num_species + id_anum] +=
+                w_ij * (prefactor_1 * mat->m1_mat_ab[id_anum][i][j] +
+                        prefactor_2 * (mat->m1_mat_ab[id_anum][i][n + j] +
+                                       mat->m1_mat_ab[id_anum][n + i][j]) +
+                        prefactor_3 * mat->m1_mat_ab[id_anum][n + i][n + j]
                     );
 
             // Number, anue
@@ -974,32 +988,74 @@ void GaussLegendreIntegrate2DMatrixForMuonDecay(const MyQuadrature* quad,
                         prefactor_3 * mat->m1_mat_ab[id_anue][n + i][n + j]
                     );
 
+            // Number, nue
+            result_1->integrand[id_nue] +=
+                w_ij * (prefactor_1 * mat->m1_mat_em[id_nue][i][j] +
+                        prefactor_2 * (mat->m1_mat_em[id_nue][i][n + j] +
+                                       mat->m1_mat_em[id_nue][n + i][j]) +
+                        prefactor_3 * mat->m1_mat_em[id_nue][n + i][n + j]
+                    );
+            result_1->integrand[total_num_species + id_nue] +=
+                w_ij * (prefactor_1 * mat->m1_mat_ab[id_nue][i][j] +
+                        prefactor_2 * (mat->m1_mat_ab[id_nue][i][n + j] +
+                                       mat->m1_mat_ab[id_nue][n + i][j]) +
+                        prefactor_3 * mat->m1_mat_ab[id_nue][n + i][n + j]
+                    );
+
             // Energy, numu
             result_2->integrand[id_num] +=
-                w_ij * (prefactor_1 * w_numu_0 * mat->m1_mat_em[id_num][i][j] +
-                        prefactor_2 * (w_numu_0 * mat->m1_mat_em[id_num][i][n + j] +
-                                       w_numu_1 * mat->m1_mat_em[id_num][n + i][j]) +
-                        prefactor_3 * w_numu_1 * mat->m1_mat_em[id_num][n + i][n + j]
+                w_ij * (prefactor_1 * w_mu_0 * mat->m1_mat_em[id_num][i][j] +
+                        prefactor_2 * (w_mu_0 * mat->m1_mat_em[id_num][i][n + j] +
+                                       w_mu_1 * mat->m1_mat_em[id_num][n + i][j]) +
+                        prefactor_3 * w_mu_1 * mat->m1_mat_em[id_num][n + i][n + j]
                     );
             result_2->integrand[total_num_species + id_num] +=
-                w_ij * (prefactor_1 * w_numu_0 * mat->m1_mat_ab[id_num][i][j] +
-                        prefactor_2 * (w_numu_0 * mat->m1_mat_ab[id_num][i][n + j] +
-                                       w_numu_1 * mat->m1_mat_ab[id_num][n + i][j]) +
-                        prefactor_3 * w_numu_1 * mat->m1_mat_ab[id_num][n + i][n + j]
+                w_ij * (prefactor_1 * w_mu_0 * mat->m1_mat_ab[id_num][i][j] +
+                        prefactor_2 * (w_mu_0 * mat->m1_mat_ab[id_num][i][n + j] +
+                                       w_mu_1 * mat->m1_mat_ab[id_num][n + i][j]) +
+                        prefactor_3 * w_mu_1 * mat->m1_mat_ab[id_num][n + i][n + j]
+                    );
+
+            // Energy, anumu
+            result_2->integrand[id_anum] +=
+                w_ij * (prefactor_1 * w_mu_0 * mat->m1_mat_em[id_anum][i][j] +
+                        prefactor_2 * (w_mu_0 * mat->m1_mat_em[id_anum][i][n + j] +
+                                       w_mu_1 * mat->m1_mat_em[id_anum][n + i][j]) +
+                        prefactor_3 * w_mu_1 * mat->m1_mat_em[id_anum][n + i][n + j]
+                    );
+            result_2->integrand[total_num_species + id_anum] +=
+                w_ij * (prefactor_1 * w_mu_0 * mat->m1_mat_ab[id_anum][i][j] +
+                        prefactor_2 * (w_mu_0 * mat->m1_mat_ab[id_anum][i][n + j] +
+                                       w_mu_1 * mat->m1_mat_ab[id_anum][n + i][j]) +
+                        prefactor_3 * w_mu_1 * mat->m1_mat_ab[id_anum][n + i][n + j]
                     );
 
             // Energy, anue
             result_2->integrand[id_anue] +=
-                w_ij * (prefactor_1 * w_anue_0 * mat->m1_mat_em[id_anue][i][j] +
-                        prefactor_2 * (w_anue_1 * mat->m1_mat_em[id_anue][i][n + j] +
-                                       w_anue_0 * mat->m1_mat_em[id_anue][n + i][j]) +
-                        prefactor_3 * w_anue_1 * mat->m1_mat_em[id_anue][n + i][n + j]
+                w_ij * (prefactor_1 * w_e_0 * mat->m1_mat_em[id_anue][i][j] +
+                        prefactor_2 * (w_e_1 * mat->m1_mat_em[id_anue][i][n + j] +
+                                       w_e_0 * mat->m1_mat_em[id_anue][n + i][j]) +
+                        prefactor_3 * w_e_1 * mat->m1_mat_em[id_anue][n + i][n + j]
                     );
             result_2->integrand[total_num_species + id_anue] +=
-                w_ij * (prefactor_1 * w_anue_0 * mat->m1_mat_ab[id_anue][i][j] +
-                        prefactor_2 * (w_anue_1 * mat->m1_mat_ab[id_anue][i][n + j] +
-                                       w_anue_0 * mat->m1_mat_ab[id_anue][n + i][j]) +
-                        prefactor_3 * w_anue_1 * mat->m1_mat_ab[id_anue][n + i][n + j]
+                w_ij * (prefactor_1 * w_e_0 * mat->m1_mat_ab[id_anue][i][j] +
+                        prefactor_2 * (w_e_1 * mat->m1_mat_ab[id_anue][i][n + j] +
+                                       w_e_0 * mat->m1_mat_ab[id_anue][n + i][j]) +
+                        prefactor_3 * w_e_1 * mat->m1_mat_ab[id_anue][n + i][n + j]
+                    );
+
+            // Energy, nue
+            result_2->integrand[id_nue] +=
+                w_ij * (prefactor_1 * w_e_0 * mat->m1_mat_em[id_nue][i][j] +
+                        prefactor_2 * (w_e_1 * mat->m1_mat_em[id_nue][i][n + j] +
+                                       w_e_0 * mat->m1_mat_em[id_nue][n + i][j]) +
+                        prefactor_3 * w_e_1 * mat->m1_mat_em[id_nue][n + i][n + j]
+                    );
+            result_2->integrand[total_num_species + id_nue] +=
+                w_ij * (prefactor_1 * w_e_0 * mat->m1_mat_ab[id_nue][i][j] +
+                        prefactor_2 * (w_e_1 * mat->m1_mat_ab[id_nue][i][n + j] +
+                                       w_e_0 * mat->m1_mat_ab[id_nue][n + i][j]) +
+                        prefactor_3 * w_e_1 * mat->m1_mat_ab[id_nue][n + i][n + j]
                     );
         }
     }

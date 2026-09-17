@@ -265,7 +265,6 @@ NuDistributionParams NuEquilibriumParams(const MyEOSParams* eos_pars)
     const BS_REAL mu_e  = eos_pars->mu_e;  // [MeV]
     const BS_REAL mu_p  = eos_pars->mu_p;  // [MeV]
     const BS_REAL mu_n  = eos_pars->mu_n;  // [MeV]
-    const BS_REAL mu_mu = eos_pars->mu_mu; // [MeV]
 
     BS_ASSERT(T > zero && T < thousand,
               "Given temperature is either negative or beyond 1 GeV (T=%e).",
@@ -292,6 +291,8 @@ NuDistributionParams NuEquilibriumParams(const MyEOSParams* eos_pars)
 
     else if constexpr (total_num_species == 6)
     {
+        const BS_REAL mu_mu = eos_pars->mu_mu; // [MeV]
+        
         out.eta_t[id_nue]  = (mu_e - mu_n + mu_p) / T;
         out.eta_t[id_anue] = -out.eta_t[id_nue];
         out.eta_t[id_num]  = (mu_mu - mu_n + mu_p) / T;

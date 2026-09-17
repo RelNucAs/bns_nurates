@@ -251,8 +251,8 @@ typedef struct InelasticScattKernelParams InelasticScattKernelParams;
  */
 struct MuonDecayKernelParams
 {
-    BS_REAL omega_numu;       // muon neutrino energy
-    BS_REAL omega_anue;       // electron anti-neutrino energy
+    BS_REAL omega_mu;       // muon (anti)neutrino energy
+    BS_REAL omega_e;        // electron (anti)neutrino energy
 };
 typedef struct MuonDecayKernelParams MuonDecayKernelParams;
 
