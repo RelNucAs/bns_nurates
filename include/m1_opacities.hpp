@@ -1320,8 +1320,8 @@ M1MatrixKokkos2D ComputeNMSIntegrand(const MyQuadrature* quad, BS_REAL t,
 
             u1 = umin + (t - umin) * x_i;
             u2 = t + (umax - t) * x_i;
-            min1 = Kokkos::min(u1, vmax);
-            min2 = Kokkos::min(u2, vmax);
+            min1 = Kokkos::fmin(u1, vmax);
+            min2 = Kokkos::fmin(u2, vmax);
 
             for (int j = 0; j < n; ++j)
             {
@@ -1489,8 +1489,8 @@ M1MatrixKokkos2D ComputeNMSIntegrand(const MyQuadrature* quad, BS_REAL t,
 
             u1 = umin + (t - umin) * x_i;
             u2 = t + (umax - t) * x_i;
-            min1 = Kokkos::min(u1, vmax);
-            min2 = Kokkos::min(u2, vmax);
+            min1 = Kokkos::fmin(u1, vmax);
+            min2 = Kokkos::fmin(u2, vmax);
 
             for (int j = 0; j < n; ++j)
             {
@@ -1890,7 +1890,7 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
     const BS_REAL s_neps = temp_multiple * temp;
     constexpr BS_REAL s_mudec = kBS_Mmu / 3.; 
     // s_nms depends on the grid boundaries:
-    const BS_REAL s_nms = Kokkos::max(two * umin, Kokkos::min(four * s_neps, five_sixths * umax));
+    const BS_REAL s_nms = Kokkos::fmax(two * umin, Kokkos::fmin(four * s_neps, five_sixths * umax));
 
     BS_REAL s_beta_el[total_num_species] = {0}, s_beta_muon[total_num_species] = {0},
             s_iso[total_num_species] = {0};
@@ -2482,7 +2482,7 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     const BS_REAL s_neps = temp_multiple * temp;
     constexpr BS_REAL s_mudec = kBS_Mmu / 3.;
     // s_nms depends on the grid boundaries:
-    const BS_REAL s_nms = Kokkos::max(two * umin, Kokkos::min(four * s_neps, five_sixths * umax));
+    const BS_REAL s_nms = Kokkos::fmax(two * umin, Kokkos::fmin(four * s_neps, five_sixths * umax));
 
     BS_REAL s_beta_el[total_num_species] = {0}, s_beta_muon[total_num_species];
     BS_REAL s_iso[total_num_species] = {0};
@@ -3465,7 +3465,7 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
     {
         s_pair[i] = temp_multiple * my_grey_opacity_params->eos_pars.temp;
         s_neps[i] = nu;
-        s_nms[i] = Kokkos::max(3. * wmin, Kokkos::min(nu, two_over_three * wmax));
+        s_nms[i] = Kokkos::fmax(3. * wmin, Kokkos::fmin(nu, two_over_three * wmax));
         s_mudec[i] = Mmu_over_three;
     }
 

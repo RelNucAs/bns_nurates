@@ -847,8 +847,8 @@ void GaussLegendreIntegrate2DMatrixForNMS(const MyQuadrature* quad,
 
             u1 = umin + (t - umin) * x_i;
             u2 = t + (umax - t) * x_i;
-            min1 = Kokkos::min(u1, vmax);
-            min2 = Kokkos::min(u2, vmax);
+            min1 = Kokkos::fmin(u1, vmax);
+            min2 = Kokkos::fmin(u2, vmax);
             prefactor1 = (t - umin) * min1;
             prefactor2 = (umax - t) * min2;
 

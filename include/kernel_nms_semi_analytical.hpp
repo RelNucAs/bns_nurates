@@ -218,8 +218,8 @@ BS_REAL NMS_SemiAnalyticalKernel(const BS_REAL T, const BS_REAL mu, const BS_REA
                         const BS_REAL alpha, const BS_REAL beta, const BS_REAL gamma, const BS_REAL delta,
                         const BS_REAL wpbar, const BS_REAL wpzero)
 {
-    BS_REAL min_val = Kokkos::min(wpbar, w);
-    BS_REAL max_val = Kokkos::max(wpbar, w);
+    BS_REAL min_val = Kokkos::fmin(wpbar, w);
+    BS_REAL max_val = Kokkos::fmax(wpbar, w);
     BS_REAL epsilon = 0.2 * wpzero;
 
     if (wp <= (wpzero - epsilon)){
