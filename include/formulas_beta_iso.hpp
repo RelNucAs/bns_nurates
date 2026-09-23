@@ -211,21 +211,13 @@ void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
         }
     }
 
-    // @TODO: eventually think about a specifically designed function for
-    // (1-FermiDistr)
+    const BS_REAL blk_e = OneMinusFermiDistr(E_e, T, +mu_lepton);
+    const BS_REAL blk_p = OneMinusFermiDistr(E_p, T, -mu_lepton);
 
     // Neutrino emissivity [s^-1], Eq.(C15), remove c to get output in nm^-1
-    out[1] =
-        kBS_Beta_Const * etapn * (cap_term * fd_e + dec_term * (one - fd_p));
-    // Neutrino absorptivity [s^-1]
-    out[0] = out[1] * SafeExp((omega - (mu_p + mu_lepton - mu_n)) / T);
-
-    // without detailed balance
-    // out[0] = kAbsEmConst * etanp * (cap_term * (1. - fd_e) + dec_term *
-    // fd_p); // Neutrino absorptivity [s-1], Eq.(C13) BS_REAL mu_nue =
-    // (eos_pars->mu_e - eos_pars->mu_n + eos_pars->mu_p) / temp; out[0] =
-    // kAbsEmConst * etanp * cap_term / (1. + Kokkos::exp(eos_pars->mu_e / temp -
-    // FDI_p5(mu_nue)/FDI_p4(mu_nue)));
+    out[1] = kBS_Beta_Const * etapn * (cap_term * fd_e + dec_term * blk_p);
+    // Neutrino absorptivity [s^-1], Eq.(C13)
+    out[0] = kBS_Beta_Const * etanp * (cap_term * blk_e + dec_term * fd_p);
 
     cap_term = zero;
     dec_term = zero;
@@ -256,15 +248,13 @@ void AbsOpacitySingleLep(const BS_REAL omega, OpacityParams* opacity_pars,
         }
     }
 
-    // Antineutrino emissivity [s^-1], Eq.(C20), remove c to get output in nm^-1
-    out[3] =
-        kBS_Beta_Const * etanp * (cap_term * fd_p + dec_term * (one - fd_e));
-    // Antineutrino absorptivity [s^-1]
-    out[2] = out[3] * SafeExp((omega - (mu_n - mu_p - mu_lepton)) / T);
+    const BS_REAL blk_e_bar = OneMinusFermiDistr(E_e, T, +mu_lepton);
+    const BS_REAL blk_p_bar = OneMinusFermiDistr(E_p, T, -mu_lepton);
 
-    // without detailed balance
-    // out[2] = kAbsEmConst * etapn * (cap_term * (1 - fd_p) + dec_term * fd_e);
-    // // Antineutrino absorptivity [s-1], Eq.(C19)
+    // Antineutrino emissivity [s^-1], Eq.(C20), remove c to get output in nm^-1
+    out[3] = kBS_Beta_Const * etanp * (cap_term * fd_p + dec_term * blk_e_bar);
+    // Antineutrino absorptivity [s^-1], Eq.(C19)
+    out[2] = kBS_Beta_Const * etapn * (cap_term * blk_p_bar + dec_term * fd_e);
 
     BS_ASSERT(isfinite(out[1]) && out[1] >= zero,
               "Invalid beta-process nue emissivity.");
