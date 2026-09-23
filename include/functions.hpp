@@ -4394,6 +4394,38 @@ BS_REAL FermiDistr(const BS_REAL e, const BS_REAL temp, const BS_REAL mu)
     }
 }
 
+/* Pauli blocking factor 1 - FermiDistr(e, temp, mu).
+ *
+ * Evaluating this as a literal subtraction cancels catastrophically for
+ * e - mu << -temp, where FermiDistr rounds to exactly one.  Both branches
+ * below return the blocking factor as a ratio that stays well conditioned.
+ *
+ * Inputs:
+ * 	e     [MeV] : energy
+ * 	temp  [MeV] : temperature
+ * 	mu    [MeV] : chemical potential
+ */
+KOKKOS_INLINE_FUNCTION
+BS_REAL OneMinusFermiDistr(const BS_REAL e, const BS_REAL temp,
+                           const BS_REAL mu)
+{
+    const BS_REAL arg = (e - mu) / temp;
+    BS_REAL tmp;
+
+    constexpr BS_REAL one = 1;
+
+    if (arg > zero)
+    {
+        tmp = SafeExp(-arg);
+        return one / (tmp + one);
+    }
+    else
+    {
+        tmp = SafeExp(arg);
+        return tmp / (tmp + one);
+    }
+}
+
 /*===========================================================================*/
 
 // Calculates the exponential-dependent factors in the denominator of the NEPS
