@@ -64,8 +64,20 @@ namespace Kokkos {
 // Define dimension of tabulated PairT function
 #define dim_pair_t 100
 
-// Define maximum number of quadrature points
+// Define maximum number of quadrature points.
+//
+// INVARIANT: 2 * quad->nx <= BS_N_MAX.  The split-interval integrands write
+// out[idx][n + i] for i < n, so a quadrature of order nx needs 2*nx slots.
+// The default of 20 therefore supports nx <= 10.
+//
+// This also sizes every private per-work-item array in the library
+// (MyQuadrature::points/w, out_iso, out_beta_*, and the GaussLegendre
+// temporaries), so on GPU it directly controls occupancy.  Override it at
+// build time to match the quadrature the run actually uses: AthenaK's
+// production configuration is nurates_quad_nx = 6, needing only 12.
+#ifndef BS_N_MAX
 #define BS_N_MAX 20
+#endif
 
 /* ==================================================================================
  * Integration structures
@@ -489,12 +501,8 @@ typedef struct M1Opacities M1Opacities;
 struct M1OpacitiesNonThermalSeparated
 {
     /* Number coefficients */
-    BS_REAL eta_0_th[total_num_species];     // number emissivity coefficient, THERMAL processes only
-    BS_REAL kappa_0_a_th[total_num_species]; // number absorption coefficient, THERMAL processes only
-    BS_REAL eta_0_non_th[total_num_species];     // number emissivity coefficient,
-                                                 // non-thermal (NEPS / inelastic scatt) part only
-    BS_REAL kappa_0_a_non_th[total_num_species]; // number absorption coefficient,
-                                                 // non-thermal (NEPS / inelastic scatt) part only
+    BS_REAL eta_0[total_num_species];     // number emissivity coefficient
+    BS_REAL kappa_0_a[total_num_species]; // number absorption coefficient
 
     /* Energy coefficients */
     BS_REAL eta_th[total_num_species];          // energy emissivity coefficient

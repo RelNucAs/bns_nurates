@@ -1079,13 +1079,23 @@ M1MatrixKokkos2D ComputeNEPSIntegrand(const MyQuadrature* quad, BS_REAL t,
 //   M1MatrixKokkos2D m = ComputeDoubleIntegrand(quad, t, gop, stim_abs);
 //   GaussLegendreIntegrate2DMatrixForM1Coeffs(quad, &m, t, n2d, e2d);
 // (accumulates into *n2d, *e2d which the caller initialised to zero).
+//
+// In the production six-point quadrature there are only twelve distinct
+// transformed energies (t*x_i and t/x_i), but the upper-triangular pair loop
+// visits them 90 times. TotalNuF is pure for fixed distribution parameters,
+// so cache those twelve x four values. The accumulation loop and its order
+// remain unchanged. Keep the generic specialization for non-production
+// quadrature sizes to avoid allocating this cache unnecessarily.
+template <bool cache_six_point_distributions>
 KOKKOS_INLINE_FUNCTION
-void AddPairBremDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
-                                    GreyOpacityParams* gop, const int stim_abs,
-                                    MyQuadratureIntegrand* n2d,
-                                    MyQuadratureIntegrand* e2d)
+void AddPairBremDoubleIntegralFusedImpl(const MyQuadrature* quad, BS_REAL t,
+                                        GreyOpacityParams* gop, const int stim_abs,
+                                        MyQuadratureIntegrand* n2d,
+                                        MyQuadratureIntegrand* e2d)
 {
     constexpr BS_REAL one  = 1;
+    constexpr int six_point_n = 6;
+    constexpr int cached_nodes = cache_six_point_distributions ? 2 * six_point_n : 1;
     const int n  = quad->nx;
     const int N2 = 2 * n;
 
@@ -1099,6 +1109,41 @@ void AddPairBremDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
     BS_REAL acc_n_em[total_num_species] = {0}, acc_n_ab[total_num_species] = {0};
     BS_REAL acc_e_em[total_num_species] = {0}, acc_e_ab[total_num_species] = {0};
 
+    BS_REAL g_nodes[cached_nodes][total_num_species];
+    if constexpr (cache_six_point_distributions)
+    {
+        for (int node = 0; node < 2 * six_point_n; ++node)
+        {
+            const int point = (node < six_point_n) ? node : node - six_point_n;
+            const BS_REAL x = quad->points[point];
+            const BS_REAL nu = (node < six_point_n) ? t * x : t / x;
+            for (int s = 0; s < total_num_species; ++s)
+            {
+                g_nodes[node][s] = TotalNuF(nu, &gop->distr_pars, s);
+            }
+        }
+    }
+
+    // Loop-invariant kernel parameters.  PairKernels() takes a const pointer
+    // and reads only omega/omega_prime; both Brem kernels are likewise
+    // read-only on their params.  Writing these once instead of per pair
+    // removes ~550 stores per cell and leaves the same final state in
+    // gop->kernel_pars, so the result is bitwise unchanged.
+    if (use_pair)
+    {
+        gop->kernel_pars.pair_kernel_params.cos_theta = one;
+        gop->kernel_pars.pair_kernel_params.filter    = 0;
+        gop->kernel_pars.pair_kernel_params.lmax      = 0;
+        gop->kernel_pars.pair_kernel_params.mu        = one;
+        gop->kernel_pars.pair_kernel_params.mu_prime  = one;
+    }
+    if (use_brem && brem_impl != BREM_BRT06)
+    {
+        gop->kernel_pars.brem_kernel_params.l = 0;
+        gop->kernel_pars.brem_kernel_params.use_NN_medium_corr =
+            gop->opacity_pars.use_NN_medium_corr;
+    }
+
     for (int a = 0; a < N2; ++a)
     {
         const int    ia    = (a < n) ? a : a - n;
@@ -1110,7 +1155,14 @@ void AddPairBremDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
         BS_REAL g_a[total_num_species], bf_a[total_num_species];
         for (int s = 0; s < total_num_species; ++s)
         {
-            g_a[s]  = TotalNuF(nu_a, &gop->distr_pars, s);
+            if constexpr (cache_six_point_distributions)
+            {
+                g_a[s] = g_nodes[a][s];
+            }
+            else
+            {
+                g_a[s] = TotalNuF(nu_a, &gop->distr_pars, s);
+            }
             bf_a[s] = neglect_blocking ? one : (one - g_a[s]);
         }
 
@@ -1128,7 +1180,14 @@ void AddPairBremDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
             BS_REAL g_b[total_num_species], bf_b[total_num_species];
             for (int s = 0; s < total_num_species; ++s)
             {
-                g_b[s]  = TotalNuF(nu_b, &gop->distr_pars, s);
+                if constexpr (cache_six_point_distributions)
+                {
+                    g_b[s] = g_nodes[b][s];
+                }
+                else
+                {
+                    g_b[s] = TotalNuF(nu_b, &gop->distr_pars, s);
+                }
                 bf_b[s] = neglect_blocking ? one : (one - g_b[s]);
             }
 
@@ -1138,11 +1197,6 @@ void AddPairBremDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
 
             if (use_pair)
             {
-                gop->kernel_pars.pair_kernel_params.cos_theta = one;
-                gop->kernel_pars.pair_kernel_params.filter    = 0;
-                gop->kernel_pars.pair_kernel_params.lmax      = 0;
-                gop->kernel_pars.pair_kernel_params.mu        = one;
-                gop->kernel_pars.pair_kernel_params.mu_prime  = one;
                 gop->kernel_pars.pair_kernel_params.omega       = nu_a;
                 gop->kernel_pars.pair_kernel_params.omega_prime = nu_b;
                 MyKernelOutput pair_1, pair_2;
@@ -1166,9 +1220,6 @@ void AddPairBremDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
                 }
                 else
                 {
-                    gop->kernel_pars.brem_kernel_params.l = 0;
-                    gop->kernel_pars.brem_kernel_params.use_NN_medium_corr =
-                        gop->opacity_pars.use_NN_medium_corr;
                     brem_ker = BremKernelsLegCoeff(&gop->kernel_pars.brem_kernel_params,
                                                    &gop->eos_pars);
                 }
@@ -1229,12 +1280,41 @@ void AddPairBremDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
     }
 }
 
+// The node cache trades ~78 TotalNuF evaluations per cell for a 12 x 4 private
+// array that the pair loop indexes dynamically (g_nodes[b][s], b varying).  On
+// a CPU that is an unambiguous win.  On SYCL/Intel GPU a dynamically indexed
+// private array may not stay in registers, and TotalNuF is cheap pure ALU, so
+// the trade can invert.  Both paths are numerically identical -- the cached
+// energies are formed by the same operation sequence as the loop -- so this is
+// purely a performance switch.  Define BS_CACHE_2D_NODE_DISTRIBUTIONS=0 at
+// build time to fall back to recomputation and measure the difference.
+#ifndef BS_CACHE_2D_NODE_DISTRIBUTIONS
+#define BS_CACHE_2D_NODE_DISTRIBUTIONS 1
+#endif
+
+KOKKOS_INLINE_FUNCTION
+void AddPairBremDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
+                                    GreyOpacityParams* gop, const int stim_abs,
+                                    MyQuadratureIntegrand* n2d,
+                                    MyQuadratureIntegrand* e2d)
+{
+#if BS_CACHE_2D_NODE_DISTRIBUTIONS
+    if (quad->nx == 6)
+    {
+        AddPairBremDoubleIntegralFusedImpl<true>(quad, t, gop, stim_abs, n2d, e2d);
+        return;
+    }
+#endif
+    AddPairBremDoubleIntegralFusedImpl<false>(quad, t, gop, stim_abs, n2d, e2d);
+}
+
 // Helper: weighted NEPS kernel values for one (nu, nu_bar) energy pair.
 // Fills the "[.][j]" cell (em_j/ab_j) and the "[.][n+j]" cell (em_nj/ab_nj),
 // matching the inner body of ComputeNEPSIntegrand.
+template <int stim_abs>
 KOKKOS_INLINE_FUNCTION
 void NEPSCellFused(GreyOpacityParams* gop, BS_REAL nu, BS_REAL nu_bar,
-                   const int stim_abs, const bool neglect_blocking,
+                   const bool neglect_blocking,
                    BS_REAL em_j[total_num_species],  BS_REAL ab_j[total_num_species],
                    BS_REAL em_nj[total_num_species], BS_REAL ab_nj[total_num_species])
 {
@@ -1265,7 +1345,7 @@ void NEPSCellFused(GreyOpacityParams* gop, BS_REAL nu, BS_REAL nu_bar,
         const BS_REAL ta1 = inel_1.abs[s] * bf_nb;
         const BS_REAL te2 = inel_2.em[s]  * g_nu[s];
         const BS_REAL ta2 = inel_2.abs[s] * bf_nu;
-        if (stim_abs == 1)
+        if constexpr (stim_abs == 1)
         {
             ab_j[s]  = nu_fourth * g_nu[s] * (te1 + ta1);
             em_j[s]  = nu_fourth * te1;
@@ -1285,11 +1365,12 @@ void NEPSCellFused(GreyOpacityParams* gop, BS_REAL nu, BS_REAL nu_bar,
 // Fused inelastic-scattering (NEPS) double integral.  Equivalent to:
 //   M1MatrixKokkos2D m = ComputeNEPSIntegrand(quad, t, gop, stim_abs);
 //   GaussLegendreIntegrate2DMatrixForNEPS(quad, &m, t, n2d, e2d);
+template <int stim_abs>
 KOKKOS_INLINE_FUNCTION
-void AddNEPSDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
-                                GreyOpacityParams* gop, const int stim_abs,
-                                MyQuadratureIntegrand* n2d,
-                                MyQuadratureIntegrand* e2d)
+void AddNEPSDoubleIntegralFusedImpl(const MyQuadrature* quad, BS_REAL t,
+                                    GreyOpacityParams* gop,
+                                    MyQuadratureIntegrand* n2d,
+                                    MyQuadratureIntegrand* e2d)
 {
     constexpr BS_REAL half = 0.5, one = 1;
     const int n = quad->nx;
@@ -1320,10 +1401,10 @@ void AddNEPSDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
             BS_REAL em_inj[total_num_species], ab_inj[total_num_species];
             BS_REAL em_nij[total_num_species], ab_nij[total_num_species];
             BS_REAL em_ninj[total_num_species],ab_ninj[total_num_species];
-            NEPSCellFused(gop, nu1, nb1, stim_abs, neglect_blocking,
-                          em_ij, ab_ij, em_inj, ab_inj);
-            NEPSCellFused(gop, nu2, nb2, stim_abs, neglect_blocking,
-                          em_nij, ab_nij, em_ninj, ab_ninj);
+            NEPSCellFused<stim_abs>(gop, nu1, nb1, neglect_blocking,
+                                    em_ij, ab_ij, em_inj, ab_inj);
+            NEPSCellFused<stim_abs>(gop, nu2, nb2, neglect_blocking,
+                                    em_nij, ab_nij, em_ninj, ab_ninj);
 
             for (int s = 0; s < total_num_species; ++s)
             {
@@ -1346,6 +1427,30 @@ void AddNEPSDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
         n2d->integrand[total_num_species + s] += acc_n_ab[s] * half_t_sqr;
         e2d->integrand[0 + s]                 += acc_e_em[s] * half_t_sqr;
         e2d->integrand[total_num_species + s] += acc_e_ab[s] * half_t_sqr;
+    }
+}
+
+// stim_abs is fixed for a whole run, but was previously branched on inside the
+// innermost species loop (4 x 144 = 576 evaluations per cell).  Resolve it once
+// per cell instead.  Ported from upstream commit 65ac27e on 'muons_branch',
+// which applied the same transformation to the pre-fused NEPS integrand and
+// measured a speed-up.  neglect_blocking stays a runtime select: it is a cheap
+// ternary that the compiler hoists, and templating it too would double the
+// instantiation count of this loop for little gain.
+KOKKOS_INLINE_FUNCTION
+void AddNEPSDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
+                                GreyOpacityParams* gop, const int stim_abs,
+                                MyQuadratureIntegrand* n2d,
+                                MyQuadratureIntegrand* e2d)
+{
+    BS_ASSERT((stim_abs == 0) || (stim_abs == 1));
+    if (stim_abs == 1)
+    {
+        AddNEPSDoubleIntegralFusedImpl<1>(quad, t, gop, n2d, e2d);
+    }
+    else
+    {
+        AddNEPSDoubleIntegralFusedImpl<0>(quad, t, gop, n2d, e2d);
     }
 }
 
@@ -1594,12 +1699,9 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
 /* Computes the opacities for the M1 code, with thermal and
  * non-thermal processes treated separately.
  *
- * NEPS is treated separately from other reactions for the ENERGY
- * coefficients only: the NEPS energy emissivity/absorptivity are split out
- * into eta_non_th / kappa_a_non_th (so they can be kept out of Kirchhoff).
- * NEPS IS included in the number emissivity (eta_0) and absorptivity
- * (kappa_0_a), so the non-thermal energy source has a consistent number
- * partner and the neutrino mean energy E/N stays bounded.
+ * NEPS is treated separately from other reactions and is not included in the
+ * number emissivity (eta_0) or absorptivity (kappa_0_a). The NEPS energy
+ * emissivity/absorptivity are split out into eta_non_th / kappa_a_non_th.
  */
 KOKKOS_INLINE_FUNCTION
 M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSeparated(
@@ -1719,15 +1821,14 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     constexpr BS_REAL zero = 0;
     for (int idx = 0; idx < total_num_species; ++idx)
     {
-        m1_opacities_non_th_separated.kappa_0_a_th[idx]        = zero;
-        m1_opacities_non_th_separated.kappa_0_a_non_th[idx] = zero;
+        m1_opacities_non_th_separated.kappa_0_a[idx]        = zero;
         m1_opacities_non_th_separated.kappa_a_th[idx]       = zero;
         m1_opacities_non_th_separated.kappa_a_non_th[idx]   = zero;
         m1_opacities_non_th_separated.kappa_s[idx]          = zero;
     }
 
     /* Electron neutrinos */
-    m1_opacities_non_th_separated.eta_0_th[id_nue] =
+    m1_opacities_non_th_separated.eta_0[id_nue] =
         kBS_FourPi_hc3 * (kBS_FourPi_hc3 * n_integrals_2d.integrand[0] +
                           beta_n_em_integrals.integrand[id_nue]);
 
@@ -1738,19 +1839,13 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     m1_opacities_non_th_separated.eta_non_th[id_nue] =
         kBS_FourPi_hc3 * kBS_FourPi_hc3 * e_neps_2d.integrand[0];
 
-    m1_opacities_non_th_separated.eta_0_non_th[id_nue] =
-        kBS_FourPi_hc3 * kBS_FourPi_hc3 * n_neps_2d.integrand[0];
-
     if (n[id_nue] > THRESHOLD_N)
     {
-        m1_opacities_non_th_separated.kappa_0_a_th[id_nue] =
+        m1_opacities_non_th_separated.kappa_0_a[id_nue] =
             kBS_FourPi_hc3 / (c_light * n[id_nue]) *
             (kBS_FourPi_hc3 * n_integrals_2d.integrand[4] +
              beta_n_abs_integrals.integrand[id_nue]);
 
-        m1_opacities_non_th_separated.kappa_0_a_non_th[id_nue] =
-            kBS_FourPi_hc3 / (c_light * n[id_nue]) *
-            (kBS_FourPi_hc3 * n_neps_2d.integrand[4]);
     }
     if (J[id_nue] > THRESHOLD_J)
     {
@@ -1772,7 +1867,7 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     }
 
     /* Electron anti-neutrinos */
-    m1_opacities_non_th_separated.eta_0_th[id_anue] =
+    m1_opacities_non_th_separated.eta_0[id_anue] =
         kBS_FourPi_hc3 * (kBS_FourPi_hc3 * n_integrals_2d.integrand[1] +
                           beta_n_em_integrals.integrand[id_anue]);
 
@@ -1783,19 +1878,13 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     m1_opacities_non_th_separated.eta_non_th[id_anue] =
         kBS_FourPi_hc3 * kBS_FourPi_hc3 * e_neps_2d.integrand[1];
 
-    m1_opacities_non_th_separated.eta_0_non_th[id_anue] =
-        kBS_FourPi_hc3 * kBS_FourPi_hc3 * n_neps_2d.integrand[1];
-
     if (n[id_anue] > THRESHOLD_N)
     {
-        m1_opacities_non_th_separated.kappa_0_a_th[id_anue] =
+        m1_opacities_non_th_separated.kappa_0_a[id_anue] =
             kBS_FourPi_hc3 / (c_light * n[id_anue]) *
             (kBS_FourPi_hc3 * n_integrals_2d.integrand[5] +
              beta_n_abs_integrals.integrand[id_anue]);
 
-        m1_opacities_non_th_separated.kappa_0_a_non_th[id_anue] =
-            kBS_FourPi_hc3 / (c_light * n[id_anue]) *
-            (kBS_FourPi_hc3 * n_neps_2d.integrand[5]);
     }
     if (J[id_anue] > THRESHOLD_J)
     {
@@ -1814,7 +1903,7 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     }
 
     /* Heavy neutrinos */
-    m1_opacities_non_th_separated.eta_0_th[id_nux] =
+    m1_opacities_non_th_separated.eta_0[id_nux] =
         kBS_FourPi_hc3_sqr * n_integrals_2d.integrand[2];
 
     m1_opacities_non_th_separated.eta_th[id_nux] =
@@ -1823,18 +1912,12 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     m1_opacities_non_th_separated.eta_non_th[id_nux] =
         kBS_FourPi_hc3_sqr * e_neps_2d.integrand[2];
 
-    m1_opacities_non_th_separated.eta_0_non_th[id_nux] =
-        kBS_FourPi_hc3_sqr * n_neps_2d.integrand[2];
-
     if (n[id_nux] > THRESHOLD_N)
     {
-        m1_opacities_non_th_separated.kappa_0_a_th[id_nux] =
+        m1_opacities_non_th_separated.kappa_0_a[id_nux] =
             kBS_FourPi_hc3_sqr / (c_light * n[id_nux]) *
             n_integrals_2d.integrand[6];
 
-        m1_opacities_non_th_separated.kappa_0_a_non_th[id_nux] =
-            kBS_FourPi_hc3_sqr / (c_light * n[id_nux]) *
-            n_neps_2d.integrand[6];
     }
     if (J[id_nux] > THRESHOLD_J)
     {
@@ -1851,7 +1934,7 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     }
 
     /* Heavy anti-neutrinos */
-    m1_opacities_non_th_separated.eta_0_th[id_anux] =
+    m1_opacities_non_th_separated.eta_0[id_anux] =
         kBS_FourPi_hc3_sqr * n_integrals_2d.integrand[3];
 
     m1_opacities_non_th_separated.eta_th[id_anux] =
@@ -1860,22 +1943,14 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     m1_opacities_non_th_separated.eta_non_th[id_anux] =
         kBS_FourPi_hc3_sqr * e_neps_2d.integrand[3];
 
-    m1_opacities_non_th_separated.eta_0_non_th[id_anux] =
-        kBS_FourPi_hc3_sqr * n_neps_2d.integrand[3];
-
     if (n[id_anux] > THRESHOLD_N)
     {
-        m1_opacities_non_th_separated.kappa_0_a_th[id_anux] =
+        m1_opacities_non_th_separated.kappa_0_a[id_anux] =
             n[id_anux] == zero ?
                 zero :
                 kBS_FourPi_hc3_sqr / (c_light * n[id_anux]) *
                     n_integrals_2d.integrand[7];
 
-        m1_opacities_non_th_separated.kappa_0_a_non_th[id_anux] =
-            n[id_anux] == zero ?
-                zero :
-                kBS_FourPi_hc3_sqr / (c_light * n[id_anux]) *
-                    n_neps_2d.integrand[7];
     }
     if (J[id_anux] > THRESHOLD_J)
     {
@@ -2772,18 +2847,18 @@ void ComputeM1OpacitiesNonThermalSeparatedTeam(
         *result = {0};
         constexpr BS_REAL z = BS_REAL(0);
         for (int s = 0; s < total_num_species; ++s) {
-            result->kappa_0_a_th[s] = z; result->kappa_a_th[s] = z;
-            result->kappa_0_a_non_th[s] = z; result->kappa_a_non_th[s] = z; result->kappa_s[s] = z;
+            result->kappa_0_a[s] = z; result->kappa_a_th[s] = z;
+            result->kappa_a_non_th[s] = z; result->kappa_s[s] = z;
         }
 
         // nue
-        result->eta_0_th[id_nue]   = kBS_FourPi_hc3 *
+        result->eta_0[id_nue]      = kBS_FourPi_hc3 *
             (kBS_FourPi_hc3 * n2d.integrand[0] + bne.integrand[id_nue]);
         result->eta_th[id_nue]     = kBS_FourPi_hc3 *
             (kBS_FourPi_hc3 * e2d.integrand[0] + bje.integrand[id_nue]);
         result->eta_non_th[id_nue] = kBS_FourPi_hc3_sqr * en.integrand[0];
         if (n_m1[id_nue] > THRESHOLD_N)
-            result->kappa_0_a_th[id_nue] = kBS_FourPi_hc3 / (c_light * n_m1[id_nue]) *
+            result->kappa_0_a[id_nue] = kBS_FourPi_hc3 / (c_light * n_m1[id_nue]) *
                 (kBS_FourPi_hc3 * n2d.integrand[4] + bna.integrand[id_nue]);
         if (J_m1[id_nue] > THRESHOLD_J) {
             result->kappa_a_th[id_nue]     = (n_m1[id_nue] == z) ? z :
@@ -2795,13 +2870,13 @@ void ComputeM1OpacitiesNonThermalSeparatedTeam(
         }
 
         // anue
-        result->eta_0_th[id_anue]   = kBS_FourPi_hc3 *
+        result->eta_0[id_anue]      = kBS_FourPi_hc3 *
             (kBS_FourPi_hc3 * n2d.integrand[1] + bne.integrand[id_anue]);
         result->eta_th[id_anue]     = kBS_FourPi_hc3 *
             (kBS_FourPi_hc3 * e2d.integrand[1] + bje.integrand[id_anue]);
         result->eta_non_th[id_anue] = kBS_FourPi_hc3_sqr * en.integrand[1];
         if (n_m1[id_anue] > THRESHOLD_N)
-            result->kappa_0_a_th[id_anue] = kBS_FourPi_hc3 / (c_light * n_m1[id_anue]) *
+            result->kappa_0_a[id_anue] = kBS_FourPi_hc3 / (c_light * n_m1[id_anue]) *
                 (kBS_FourPi_hc3 * n2d.integrand[5] + bna.integrand[id_anue]);
         if (J_m1[id_anue] > THRESHOLD_J) {
             result->kappa_a_th[id_anue]     = kBS_FourPi_hc3 / (c_light * J_m1[id_anue]) *
@@ -2811,11 +2886,11 @@ void ComputeM1OpacitiesNonThermalSeparatedTeam(
         }
 
         // nux
-        result->eta_0_th[id_nux]   = kBS_FourPi_hc3_sqr * n2d.integrand[2];
+        result->eta_0[id_nux]      = kBS_FourPi_hc3_sqr * n2d.integrand[2];
         result->eta_th[id_nux]     = kBS_FourPi_hc3_sqr * e2d.integrand[2];
         result->eta_non_th[id_nux] = kBS_FourPi_hc3_sqr * en.integrand[2];
         if (n_m1[id_nux] > THRESHOLD_N)
-            result->kappa_0_a_th[id_nux] = kBS_FourPi_hc3_sqr / (c_light * n_m1[id_nux]) * n2d.integrand[6];
+            result->kappa_0_a[id_nux] = kBS_FourPi_hc3_sqr / (c_light * n_m1[id_nux]) * n2d.integrand[6];
         if (J_m1[id_nux] > THRESHOLD_J) {
             result->kappa_a_th[id_nux]     = kBS_FourPi_hc3_sqr / (c_light * J_m1[id_nux]) * e2d.integrand[6];
             result->kappa_a_non_th[id_nux] = kBS_FourPi_hc3_sqr / (c_light * J_m1[id_nux]) * en.integrand[6];
@@ -2823,11 +2898,11 @@ void ComputeM1OpacitiesNonThermalSeparatedTeam(
         }
 
         // anux
-        result->eta_0_th[id_anux]   = kBS_FourPi_hc3_sqr * n2d.integrand[3];
+        result->eta_0[id_anux]      = kBS_FourPi_hc3_sqr * n2d.integrand[3];
         result->eta_th[id_anux]     = kBS_FourPi_hc3_sqr * e2d.integrand[3];
         result->eta_non_th[id_anux] = kBS_FourPi_hc3_sqr * en.integrand[3];
         if (n_m1[id_anux] > THRESHOLD_N)
-            result->kappa_0_a_th[id_anux] = (n_m1[id_anux] == z) ? z :
+            result->kappa_0_a[id_anux] = (n_m1[id_anux] == z) ? z :
                 kBS_FourPi_hc3_sqr / (c_light * n_m1[id_anux]) * n2d.integrand[7];
         if (J_m1[id_anux] > THRESHOLD_J) {
             result->kappa_a_th[id_anux]     = kBS_FourPi_hc3_sqr / (c_light * J_m1[id_anux]) * e2d.integrand[7];
