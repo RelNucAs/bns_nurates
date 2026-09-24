@@ -1620,12 +1620,9 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
 /* Computes the opacities for the M1 code, with thermal and
  * non-thermal processes treated separately.
  *
- * NEPS is treated separately from other reactions for the ENERGY
- * coefficients only: the NEPS energy emissivity/absorptivity are split out
- * into eta_non_th / kappa_a_non_th (so they can be kept out of Kirchhoff).
- * NEPS IS included in the number emissivity (eta_0) and absorptivity
- * (kappa_0_a), so the non-thermal energy source has a consistent number
- * partner and the neutrino mean energy E/N stays bounded.
+ * NEPS is treated separately from other reactions and is not included in the
+ * number emissivity (eta_0) or absorptivity (kappa_0_a). The NEPS energy
+ * emissivity/absorptivity are split out into eta_non_th / kappa_a_non_th.
  */
 KOKKOS_INLINE_FUNCTION
 M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSeparated(
@@ -1745,15 +1742,14 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     constexpr BS_REAL zero = 0;
     for (int idx = 0; idx < total_num_species; ++idx)
     {
-        m1_opacities_non_th_separated.kappa_0_a_th[idx]        = zero;
-        m1_opacities_non_th_separated.kappa_0_a_non_th[idx] = zero;
+        m1_opacities_non_th_separated.kappa_0_a[idx]        = zero;
         m1_opacities_non_th_separated.kappa_a_th[idx]       = zero;
         m1_opacities_non_th_separated.kappa_a_non_th[idx]   = zero;
         m1_opacities_non_th_separated.kappa_s[idx]          = zero;
     }
 
     /* Electron neutrinos */
-    m1_opacities_non_th_separated.eta_0_th[id_nue] =
+    m1_opacities_non_th_separated.eta_0[id_nue] =
         kBS_FourPi_hc3 * (kBS_FourPi_hc3 * n_integrals_2d.integrand[0] +
                           beta_n_em_integrals.integrand[id_nue]);
 
@@ -1764,19 +1760,12 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     m1_opacities_non_th_separated.eta_non_th[id_nue] =
         kBS_FourPi_hc3 * kBS_FourPi_hc3 * e_neps_2d.integrand[0];
 
-    m1_opacities_non_th_separated.eta_0_non_th[id_nue] =
-        kBS_FourPi_hc3 * kBS_FourPi_hc3 * n_neps_2d.integrand[0];
-
     if (n[id_nue] > THRESHOLD_N)
     {
-        m1_opacities_non_th_separated.kappa_0_a_th[id_nue] =
+        m1_opacities_non_th_separated.kappa_0_a[id_nue] =
             kBS_FourPi_hc3 / (c_light * n[id_nue]) *
             (kBS_FourPi_hc3 * n_integrals_2d.integrand[4] +
              beta_n_abs_integrals.integrand[id_nue]);
-
-        m1_opacities_non_th_separated.kappa_0_a_non_th[id_nue] =
-            kBS_FourPi_hc3 / (c_light * n[id_nue]) *
-            (kBS_FourPi_hc3 * n_neps_2d.integrand[4]);
     }
     if (J[id_nue] > THRESHOLD_J)
     {
@@ -1798,7 +1787,7 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     }
 
     /* Electron anti-neutrinos */
-    m1_opacities_non_th_separated.eta_0_th[id_anue] =
+    m1_opacities_non_th_separated.eta_0[id_anue] =
         kBS_FourPi_hc3 * (kBS_FourPi_hc3 * n_integrals_2d.integrand[1] +
                           beta_n_em_integrals.integrand[id_anue]);
 
@@ -1809,19 +1798,12 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     m1_opacities_non_th_separated.eta_non_th[id_anue] =
         kBS_FourPi_hc3 * kBS_FourPi_hc3 * e_neps_2d.integrand[1];
 
-    m1_opacities_non_th_separated.eta_0_non_th[id_anue] =
-        kBS_FourPi_hc3 * kBS_FourPi_hc3 * n_neps_2d.integrand[1];
-
     if (n[id_anue] > THRESHOLD_N)
     {
-        m1_opacities_non_th_separated.kappa_0_a_th[id_anue] =
+        m1_opacities_non_th_separated.kappa_0_a[id_anue] =
             kBS_FourPi_hc3 / (c_light * n[id_anue]) *
             (kBS_FourPi_hc3 * n_integrals_2d.integrand[5] +
              beta_n_abs_integrals.integrand[id_anue]);
-
-        m1_opacities_non_th_separated.kappa_0_a_non_th[id_anue] =
-            kBS_FourPi_hc3 / (c_light * n[id_anue]) *
-            (kBS_FourPi_hc3 * n_neps_2d.integrand[5]);
     }
     if (J[id_anue] > THRESHOLD_J)
     {
@@ -1840,7 +1822,7 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     }
 
     /* Heavy neutrinos */
-    m1_opacities_non_th_separated.eta_0_th[id_nux] =
+    m1_opacities_non_th_separated.eta_0[id_nux] =
         kBS_FourPi_hc3_sqr * n_integrals_2d.integrand[2];
 
     m1_opacities_non_th_separated.eta_th[id_nux] =
@@ -1849,18 +1831,11 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     m1_opacities_non_th_separated.eta_non_th[id_nux] =
         kBS_FourPi_hc3_sqr * e_neps_2d.integrand[2];
 
-    m1_opacities_non_th_separated.eta_0_non_th[id_nux] =
-        kBS_FourPi_hc3_sqr * n_neps_2d.integrand[2];
-
     if (n[id_nux] > THRESHOLD_N)
     {
-        m1_opacities_non_th_separated.kappa_0_a_th[id_nux] =
+        m1_opacities_non_th_separated.kappa_0_a[id_nux] =
             kBS_FourPi_hc3_sqr / (c_light * n[id_nux]) *
             n_integrals_2d.integrand[6];
-
-        m1_opacities_non_th_separated.kappa_0_a_non_th[id_nux] =
-            kBS_FourPi_hc3_sqr / (c_light * n[id_nux]) *
-            n_neps_2d.integrand[6];
     }
     if (J[id_nux] > THRESHOLD_J)
     {
@@ -1877,7 +1852,7 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     }
 
     /* Heavy anti-neutrinos */
-    m1_opacities_non_th_separated.eta_0_th[id_anux] =
+    m1_opacities_non_th_separated.eta_0[id_anux] =
         kBS_FourPi_hc3_sqr * n_integrals_2d.integrand[3];
 
     m1_opacities_non_th_separated.eta_th[id_anux] =
@@ -1886,22 +1861,13 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     m1_opacities_non_th_separated.eta_non_th[id_anux] =
         kBS_FourPi_hc3_sqr * e_neps_2d.integrand[3];
 
-    m1_opacities_non_th_separated.eta_0_non_th[id_anux] =
-        kBS_FourPi_hc3_sqr * n_neps_2d.integrand[3];
-
     if (n[id_anux] > THRESHOLD_N)
     {
-        m1_opacities_non_th_separated.kappa_0_a_th[id_anux] =
+        m1_opacities_non_th_separated.kappa_0_a[id_anux] =
             n[id_anux] == zero ?
                 zero :
                 kBS_FourPi_hc3_sqr / (c_light * n[id_anux]) *
                     n_integrals_2d.integrand[7];
-
-        m1_opacities_non_th_separated.kappa_0_a_non_th[id_anux] =
-            n[id_anux] == zero ?
-                zero :
-                kBS_FourPi_hc3_sqr / (c_light * n[id_anux]) *
-                    n_neps_2d.integrand[7];
     }
     if (J[id_anux] > THRESHOLD_J)
     {
@@ -2807,18 +2773,18 @@ void ComputeM1OpacitiesNonThermalSeparatedTeam(
         *result = {0};
         constexpr BS_REAL z = BS_REAL(0);
         for (int s = 0; s < total_num_species; ++s) {
-            result->kappa_0_a_th[s] = z; result->kappa_a_th[s] = z;
-            result->kappa_0_a_non_th[s] = z; result->kappa_a_non_th[s] = z; result->kappa_s[s] = z;
+            result->kappa_0_a[s] = z; result->kappa_a_th[s] = z;
+            result->kappa_a_non_th[s] = z; result->kappa_s[s] = z;
         }
 
         // nue
-        result->eta_0_th[id_nue]   = kBS_FourPi_hc3 *
+        result->eta_0[id_nue]      = kBS_FourPi_hc3 *
             (kBS_FourPi_hc3 * n2d.integrand[0] + bne.integrand[id_nue]);
         result->eta_th[id_nue]     = kBS_FourPi_hc3 *
             (kBS_FourPi_hc3 * e2d.integrand[0] + bje.integrand[id_nue]);
         result->eta_non_th[id_nue] = kBS_FourPi_hc3_sqr * en.integrand[0];
         if (n_m1[id_nue] > THRESHOLD_N)
-            result->kappa_0_a_th[id_nue] = kBS_FourPi_hc3 / (c_light * n_m1[id_nue]) *
+            result->kappa_0_a[id_nue] = kBS_FourPi_hc3 / (c_light * n_m1[id_nue]) *
                 (kBS_FourPi_hc3 * n2d.integrand[4] + bna.integrand[id_nue]);
         if (J_m1[id_nue] > THRESHOLD_J) {
             result->kappa_a_th[id_nue]     = (n_m1[id_nue] == z) ? z :
@@ -2830,13 +2796,13 @@ void ComputeM1OpacitiesNonThermalSeparatedTeam(
         }
 
         // anue
-        result->eta_0_th[id_anue]   = kBS_FourPi_hc3 *
+        result->eta_0[id_anue]      = kBS_FourPi_hc3 *
             (kBS_FourPi_hc3 * n2d.integrand[1] + bne.integrand[id_anue]);
         result->eta_th[id_anue]     = kBS_FourPi_hc3 *
             (kBS_FourPi_hc3 * e2d.integrand[1] + bje.integrand[id_anue]);
         result->eta_non_th[id_anue] = kBS_FourPi_hc3_sqr * en.integrand[1];
         if (n_m1[id_anue] > THRESHOLD_N)
-            result->kappa_0_a_th[id_anue] = kBS_FourPi_hc3 / (c_light * n_m1[id_anue]) *
+            result->kappa_0_a[id_anue] = kBS_FourPi_hc3 / (c_light * n_m1[id_anue]) *
                 (kBS_FourPi_hc3 * n2d.integrand[5] + bna.integrand[id_anue]);
         if (J_m1[id_anue] > THRESHOLD_J) {
             result->kappa_a_th[id_anue]     = kBS_FourPi_hc3 / (c_light * J_m1[id_anue]) *
@@ -2846,11 +2812,11 @@ void ComputeM1OpacitiesNonThermalSeparatedTeam(
         }
 
         // nux
-        result->eta_0_th[id_nux]   = kBS_FourPi_hc3_sqr * n2d.integrand[2];
+        result->eta_0[id_nux]      = kBS_FourPi_hc3_sqr * n2d.integrand[2];
         result->eta_th[id_nux]     = kBS_FourPi_hc3_sqr * e2d.integrand[2];
         result->eta_non_th[id_nux] = kBS_FourPi_hc3_sqr * en.integrand[2];
         if (n_m1[id_nux] > THRESHOLD_N)
-            result->kappa_0_a_th[id_nux] = kBS_FourPi_hc3_sqr / (c_light * n_m1[id_nux]) * n2d.integrand[6];
+            result->kappa_0_a[id_nux] = kBS_FourPi_hc3_sqr / (c_light * n_m1[id_nux]) * n2d.integrand[6];
         if (J_m1[id_nux] > THRESHOLD_J) {
             result->kappa_a_th[id_nux]     = kBS_FourPi_hc3_sqr / (c_light * J_m1[id_nux]) * e2d.integrand[6];
             result->kappa_a_non_th[id_nux] = kBS_FourPi_hc3_sqr / (c_light * J_m1[id_nux]) * en.integrand[6];
@@ -2858,11 +2824,11 @@ void ComputeM1OpacitiesNonThermalSeparatedTeam(
         }
 
         // anux
-        result->eta_0_th[id_anux]   = kBS_FourPi_hc3_sqr * n2d.integrand[3];
+        result->eta_0[id_anux]      = kBS_FourPi_hc3_sqr * n2d.integrand[3];
         result->eta_th[id_anux]     = kBS_FourPi_hc3_sqr * e2d.integrand[3];
         result->eta_non_th[id_anux] = kBS_FourPi_hc3_sqr * en.integrand[3];
         if (n_m1[id_anux] > THRESHOLD_N)
-            result->kappa_0_a_th[id_anux] = (n_m1[id_anux] == z) ? z :
+            result->kappa_0_a[id_anux] = (n_m1[id_anux] == z) ? z :
                 kBS_FourPi_hc3_sqr / (c_light * n_m1[id_anux]) * n2d.integrand[7];
         if (J_m1[id_anux] > THRESHOLD_J) {
             result->kappa_a_th[id_anux]     = kBS_FourPi_hc3_sqr / (c_light * J_m1[id_anux]) * e2d.integrand[7];
@@ -2875,4 +2841,3 @@ void ComputeM1OpacitiesNonThermalSeparatedTeam(
 #endif // KOKKOS_CORE_HPP
 
 #endif // BNS_NURATES_SRC_OPACITIES_M1_OPACITIES_HPP_
-
