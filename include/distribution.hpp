@@ -177,7 +177,7 @@ void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
             FDI_p2(out_distribution_pars->eta_t[nuid]) * J /
             (FDI_p3(out_distribution_pars->eta_t[nuid]) * n);
 
-        if (out_distribution_pars->temp_t[nuid] >= 200 || y >= y3){
+        if (out_distribution_pars->temp_t[nuid] >= 500 || y >= y3){
 
             out_distribution_pars->switch_to_equilibrium_bns[nuid] = true;
         }
@@ -310,7 +310,7 @@ BS_REAL TotalNuF(const BS_REAL omega, const NuDistributionParams* distr_pars,
                  MyEOSParams* eos_pars, const int nuid)
 {
 
-    // Fallback to equilibrium if T_trapped>200 MeV or y>0.8
+    // Fallback to equilibrium if T_trap>500 MeV or y>0.8
     if (distr_pars->switch_to_equilibrium_bns[nuid] == true){
 
         const BS_REAL T    = eos_pars->temp;        // [MeV]
