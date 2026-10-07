@@ -330,7 +330,8 @@ void test_distribution()
 
             NuDistributionParams my_nudistributionparams =
                 CalculateDistrParamsFromM1(&my_grey_opacity_params.m1_pars,
-                                           &my_grey_opacity_params.eos_pars);
+                                           &my_grey_opacity_params.eos_pars,
+                                           &my_grey_opacity_params.opacity_pars);
 
             printf("Kokkos parallel for: Done calculating distribution "
                    "function parameters from M1 ...\n");

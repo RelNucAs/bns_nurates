@@ -1481,6 +1481,18 @@ M1Opacities ComputeM1OpacitiesGenericFormalism(
                                        stim_abs, &n_integrals_2d, &e_integrals_2d);
     }
 
+    // Optionally drop pair and brem from nue/anue (emission [0,1], absorption
+    // [4,5]); the heavy-lepton entries [2,3,6,7] are kept.
+    if (my_grey_opacity_params->opacity_pars.exclude_pair_brem_nue_anue)
+    {
+        const int idx_e[4] = {0, 1, 4, 5};
+        for (int i = 0; i < 4; ++i)
+        {
+            n_integrals_2d.integrand[idx_e[i]] = 0;
+            e_integrals_2d.integrand[idx_e[i]] = 0;
+        }
+    }
+
     MyQuadratureIntegrand n_neps_2d = {0};
     MyQuadratureIntegrand e_neps_2d = {0};
 
@@ -1720,6 +1732,18 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
         // Fused fill+reduce: no 25.6 KB M1MatrixKokkos2D on the stack.
         AddPairBremDoubleIntegralFused(quad_2d, s_pair, my_grey_opacity_params,
                                        stim_abs, &n_integrals_2d, &e_integrals_2d);
+    }
+
+    // Optionally drop pair and brem from nue/anue (emission [0,1], absorption
+    // [4,5]); the heavy-lepton entries [2,3,6,7] are kept.
+    if (my_grey_opacity_params->opacity_pars.exclude_pair_brem_nue_anue)
+    {
+        const int idx_e[4] = {0, 1, 4, 5};
+        for (int i = 0; i < 4; ++i)
+        {
+            n_integrals_2d.integrand[idx_e[i]] = 0;
+            e_integrals_2d.integrand[idx_e[i]] = 0;
+        }
     }
 
     MyQuadratureIntegrand n_neps_2d = {0};

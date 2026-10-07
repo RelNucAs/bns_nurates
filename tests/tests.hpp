@@ -732,7 +732,8 @@ inline void TestM1OpacitiesSelectedPoints(char filename[200], const int nx,
             // Distribution parameters
             my_grey_opacity_params.distr_pars =
                 CalculateDistrParamsFromM1(&my_grey_opacity_params.m1_pars,
-                                           &my_grey_opacity_params.eos_pars);
+                                           &my_grey_opacity_params.eos_pars,
+                                           &my_grey_opacity_params.opacity_pars);
 
             printf("# Generating and populating quadrature on GPU\n");
 

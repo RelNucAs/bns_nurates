@@ -50,8 +50,15 @@ parameter
  */
 KOKKOS_INLINE_FUNCTION
 void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
-                                NuDistributionParams* out_distribution_pars)
+                                NuDistributionParams* out_distribution_pars,
+                                const OpacityParams* opacity_pars = nullptr)
 {
+    // Both guards are on by default.  A null opacity_pars (callers that
+    // predate this argument) therefore enables them, as does the struct default.
+    const bool eq_fallback_temp =
+        (opacity_pars == nullptr) || opacity_pars->use_eq_fallback_temp;
+    const bool eq_fallback_y =
+        (opacity_pars == nullptr) || opacity_pars->use_eq_fallback_y;
     // constexpr BS_REAL zero         = 0;
     constexpr BS_REAL one          = 1;
     constexpr BS_REAL three_halves = 1.5;
@@ -177,7 +184,11 @@ void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
             FDI_p2(out_distribution_pars->eta_t[nuid]) * J /
             (FDI_p3(out_distribution_pars->eta_t[nuid]) * n);
 
-        if (out_distribution_pars->temp_t[nuid] >= 500 || y >= y3){
+        // TotalNuF() reads switch_to_equilibrium_bns and returns a pure
+        // Fermi-Dirac distribution for that flavour.  With both guards off the
+        // flag is never raised, so TotalNuF keeps the reconstructed form.
+        if ((eq_fallback_temp && out_distribution_pars->temp_t[nuid] >= 500) ||
+            (eq_fallback_y && y >= y3)) {
 
             out_distribution_pars->switch_to_equilibrium_bns[nuid] = true;
         }
@@ -347,11 +358,12 @@ BS_REAL TotalNuF(const BS_REAL omega, const NuDistributionParams* distr_pars,
  */
 KOKKOS_INLINE_FUNCTION
 NuDistributionParams CalculateDistrParamsFromM1(const M1Quantities* M1_pars,
-                                                const MyEOSParams* eos_pars)
+                                                const MyEOSParams* eos_pars,
+                                                const OpacityParams* opacity_pars = nullptr)
 {
     NuDistributionParams out;
 
-    CalculateThickParamsFromM1(M1_pars, &out);
+    CalculateThickParamsFromM1(M1_pars, &out, opacity_pars);
     CalculateThinParamsFromM1(M1_pars, &out);
 
     return out;

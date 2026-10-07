@@ -348,6 +348,18 @@ struct OpacityParams
                              // NN brem kernel as in Fischer16
     bool neglect_blocking;   // flag for neglecting blocking factor of
                              // antineutrino in pair (nu + anu) processes
+    bool exclude_pair_brem_nue_anue; // flag for dropping pair and brem from the
+                                     // electron (anti-)neutrino rates; the
+                                     // heavy-lepton rates keep them
+
+    // Fallbacks from the RECONSTRUCTED distribution to a Fermi-Dirac one,
+    // applied per flavour inside CalculateThickParamsFromM1.  Both default to
+    // true, matching upstream.  Disable either one to keep the reconstructed
+    // distribution where that guard would otherwise trigger.
+    bool use_eq_fallback_temp;  // fall back where the trapped temperature
+                                // reaches 500 MeV
+    bool use_eq_fallback_y;     // fall back where y reaches y3 (~0.79012), the
+                                // upper edge of the eta_t fit range
 };
 typedef struct OpacityParams OpacityParams;
 __attribute__((unused)) static OpacityParams opacity_params_default_all = {
@@ -358,7 +370,10 @@ __attribute__((unused)) static OpacityParams opacity_params_default_all = {
     .use_decay           = true,
     .brem_implementation = BREM_HR98,
     .use_NN_medium_corr  = true,
-    .neglect_blocking    = true};
+    .neglect_blocking    = true,
+    .exclude_pair_brem_nue_anue = false,
+    .use_eq_fallback_temp = true,
+    .use_eq_fallback_y    = true};
 __attribute__((unused)) static OpacityParams opacity_params_default_none = {
     .use_dU              = false,
     .use_dm_eff          = false,
@@ -367,7 +382,10 @@ __attribute__((unused)) static OpacityParams opacity_params_default_none = {
     .use_decay           = false,
     .brem_implementation = BREM_HR98,
     .use_NN_medium_corr  = false,
-    .neglect_blocking    = false};
+    .neglect_blocking    = false,
+    .exclude_pair_brem_nue_anue = false,
+    .use_eq_fallback_temp = true,
+    .use_eq_fallback_y    = true};
 
 /* ==================================================================================
  * M1 structures
