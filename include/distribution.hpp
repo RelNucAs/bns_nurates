@@ -50,15 +50,8 @@ parameter
  */
 KOKKOS_INLINE_FUNCTION
 void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
-                                NuDistributionParams* out_distribution_pars,
-                                const OpacityParams* opacity_pars = nullptr)
+                                NuDistributionParams* out_distribution_pars)
 {
-    // Both guards are on by default.  A null opacity_pars (callers that
-    // predate this argument) therefore enables them, as does the struct default.
-    const bool eq_fallback_temp =
-        (opacity_pars == nullptr) || opacity_pars->use_eq_fallback_temp;
-    const bool eq_fallback_y =
-        (opacity_pars == nullptr) || opacity_pars->use_eq_fallback_y;
     // constexpr BS_REAL zero         = 0;
     constexpr BS_REAL one          = 1;
     constexpr BS_REAL three_halves = 1.5;
@@ -183,15 +176,6 @@ void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
         out_distribution_pars->temp_t[nuid] =
             FDI_p2(out_distribution_pars->eta_t[nuid]) * J /
             (FDI_p3(out_distribution_pars->eta_t[nuid]) * n);
-
-        // TotalNuF() reads switch_to_equilibrium_bns and returns a pure
-        // Fermi-Dirac distribution for that flavour.  With both guards off the
-        // flag is never raised, so TotalNuF keeps the reconstructed form.
-        if ((eq_fallback_temp && out_distribution_pars->temp_t[nuid] >= 500) ||
-            (eq_fallback_y && y >= y3)) {
-
-            out_distribution_pars->switch_to_equilibrium_bns[nuid] = true;
-        }
     }
 }
 
@@ -318,23 +302,8 @@ NuDistributionParams NuEquilibriumParams(const MyEOSParams* eos_pars)
  */
 KOKKOS_INLINE_FUNCTION
 BS_REAL TotalNuF(const BS_REAL omega, const NuDistributionParams* distr_pars,
-                 MyEOSParams* eos_pars, const int nuid)
+                 const int nuid)
 {
-
-    // Fallback to equilibrium if T_trap>500 MeV or y>0.8
-    if (distr_pars->switch_to_equilibrium_bns[nuid] == true){
-
-        const BS_REAL T    = eos_pars->temp;        // [MeV]
-        const BS_REAL mu_e = eos_pars->mu_e;        // [MeV]
-        const BS_REAL mu_p = eos_pars->mu_p;        // [MeV]
-        const BS_REAL mu_n = eos_pars->mu_n;        // [MeV]
-        const BS_REAL mu_nue = mu_e - mu_n + mu_p;
-        const BS_REAL mu_nu = (nuid == id_nue) ? mu_nue : 
-                      (nuid == id_anue) ? -mu_nue : 0;
-
-        return FermiDistr(omega, T, mu_nu);
-    }
-
     [[maybe_unused]] constexpr BS_REAL zero = 0;
 
     BS_ASSERT(omega >= zero, "Neutrino energy is negative.");
@@ -358,12 +327,11 @@ BS_REAL TotalNuF(const BS_REAL omega, const NuDistributionParams* distr_pars,
  */
 KOKKOS_INLINE_FUNCTION
 NuDistributionParams CalculateDistrParamsFromM1(const M1Quantities* M1_pars,
-                                                const MyEOSParams* eos_pars,
-                                                const OpacityParams* opacity_pars = nullptr)
+                                                const MyEOSParams* eos_pars)
 {
     NuDistributionParams out;
 
-    CalculateThickParamsFromM1(M1_pars, &out, opacity_pars);
+    CalculateThickParamsFromM1(M1_pars, &out);
     CalculateThinParamsFromM1(M1_pars, &out);
 
     return out;

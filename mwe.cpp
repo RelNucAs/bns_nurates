@@ -361,8 +361,7 @@ int main(int argc, char* argv[])
     // Compute neutrino distribution parameters from neutrino number/energy
     // densities
     my_grey_opacity_params.distr_pars = CalculateDistrParamsFromM1(
-        &my_grey_opacity_params.m1_pars, &my_grey_opacity_params.eos_pars,
-        &my_grey_opacity_params.opacity_pars);
+        &my_grey_opacity_params.m1_pars, &my_grey_opacity_params.eos_pars);
 
     // Compute and output spectral emissivities and inverse mean free paths (not
     // in the stimulated absorption formalism)
