@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 
     // Select corrections to rates
     my_grey_opacity_params.opacity_pars.use_dm_eff =
-        0; // Do not use effective mass correction to beta processes
+        1; // Do not use effective mass correction to beta processes
     my_grey_opacity_params.opacity_pars.use_dU =
         1; // Use effective potential correction to beta processes
     my_grey_opacity_params.opacity_pars.use_decay =
@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
     my_grey_opacity_params.opacity_pars.use_WM_sc =
         1; // Activate isoenergetic scattering weak magnetism correction
     my_grey_opacity_params.opacity_pars.brem_implementation =
-        BREM_GP19; // Select bremsstrahlung implementation: Guo and Pinedo 2019
+        BREM_HR98; // Select bremsstrahlung implementation: Guo and Pinedo 2019
     my_grey_opacity_params.opacity_pars.use_NN_medium_corr =
         1; // Activate NN bremsstrahlung medium correction as in Fischer+16
 

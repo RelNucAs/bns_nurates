@@ -84,6 +84,10 @@ inline constexpr double kBS_Gf =
 // Nuclear saturation number density
 inline constexpr BS_REAL kBS_Saturation_n = 0.15e+18; // [nm^-3]
 
+// CKM matrix elements
+inline constexpr double kBS_Vud = 0.9743; //average between different measurements
+                                          // see [Bargiotti et al, 2000]
+
 
 ////////////////////////////////////////
 // COUPLING CONSTANTS AND FORM FACTORS//
@@ -105,9 +109,9 @@ inline constexpr double kBS_Hpa = 0.5 * kBS_Ga;
 // BETA-PROCESSES CONSTANTS //
 //////////////////////////////
 
-// Constant in Eq.(C13,C15,C19,C20) of Bruenn
+// Constant in Eq.(C13,C15,C19,C20) of Bruenn (* V_ud^2)
 inline constexpr BS_REAL kBS_Beta_Const =
-    (POW3(kBS_Clight) * POW2(kBS_Gf0 * kBS_Hbar)) *
+    (POW3(kBS_Clight) * POW2(kBS_Gf0 * kBS_Hbar)) * POW2(kBS_Vud) *
     (POW2(kBS_Gv) + 3. * POW2(kBS_Ga)) / kBS_Pi;
 
 
