@@ -192,6 +192,42 @@ typedef struct MyFunctionMultiD MyFunctionMultiD;
  * ==================================================================================
  */
 
+/* BremHR98Channel struct
+ *
+ * EOS-dependent quantities of a single NN channel of the HR98 kernel
+ */
+struct BremHR98Channel
+{
+    BS_REAL weight;          // kBS_Brem_Const * n_nuc * gamma / T, times 28/3 for
+                             // the np channel and the Fischer16 medium correction
+    BS_REAL half_gamma_g_sq; // (gamma * g / 2)^2, Eqn. (35)
+    BS_REAL s_d_etafac;      // f(u) / eta_star^(5/2), Eqn. (46)
+    BS_REAL log_s_d_etafac;  // log(s_d_etafac)
+    BS_REAL f_etafac;        // 1 / (1 + eta_star^2), Eqn. (50)
+    BS_REAL g_etafac;        // eta_star^(1/2) / (eta_star + 0.2), Eqn. (50)
+    BS_REAL h;               // h, Eqn. (50)
+};
+typedef struct BremHR98Channel BremHR98Channel;
+
+/* BremHR98EOSTerms struct
+ *
+ * EOS-dependent quantities of the HR98 kernel (see BremHR98PrecomputeEOS)
+ */
+struct BremHR98EOSTerms
+{
+    BS_REAL temp;                // temperature [MeV]
+    BS_REAL y;                   // clamped y, Eqn. (38)
+    BS_REAL s_nd_yexp;           // 2 - exp(-y/12), Eqn. (45)
+    BS_REAL s_nd_ypoly;          // 5 y^2 / 3 + 1, Eqn. (45)
+    BS_REAL s_nd_yshift;         // pi^(1/8) + y, Eqn. (45)
+    BS_REAL f_yfac;              // 1 + y^4, Eqn. (50)
+    BS_REAL g_yfac;              // 0.0044 y / (0.8 + 0.06 y^1.05), Eqn. (50)
+    BS_REAL p;                   // p, Eqn. (50)
+    BS_REAL minus_inv_p;         // -1/p
+    BremHR98Channel channel[3];  // nn, pp, np channels
+};
+typedef struct BremHR98EOSTerms BremHR98EOSTerms;
+
 /* BremKernelParams struct
  *
  * Parameters for Bremsstrahlung kernel
@@ -457,6 +493,18 @@ struct GreyOpacityParams
 };
 typedef struct GreyOpacityParams GreyOpacityParams;
 
+/* SpectralIntegrandParams struct
+ *
+ * Parameters passed to SpectralIntegrand: the opacity parameters and the
+ * EOS-dependent part of the HR98 brem kernel, computed once per spectral
+ * opacity evaluation (see ComputeSpectralOpacitiesNotStimulatedAbs)
+ */
+struct SpectralIntegrandParams
+{
+    GreyOpacityParams grey_pars;
+    BremHR98EOSTerms brem_hr98_fromEOS;
+};
+typedef struct SpectralIntegrandParams SpectralIntegrandParams;
 
 /* M1Opacities struct
  *

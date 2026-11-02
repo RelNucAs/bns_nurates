@@ -102,9 +102,13 @@ int main(int argc, char* argv[])
     my_grey_opacity_params.opacity_pars.use_WM_sc =
         1; // Activate isoenergetic scattering weak magnetism correction
     my_grey_opacity_params.opacity_pars.brem_implementation =
-        BREM_GP19; // Select bremsstrahlung implementation: Guo and Pinedo 2019
+        BREM_HR98; // Select bremsstrahlung implementation
+                   // Guo & Pinedo 2019 (GP19)
+                   // Burrows, Reddy & Thompson 2006 (BRT06)
+                   // Hannestad & Raffelt 1998 (HR98)
     my_grey_opacity_params.opacity_pars.use_NN_medium_corr =
         1; // Activate NN bremsstrahlung medium correction as in Fischer+16
+           // (for HR98)
 
     // Pass thermodynamic conditions
     my_grey_opacity_params.eos_pars.nb =

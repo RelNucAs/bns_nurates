@@ -236,6 +236,12 @@ void Beta1DIntegrand(const MyQuadrature* quad, GreyOpacityParams* grey_pars,
     return;
 }
 
+
+// -------------------------------------------------------------------------------------- //
+// ------------------------- OLD GRAY RATES IMPLEMENTATION ------------------------------ //
+// -------------------------------------------------------------------------------------- //
+
+/*
 KOKKOS_INLINE_FUNCTION
 void AddBetaReactionToIntegrand(int n, BS_REAL* nu_array,
                                 GreyOpacityParams* grey_pars,
@@ -755,6 +761,7 @@ void AddCommonWeightsToIntegrand(int n, BS_REAL* nu_array,
     }
     return;
 }
+*/
 
 /* Compute the 2d integrands for all reactions from Leonardo's notes [Eqns. (51)
  * & (52)] There are a total of two expressions for 'e' and 'x' neutrinos, so 4
@@ -770,6 +777,7 @@ void AddCommonWeightsToIntegrand(int n, BS_REAL* nu_array,
  * Note that there are no BS_REAL integrals for the computation of the
  * scattering coefficient.
  */
+/*
 KOKKOS_INLINE_FUNCTION
 M1MatrixKokkos2D ComputeDoubleIntegrand(const MyQuadrature* quad, BS_REAL t,
                                         GreyOpacityParams* grey_pars,
@@ -854,12 +862,13 @@ M1MatrixKokkos2D ComputeDoubleIntegrand(const MyQuadrature* quad, BS_REAL t,
     // */
 
     // //////////////////////////////////////////////
-
+/*
     AddCommonWeightsToIntegrand(n, nu_array, grey_pars, &out, stim_abs);
 
     return out;
 }
-
+*/
+/*
 KOKKOS_INLINE_FUNCTION
 M1MatrixKokkos2D ComputeNEPSIntegrand(const MyQuadrature* quad, BS_REAL t,
                                       GreyOpacityParams* grey_pars,
@@ -1054,7 +1063,12 @@ M1MatrixKokkos2D ComputeNEPSIntegrand(const MyQuadrature* quad, BS_REAL t,
 
     return out;
 }
+*/
 
+
+// -------------------------------------------------------------------------------------- //
+// ------------------------- NEW GRAY RATES IMPLEMENTATION ------------------------------ //
+// -------------------------------------------------------------------------------------- //
 
 // ===========================================================================
 // FUSED 2D integrals (no materialized M1MatrixKokkos2D)
@@ -1655,8 +1669,6 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     constexpr BS_REAL five          = 5;
     constexpr BS_REAL temp_multiple = 0.5 * 4.364;
     const BS_REAL s_pair            = temp_multiple * temp;
-    // const BS_REAL s_pair              = temp * (FDI_p4(eta_e) / FDI_p3(eta_e)
-    // + FDI_p4(-eta_e) / FDI_p3(-eta_e));
     const BS_REAL s_nux  = three_halves * temp;
     const BS_REAL s_neps = temp_multiple * temp;
 
@@ -1946,18 +1958,10 @@ ComputeM1OpacitiesNonThermalSeparated(
 }
 
 
-/* SpectralIntegrandParams struct
- *
- * Parameters passed to SpectralIntegrand: the opacity parameters and the
- * EOS-dependent part of the HR98 brem kernel, computed once per spectral
- * opacity evaluation (see ComputeSpectralOpacitiesNotStimulatedAbs)
- */
-struct SpectralIntegrandParams
-{
-    GreyOpacityParams grey_pars;
-    BremHR98EOSTerms brem_hr98_fromEOS;
-};
-typedef struct SpectralIntegrandParams SpectralIntegrandParams;
+
+// -------------------------------------------------------------------------------------- //
+// ------------------------- SPECTRAL RATES IMPLEMENTATION ------------------------------ //
+// -------------------------------------------------------------------------------------- //
 
 /* Compute the integrands for the computation of the spectral emissivity and
  * inverse mean free path */
@@ -2002,8 +2006,6 @@ MyQuadratureIntegrand SpectralIntegrand(BS_REAL* var, void* p)
         my_grey_opacity_params->kernel_pars.pair_kernel_params.lmax      = zero;
         my_grey_opacity_params->kernel_pars.pair_kernel_params.mu        = one;
         my_grey_opacity_params->kernel_pars.pair_kernel_params.mu_prime  = one;
-        // pair_kernels_m1 = PairKernels(&my_eos_params,
-        // &my_grey_opacity_params->kernel_pars.pair_kernel_params);
         pair_kernels_m1 = PairKernels(
             &my_eos_params,
             &my_grey_opacity_params->kernel_pars.pair_kernel_params);
@@ -2194,23 +2196,14 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
         g_nu[idx] = TotalNuF(nu, &my_grey_opacity_params->distr_pars, idx);
     }
 
-    // const BS_REAL eta_e = my_grey_opacity_params->eos_pars.mu_e /
-    //                       my_grey_opacity_params->eos_pars.temp;
-
     constexpr BS_REAL temp_multiple = 0.5 * 4.364;
 
     BS_REAL s_pair[8], s_neps[8];
 
     for (int i = 0; i < 8; ++i)
     {
-        // s[i] = 1.5 * my_grey_opacity_params->eos_pars.temp;
         s_pair[i] = temp_multiple * my_grey_opacity_params->eos_pars.temp;
         s_neps[i] = nu;
-        // s[i] = my_grey_opacity_params->eos_pars.temp;
-        // s[i] = 2.425E-03 * my_grey_opacity_params->eos_pars.temp;
-        // s[i] =
-        // 0.5 * my_grey_opacity_params->eos_pars.temp *
-        // (FDI_p4(eta_e) / FDI_p3(eta_e) + FDI_p4(-eta_e) / FDI_p3(-eta_e));
     }
 
     MyQuadratureIntegrand integrals_pair_1d =
