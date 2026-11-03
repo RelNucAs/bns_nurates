@@ -58,6 +58,7 @@ void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
     [[maybe_unused]] constexpr BS_REAL one_third    = 1. / 3.;
 
     constexpr BS_REAL twenty = 20;
+    constexpr BS_REAL minus_twenty = -20;
     constexpr BS_REAL thirty = 30;
 
     constexpr BS_REAL y1 = 0.005;
@@ -167,6 +168,10 @@ void CalculateThickParamsFromM1(const M1Quantities* M1_pars,
         out_distribution_pars->eta_t[nuid] =
             (out_distribution_pars->eta_t[nuid] < twenty)
                 ? out_distribution_pars->eta_t[nuid] : twenty;
+
+        out_distribution_pars->eta_t[nuid] =
+            (out_distribution_pars->eta_t[nuid] > minus_twenty)
+                ? out_distribution_pars->eta_t[nuid] : minus_twenty;
 
         out_distribution_pars->temp_t[nuid] =
             FDI_p2(out_distribution_pars->eta_t[nuid]) * J /
@@ -336,6 +341,7 @@ NuDistributionParams CalculateDistrParamsFromM1(const M1Quantities* M1_pars,
  *
  * Computes this for three neutrino species
  */
+/*
 KOKKOS_INLINE_FUNCTION
 MyQuadratureIntegrand NuNumberIntegrand(BS_REAL* x, void* p)
 {
@@ -351,7 +357,7 @@ MyQuadratureIntegrand NuNumberIntegrand(BS_REAL* x, void* p)
 
     return result;
 }
-
+*/
 /* Compute neutrino number density
  *
  * Computes this for three neutrino species
@@ -394,6 +400,7 @@ inline MyQuadratureIntegrand NuNumber(NuDistributionParams* distr_pars)
  *
  * Computes this for three neutrino species
  */
+/*
 inline MyQuadratureIntegrand NuEnergyIntegrand(BS_REAL* x, void* p)
 {
     MyQuadratureIntegrand result = NuNumberIntegrand(x, p);
@@ -405,7 +412,7 @@ inline MyQuadratureIntegrand NuEnergyIntegrand(BS_REAL* x, void* p)
 
     return result;
 }
-
+*/
 /* Compute neutrino energy density
  *
  * Computes this for three neutrino species
