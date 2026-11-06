@@ -4431,6 +4431,403 @@ BS_REAL OneMinusFermiDistr(const BS_REAL e, const BS_REAL temp,
 // Calculates the exponential-dependent factors in the denominator of the NEPS
 // kernel
 KOKKOS_INLINE_FUNCTION
+BS_REAL FDI_0_ex(const BS_REAL y, const BS_REAL ex_in)
+{
+    BS_REAL x, ex, t, s;
+    BS_REAL fd = 0.;
+
+    x = -Kokkos::fabs(y);
+
+    constexpr BS_REAL A[10] = {1,
+                               22696.2126132366633,
+                               5222.0667923565138,
+                               357.623326425354522,
+                               6.9167792879948140,
+                               0.00200096064827815813,
+                               45392.4252264733267,
+                               14539.5980679273792,
+                               1611.36476693109675,
+                               71.072178562726798};
+    constexpr BS_REAL B[16] = {
+        159.601717762460980,   23.7193942338278703,    0.377783268730614356,
+        10.5181677709577503,   3.78181326142271599,    -0.441998676614933572,
+        -0.450072959113928254, -0.0734798777056723512, 0.000915454570009894267,
+        284.26032127745967,    315.2592651624449,      310.2713981221035,
+        206.21640678892182,    96.77898293084927,      35.456591489081173,
+        8.1762315442738975};
+    constexpr BS_REAL half = 0.5;
+
+    if (x < -two)
+    {
+        ex = ex_in;
+        t  = ex * fdi_litconst;
+
+        fd = ex *
+             (A[0] -
+              ex * (A[1] + t * (A[2] + t * (A[3] + t * (A[4] + t * A[5])))) /
+                  (A[6] + t * (A[7] + t * (A[8] + t * (A[9] + t)))));
+    }
+    else if (x <= zero)
+    {
+        s = -half * x;
+        t = one - s;
+
+        fd =
+            (B[0] +
+             t * (B[1] +
+                  t * (B[2] +
+                       t * (B[3] +
+                            t * (B[4] +
+                                 t * (B[5] +
+                                      t * (B[6] + t * (B[7] + t * B[8])))))))) /
+            (B[9] +
+             s * (B[10] +
+                  s * (B[11] +
+                       s * (B[12] +
+                            s * (B[13] + s * (B[14] + s * (B[15] + s)))))));
+    }
+    if (y > zero)
+    {
+        fd = fd + y;
+    }
+
+    return fd;
+}
+
+KOKKOS_INLINE_FUNCTION
+BS_REAL FDI_p1_ex(const BS_REAL y, const BS_REAL ex_in)
+{
+    BS_REAL x, ex, t, s;
+    BS_REAL fd = 0.;
+
+    x = -Kokkos::fabs(y);
+
+    constexpr BS_REAL A[10] = {1,
+                               22189.1070807945062,
+                               4915.92700908746777,
+                               322.901386168881348,
+                               5.9897442965804548,
+                               0.00397641173774375092,
+                               88756.428323178025,
+                               25002.3197546553836,
+                               2389.06277237306633,
+                               88.376214553692756};
+    constexpr BS_REAL B[17] = {
+        145.488167182330098,  251.392824471576922,   56.6537141912783024,
+        17.9918985363509694,  20.1369115558099802,   7.09659390228556164,
+        0.199701180197912643, -0.403173132925886253, 0.0792966701498222697,
+        606.0757707716040,    374.1806357435014,     252.1367051536344,
+        27.2746245830016,     -61.57766112137513,    -53.72117554363975,
+        -25.678454878692950,  -7.1995819520154718};
+    constexpr BS_REAL C[2] = {1.64493406684822644, 0.5};
+    constexpr BS_REAL half = 0.5;
+
+    if (x < -two)
+    {
+        ex = ex_in;
+        t  = ex * fdi_litconst;
+
+        fd = ex *
+             (A[0] -
+              ex * (A[1] + t * (A[2] + t * (A[3] + t * (A[4] + t * A[5])))) /
+                  (A[6] + t * (A[7] + t * (A[8] + t * (A[9] + t)))));
+    }
+    else if (x <= zero)
+    {
+        s = -half * x;
+        t = one - s;
+
+        fd =
+            (B[0] +
+             t * (B[1] +
+                  t * (B[2] +
+                       t * (B[3] +
+                            t * (B[4] +
+                                 t * (B[5] +
+                                      t * (B[6] + t * (B[7] - t * B[8])))))))) /
+            (B[9] +
+             s * (B[10] +
+                  s * (B[11] +
+                       s * (B[12] +
+                            s * (B[13] +
+                                 s * (B[14] +
+                                      s * (B[15] + s * (B[16] - s))))))));
+    }
+    if (y > zero)
+    {
+        fd = -fd + C[0] + C[1] * y * y;
+    }
+
+    return fd;
+}
+
+KOKKOS_INLINE_FUNCTION
+BS_REAL FDI_p2_ex(const BS_REAL y, const BS_REAL ex_in)
+{
+    BS_REAL x, ex, t, s;
+    BS_REAL fd = 0.;
+
+    x = -Kokkos::fabs(y);
+
+    constexpr BS_REAL A[8]  = {2,
+                               1914.06748184935743,
+                               273.085756700981399,
+                               8.5861610217850095,
+                               0.0161890243763741414,
+                               7656.2699273974454,
+                               1399.35442210906621,
+                               72.929152915475392};
+    constexpr BS_REAL B[17] = {
+        2711.49678259128843,  1299.85460914884154,  222.606134197895041,
+        172.881855215582924,  112.951038040682055,  24.0376482128898634,
+        -2.68393549333878715, -2.14077421411719935, 0.326188299771397236,
+        2517.1726659917047,   3038.7689794575778,   2541.7823512372631,
+        1428.0589853413436,   531.62378035996132,   122.54595216479181,
+        8.395768655115050,    -3.9142702096919080};
+    constexpr BS_REAL C[2] = {3.28986813369645287, 0.333333333333333333};
+    constexpr BS_REAL half = 0.5;
+
+    if (x < -two)
+    {
+        ex = ex_in;
+        t  = ex * fdi_litconst;
+
+        fd = ex * (A[0] - ex * (A[1] + t * (A[2] + t * (A[3] + t * A[4]))) /
+                              (A[5] + t * (A[6] + t * (A[7] + t))));
+    }
+    else if (x <= zero)
+    {
+        s = -half * x;
+        t = one - s;
+
+        fd =
+            (B[0] +
+             t * (B[1] +
+                  t * (B[2] +
+                       t * (B[3] +
+                            t * (B[4] +
+                                 t * (B[5] +
+                                      t * (B[6] + t * (B[7] - t * B[8])))))))) /
+            (B[9] +
+             s * (B[10] +
+                  s * (B[11] +
+                       s * (B[12] +
+                            s * (B[13] +
+                                 s * (B[14] +
+                                      s * (B[15] + s * (B[16] - s))))))));
+    }
+    if (y > zero)
+    {
+        fd = fd + y * (C[0] + C[1] * y * y);
+    }
+
+    return fd;
+}
+
+KOKKOS_INLINE_FUNCTION
+BS_REAL FDI_p3_ex(const BS_REAL y, const BS_REAL ex_in)
+{
+    BS_REAL x, ex, t, s, y2;
+    BS_REAL fd = 0.;
+
+    x = -Kokkos::fabs(y);
+
+    constexpr BS_REAL A[8]  = {6,
+                               5121.6401850302408,
+                               664.28706260743472,
+                               19.0856927562699544,
+                               0.0410982603688952131,
+                               13657.7071600806539,
+                               2136.54222460571183,
+                               92.376788603062645};
+    constexpr BS_REAL B[15] = {
+        7881.24597452900838, 4323.07526636309661, 1260.13125873282465,
+        653.359212389160499, 354.630774329461644, 113.373708671587772,
+        19.9559488532742796, 1.59407954898394322, 2570.7250703533430,
+        2972.7443644211129,  2393.9995533270879,  1259.0724833462608,
+        459.86413596901097,  112.60906419590854,  16.468882811659000};
+    constexpr BS_REAL C[3] = {11.3643939539669510, 4.93480220054467931, 0.25};
+    constexpr BS_REAL half = 0.5;
+
+    if (x < -two)
+    {
+        ex = ex_in;
+        t  = ex * fdi_litconst;
+
+        fd = ex * (A[0] - ex * (A[1] + t * (A[2] + t * (A[3] + t * A[4]))) /
+                              (A[5] + t * (A[6] + t * (A[7] + t))));
+    }
+    else if (x <= zero)
+    {
+        s = -half * x;
+        t = one - s;
+
+        fd = (B[0] +
+              t * (B[1] +
+                   t * (B[2] +
+                        t * (B[3] +
+                             t * (B[4] +
+                                  t * (B[5] + t * (B[6] + t * B[7]))))))) /
+             (B[8] +
+              s * (B[9] +
+                   s * (B[10] +
+                        s * (B[11] +
+                             s * (B[12] + s * (B[13] + s * (B[14] + s)))))));
+    }
+    if (y > zero)
+    {
+        y2 = y * y;
+        fd = -fd + C[0] + y2 * (C[1] + y2 * C[2]);
+    }
+
+    return fd;
+}
+
+KOKKOS_INLINE_FUNCTION
+BS_REAL FDI_p4_ex(const BS_REAL y, const BS_REAL ex_in)
+{
+    BS_REAL x, ex, t, s, y2;
+    BS_REAL fd = 0.;
+
+    x = -Kokkos::fabs(y);
+
+    constexpr BS_REAL A[8]  = {24,
+                               18247.2542465629199,
+                               2120.56302902849207,
+                               54.659507299984584,
+                               0.121876197098273914,
+                               24329.6723287505678,
+                               3261.01909656925521,
+                               117.071576489684022};
+    constexpr BS_REAL B[15] = {
+        33093.9102025608137, 19031.4783357798975, 5431.08357152245897,
+        2393.94262931609398, 1268.40017257978070, 418.662172475927160,
+        77.4108960876508190, 6.67374311450268357, 2645.4885670047153,
+        3236.2237702166948,  2500.5977847175497,  1278.0109577275445,
+        448.99020896813485,  105.86020755838874,  15.216887271751039};
+    constexpr BS_REAL C[3] = {45.4575758158678040, 6.57973626739290575, 0.2};
+    constexpr BS_REAL half = 0.5;
+
+    if (x < -two)
+    {
+        ex = ex_in;
+        t  = ex * fdi_litconst;
+
+        fd = ex * (A[0] - ex * (A[1] + t * (A[2] + t * (A[3] + t * A[4]))) /
+                              (A[5] + t * (A[6] + t * (A[7] + t))));
+    }
+    else if (x <= zero)
+    {
+        s = -half * x;
+        t = one - s;
+
+        fd = (B[0] +
+              t * (B[1] +
+                   t * (B[2] +
+                        t * (B[3] +
+                             t * (B[4] +
+                                  t * (B[5] + t * (B[6] + t * B[7]))))))) /
+             (B[8] +
+              s * (B[9] +
+                   s * (B[10] +
+                        s * (B[11] +
+                             s * (B[12] + s * (B[13] + s * (B[14] + s)))))));
+    }
+    if (y > zero)
+    {
+        y2 = y * y;
+        fd = fd + y * (C[0] + y2 * (C[1] + y2 * C[2]));
+    }
+
+    return fd;
+}
+
+KOKKOS_INLINE_FUNCTION
+BS_REAL FDI_p5_ex(const BS_REAL y, const BS_REAL ex_in)
+{
+    BS_REAL x, ex, t, s, y2;
+    BS_REAL fd = 0.;
+
+    x = -Kokkos::fabs(y);
+
+    constexpr BS_REAL A[8]  = {120,
+                               81190.938912603315,
+                               8368.4990332049831,
+                               190.753830813273698,
+                               0.413800735538960261,
+                               43301.8340867217726,
+                               4977.68099709243407,
+                               148.484432990224213};
+    constexpr BS_REAL B[15] = {
+        159651.547840031111, 96307.2005742063042, 26923.5693307648389,
+        9274.54751848368696, 4445.76333033698006, 1461.45267097859337,
+        272.164427980501432, 23.6526046298891619, 2522.7839609396783,
+        3244.5527999477567,  2403.0532924519756,  1176.7202478443275,
+        397.7596246691212,   91.84661231161838,   13.491911254479298};
+    constexpr BS_REAL C[4] = {236.532261911384425, 113.643939539669510,
+                              8.22467033424113218, 0.166666666666666667};
+    constexpr BS_REAL half = 0.5;
+
+    if (x < -two)
+    {
+        ex = ex_in;
+        t  = ex * fdi_litconst;
+
+        fd = ex * (A[0] - ex * (A[1] + t * (A[2] + t * (A[3] + t * A[4]))) /
+                              (A[5] + t * (A[6] + t * (A[7] + t))));
+    }
+    else if (x <= zero)
+    {
+        s = -half * x;
+        t = one - s;
+
+        fd = (B[0] +
+              t * (B[1] +
+                   t * (B[2] +
+                        t * (B[3] +
+                             t * (B[4] +
+                                  t * (B[5] + t * (B[6] + t * B[7]))))))) /
+             (B[8] +
+              s * (B[9] +
+                   s * (B[10] +
+                        s * (B[11] +
+                             s * (B[12] + s * (B[13] + s * (B[14] + s)))))));
+    }
+    if (y > zero)
+    {
+        y2 = y * y;
+
+        fd = -fd + C[0] + y2 * (C[1] + y2 * (C[2] + y2 * C[3]));
+    }
+
+    return fd;
+}
+
+/* Fermi-Dirac integrals of several orders at the same argument, sharing exp(-|y|)
+ * (bit-identical to the single-order functions) */
+KOKKOS_INLINE_FUNCTION
+BS_REAL FDIExpArg(const BS_REAL y)
+{
+    const BS_REAL x = -Kokkos::fabs(y);
+    return (x < -two) ? Kokkos::exp(x) : zero;
+}
+
+KOKKOS_INLINE_FUNCTION
+void FDI_p1to5(const BS_REAL y, BS_REAL* f)
+{
+    const BS_REAL ex = FDIExpArg(y);
+    f[0] = FDI_p1_ex(y, ex); f[1] = FDI_p2_ex(y, ex); f[2] = FDI_p3_ex(y, ex);
+    f[3] = FDI_p4_ex(y, ex); f[4] = FDI_p5_ex(y, ex);
+}
+
+KOKKOS_INLINE_FUNCTION
+void FDI_p3to5(const BS_REAL y, BS_REAL* f)
+{
+    const BS_REAL ex = FDIExpArg(y);
+    f[0] = FDI_p3_ex(y, ex); f[1] = FDI_p4_ex(y, ex); f[2] = FDI_p5_ex(y, ex);
+}
+
+KOKKOS_INLINE_FUNCTION
 BS_REAL NEPSExpFunc(BS_REAL x)
 {
     const BS_REAL exp_ = SafeExp(-Kokkos::fabs(x));

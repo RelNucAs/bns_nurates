@@ -12,6 +12,8 @@
 #include "kernels.hpp"
 #include "integration.hpp"
 #include "distribution.hpp"
+#include "opt_kernels.hpp"
+#include "opt_neps.hpp"
 
 /* Thresholds on the neutrino energy number and energy density. If values are
 below the thresholds, absorption opacities or scattering opacities are set to 0.
@@ -1123,6 +1125,26 @@ void AddPairBremDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
                                           gop->opacity_pars.use_NN_medium_corr);
     }
 
+    const NuDistrFast nuf_pb = NuDistrFastInit(&gop->distr_pars);
+    // Per-node quantities: distribution function and pair FDIs at eta -/+ nu/T
+    BS_REAL g_node[total_num_species][BS_N_MAX];
+    BS_REAL nu_node[BS_N_MAX];
+    PairNodeFDI fdi_node[BS_N_MAX];
+    const BS_REAL T_pair   = gop->eos_pars.temp;
+    const BS_REAL eta_pair = gop->eos_pars.mu_e / T_pair;
+    BS_REAL FDI_p3_e = 0, FDI_p4_e = 0;
+    if (use_pair) { FDI_p3_e = FDI_p3(eta_pair); FDI_p4_e = FDI_p4(eta_pair); }
+    for (int k = 0; k < N2; ++k)
+    {
+        const int ik = (k < n) ? k : k - n;
+        const BS_REAL x_k = quad->points[ik];
+        nu_node[k] = (k < n) ? t * x_k : t / x_k;
+        BS_REAL gk[total_num_species];
+        TotalNuFAll(nu_node[k], &nuf_pb, gk);
+        for (int s = 0; s < total_num_species; ++s) g_node[s][k] = gk[s];
+        if (use_pair) PairNodeFDIFill(eta_pair, nu_node[k] / T_pair, &fdi_node[k]);
+    }
+
     for (int a = 0; a < N2; ++a)
     {
         const int    ia    = (a < n) ? a : a - n;
@@ -1134,7 +1156,7 @@ void AddPairBremDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
         BS_REAL g_a[total_num_species], bf_a[total_num_species];
         for (int s = 0; s < total_num_species; ++s)
         {
-            g_a[s]  = TotalNuF(nu_a, &gop->distr_pars, s);
+            g_a[s]  = g_node[s][a];
             bf_a[s] = neglect_blocking ? one : (one - g_a[s]);
         }
 
@@ -1152,7 +1174,7 @@ void AddPairBremDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
             BS_REAL g_b[total_num_species], bf_b[total_num_species];
             for (int s = 0; s < total_num_species; ++s)
             {
-                g_b[s]  = TotalNuF(nu_b, &gop->distr_pars, s);
+                g_b[s]  = g_node[s][b];
                 bf_b[s] = neglect_blocking ? one : (one - g_b[s]);
             }
 
@@ -1170,8 +1192,8 @@ void AddPairBremDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
                 gop->kernel_pars.pair_kernel_params.omega       = nu_a;
                 gop->kernel_pars.pair_kernel_params.omega_prime = nu_b;
                 MyKernelOutput pair_1, pair_2;
-                PairKernels(&gop->eos_pars, &gop->kernel_pars.pair_kernel_params,
-                            &pair_1, &pair_2);
+                PairKernelsCached(nu_a, nu_b, T_pair, eta_pair, FDI_p3_e, FDI_p4_e,
+                                  &fdi_node[a], &fdi_node[b], &pair_1, &pair_2);
                 for (int s = 0; s < total_num_species; ++s)
                 {
                     em_ab[s] += pair_1.em[s];  ab_ab[s] += pair_1.abs[s];
@@ -1265,7 +1287,8 @@ void AddPairBremDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
 // Fills the "[.][j]" cell (em_j/ab_j) and the "[.][n+j]" cell (em_nj/ab_nj),
 // matching the inner body of ComputeNEPSIntegrand.
 KOKKOS_INLINE_FUNCTION
-void NEPSCellFused(GreyOpacityParams* gop, BS_REAL nu, BS_REAL nu_bar,
+void NEPSCellFused(GreyOpacityParams* gop, const NEPSEOSTerms* neps_eos, const NuDistrFast* nuf,
+                   BS_REAL nu, BS_REAL nu_bar,
                    const int stim_abs, const bool neglect_blocking,
                    BS_REAL em_j[total_num_species],  BS_REAL ab_j[total_num_species],
                    BS_REAL em_nj[total_num_species], BS_REAL ab_nj[total_num_species])
@@ -1274,20 +1297,18 @@ void NEPSCellFused(GreyOpacityParams* gop, BS_REAL nu, BS_REAL nu_bar,
     const BS_REAL nu_fourth = (nu * nu) * (nu_bar * nu_bar);
 
     BS_REAL g_nu[total_num_species], g_nb[total_num_species];
+    TotalNuFAll(nu, nuf, g_nu);
+    TotalNuFAll(nu_bar, nuf, g_nb);
+
+    MyKernelOutput inel_1 =
+        InelasticScattKernelsFromEOS(nu, nu_bar, neps_eos, NEPSUseNPS(neps_eos));
+    // R_in(w, w') = R_out(w', w): the swapped kernel is the transpose
+    MyKernelOutput inel_2;
     for (int s = 0; s < total_num_species; ++s)
     {
-        g_nu[s] = TotalNuF(nu, &gop->distr_pars, s);
-        g_nb[s] = TotalNuF(nu_bar, &gop->distr_pars, s);
+        inel_2.em[s]  = inel_1.abs[s];
+        inel_2.abs[s] = inel_1.em[s];
     }
-
-    gop->kernel_pars.inelastic_kernel_params.omega       = nu;
-    gop->kernel_pars.inelastic_kernel_params.omega_prime = nu_bar;
-    MyKernelOutput inel_1 =
-        InelasticScattKernels(&gop->kernel_pars.inelastic_kernel_params, &gop->eos_pars);
-    gop->kernel_pars.inelastic_kernel_params.omega       = nu_bar;
-    gop->kernel_pars.inelastic_kernel_params.omega_prime = nu;
-    MyKernelOutput inel_2 =
-        InelasticScattKernels(&gop->kernel_pars.inelastic_kernel_params, &gop->eos_pars);
 
     for (int s = 0; s < total_num_species; ++s)
     {
@@ -1330,6 +1351,9 @@ void AddNEPSDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
     BS_REAL acc_n_em[total_num_species] = {0}, acc_n_ab[total_num_species] = {0};
     BS_REAL acc_e_em[total_num_species] = {0}, acc_e_ab[total_num_species] = {0};
 
+    const NEPSEOSTerms neps_eos = NEPSPrecomputeEOS(&gop->eos_pars);
+    const NuDistrFast nuf = NuDistrFastInit(&gop->distr_pars);
+
     for (int i = 0; i < n; ++i)
     {
         const BS_REAL x_i  = quad->points[i];
@@ -1352,9 +1376,9 @@ void AddNEPSDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
             BS_REAL em_inj[total_num_species], ab_inj[total_num_species];
             BS_REAL em_nij[total_num_species], ab_nij[total_num_species];
             BS_REAL em_ninj[total_num_species],ab_ninj[total_num_species];
-            NEPSCellFused(gop, nu1, nb1, stim_abs, neglect_blocking,
+            NEPSCellFused(gop, &neps_eos, &nuf, nu1, nb1, stim_abs, neglect_blocking,
                           em_ij, ab_ij, em_inj, ab_inj);
-            NEPSCellFused(gop, nu2, nb2, stim_abs, neglect_blocking,
+            NEPSCellFused(gop, &neps_eos, &nuf, nu2, nb2, stim_abs, neglect_blocking,
                           em_nij, ab_nij, em_ninj, ab_ninj);
 
             for (int s = 0; s < total_num_species; ++s)

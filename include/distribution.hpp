@@ -319,6 +319,51 @@ BS_REAL TotalNuF(const BS_REAL omega, const NuDistributionParams* distr_pars,
     return w_t * f_thick + w_f * f_thin;
 }
 
+/* Per-cell constants for evaluating the distribution of all species at one
+ * energy: the thin part beta * omega^c * exp(-omega/T) is computed as
+ * exp(log(beta) + c * log(omega) - omega/T), with log(omega) shared by all
+ * species. */
+struct NuDistrFast
+{
+    BS_REAL w_t[total_num_species], w_f[total_num_species];
+    BS_REAL T_t[total_num_species], mu_t[total_num_species];
+    BS_REAL log_beta[total_num_species], c_f[total_num_species], inv_T_f[total_num_species];
+    bool any_thin;
+};
+
+KOKKOS_INLINE_FUNCTION
+NuDistrFast NuDistrFastInit(const NuDistributionParams* d)
+{
+    NuDistrFast f;
+    f.any_thin = false;
+    for (int s = 0; s < total_num_species; ++s)
+    {
+        f.w_t[s]  = d->w_t[s];
+        f.w_f[s]  = d->w_f[s];
+        f.T_t[s]  = d->temp_t[s];
+        f.mu_t[s] = d->temp_t[s] * d->eta_t[s];
+        f.c_f[s]  = d->c_f[s];
+        f.inv_T_f[s]  = 1. / d->temp_f[s];
+        f.log_beta[s] = (d->beta_f[s] > 0) ? Kokkos::log(d->beta_f[s]) : -1e300;
+        f.any_thin = f.any_thin || (d->w_f[s] != 0);
+    }
+    return f;
+}
+
+KOKKOS_INLINE_FUNCTION
+void TotalNuFAll(const BS_REAL omega, const NuDistrFast* f, BS_REAL* g)
+{
+    const BS_REAL log_w = f->any_thin ? Kokkos::log(omega) : 0;
+    for (int s = 0; s < total_num_species; ++s)
+    {
+        BS_REAL r = 0;
+        if (f->w_t[s] != 0) r += f->w_t[s] * FermiDistr(omega, f->T_t[s], f->mu_t[s]);
+        if (f->w_f[s] != 0)
+            r += f->w_f[s] * Kokkos::exp(f->log_beta[s] + f->c_f[s] * log_w - omega * f->inv_T_f[s]);
+        g[s] = r;
+    }
+}
+
 /* Calculate distribution function parameters in the thick and thin regime from
  * M1 quantities
  *
