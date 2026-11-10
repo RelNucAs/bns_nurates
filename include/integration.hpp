@@ -824,7 +824,6 @@ void GaussLegendreIntegrate2DMatrixForNMS(const MyQuadrature* quad,
                                            MyQuadratureIntegrand* result_2)
 {
     constexpr BS_REAL half = 0.5;
-    constexpr BS_REAL one  = 1;
 
     const int n              = quad->nx;
     const int num_integrands = 2 * total_num_species;
