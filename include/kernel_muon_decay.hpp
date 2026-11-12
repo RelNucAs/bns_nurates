@@ -260,10 +260,10 @@ Decay_ubar_int16 ubar_int16_interpolator(const BS_REAL T, const BS_REAL mu, cons
 }
 
 
-//==========================================//
-// ---         Muon Decay Kernel        --- //
-// ---      via ubar interpolation      --- //
-//==========================================//
+//================================================//
+// ---         (Anti)Muon Decay Kernel        --- //
+// ---          via ubar interpolation        --- //
+//================================================//
 /* Interpolate ubar grid + Analytical expression
  *
  * NOTE: this function is just for points inside the ranges of the 4D table!
