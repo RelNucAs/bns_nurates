@@ -1094,6 +1094,9 @@ M1MatrixKokkos2D ComputeNEPSIntegrand(const MyQuadrature* quad, BS_REAL t,
 //   M1MatrixKokkos2D m = ComputeDoubleIntegrand(quad, t, gop, stim_abs);
 //   GaussLegendreIntegrate2DMatrixForM1Coeffs(quad, &m, t, n2d, e2d);
 // (accumulates into *n2d, *e2d which the caller initialised to zero).
+#if defined(KOKKOS_ENABLE_SYCL) && defined(ATHENA_M1_SYCL_OUTLINING)
+__attribute__((noinline))
+#endif
 KOKKOS_INLINE_FUNCTION
 void AddPairBremDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
                                     GreyOpacityParams* gop, const int stim_abs,
@@ -1338,6 +1341,9 @@ void NEPSCellFused(GreyOpacityParams* gop, const NEPSEOSTerms* neps_eos, const N
 // Fused inelastic-scattering (NEPS) double integral.  Equivalent to:
 //   M1MatrixKokkos2D m = ComputeNEPSIntegrand(quad, t, gop, stim_abs);
 //   GaussLegendreIntegrate2DMatrixForNEPS(quad, &m, t, n2d, e2d);
+#if defined(KOKKOS_ENABLE_SYCL) && defined(ATHENA_M1_SYCL_OUTLINING)
+__attribute__((noinline))
+#endif
 KOKKOS_INLINE_FUNCTION
 void AddNEPSDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
                                 GreyOpacityParams* gop, const int stim_abs,
