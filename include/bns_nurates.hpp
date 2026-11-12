@@ -462,6 +462,10 @@ struct OpacityFlags
     int use_brem;
     int use_inelastic_scatt;
     int use_iso;
+    int use_nucleon_recoil; // energy exchange with recoiling nucleons in the
+                            // M1 coefficients (NonThermalSeparated only):
+                            // 0 off, 1 nux and anux (BS_RECOIL_HEAVY), 2 all
+                            // species (BS_RECOIL_ALL); see nucleon_recoil.hpp
 };
 typedef struct OpacityFlags OpacityFlags;
 __attribute__((unused)) static OpacityFlags opacity_flags_default_all = {
@@ -469,13 +473,15 @@ __attribute__((unused)) static OpacityFlags opacity_flags_default_all = {
     .use_pair            = 1,
     .use_brem            = 1,
     .use_inelastic_scatt = 1,
-    .use_iso             = 1};
+    .use_iso             = 1,
+    .use_nucleon_recoil  = 0};
 __attribute__((unused)) static OpacityFlags opacity_flags_default_none = {
     .use_abs_em          = 0,
     .use_pair            = 0,
     .use_brem            = 0,
     .use_inelastic_scatt = 0,
-    .use_iso             = 0};
+    .use_iso             = 0,
+    .use_nucleon_recoil  = 0};
 
 /* GreyOpacityParams struct
  *
@@ -554,6 +560,12 @@ struct M1OpacitiesNonThermalSeparated
     BS_REAL kappa_a_non_th[total_num_species];  // energy absorption coefficient
                                                 // for non-thermal processes
     BS_REAL kappa_s[total_num_species];         // scattering coefficient
+
+    /* Nucleon recoil (opacity_flags.use_nucleon_recoil), already included in
+    eta_non_th, kappa_a_non_th and taken out of kappa_s; kept here so it can be
+    told apart from NEPS. Zero when the switch is off. */
+    BS_REAL eta_rec[total_num_species];   // energy gain (thermal motion)
+    BS_REAL kappa_rec[total_num_species]; // energy loss (recoil) opacity
 };
 typedef struct M1OpacitiesNonThermalSeparated M1OpacitiesNonThermalSeparated;
 

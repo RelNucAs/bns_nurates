@@ -12,6 +12,7 @@
 #include "kernels.hpp"
 #include "integration.hpp"
 #include "distribution.hpp"
+#include "nucleon_recoil.hpp"
 
 /* Thresholds on the neutrino energy number and energy density. If values are
 below the thresholds, absorption opacities or scattering opacities are set to 0.
@@ -1910,6 +1911,37 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
         m1_opacities_non_th_separated.kappa_s[id_anux] = kBS_FourPi_hc3 /
                                         (c_light * J[id_anux]) *
                                         iso_integrals.integrand[id_anux];
+    }
+
+    /* Nucleon recoil and thermal motion (see nucleon_recoil.hpp): energy-only,
+    so it joins NEPS in the non-thermal fields. The gain is an emissivity, the
+    loss an absorption opacity; the loss is taken out of kappa_s so that the
+    momentum damping kappa_a + kappa_s is unchanged. */
+    const int use_recoil = my_grey_opacity_params->opacity_flags.use_nucleon_recoil;
+    if (use_recoil != BS_RECOIL_OFF)
+    {
+        for (int idx = 0; idx < total_num_species; ++idx)
+        {
+            if (! NucleonRecoilSelected(use_recoil, idx) ||
+                ! (n[idx] > THRESHOLD_N) || ! (J[idx] > THRESHOLD_J))
+            {
+                continue;
+            }
+            BS_REAL gain_rec, loss_rec;
+            NucleonRecoilExchange(my_grey_opacity_params, idx, n[idx], J[idx],
+                                  &gain_rec, &loss_rec);
+            const BS_REAL kappa_rec = loss_rec / (c_light * J[idx]);
+            const BS_REAL kappa_rec_s =
+                (kappa_rec < m1_opacities_non_th_separated.kappa_s[idx]) ?
+                    kappa_rec :
+                    m1_opacities_non_th_separated.kappa_s[idx];
+
+            m1_opacities_non_th_separated.eta_rec[idx]   = gain_rec;
+            m1_opacities_non_th_separated.kappa_rec[idx] = kappa_rec;
+            m1_opacities_non_th_separated.eta_non_th[idx] += gain_rec;
+            m1_opacities_non_th_separated.kappa_a_non_th[idx] += kappa_rec;
+            m1_opacities_non_th_separated.kappa_s[idx] -= kappa_rec_s;
+        }
     }
 
     return m1_opacities_non_th_separated;
