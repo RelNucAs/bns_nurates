@@ -36,13 +36,6 @@
 
 #if !defined(__CUDA_ARCH__) && !defined(__SYCL_DEVICE_ONLY__)  // NMS direct-interp table data lives in CPU memory only
 
-// Struct to store the three terms of the kernel
-struct NMS_KernelResult{
-    BS_REAL R1;
-    BS_REAL R2;
-    BS_REAL R3;
-};
-
 KOKKOS_INLINE_FUNCTION
 NMS_KernelResult NMS_direct_interpolator(const BS_REAL T, const BS_REAL mu, const BS_REAL w,
                           const BS_REAL wp)
@@ -186,7 +179,6 @@ NMS_KernelResult NMS_direct_interpolator(const BS_REAL T, const BS_REAL mu, cons
 
 
 // Calculates and saves the neutrino muon scattering in and out kernel
-// @TODO: GENERALIZE TO 6 NEUTRINO SPECIES (nue, nut are equal)
 KOKKOS_INLINE_FUNCTION
 MyKernelOutput InelasticNMSKernels_DirectInterp(InelasticScattKernelParams* kernel_params,
                                         MyEOSParams* eos_params)

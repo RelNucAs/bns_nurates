@@ -163,12 +163,6 @@ BS_REAL InverseAntiMuonDecayKernel_Analytical(const BS_REAL T, const BS_REAL mu_
  *          anti-muon decay : w_mu = w_anumu, w_e = w_nue
  */
 
-// Struct to store the values of ubar
-struct Decay_ubar_int16{
-    BS_REAL ubar_int16_muon_decay;
-    BS_REAL ubar_int16_anti_muon_decay;
-};
-
 KOKKOS_INLINE_FUNCTION
 Decay_ubar_int16 ubar_int16_interpolator(const BS_REAL T, const BS_REAL mu, const BS_REAL w_mu,
                                                 const BS_REAL w_e)
@@ -283,7 +277,7 @@ Decay_ubar_int16 ubar_int16_interpolator(const BS_REAL T, const BS_REAL mu, cons
  * 
 */
 
-// Calculates and saves the muon decay in and out kernel
+// Calculates and saves the (anti)muon decay in and out kernel
 KOKKOS_INLINE_FUNCTION
 MyKernelOutput MuonDecayKernels(MuonDecayKernelParams* kernel_params,
                                 MyEOSParams* eos_params)

@@ -269,6 +269,16 @@ struct PairKernelParams
 };
 typedef struct PairKernelParams PairKernelParams;
 
+/* NMS_KernelResult struct
+ * 
+ * Store three terms of scattering kernel
+*/
+struct NMS_KernelResult{
+    BS_REAL R1;
+    BS_REAL R2;
+    BS_REAL R3;
+};
+
 /* InelasticScattParams struct
  *
  * Parameters for the inelastic NEPS and NMS kernel
@@ -280,6 +290,16 @@ struct InelasticScattKernelParams
                          // @TODO: complete here
 };
 typedef struct InelasticScattKernelParams InelasticScattKernelParams;
+
+
+/* Decay_ubar_int16 struct
+ * 
+ * Store ubar_int16 values for (anti)muon decay
+*/
+struct Decay_ubar_int16{
+    BS_REAL ubar_int16_muon_decay;
+    BS_REAL ubar_int16_anti_muon_decay;
+};
 
 /* MuonDecayParams struct
  *
