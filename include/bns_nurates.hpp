@@ -269,14 +269,17 @@ struct PairKernelParams
 };
 typedef struct PairKernelParams PairKernelParams;
 
-/* NMS_KernelResult struct
+/* NMAS_KernelResult struct
  * 
  * Store three terms of scattering kernel
 */
-struct NMS_KernelResult{
-    BS_REAL R1;
-    BS_REAL R2;
-    BS_REAL R3;
+struct NMAS_KernelResult{
+    BS_REAL R1_mu;
+    BS_REAL R2_mu;
+    BS_REAL R3_mu;
+    BS_REAL R1_amu;
+    BS_REAL R2_amu;
+    BS_REAL R3_amu;
 };
 
 /* InelasticScattParams struct

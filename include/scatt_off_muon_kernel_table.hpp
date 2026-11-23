@@ -2,16 +2,16 @@
 #include "bns_nurates.hpp"
 
 // Temperature (20 points between [1,200] MeV, log scale)
-constexpr BS_REAL NMS_T_axis[20] = {
+constexpr BS_REAL NMAS_T_axis[20] = {
     1.0,         1.32162073,  1.74668135,   2.30845028,   3.05089575,
     4.03212706,  5.32894271,  7.04284115,   9.30796486,   12.30159931,
     16.25804865, 21.48697412, 28.3976304,   37.53089701,  49.60161148,
     65.55451795, 86.63820982, 114.50285407, 151.32934551, 200.0
 };
-constexpr int NMS_T_dims = 20;
+constexpr int NMAS_T_dims = 20;
 
 // Muon chemical potential (40 points between [0,300] MeV, lin scale)
-constexpr BS_REAL NMS_mu_axis[40] = {
+constexpr BS_REAL NMAS_mu_axis[40] = {
     0.0,          7.69230769,   15.38461538,  23.07692308,  30.76923077,
     38.46153846,  46.15384615,  53.84615385,  61.53846154,  69.23076923,
     76.92307692,  84.61538462,  92.30769231,  100.0,        107.69230769,
@@ -21,10 +21,10 @@ constexpr BS_REAL NMS_mu_axis[40] = {
     230.76923077, 238.46153846, 246.15384615, 253.84615385, 261.53846154,
     269.23076923, 276.92307692, 284.61538462, 292.30769231, 300.0
 };
-constexpr int NMS_mu_dims = 40;
+constexpr int NMAS_mu_dims = 40;
 
 // Incoming neutrino energy (40 points between [1,300] MeV, log scale)
-constexpr BS_REAL NMS_w_axis[40] = {
+constexpr BS_REAL NMAS_w_axis[40] = {
     1.0,          1.15748649,   1.33977497,   1.55077142,   1.79499696,
     2.07768473,   2.404892,     2.78362999,   3.2220141,    3.72943778,
     4.31677384,   4.99660739,   5.78350553,   6.6943295,    7.74859594,
@@ -34,10 +34,10 @@ constexpr BS_REAL NMS_w_axis[40] = {
     80.44107916,  93.10946213,  107.77294424, 124.74572663, 144.39149289,
     167.13120187, 193.45210774, 223.9182006,  259.18229141, 300.0
 };
-constexpr int NMS_w_dims = 40;
+constexpr int NMAS_w_dims = 40;
 
 // Outgoing neutrino energy (40 points between [1,300] MeV, log scale)
-constexpr BS_REAL NMS_wp_axis[40] = {
+constexpr BS_REAL NMAS_wp_axis[40] = {
     1.0,          1.15748649,   1.33977497,   1.55077142,   1.79499696,
     2.07768473,   2.404892,     2.78362999,   3.2220141,    3.72943778,
     4.31677384,   4.99660739,   5.78350553,   6.6943295,    7.74859594,
@@ -47,18 +47,18 @@ constexpr BS_REAL NMS_wp_axis[40] = {
     80.44107916,  93.10946213,  107.77294424, 124.74572663, 144.39149289,
     167.13120187, 193.45210774, 223.9182006,  259.18229141, 300.0
 };  
-constexpr int NMS_wp_dims = 40;
+constexpr int NMAS_wp_dims = 40;
 
 
 // Max and min values for w and wp axis
-constexpr BS_REAL NMS_w_max = NMS_w_axis[NMS_w_dims - 1];
-constexpr BS_REAL NMS_w_min = NMS_w_axis[0];
-constexpr BS_REAL NMS_wp_max = NMS_wp_axis[NMS_wp_dims - 1];
-constexpr BS_REAL NMS_wp_min = NMS_wp_axis[0];
+constexpr BS_REAL NMAS_w_max = NMAS_w_axis[NMAS_w_dims - 1];
+constexpr BS_REAL NMAS_w_min = NMAS_w_axis[0];
+constexpr BS_REAL NMAS_wp_max = NMAS_wp_axis[NMAS_wp_dims - 1];
+constexpr BS_REAL NMAS_wp_min = NMAS_wp_axis[0];
 
 
-// First term of the out-kernel (dimensionless)
-constexpr BS_REAL R1_data[1280000] = {
+// First term of the out-kernel
+constexpr BS_REAL R1_muon_scattering[1280000] = {
     2.96253e-42,
     8.35495e-43,
     1.54141e-43,
@@ -1280061,9 +1280061,8 @@ constexpr BS_REAL R1_data[1280000] = {
     4.43329e+05};
 
 
-
-// Second term of the out-kernel (dimensionless)
-constexpr BS_REAL R2_data[1280000] = {
+// Second term of the out-kernel
+constexpr BS_REAL R2_muon_scattering[1280000] = {
     2.92587e-42,
     8.16196e-43,
     1.49361e-43,
@@ -2560066,9 +2560065,8 @@ constexpr BS_REAL R2_data[1280000] = {
     2.81326e+05};
 
 
-
-// Third term of the out-kernel (dimensionless)
-constexpr BS_REAL R3_data[1280000] = {
+// Third term of the out-kernel
+constexpr BS_REAL R3_muon_scattering[1280000] = {
     8.59319e-47,
     4.21259e-47,
     9.71874e-48,

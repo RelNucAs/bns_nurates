@@ -14,8 +14,8 @@
 #include "kernel_brem_GP19.hpp"
 #include "kernel_pair.hpp"
 #include "kernel_nes.hpp"
-#include "kernel_nms_direct_interp.hpp"
-#include "kernel_nms_semi_analytical.hpp"
+#include "kernel_nmas_direct_interp.hpp"
+#include "kernel_nmas_semi_analytical.hpp"
 #include "kernel_muon_decay.hpp"
 
 #endif // BNS_NURATES_SRC_OPACITIES_KERNELS_KERNELS_HPP_

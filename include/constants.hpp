@@ -208,19 +208,19 @@ inline constexpr BS_REAL kBS_NEPS_BZero  = 4. * POW2(kBS_SinThW2);
 /////////////////////////////////////////////////////
 
 // Muon_neutrino scattering
-inline constexpr BS_REAL kBS_NMS_C1_numu = POW2(kBS_Gf0) * POW2(1. + 2. * kBS_SinThW2) /
+inline constexpr BS_REAL kBS_NMAS_C1_numu = POW2(kBS_Gf0) * POW2(1. + 2. * kBS_SinThW2) /
                                              (2. * kBS_Pi);
-inline constexpr BS_REAL kBS_NMS_C2_numu = 2. * POW2(kBS_Gf0) * POW2(kBS_SinThW2) / kBS_Pi;
-inline constexpr BS_REAL kBS_NMS_C3_numu = - 2. * POW2(kBS_Gf0) * POW2(kBS_Mmu) *
+inline constexpr BS_REAL kBS_NMAS_C2_numu = 2. * POW2(kBS_Gf0) * POW2(kBS_SinThW2) / kBS_Pi;
+inline constexpr BS_REAL kBS_NMAS_C3_numu = - 2. * POW2(kBS_Gf0) * POW2(kBS_Mmu) *
                                              (kBS_SinThW2 + 2. * POW2(kBS_SinThW2)) / kBS_Pi; 
 // Electron and Tauon scattering
-inline constexpr BS_REAL kBS_NMS_C1_nue = POW2(kBS_Gf0) * POW2(1. - 2. * kBS_SinThW2) /
+inline constexpr BS_REAL kBS_NMAS_C1_nue = POW2(kBS_Gf0) * POW2(1. - 2. * kBS_SinThW2) /
                                              (2. * kBS_Pi);
-inline constexpr BS_REAL kBS_NMS_C2_nue = 2. * POW2(kBS_Gf0) * POW2(kBS_SinThW2) / kBS_Pi;
-inline constexpr BS_REAL kBS_NMS_C3_nue = 2. * POW2(kBS_Gf0) * POW2(kBS_Mmu) *
+inline constexpr BS_REAL kBS_NMAS_C2_nue = 2. * POW2(kBS_Gf0) * POW2(kBS_SinThW2) / kBS_Pi;
+inline constexpr BS_REAL kBS_NMAS_C3_nue = 2. * POW2(kBS_Gf0) * POW2(kBS_Mmu) *
                                              (kBS_SinThW2 - 2. * POW2(kBS_SinThW2)) / kBS_Pi;
 // Conversion constant, from [MeV^-2] to [nm^3 s^-1]
-inline constexpr BS_REAL kBS_NMS_Conv_Const = kBS_Clight * POW2(kBS_Hbar * kBS_Clight);
+inline constexpr BS_REAL kBS_NMAS_Conv_Const = kBS_Clight * POW2(kBS_Hbar * kBS_Clight);
 
 
 /////////////////////////////////////////////////////
