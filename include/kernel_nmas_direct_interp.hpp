@@ -12,8 +12,8 @@
 // @TODO: ADD REFERENCE 
 
 
-#ifndef BNS_NURATES_INCLUDE_KERNEL_NMS_DIRECT_INTERP_HPP_
-#define BNS_NURATES_INCLUDE_KERNEL_NMS_DIRECT_INTERP_HPP_
+#ifndef BNS_NURATES_INCLUDE_KERNEL_NMAS_DIRECT_INTERP_HPP_
+#define BNS_NURATES_INCLUDE_KERNEL_NMAS_DIRECT_INTERP_HPP_
 
 #include "bns_nurates.hpp"
 #include "functions.hpp"
@@ -270,7 +270,6 @@ MyKernelOutput InelasticNMASKernels_DirectInterp(InelasticScattKernelParams* ker
     const BS_REAL w                    = kernel_params->omega;
     const BS_REAL wp                   = kernel_params->omega_prime;
     const BS_REAL mu_mu                = eos_params->mu_mu;
-    const BS_REAL mu_amu               = -mu_mu;
     const BS_REAL det_bal_arg          = (wp - w) / T;
     const BS_REAL det_bal              = SafeExp(det_bal_arg);
 
@@ -281,55 +280,55 @@ MyKernelOutput InelasticNMASKernels_DirectInterp(InelasticScattKernelParams* ker
 
     // Neutrino-flavor dependent kernel
     // nu_e
-    nms_kernel.abs[id_nue] = kBS_NMAS_Conv_Const * (
+    nmas_kernel.abs[id_nue] = kBS_NMAS_Conv_Const * (
                              kBS_NMAS_C1_nue * (R123_values.R1_mu + R123_values.R2_amu) +
                              kBS_NMAS_C2_nue * (R123_values.R2_mu + R123_values.R1_amu) +
                              kBS_NMAS_C3_nue * (R123_values.R3_mu + R123_values.R3_amu));
     
     // anu_e
-    nms_kernel.abs[id_anue] = kBS_NMAS_Conv_Const * (
+    nmas_kernel.abs[id_anue] = kBS_NMAS_Conv_Const * (
                               kBS_NMAS_C2_nue * (R123_values.R1_mu + R123_values.R2_amu) +
                               kBS_NMAS_C1_nue * (R123_values.R2_mu + R123_values.R1_amu) +
                               kBS_NMAS_C3_nue * (R123_values.R3_mu + R123_values.R3_amu));
     
     // num
-    nms_kernel.abs[id_num] = kBS_NMAS_Conv_Const * (
+    nmas_kernel.abs[id_num] = kBS_NMAS_Conv_Const * (
                              kBS_NMAS_C1_numu * (R123_values.R1_mu + R123_values.R2_amu) +
                              kBS_NMAS_C2_numu * (R123_values.R2_mu + R123_values.R1_amu) +
                              kBS_NMAS_C3_numu * (R123_values.R3_mu + R123_values.R3_amu));
     
     // anum
-    nms_kernel.abs[id_anum] = kBS_NMAS_Conv_Const * (
+    nmas_kernel.abs[id_anum] = kBS_NMAS_Conv_Const * (
                               kBS_NMAS_C2_numu * (R123_values.R1_mu + R123_values.R2_amu) +
                               kBS_NMAS_C1_numu * (R123_values.R2_mu + R123_values.R1_amu) + 
                               kBS_NMAS_C3_numu * (R123_values.R3_mu + R123_values.R3_amu));
 
     // nu_t
-    nms_kernel.abs[id_nut] = nms_kernel.abs[id_nue];
+    nmas_kernel.abs[id_nut] = nmas_kernel.abs[id_nue];
     
     // anu_t
-    nms_kernel.abs[id_anut] = nms_kernel.abs[id_anue];
+    nmas_kernel.abs[id_anut] = nmas_kernel.abs[id_anue];
 
     // Absorption and Emission kernels [nm^3 s^-1]
     for (int idx = 0; idx < total_num_species; ++idx)
     {
-        nms_kernel.em[idx]  = nms_kernel.abs[idx] * det_bal;
+        nmas_kernel.em[idx]  = nmas_kernel.abs[idx] * det_bal;
     }
 
-    return nms_kernel;
+    return nmas_kernel;
 }
 
 #else  // __CUDA_ARCH__ || __SYCL_DEVICE_ONLY__ — NMS direct-interp is host-only; provide a stub so device code links
 
 KOKKOS_INLINE_FUNCTION
-MyKernelOutput InelasticNMSKernels_DirectInterp(InelasticScattKernelParams* /*kernel_params*/,
+MyKernelOutput InelasticNMASKernels_DirectInterp(InelasticScattKernelParams* /*kernel_params*/,
                                         MyEOSParams* /*eos_params*/)
 {
-    MyKernelOutput nms_kernel = {0};
-    return nms_kernel;
+    MyKernelOutput nmas_kernel = {0};
+    return nmas_kernel;
 }
 
 #endif  // !__CUDA_ARCH__ && !__SYCL_DEVICE_ONLY__
 
 
-#endif // BNS_NURATES_INCLUDE_KERNEL_NMS_DIRECT_INTERP_HPP_
+#endif // BNS_NURATES_INCLUDE_KERNEL_NMAS_DIRECT_INTERP_HPP_

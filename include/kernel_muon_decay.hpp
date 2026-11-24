@@ -314,16 +314,16 @@ MyKernelOutput MuonDecayKernels(MuonDecayKernelParams* kernel_params,
 
     // Absorption and Emission kernels [nm^3 s^-1]
     // nu_e
-    mudec_kernel.abs[id_nue] = kBS_NMS_Conv_Const * InverseMuonDecay_Kernel_nue;
+    mudec_kernel.abs[id_nue] = kBS_NMAS_Conv_Const * InverseMuonDecay_Kernel_nue;
     mudec_kernel.em[id_nue] = mudec_kernel.abs[id_nue] * det_bal_amudec;
     // anu_e
-    mudec_kernel.abs[id_anue] = kBS_NMS_Conv_Const * InverseMuonDecay_Kernel_anue;
+    mudec_kernel.abs[id_anue] = kBS_NMAS_Conv_Const * InverseMuonDecay_Kernel_anue;
     mudec_kernel.em[id_anue] = mudec_kernel.abs[id_anue] * det_bal_mudec;
     // nu_m
-    mudec_kernel.abs[id_num] = kBS_NMS_Conv_Const * InverseMuonDecay_Kernel_numu;
+    mudec_kernel.abs[id_num] = kBS_NMAS_Conv_Const * InverseMuonDecay_Kernel_numu;
     mudec_kernel.em[id_num] = mudec_kernel.abs[id_num] * det_bal_mudec;
     // anu_m
-    mudec_kernel.abs[id_anum] = kBS_NMS_Conv_Const * InverseMuonDecay_Kernel_anumu;
+    mudec_kernel.abs[id_anum] = kBS_NMAS_Conv_Const * InverseMuonDecay_Kernel_anumu;
     mudec_kernel.em[id_anum] = mudec_kernel.abs[id_anum] * det_bal_amudec;
 
     return mudec_kernel;

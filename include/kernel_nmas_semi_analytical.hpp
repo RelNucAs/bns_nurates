@@ -12,13 +12,13 @@
 // @TODO: ADD REFERENCE 
 
 
-#ifndef BNS_NURATES_INCLUDE_KERNEL_NMS_SEMI_ANALYTICAL_HPP_
-#define BNS_NURATES_INCLUDE_KERNEL_NMS_SEMI_ANALYTICAL_HPP_
+#ifndef BNS_NURATES_INCLUDE_KERNEL_NMAS_SEMI_ANALYTICAL_HPP_
+#define BNS_NURATES_INCLUDE_KERNEL_NMAS_SEMI_ANALYTICAL_HPP_
 
 #include "bns_nurates.hpp"
 #include "functions.hpp"
 #include "constants.hpp"
-#include "nms_semi_analytical_table.hpp"
+#include "scatt_off_muon_semi_analytical_table.hpp"
 #include <iostream>
 
 
@@ -43,7 +43,7 @@
 #if !defined(__CUDA_ARCH__) && !defined(__SYCL_DEVICE_ONLY__)  // NMS semi-analytical table data lives in CPU memory only
 
 // Struct to store the different parameters
-struct NMS_Parameters{
+struct NMAS_Parameters{
     BS_REAL alpha;
     BS_REAL beta;
     BS_REAL gamma;
@@ -53,29 +53,29 @@ struct NMS_Parameters{
 };
 
 KOKKOS_INLINE_FUNCTION
-NMS_Parameters NMS_parameters_interpolator(const BS_REAL T, const BS_REAL mu, const BS_REAL w)
+NMAS_Parameters NMAS_parameters_interpolator(const BS_REAL T, const BS_REAL mu, const BS_REAL w)
 {
-    NMS_Parameters parameters = {0};
+    NMAS_Parameters parameters = {0};
 
     int i_nearest, j_nearest, k_nearest;
 
-    if (NMSNearest_find_nearest_index(T, NMSParams_T_axis, NMSParams_T_dims, &i_nearest) < 0 or
-        NMSNearest_find_nearest_index(mu, NMSParams_mu_axis, NMSParams_mu_dims, &j_nearest) < 0 or
-        NMSNearest_find_nearest_index(w, NMSParams_w_axis, NMSParams_w_dims, &k_nearest) < 0)
+    if (NMASNearest_find_nearest_index(T, NMASParams_T_axis, NMASParams_T_dims, &i_nearest) < 0 or
+        NMASNearest_find_nearest_index(mu, NMASParams_mu_axis, NMASParams_mu_dims, &j_nearest) < 0 or
+        NMASNearest_find_nearest_index(w, NMASParams_w_axis, NMASParams_w_dims, &k_nearest) < 0)
     {
         return parameters;
     }
 
 // macro to access the 1D array
-#define NMSParams_IDX(i, j, k)                                                        \
-    ((i * NMSParams_mu_dims + j) * NMSParams_w_dims + k)
+#define NMASParams_IDX(i, j, k)                                                        \
+    ((i * NMASParams_mu_dims + j) * NMASParams_w_dims + k)
 
-    parameters.alpha = alpha_numu_data[NMSParams_IDX(i_nearest, j_nearest, k_nearest)];
-    parameters.beta = beta_numu_data[NMSParams_IDX(i_nearest, j_nearest, k_nearest)];
-    parameters.gamma = gamma_numu_data[NMSParams_IDX(i_nearest, j_nearest, k_nearest)];
-    parameters.delta = delta_numu_data[NMSParams_IDX(i_nearest, j_nearest, k_nearest)];
-    parameters.wpbar = wpbar_numu_data[NMSParams_IDX(i_nearest, j_nearest, k_nearest)];
-    parameters.wpzero = wpzero_numu_data[NMSParams_IDX(i_nearest, j_nearest, k_nearest)];
+    parameters.alpha = alpha_numu_data[NMASParams_IDX(i_nearest, j_nearest, k_nearest)];
+    parameters.beta = beta_numu_data[NMASParams_IDX(i_nearest, j_nearest, k_nearest)];
+    parameters.gamma = gamma_numu_data[NMASParams_IDX(i_nearest, j_nearest, k_nearest)];
+    parameters.delta = delta_numu_data[NMASParams_IDX(i_nearest, j_nearest, k_nearest)];
+    parameters.wpbar = wpbar_numu_data[NMASParams_IDX(i_nearest, j_nearest, k_nearest)];
+    parameters.wpzero = wpzero_numu_data[NMASParams_IDX(i_nearest, j_nearest, k_nearest)];
 
 #undef NMSParams_IDX
 
@@ -259,7 +259,7 @@ BS_REAL NMS_SemiAnalyticalKernel(const BS_REAL T, const BS_REAL mu, const BS_REA
 // @TODO: ADD PARAMETER INTERPOLATION FOR OTHER FLAVORS
 // @TODO: GENERALIZE TO 6 NEUTRINO SPECIES (nue, nut are equal)
 KOKKOS_INLINE_FUNCTION
-MyKernelOutput InelasticNMSKernels_SemiAnalytical(InelasticScattKernelParams* kernel_params,
+MyKernelOutput InelasticNMASKernels_SemiAnalytical(InelasticScattKernelParams* kernel_params,
                                         MyEOSParams* eos_params)
 {
     const BS_REAL T                    = eos_params->temp;
@@ -269,50 +269,50 @@ MyKernelOutput InelasticNMSKernels_SemiAnalytical(InelasticScattKernelParams* ke
     const BS_REAL det_bal_arg          = (wp - w) / T;
     const BS_REAL det_bal              = SafeExp(det_bal_arg);
 
-    MyKernelOutput nms_kernel;
+    MyKernelOutput nmas_kernel;
 
     // Interpolation of the 4D table
-    const NMS_Parameters parameters_values = NMS_parameters_interpolator(T, mu_mu, w);
+    const NMAS_Parameters parameters_values = NMAS_parameters_interpolator(T, mu_mu, w);
 
     // Neutrino-flavor dependent kernel
     // nu_e
-    nms_kernel.abs[id_nue] = 0.0;
+    nmas_kernel.abs[id_nue] = 0.0;
     
     // anu_e
-    nms_kernel.abs[id_anue] = 0.0;
+    nmas_kernel.abs[id_anue] = 0.0;
     
     // nu_m
-    nms_kernel.abs[id_num] = kBS_NMS_Conv_Const * NMS_SemiAnalyticalKernel(T, mu_mu, w, wp, 
+    nmas_kernel.abs[id_num] = kBS_NMAS_Conv_Const * NMS_SemiAnalyticalKernel(T, mu_mu, w, wp, 
                                 parameters_values.alpha, parameters_values.beta, parameters_values.gamma, 
                                 parameters_values.delta, parameters_values.wpbar, parameters_values.wpzero);
     
     // anu_m
-    nms_kernel.abs[id_anum] = 0.0;
+    nmas_kernel.abs[id_anum] = 0.0;
 
     // nu_t
-    nms_kernel.abs[id_nut] = nms_kernel.abs[id_nue];
+    nmas_kernel.abs[id_nut] = nmas_kernel.abs[id_nue];
 
     // anu_t
-    nms_kernel.abs[id_anut] = nms_kernel.abs[id_anue];
+    nmas_kernel.abs[id_anut] = nmas_kernel.abs[id_anue];
 
     // Absorption and Emission kernels [nm^3 s^-1]
     // nu_e(idx=0), nu_ae(idx=1), nu_x=nu_mu(idx=2), anu_x=anu_mu(idx=3)
     for (int idx = 0; idx < total_num_species; ++idx)
     {
-        nms_kernel.em[idx]  = nms_kernel.abs[idx] * det_bal;
+        nmas_kernel.em[idx]  = nmas_kernel.abs[idx] * det_bal;
     }
 
-    return nms_kernel;
+    return nmas_kernel;
 }
 
 #else  // __CUDA_ARCH__ || __SYCL_DEVICE_ONLY__ — NMS semi-analytical is host-only; provide a stub so device code links
 
 KOKKOS_INLINE_FUNCTION
-MyKernelOutput InelasticNMSKernels_SemiAnalytical(InelasticScattKernelParams* /*kernel_params*/,
+MyKernelOutput InelasticNMASKernels_SemiAnalytical(InelasticScattKernelParams* /*kernel_params*/,
                                         MyEOSParams* /*eos_params*/)
 {
-    MyKernelOutput nms_kernel = {0};
-    return nms_kernel;
+    MyKernelOutput nmas_kernel = {0};
+    return nmas_kernel;
 }
 
 #endif  // !__CUDA_ARCH__ && !__SYCL_DEVICE_ONLY__

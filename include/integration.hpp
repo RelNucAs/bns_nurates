@@ -557,34 +557,38 @@ MyQuadratureIntegrand
 MuonReactionsGaussLegendreIntegrate1D(MyQuadrature* quad, 
                         MyFunctionMultiD* func, BS_REAL* t, BS_REAL wmin, BS_REAL wmax)
 {
+    constexpr BS_REAL one = 1.0;
     int num_integrands = func->my_quadrature_integrand.n;
     BS_ASSERT(num_integrands <= num_max_integrands);
     BS_REAL f1_x[num_max_integrands][BS_N_MAX],
         f2_x[num_max_integrands][BS_N_MAX];
     BS_REAL var[2];
+    BS_REAL y0, y;
     MyQuadratureIntegrand result;
 
     result.n = num_integrands;
 
     for (int k = 0; k < num_integrands; ++k)
     {
+        y0 = t[k] / wmax;
 
         for (int i = 0; i < quad->nx; ++i)
         {
 
-            var[0]                        = wmin + (t[k] - wmin) * quad->points[i];    // 1 + (t-1)x 
+            var[0]                        = wmin + (t[k] - wmin) * quad->points[i];    
             MyQuadratureIntegrand f1_vals = func->function(var, func->params);
-            f1_x[k][i]                    = f1_vals.integrand[k];                      // G(1 + (t-1)x)
+            f1_x[k][i]                    = f1_vals.integrand[k];                      
 
-            var[0]                        = t[k] + (wmax - t[k]) * quad->points[i];    // t + (300-t)x
+            //var[0]                        = t[k] + (wmax - t[k]) * quad->points[i];  // t + (300-t)x
+            y = y0 + (1 - y0) * quad->points[i];
+            var[0]                        = t[k] / y;  
             MyQuadratureIntegrand f2_vals = func->function(var, func->params);
-            f2_x[k][i] = f2_vals.integrand[k];                                         // G(t + (300-t)x)
+            f2_x[k][i]                    = f2_vals.integrand[k] / POW2(y);                
         }
 
         result.integrand[k] =
             (t[k] - wmin) * DoIntegration(quad->nx, quad->w, f1_x[k]) +
-                (wmax - t[k]) * DoIntegration(quad->nx, quad->w, f2_x[k]);  
-        //(t - 1) * sum_x[G(1 + (t-1)x)] + (300 - t) * sum_x[G(t + (300-t)x)] 
+                (one - y0) * t[k] * DoIntegration(quad->nx, quad->w, f2_x[k]);  
     }
 
     return result;
