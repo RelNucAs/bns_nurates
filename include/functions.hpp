@@ -4931,4 +4931,107 @@ int NMSNearest_find_nearest_index(const BS_REAL value, const BS_REAL* axis,
 }
 
 
+//=====================================================//
+// --- Linear Interpolator Structure (linear axis) --- //
+//=====================================================//
+/* Finds the idx such that the chosen value is bracketed,
+ * without allocating space for the grid's axis.
+ *
+ *      Inputs:
+ *           x:         value to interpolate        [any]
+ *           xmin:      minimum value of the table  [any]
+ *           xmax:      maximum value of the table  [any]
+ *           size:      size of the 1D axis     [/]
+ *           i0:        index 0                 [/]
+ *           t:         relative distance       [/]
+ */
+// If a point is ouside the grid, we clamp it to stay within the borders.
+
+KOKKOS_INLINE_FUNCTION
+void MuonDecay_LinAxisBracket(const BS_REAL x, const BS_REAL xmin, const BS_REAL xmax,
+                              const int size, int& i0, BS_REAL& t)
+{
+     // Points under the lower limit of the grid
+     if (x < xmin){
+          i0 = 0;
+          t = 0.; 
+          return;
+     }
+
+     // Points above the upper limit of the grid
+     if (x >= xmax){ 
+          i0 = size - 2;
+          t = 1.;
+          return;
+     }
+
+     // Points inside limits of the grid
+     const BS_REAL s = (size - 1) * (x - xmin) / (xmax - xmin);  // continuos position
+     i0 = static_cast<int>(s); // s \in [i0, i1]
+     if (i0 > size - 2){
+          i0 = size - 2;
+     }
+     t = s - i0;  // = (x - x_i)/(x_{i+1} - x_i)
+                  // grid is linear and regular
+}
+
+
+//==================================================//
+// --- Linear Interpolator Structure (log axis) --- //
+//==================================================//
+/* Finds the idx such that the chosen value is bracketed,
+ * without allocating space for the grid's axis.
+ *
+ *      Inputs:
+ *           x:         value to interpolate        [any]
+ *           xmin:      minimum value of the table  [any]
+ *           xmax:      maximum value of the table  [any]
+ *           size:      size of the 1D axis     [/]
+ *           i0:        index 0                 [/]
+ *           t:         relative distance       [/]
+ */
+// If a point is ouside the grid, we clamp it to stay within the borders.
+
+KOKKOS_INLINE_FUNCTION
+void MuonDecay_LogAxisBracket(const BS_REAL x, const BS_REAL xmin, const BS_REAL xmax,
+                              const int size, int& i0, BS_REAL& t)
+{
+     // Points under the lower limit of the grid
+     if (x < xmin){
+          i0 = 0;
+          t = 0.; 
+          return;
+     }
+
+     // Points above the upper limit of the grid
+     if (x >= xmax){ 
+          i0 = size - 2;
+          t = 1.;
+          return;
+     }
+
+     // Points inside limits of the grid
+     const BS_REAL lnr = Kokkos::log(xmax / xmin) / (size - 1);
+     i0 = static_cast<int>(Kokkos::log(x / xmin) / lnr); 
+     if (i0 > size - 2){
+          i0 = size - 2;
+     }
+     const BS_REAL xi = xmin * Kokkos::exp(i0 * lnr);
+     const BS_REAL r = Kokkos::exp(lnr);
+     t = (x / xi - 1) / (r - 1);
+     t = Kokkos::fmin(Kokkos::fmax(t, (BS_REAL)0.), (BS_REAL)1.);
+}
+
+// Read muon decay table through the read-only cache
+KOKKOS_FORCEINLINE_FUNCTION
+BS_REAL MuonDecay_Load(const short* __restrict__ p, const int idx)
+{
+#if defined(__CUDA_ARCH__)
+    return (BS_REAL)__ldg(p + idx);
+#else
+    return (BS_REAL)p[idx];
+#endif
+}
+
+
 #endif // BNS_NURATES_SRC_FUNCTIONS_FUNCTIONS_HPP_

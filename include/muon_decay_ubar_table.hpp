@@ -15,6 +15,9 @@ constexpr BS_REAL MuonDecay_T_axis[20] = {
     65.55451795, 86.63820982, 114.50285407, 151.32934551, 200.0
 };
 constexpr int MuonDecay_T_dims = 20;
+// Max and min values for T
+constexpr BS_REAL MuonDecay_T_max = MuonDecay_T_axis[MuonDecay_T_dims - 1];
+constexpr BS_REAL MuonDecay_T_min = MuonDecay_T_axis[0];
 
 // Electron chemical potential (40 points between [0,300] MeV, lin scale)
 constexpr BS_REAL MuonDecay_mu_axis[40] = {
@@ -28,6 +31,9 @@ constexpr BS_REAL MuonDecay_mu_axis[40] = {
     269.23076923, 276.92307692, 284.61538462, 292.30769231, 300.0
 };
 constexpr int MuonDecay_mu_dims = 40;
+// Max and min values for mu
+constexpr BS_REAL MuonDecay_mu_max = MuonDecay_mu_axis[MuonDecay_mu_dims - 1];
+constexpr BS_REAL MuonDecay_mu_min = MuonDecay_mu_axis[0];
 
 // Numu(anumu for anti-muon decay) neutrino energy (40 points between [1,300] MeV, log scale)
 constexpr BS_REAL MuonDecay_w_mu_axis[40] = {

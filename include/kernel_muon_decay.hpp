@@ -20,8 +20,6 @@
 #include "muon_decay_ubar_table.hpp"
 
 
-#if !defined(__CUDA_ARCH__) && !defined(__SYCL_DEVICE_ONLY__)  // muon decay table data lives in CPU memory only
-
 // Analytical Expression of Inverse Muon Decay kernel [MeV^-2]
 KOKKOS_INLINE_FUNCTION
 BS_REAL InverseMuonDecayKernel_Analytical(const BS_REAL T, const BS_REAL mu_el, 
@@ -142,7 +140,7 @@ BS_REAL InverseAntiMuonDecayKernel_Analytical(const BS_REAL T, const BS_REAL mu_
                 ) / Kokkos::pow(x4, 2.5)
             );
 }
-
+ 
 
 /* 4D linear interpolation of the numerical table of u_bar(int16)
  *
@@ -164,91 +162,60 @@ BS_REAL InverseAntiMuonDecayKernel_Analytical(const BS_REAL T, const BS_REAL mu_
  */
 
 KOKKOS_INLINE_FUNCTION
-Decay_ubar_int16 ubar_int16_interpolator(const BS_REAL T, const BS_REAL mu, const BS_REAL w_mu,
-                                                const BS_REAL w_e)
+Decay_ubar_int16 ubar_int16_interpolator(const BS_REAL T, const BS_REAL mu, 
+                                         const BS_REAL w_mu, const BS_REAL w_e,
+                                        const short* tab_mu, const short* tab_amu)
 {
 
-    int i0, i1, j0, j1, k0, k1, l0, l1;
-    BS_REAL tx, ty, tz, tw;
     Decay_ubar_int16 out;
 
-    if (MuonLinear_find_bracketing_indices(T, MuonDecay_T_axis, MuonDecay_T_dims, &i0, &i1, &tx) < 0 or
-        MuonLinear_find_bracketing_indices(mu, MuonDecay_mu_axis, MuonDecay_mu_dims, &j0, &j1, &ty) < 0 or
-        MuonLinear_find_bracketing_indices(w_mu, MuonDecay_w_mu_axis, MuonDecay_w_mu_dims, &k0, &k1, &tz) < 0 or
-        MuonLinear_find_bracketing_indices(w_e, MuonDecay_w_e_axis, MuonDecay_w_e_dims, &l0, &l1, &tw) < 0)
-    {
-        out.ubar_int16_muon_decay = -2.;
-        out.ubar_int16_anti_muon_decay = -2.;
+// Keep mwe.cpp and CPU tests working
+#if !defined(__CUDA_ARCH__) && !defined(__SYCL_DEVICE_ONLY__) && !defined(__HIP_DEVICE_COMPILE__)
+    if (tab_mu  == nullptr) tab_mu  = muon_decay_ubar_int16_data;
+    if (tab_amu == nullptr) tab_amu = anti_muon_decay_ubar_int16_data;
+#endif
+
+    // If there are no tables, return an interpolation error
+    if (tab_mu == nullptr || tab_amu == nullptr){
+        out.ubar_int16_muon_decay       = -65536.;
+        out.ubar_int16_anti_muon_decay  = -65536.;
         return out;
     }
 
-// macro to access the 1D array
-#define MuonDecay_IDX(i, j, k, l)                                                        \
-    (((i * MuonDecay_mu_dims + j) * MuonDecay_w_mu_dims + k) * MuonDecay_w_e_dims + l)
+    int i0, j0, k0, l0;
+    BS_REAL tx, ty, tz, tw;
 
-    BS_REAL a0 = (one - tx), a1 = tx;
-    BS_REAL b0 = (one - ty), b1 = ty;
-    BS_REAL c0 = (one - tz), c1 = tz;
-    BS_REAL d0 = (one - tw), d1 = tw;
+    MuonDecay_LogAxisBracket(T, MuonDecay_T_min, MuonDecay_T_max, MuonDecay_T_dims, i0, tx);
+    MuonDecay_LinAxisBracket(mu, MuonDecay_mu_min, MuonDecay_mu_max, MuonDecay_mu_dims, j0, ty);
+    MuonDecay_LogAxisBracket(w_mu, MuonDecay_w_mu_min, MuonDecay_w_mu_max, MuonDecay_w_mu_dims, k0, tz);
+    MuonDecay_LogAxisBracket(w_e, MuonDecay_w_e_min, MuonDecay_w_e_max, MuonDecay_w_e_dims, l0, tw);
 
-    // Extract the 16 vertexes of the hypercube for ubar_int16
-    // Then compute the interpolated value.
+    BS_REAL res_mu = 0., res_amu = 0.;
 
-    // Muon decay
-    BS_REAL ubar_int16_c0000 = muon_decay_ubar_int16_data[MuonDecay_IDX(i0, j0, k0, l0)];
-    BS_REAL ubar_int16_c0001 = muon_decay_ubar_int16_data[MuonDecay_IDX(i0, j0, k0, l1)];
-    BS_REAL ubar_int16_c0010 = muon_decay_ubar_int16_data[MuonDecay_IDX(i0, j0, k1, l0)];
-    BS_REAL ubar_int16_c0011 = muon_decay_ubar_int16_data[MuonDecay_IDX(i0, j0, k1, l1)];
-    BS_REAL ubar_int16_c0100 = muon_decay_ubar_int16_data[MuonDecay_IDX(i0, j1, k0, l0)];
-    BS_REAL ubar_int16_c0101 = muon_decay_ubar_int16_data[MuonDecay_IDX(i0, j1, k0, l1)];
-    BS_REAL ubar_int16_c0110 = muon_decay_ubar_int16_data[MuonDecay_IDX(i0, j1, k1, l0)];
-    BS_REAL ubar_int16_c0111 = muon_decay_ubar_int16_data[MuonDecay_IDX(i0, j1, k1, l1)];
-    BS_REAL ubar_int16_c1000 = muon_decay_ubar_int16_data[MuonDecay_IDX(i1, j0, k0, l0)];
-    BS_REAL ubar_int16_c1001 = muon_decay_ubar_int16_data[MuonDecay_IDX(i1, j0, k0, l1)];
-    BS_REAL ubar_int16_c1010 = muon_decay_ubar_int16_data[MuonDecay_IDX(i1, j0, k1, l0)];
-    BS_REAL ubar_int16_c1011 = muon_decay_ubar_int16_data[MuonDecay_IDX(i1, j0, k1, l1)];
-    BS_REAL ubar_int16_c1100 = muon_decay_ubar_int16_data[MuonDecay_IDX(i1, j1, k0, l0)];
-    BS_REAL ubar_int16_c1101 = muon_decay_ubar_int16_data[MuonDecay_IDX(i1, j1, k0, l1)];
-    BS_REAL ubar_int16_c1110 = muon_decay_ubar_int16_data[MuonDecay_IDX(i1, j1, k1, l0)];
-    BS_REAL ubar_int16_c1111 = muon_decay_ubar_int16_data[MuonDecay_IDX(i1, j1, k1, l1)];
+    // Consider 16 vertices of the hypercube
+    for (int v = 0; v < 16; ++v){
+        // Use binary representation to extract cube vertices (eg. 1=0001)
+        const int a = (v >> 3) & 1; //fourth bit, T dimension
+        const int b = (v >> 2) & 1; //third bit, mu dimension
+        const int c = (v >> 1) & 1; //second bit, w_mu dimension
+        const int d = v & 1;        //first bit, w_e dimension
 
-    out.ubar_int16_muon_decay = ubar_int16_c0000 * a0 * b0 * c0 * d0 + ubar_int16_c0001 * a0 * b0 * c0 * d1 +
-                                ubar_int16_c0010 * a0 * b0 * c1 * d0 + ubar_int16_c0011 * a0 * b0 * c1 * d1 +
-                                ubar_int16_c0100 * a0 * b1 * c0 * d0 + ubar_int16_c0101 * a0 * b1 * c0 * d1 +
-                                ubar_int16_c0110 * a0 * b1 * c1 * d0 + ubar_int16_c0111 * a0 * b1 * c1 * d1 +
-                                ubar_int16_c1000 * a1 * b0 * c0 * d0 + ubar_int16_c1001 * a1 * b0 * c0 * d1 +
-                                ubar_int16_c1010 * a1 * b0 * c1 * d0 + ubar_int16_c1011 * a1 * b0 * c1 * d1 +
-                                ubar_int16_c1100 * a1 * b1 * c0 * d0 + ubar_int16_c1101 * a1 * b1 * c0 * d1 +
-                                ubar_int16_c1110 * a1 * b1 * c1 * d0 + ubar_int16_c1111 * a1 * b1 * c1 * d1;
+        // Depending on (a,b,c,d), compute the weight of the vertex
+        const BS_REAL wgt = (a ? tx : 1. - tx) * (b ? ty : 1. - ty)
+                          * (c ? tz : 1. - tz) * (d ? tw : 1. - tw);
+        
+        // Index for the ubar vector
+        const int idx = (((i0 + a) * MuonDecay_mu_dims + (j0 + b)) * MuonDecay_w_mu_dims
+                        + (k0 + c)) * MuonDecay_w_e_dims + (l0 + d);
 
-    // Anti-Muon decay
-    ubar_int16_c0000 = anti_muon_decay_ubar_int16_data[MuonDecay_IDX(i0, j0, k0, l0)];
-    ubar_int16_c0001 = anti_muon_decay_ubar_int16_data[MuonDecay_IDX(i0, j0, k0, l1)];
-    ubar_int16_c0010 = anti_muon_decay_ubar_int16_data[MuonDecay_IDX(i0, j0, k1, l0)];
-    ubar_int16_c0011 = anti_muon_decay_ubar_int16_data[MuonDecay_IDX(i0, j0, k1, l1)];
-    ubar_int16_c0100 = anti_muon_decay_ubar_int16_data[MuonDecay_IDX(i0, j1, k0, l0)];
-    ubar_int16_c0101 = anti_muon_decay_ubar_int16_data[MuonDecay_IDX(i0, j1, k0, l1)];
-    ubar_int16_c0110 = anti_muon_decay_ubar_int16_data[MuonDecay_IDX(i0, j1, k1, l0)];
-    ubar_int16_c0111 = anti_muon_decay_ubar_int16_data[MuonDecay_IDX(i0, j1, k1, l1)];
-    ubar_int16_c1000 = anti_muon_decay_ubar_int16_data[MuonDecay_IDX(i1, j0, k0, l0)];
-    ubar_int16_c1001 = anti_muon_decay_ubar_int16_data[MuonDecay_IDX(i1, j0, k0, l1)];
-    ubar_int16_c1010 = anti_muon_decay_ubar_int16_data[MuonDecay_IDX(i1, j0, k1, l0)];
-    ubar_int16_c1011 = anti_muon_decay_ubar_int16_data[MuonDecay_IDX(i1, j0, k1, l1)];
-    ubar_int16_c1100 = anti_muon_decay_ubar_int16_data[MuonDecay_IDX(i1, j1, k0, l0)];
-    ubar_int16_c1101 = anti_muon_decay_ubar_int16_data[MuonDecay_IDX(i1, j1, k0, l1)];
-    ubar_int16_c1110 = anti_muon_decay_ubar_int16_data[MuonDecay_IDX(i1, j1, k1, l0)];
-    ubar_int16_c1111 = anti_muon_decay_ubar_int16_data[MuonDecay_IDX(i1, j1, k1, l1)];
+        // Sum weighted values at each vertex
+        res_mu += wgt * MuonDecay_Load(tab_mu, idx);
+        res_amu += wgt * MuonDecay_Load(tab_amu, idx);
+    }
 
-    out.ubar_int16_anti_muon_decay = ubar_int16_c0000 * a0 * b0 * c0 * d0 + ubar_int16_c0001 * a0 * b0 * c0 * d1 +
-                                     ubar_int16_c0010 * a0 * b0 * c1 * d0 + ubar_int16_c0011 * a0 * b0 * c1 * d1 +
-                                     ubar_int16_c0100 * a0 * b1 * c0 * d0 + ubar_int16_c0101 * a0 * b1 * c0 * d1 +
-                                     ubar_int16_c0110 * a0 * b1 * c1 * d0 + ubar_int16_c0111 * a0 * b1 * c1 * d1 +
-                                     ubar_int16_c1000 * a1 * b0 * c0 * d0 + ubar_int16_c1001 * a1 * b0 * c0 * d1 +
-                                     ubar_int16_c1010 * a1 * b0 * c1 * d0 + ubar_int16_c1011 * a1 * b0 * c1 * d1 +
-                                     ubar_int16_c1100 * a1 * b1 * c0 * d0 + ubar_int16_c1101 * a1 * b1 * c0 * d1 +
-                                     ubar_int16_c1110 * a1 * b1 * c1 * d0 + ubar_int16_c1111 * a1 * b1 * c1 * d1;
-
-#undef MuonDecay_IDX
+    // Return interpolated values
+    out.ubar_int16_muon_decay      = res_mu;
+    out.ubar_int16_anti_muon_decay = res_amu;
 
     return out;
 }
@@ -260,7 +227,7 @@ Decay_ubar_int16 ubar_int16_interpolator(const BS_REAL T, const BS_REAL mu, cons
 //================================================//
 /* Interpolate ubar grid + Analytical expression
  *
- * NOTE: this function is just for points inside the ranges of the 4D table!
+ * NOTE: points outside the ranges of the 4D table are mapped to the borders!
  *
  *      Inputs:
  *          T:          temperature                    [MeV]
@@ -297,6 +264,9 @@ MyKernelOutput MuonDecayKernels(MuonDecayKernelParams* kernel_params,
     const BS_REAL det_bal_arg_amudec   = (mu_antimu - mu_pos - w_mu - w_e) / T;
     const BS_REAL det_bal_amudec       = SafeExp(det_bal_arg_amudec);
 
+    const short* tab_mu = kernel_params->ubar_mu_table;
+    const short* tab_amu = kernel_params->ubar_amu_table;
+
     MyKernelOutput mudec_kernel = {0.};
 
     // Spectral integrals related to numu are performed along anue 
@@ -311,8 +281,8 @@ MyKernelOutput MuonDecayKernels(MuonDecayKernelParams* kernel_params,
     // and we consider only the id_num(id_anum for anti-muon decay) term.
 
     // Interpolate u_bar in both cases
-    Decay_ubar_int16 out_wmu_we = ubar_int16_interpolator(T, mu_el, w_mu, w_e);
-    Decay_ubar_int16 out_we_wmu = ubar_int16_interpolator(T, mu_el, w_e, w_mu); 
+    Decay_ubar_int16 out_wmu_we = ubar_int16_interpolator(T, mu_el, w_mu, w_e, tab_mu, tab_amu);
+    Decay_ubar_int16 out_we_wmu = ubar_int16_interpolator(T, mu_el, w_e, w_mu, tab_mu, tab_amu); 
 
     // Muon Decay (mu <--> el + numu + anue)
     // nu_mu
@@ -358,18 +328,5 @@ MyKernelOutput MuonDecayKernels(MuonDecayKernelParams* kernel_params,
 
     return mudec_kernel;
 }
-
-#else  // __CUDA_ARCH__ || __SYCL_DEVICE_ONLY__ — muon decay is host-only; provide a stub so device code links
-
-KOKKOS_INLINE_FUNCTION
-MyKernelOutput MuonDecayKernels(MuonDecayKernelParams* /*kernel_params*/,
-                                MyEOSParams* /*eos_params*/)
-{
-    MyKernelOutput mudec_kernel = {0};
-    return mudec_kernel;
-}
-
-#endif  // !__CUDA_ARCH__ && !__SYCL_DEVICE_ONLY__
-
 
 #endif // BNS_NURATES_INCLUDE_KERNEL_MUON_DECAY_HPP_

@@ -307,8 +307,10 @@ struct Decay_ubar_int16{
  */
 struct MuonDecayKernelParams
 {
-    BS_REAL omega_mu;       // muon (anti)neutrino energy
-    BS_REAL omega_e;        // electron (anti)neutrino energy
+    BS_REAL omega_mu;            // muon (anti)neutrino energy
+    BS_REAL omega_e;             // electron (anti)neutrino energy
+    const short* ubar_mu_table;  // ubar int16 data for muon decay
+    const short* ubar_amu_table; // ubar int16 data for anti-muon decay
 };
 typedef struct MuonDecayKernelParams MuonDecayKernelParams;
 
