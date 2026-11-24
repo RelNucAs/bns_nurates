@@ -5023,7 +5023,7 @@ void MuonDecay_LogAxisBracket(const BS_REAL x, const BS_REAL xmin, const BS_REAL
 }
 
 // Read muon decay table through the read-only cache
-KOKKOS_FORCEINLINE_FUNCTION
+KOKKOS_INLINE_FUNCTION
 BS_REAL MuonDecay_Load(const short* __restrict__ p, const int idx)
 {
 #if defined(__CUDA_ARCH__)
