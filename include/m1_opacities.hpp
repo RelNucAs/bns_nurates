@@ -2226,9 +2226,11 @@ void NMASCellFused(GreyOpacityParams* gop, BS_REAL nu, BS_REAL nu_bar,
     }
 }
 
-// Fused inelastic-scattering (NEPS) double integral.  Equivalent to:
-//   M1MatrixKokkos2D m = ComputeNMSSIntegrand(quad, t, gop, stim_abs);
-//   GaussLegendreIntegrate2DMatrixForNMS(quad, &m, t, n2d, e2d);
+// Fused inelastic-scattering (NMAS) double integral.  Equivalent to:
+//   M1MatrixKokkos2D m = ComputeNMASIntegrand(quad, t, gop, stim_abs);
+//   GaussLegendreIntegrate2DMatrixForNMAS(quad, &m, t, n2d, e2d);
+// However, here a new mapping is implemented: linear in [1, t] and reciprocal
+// in [t, 300].
 KOKKOS_INLINE_FUNCTION
 void AddNMASDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t, const BS_REAL umin,
                                 const BS_REAL umax, GreyOpacityParams* gop,
@@ -2240,7 +2242,7 @@ void AddNMASDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t, const BS_RE
     const bool neglect_blocking = gop->opacity_pars.neglect_blocking;
     BS_REAL u1, u2, min1, min2;
     BS_REAL prefactor1, prefactor2;
-    const BS_REAL y0 = t / umax;
+    const BS_REAL z0 = t / umax;
 
     BS_REAL acc_n_em[total_num_species] = {0}, acc_n_ab[total_num_species] = {0};
     BS_REAL acc_e_em[total_num_species] = {0}, acc_e_ab[total_num_species] = {0};
@@ -2249,14 +2251,14 @@ void AddNMASDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t, const BS_RE
     {
         const BS_REAL x_i  = quad->points[i];
         const BS_REAL w_i  = quad->w[i];
-        const BS_REAL y_i = y0 + (one - y0) * x_i;
+        const BS_REAL z_i = z0 + (one - z0) * x_i;
 
         u1 = umin + (t - umin) * x_i;
-        u2 = t / y_i;
+        u2 = t / z_i;
         min1 = Kokkos::fmin(u1 - umin, umax - u1);
         min2 = Kokkos::fmin(u2 - umin, umax - u2);
         prefactor1 = (t - umin) * min1;
-        prefactor2 = (one - y0) * (t / POW2(y_i)) * min2;
+        prefactor2 = (one - z0) * (t / POW2(z_i)) * min2;
 
         for (int j = 0; j < n; ++j)
         {
@@ -2379,23 +2381,28 @@ void MuDecayCellFused(GreyOpacityParams* gop, BS_REAL nu_mu, BS_REAL nu_e,
 
 
 // Fused (anti)muon decay double integral.  Equivalent to:
-//   M1MatrixKokkos2D m = ComputeNEPSIntegrand(quad, t, gop, stim_abs);
-//   GaussLegendreIntegrate2DMatrixForNEPS(quad, &m, t, n2d, e2d);
+//   M1MatrixKokkos2D m = ComputeMuDeacayIntegrand(quad, t, gop, stim_abs);
+//   GaussLegendreIntegrate2DMatrixForMuDecay(quad, &m, t, n2d, e2d);
+// However, here a new mapping is used: linear in [1, t] and
+// reciprocal in [t, 300].
 KOKKOS_INLINE_FUNCTION
 void AddMuDecayDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
                                 GreyOpacityParams* gop, const int stim_abs,
                                 MyQuadratureIntegrand* n2d,
                                 MyQuadratureIntegrand* e2d)
 {
-    constexpr BS_REAL half = 0.5, one = 1;
+    constexpr BS_REAL one = 1.0;
     const int n = quad->nx;
     const bool neglect_blocking = gop->opacity_pars.neglect_blocking;
     constexpr BS_REAL max = MuonDecay_w_mu_max;
     constexpr BS_REAL min = MuonDecay_w_mu_min;
-    BS_REAL prefactor_1 = (t - min) * (t - min);
-    BS_REAL prefactor_2 = (t - min) * (max - t);
-    BS_REAL prefactor_3 = (max - t) * (max - t);
+    const BS_REAL z0 = t / max;
+    const BS_REAL prefactor_1 = POW2(t - min);
+    const BS_REAL prefactor_2 = t * (t - min) * (one - z0);
+    const BS_REAL prefactor_3 = POW2(t) * POW2(one - z0);
     BS_REAL w_mu[2], w_e[2];
+    BS_REAL z_i, z_j;
+    BS_REAL inv_squared_zi, inv_squared_zj, inv_squared_z_product;
 
     BS_REAL acc_n_em[total_num_species] = {0}, acc_n_ab[total_num_species] = {0};
     BS_REAL acc_e_em[total_num_species] = {0}, acc_e_ab[total_num_species] = {0};
@@ -2404,16 +2411,21 @@ void AddMuDecayDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
     {
         const BS_REAL x_i  = quad->points[i];
         const BS_REAL w_i  = quad->w[i];
+        z_i = z0 + (one - z0) * x_i;
+        inv_squared_zi = one / POW2(z_i);
         w_mu[0] = min + (t - min) * x_i;
-        w_mu[1] = t + (max - t) * x_i;
+        w_mu[1] = t / z_i;
 
         for (int j = 0; j < n; ++j)
         {
             const BS_REAL x_j  = quad->points[j];
             const BS_REAL w_ij = w_i * quad->w[j];
-
+            z_j = z0 + (one - z0) * x_j;
+            inv_squared_zj = one / POW2(z_j);
             w_e[0] = min + (t - min) * x_j;
-            w_e[1] = t + (max - t) * x_j;
+            w_e[1] = t / z_j;
+
+            inv_squared_z_product = inv_squared_zi * inv_squared_zj;
 
             BS_REAL em_ij[total_num_species],  ab_ij[total_num_species];
             BS_REAL em_inj[total_num_species], ab_inj[total_num_species];
@@ -2432,48 +2444,50 @@ void AddMuDecayDoubleIntegralFused(const MyQuadrature* quad, BS_REAL t,
             for (int s = 0; s < total_num_species - 2; ++s)
             {
                 acc_n_em[s] += w_ij * (prefactor_1 * em_ij[s] +
-                                       prefactor_2 * (em_inj[s] + em_nij[s]) +
-                                       prefactor_3 * em_ninj[s]);
+                                       prefactor_2 * (inv_squared_zj * em_inj[s] + 
+                                                      inv_squared_zi * em_nij[s]) +
+                                       prefactor_3 * inv_squared_z_product * em_ninj[s]);
 
                 acc_n_ab[s] += w_ij * (prefactor_1 * ab_ij[s] +
-                                       prefactor_2 * (ab_inj[s] + ab_nij[s]) + 
-                                       prefactor_3 * ab_ninj[s]);
+                                       prefactor_2 * (inv_squared_zj * ab_inj[s] + 
+                                                      inv_squared_zi * ab_nij[s]) + 
+                                       prefactor_3 * inv_squared_z_product * ab_ninj[s]);
             }
 
             // Energy, emissivity
             acc_e_em[id_nue] += w_ij * (prefactor_1 * w_e[0] * em_ij[id_nue] +
-                                         prefactor_2 * (w_e[1] * em_inj[id_nue] +
-                                                  w_e[0] * em_nij[id_nue]) + 
-                                         prefactor_3 * w_e[1] * em_ninj[id_nue]);
+                                        prefactor_2 * (inv_squared_zj * w_e[1] * em_inj[id_nue] +
+                                                       inv_squared_zi * w_e[0] * em_nij[id_nue]) + 
+                                        prefactor_3 * inv_squared_z_product * w_e[1] * em_ninj[id_nue]);
             acc_e_em[id_anue] += w_ij * (prefactor_1 * w_e[0] * em_ij[id_anue] +
-                                         prefactor_2 * (w_e[1] * em_inj[id_anue] +
-                                                  w_e[0] * em_nij[id_anue]) + 
-                                         prefactor_3 * w_e[1] * em_ninj[id_anue]);
+                                         prefactor_2 * (inv_squared_zj * w_e[1] * em_inj[id_anue] +
+                                                        inv_squared_zi * w_e[0] * em_nij[id_anue]) + 
+                                         prefactor_3 * inv_squared_z_product * w_e[1] * em_ninj[id_anue]);
             acc_e_em[id_num] += w_ij * (prefactor_1 * w_mu[0] * em_ij[id_num] +
-                                        prefactor_2 * (w_mu[0] * em_inj[id_num] +
-                                                  w_mu[1] * em_nij[id_num]) + 
-                                        prefactor_3 * w_mu[1] * em_ninj[id_num]);
+                                        prefactor_2 * (inv_squared_zj * w_mu[0] * em_inj[id_num] +
+                                                       inv_squared_zi * w_mu[1] * em_nij[id_num]) + 
+                                        prefactor_3 * inv_squared_z_product * w_mu[1] * em_ninj[id_num]);
             acc_e_em[id_anum] += w_ij * (prefactor_1 * w_mu[0] * em_ij[id_anum] +
-                                         prefactor_2 * (w_mu[0] * em_inj[id_anum] +
-                                                  w_mu[1] * em_nij[id_anum]) + 
-                                         prefactor_3 * w_mu[1] * em_ninj[id_anum]);
+                                         prefactor_2 * (inv_squared_zj * w_mu[0] * em_inj[id_anum] +
+                                                        inv_squared_zi * w_mu[1] * em_nij[id_anum]) + 
+                                         prefactor_3 * inv_squared_z_product * w_mu[1] * em_ninj[id_anum]);
             // Energy, absorsivity
             acc_e_ab[id_nue] += w_ij * (prefactor_1 * w_e[0] * ab_ij[id_nue] +
-                                         prefactor_2 * (w_e[1] * ab_inj[id_nue] +
-                                                  w_e[0] * ab_nij[id_nue]) + 
-                                         prefactor_3 * w_e[1] * ab_ninj[id_nue]);
+                                        prefactor_2 * (inv_squared_zj * w_e[1] * ab_inj[id_nue] +
+                                                       inv_squared_zi * w_e[0] * ab_nij[id_nue]) + 
+                                        prefactor_3 * inv_squared_z_product * w_e[1] * ab_ninj[id_nue]);
             acc_e_ab[id_anue] += w_ij * (prefactor_1 * w_e[0] * ab_ij[id_anue] +
-                                         prefactor_2 * (w_e[1] * ab_inj[id_anue] +
-                                                  w_e[0] * ab_nij[id_anue]) + 
-                                         prefactor_3 * w_e[1] * ab_ninj[id_anue]);
+                                         prefactor_2 * (inv_squared_zj * w_e[1] * ab_inj[id_anue] +
+                                                        inv_squared_zi * w_e[0] * ab_nij[id_anue]) + 
+                                         prefactor_3 * inv_squared_z_product * w_e[1] * ab_ninj[id_anue]);
             acc_e_ab[id_num] += w_ij * (prefactor_1 * w_mu[0] * ab_ij[id_num] +
-                                        prefactor_2 * (w_mu[0] * ab_inj[id_num] +
-                                                  w_mu[1] * ab_nij[id_num]) + 
-                                        prefactor_3 * w_mu[1] * ab_ninj[id_num]);
+                                        prefactor_2 * (inv_squared_zj * w_mu[0] * ab_inj[id_num] +
+                                                       inv_squared_zi * w_mu[1] * ab_nij[id_num]) + 
+                                        prefactor_3 * inv_squared_z_product * w_mu[1] * ab_ninj[id_num]);
             acc_e_ab[id_anum] += w_ij * (prefactor_1 * w_mu[0] * ab_ij[id_anum] +
-                                         prefactor_2 * (w_mu[0] * ab_inj[id_anum] +
-                                                  w_mu[1] * ab_nij[id_anum]) + 
-                                         prefactor_3 * w_mu[1] * ab_ninj[id_anum]);
+                                         prefactor_2 * (inv_squared_zj * w_mu[0] * ab_inj[id_anum] +
+                                                        inv_squared_zi * w_mu[1] * ab_nij[id_anum]) + 
+                                         prefactor_3 * inv_squared_z_product * w_mu[1] * ab_ninj[id_anum]);
         }
     }
 

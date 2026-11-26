@@ -563,14 +563,14 @@ MuonReactionsGaussLegendreIntegrate1D(MyQuadrature* quad,
     BS_REAL f1_x[num_max_integrands][BS_N_MAX],
         f2_x[num_max_integrands][BS_N_MAX];
     BS_REAL var[2];
-    BS_REAL y0, y;
+    BS_REAL z0, z;
     MyQuadratureIntegrand result;
 
     result.n = num_integrands;
 
     for (int k = 0; k < num_integrands; ++k)
     {
-        y0 = t[k] / wmax;
+        z0 = t[k] / wmax;
 
         for (int i = 0; i < quad->nx; ++i)
         {
@@ -579,16 +579,15 @@ MuonReactionsGaussLegendreIntegrate1D(MyQuadrature* quad,
             MyQuadratureIntegrand f1_vals = func->function(var, func->params);
             f1_x[k][i]                    = f1_vals.integrand[k];                      
 
-            //var[0]                        = t[k] + (wmax - t[k]) * quad->points[i];  // t + (300-t)x
-            y = y0 + (1 - y0) * quad->points[i];
-            var[0]                        = t[k] / y;  
+            z = z0 + (one - z0) * quad->points[i];
+            var[0]                        = t[k] / z;  
             MyQuadratureIntegrand f2_vals = func->function(var, func->params);
-            f2_x[k][i]                    = f2_vals.integrand[k] / POW2(y);                
+            f2_x[k][i]                    = f2_vals.integrand[k] / POW2(z);                
         }
 
         result.integrand[k] =
             (t[k] - wmin) * DoIntegration(quad->nx, quad->w, f1_x[k]) +
-                (one - y0) * t[k] * DoIntegration(quad->nx, quad->w, f2_x[k]);  
+                (one - z0) * t[k] * DoIntegration(quad->nx, quad->w, f2_x[k]);  
     }
 
     return result;
