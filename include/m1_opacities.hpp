@@ -3084,7 +3084,7 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     constexpr BS_REAL four = 4;
     constexpr BS_REAL two = 2;
     constexpr BS_REAL c_light = kBS_Clight;
-    BS_REAL umin, umax, vmax;
+    BS_REAL umin, umax;
     BS_REAL dQ = kBS_Q;
     BS_REAL dU = 0.;
     // Mean field corrections
@@ -3099,13 +3099,11 @@ M1OpacitiesNonThermalSeparated ComputeM1OpacitiesGenericFormalismNonThermalSepar
     {
         umin = NMAS_w_min + NMAS_wp_min;
         umax = NMAS_w_max + NMAS_wp_max;
-        vmax = NMAS_w_max - NMAS_wp_min;
     }
     else if (my_grey_opacity_params->opacity_pars.NMAS_implementation == NMAS_SemiAnalytical)
     {
         umin = NMASParams_w_min + NMASParams_wp_min;
         umax = NMASParams_w_max + NMASParams_wp_max;
-        vmax = NMASParams_w_max - NMASParams_wp_min;
     }
 
     BS_REAL n[total_num_species];
@@ -4028,7 +4026,6 @@ SpectralOpacities ComputeSpectralOpacitiesNotStimulatedAbs(
 {
     constexpr BS_REAL zero    = 0;
     constexpr BS_REAL one     = 1;
-    constexpr BS_REAL two_over_three = 2. / 3.;
     constexpr BS_REAL four_pi = 4 * kBS_Pi;
     constexpr BS_REAL c_light = kBS_Clight;
     constexpr BS_REAL Mmu_over_three = kBS_Mmu / 3.;
